@@ -135,6 +135,14 @@
         (suggestSearch)="onSuggestSearch($event)"
       ></app-search-results>
     </div>
+
+    <!-- On-Screen Debug Console for Diagnostics -->
+    <div class="debug-panel" style="margin: 40px auto 20px; max-width: 1400px; padding: 16px; background: rgba(5,5,12,0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-family: monospace; font-size: 0.82rem; color: #10b981; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <h4 style="margin: 0 0 10px; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px; font-weight: 600;">🔧 GanaTube System Debug Console</h4>
+      <div *ngIf="debugLogs.length === 0" style="color: rgba(255,255,255,0.4);">No logs recorded.</div>
+      <div *ngFor="let log of debugLogs" style="margin-bottom: 6px; line-height: 1.4; border-bottom: 1px dashed rgba(255,255,255,0.05); padding-bottom: 4px;">{{ log }}</div>
+    </div>
+
   </main>
 
   <!-- Fixed Music Player -->

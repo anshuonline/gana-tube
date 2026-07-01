@@ -35,6 +35,8 @@ export class App implements OnInit {
   hasSearched = signal<boolean>(false);
   apiKeyMissing = false;
 
+  debugLogs: string[] = [];
+
   // Recommendation Shelves using Signals to trigger zoneless CD instantly
   trendingIndia = signal<YouTubeSearchResult[]>([]);
   bollywoodHits = signal<YouTubeSearchResult[]>([]);
@@ -59,7 +61,19 @@ export class App implements OnInit {
     }
   }
 
+  logDebug(msg: string): void {
+    console.log(msg);
+    this.debugLogs.push(`${new Date().toLocaleTimeString()} - ${msg}`);
+  }
+
+  logError(msg: string, err: any): void {
+    console.error(msg, err);
+    const errMsg = err?.message || err?.statusText || JSON.stringify(err);
+    this.debugLogs.push(`${new Date().toLocaleTimeString()} - ❌ ERROR: ${msg} (${errMsg})`);
+  }
+
   ngOnInit(): void {
+    this.logDebug('App initialized. Checking API key...');
     this.apiKeyMissing =
       !environment.youtubeApiKey ||
       environment.youtubeApiKey === 'YOUR_YOUTUBE_API_KEY_HERE';
@@ -80,14 +94,14 @@ export class App implements OnInit {
 
   loadRecommendationShelves(): void {
     this.shelvesLoading.set(true);
-    console.log('Initializing GanaTube recommendation shelves...');
+    this.logDebug('Initializing GanaTube recommendation shelves...');
 
     let loadedCount = 0;
     const checkDone = () => {
       loadedCount++;
       if (loadedCount >= 3) {
         this.shelvesLoading.set(false);
-        console.log('All recommendation shelves loading lifecycle complete.');
+        this.logDebug('All recommendation shelves loading lifecycle complete.');
       }
     };
 
@@ -95,12 +109,12 @@ export class App implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          console.log(`Trending India Shelf loaded successfully. Count: ${res.length}`);
+          this.logDebug(`Trending India Shelf loaded. Count: ${res.length}`);
           this.trendingIndia.set(res);
           checkDone();
         },
         error: (err) => {
-          console.error('Failed to load Trending India shelf:', err);
+          this.logError('Failed to load Trending India shelf', err);
           checkDone();
         }
       });
@@ -109,12 +123,12 @@ export class App implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          console.log(`Bollywood Hits Shelf loaded successfully. Count: ${res.length}`);
+          this.logDebug(`Bollywood Hits Shelf loaded. Count: ${res.length}`);
           this.bollywoodHits.set(res);
           checkDone();
         },
         error: (err) => {
-          console.error('Failed to load Bollywood Hits shelf:', err);
+          this.logError('Failed to load Bollywood Hits shelf', err);
           checkDone();
         }
       });
@@ -123,12 +137,12 @@ export class App implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          console.log(`Chill & Lo-Fi Shelf loaded successfully. Count: ${res.length}`);
+          this.logDebug(`Chill & Lo-Fi Shelf loaded. Count: ${res.length}`);
           this.lofiRelax.set(res);
           checkDone();
         },
         error: (err) => {
-          console.error('Failed to load Lo-Fi shelf:', err);
+          this.logError('Failed to load Lo-Fi shelf', err);
           checkDone();
         }
       });
