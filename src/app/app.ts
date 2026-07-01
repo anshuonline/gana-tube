@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucidePlay } from '@lucide/angular';
+import { LucideDisc3 } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -18,7 +18,6 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
   imports: [
     CommonModule,
     LucideDisc3,
-    LucidePlay,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -26,6 +25,7 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class App implements OnInit {
   @ViewChild(SearchBarComponent) searchBar!: SearchBarComponent;

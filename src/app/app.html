@@ -35,7 +35,7 @@
     <div class="results-container">
       
       <!-- Recommendation Shelves (Home Screen) -->
-      <div class="recommendations-wrap" *ngIf="!hasSearched && !isLoading && !shelvesLoading()">
+      <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !shelvesLoading()">
         
         <!-- Shelf 1: Trending in India -->
         <div class="shelf-section" *ngIf="trendingIndia().length > 0">
@@ -49,7 +49,7 @@
                     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                   </div>
                   <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
-                    <svg lucidePlay [attr.size]="28"></svg>
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
                   </button>
                 </div>
               </div>
@@ -73,7 +73,7 @@
                     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                   </div>
                   <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
-                    <svg lucidePlay [attr.size]="28"></svg>
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
                   </button>
                 </div>
               </div>
@@ -97,7 +97,7 @@
                     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                   </div>
                   <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
-                    <svg lucidePlay [attr.size]="28"></svg>
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
                   </button>
                 </div>
               </div>

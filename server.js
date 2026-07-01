@@ -87,6 +87,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', ytmusicInitialized: !!ytmusicInstance });
 });
 
+// Serve Angular static frontend files from 'browser' folder
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'browser')));
+
+// Route all other requests to Angular's index.html (SPA routing fallback)
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, 'browser/index.html'));
+});
+
 // Start server
 app.listen(PORT, async () => {
   console.log(`GanaTube Backend Server listening at http://localhost:${PORT}`);
