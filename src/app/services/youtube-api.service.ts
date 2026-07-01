@@ -27,7 +27,7 @@ export class YoutubeApiService {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams().set('q', query);
 
-    return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/tracks`, { params }).pipe(
+    return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/songs`, { params }).pipe(
       catchError((err) => {
         console.warn('Backend server failed, falling back to YouTube Data API:', err);
         // Fallback: YouTube Data API

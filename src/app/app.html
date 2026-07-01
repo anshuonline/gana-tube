@@ -112,7 +112,7 @@
       </div>
 
       <!-- Shelves Loading Skeletons -->
-      <div class="recommendations-wrap" *ngIf="!hasSearched && shelvesLoading()">
+      <div class="recommendations-wrap" *ngIf="!hasSearched() && shelvesLoading()">
         <div class="shelf-section" *ngFor="let s of [1,2]">
           <div class="skeleton-title" style="width: 200px; height: 28px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
           <div class="loading-grid">

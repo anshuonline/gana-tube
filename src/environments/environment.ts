@@ -4,5 +4,5 @@ export const environment = {
   // Get one at: https://console.cloud.google.com/apis/library/youtube.googleapis.com
   youtubeApiKey: 'AIzaSyDsSDmNFF4Z74VTdbaLuAMAw4ivWSFPHYI',
   youtubeApiUrl: 'https://www.googleapis.com/youtube/v3',
-  backendUrl: 'http://localhost:3000/api',
+  backendUrl: '/api',
 };

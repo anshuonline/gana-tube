@@ -80,12 +80,14 @@ export class App implements OnInit {
 
   loadRecommendationShelves(): void {
     this.shelvesLoading.set(true);
+    console.log('Initializing GanaTube recommendation shelves...');
 
     let loadedCount = 0;
     const checkDone = () => {
       loadedCount++;
       if (loadedCount >= 3) {
         this.shelvesLoading.set(false);
+        console.log('All recommendation shelves loading lifecycle complete.');
       }
     };
 
@@ -93,11 +95,12 @@ export class App implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
+          console.log(`Trending India Shelf loaded successfully. Count: ${res.length}`);
           this.trendingIndia.set(res);
           checkDone();
         },
         error: (err) => {
-          console.warn('Failed to load Trending India shelf:', err);
+          console.error('Failed to load Trending India shelf:', err);
           checkDone();
         }
       });
@@ -106,11 +109,12 @@ export class App implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
+          console.log(`Bollywood Hits Shelf loaded successfully. Count: ${res.length}`);
           this.bollywoodHits.set(res);
           checkDone();
         },
         error: (err) => {
-          console.warn('Failed to load Bollywood Hits shelf:', err);
+          console.error('Failed to load Bollywood Hits shelf:', err);
           checkDone();
         }
       });
@@ -119,11 +123,12 @@ export class App implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
+          console.log(`Chill & Lo-Fi Shelf loaded successfully. Count: ${res.length}`);
           this.lofiRelax.set(res);
           checkDone();
         },
         error: (err) => {
-          console.warn('Failed to load Lo-Fi shelf:', err);
+          console.error('Failed to load Lo-Fi shelf:', err);
           checkDone();
         }
       });
