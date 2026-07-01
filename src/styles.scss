@@ -1,0 +1,79 @@
+/* GanaTube - Global Dark Theme */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #0a0a14;
+  --color-surface: #0f0f1e;
+  --color-surface-2: #14142a;
+  --color-primary: #8b5cf6;
+  --color-primary-dark: #7c3aed;
+  --color-secondary: #6366f1;
+  --color-accent: #06b6d4;
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.4);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --font: 'Outfit', system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  /* Subtle noise texture */
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Selection */
+::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: #fff;
+}
+
+/* Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
