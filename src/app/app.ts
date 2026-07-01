@@ -80,23 +80,52 @@ export class App implements OnInit {
 
   loadRecommendationShelves(): void {
     this.shelvesLoading.set(true);
-    forkJoin({
-      trending: this.youtubeApi.searchMusic('Trending in India', 8),
-      bollywood: this.youtubeApi.searchMusic('Bollywood Hits 2026', 8),
-      lofi: this.youtubeApi.searchMusic('lo fi chill beats', 8),
-    })
+
+    let loadedCount = 0;
+    const checkDone = () => {
+      loadedCount++;
+      if (loadedCount >= 3) {
+        this.shelvesLoading.set(false);
+      }
+    };
+
+    this.youtubeApi.searchMusic('Trending in India', 8)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.trendingIndia.set(res.trending);
-          this.bollywoodHits.set(res.bollywood);
-          this.lofiRelax.set(res.lofi);
-          this.shelvesLoading.set(false);
+          this.trendingIndia.set(res);
+          checkDone();
         },
         error: (err) => {
-          console.error('Failed to load shelves:', err);
-          this.shelvesLoading.set(false);
+          console.warn('Failed to load Trending India shelf:', err);
+          checkDone();
+        }
+      });
+
+    this.youtubeApi.searchMusic('Bollywood Hits 2026', 8)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.bollywoodHits.set(res);
+          checkDone();
         },
+        error: (err) => {
+          console.warn('Failed to load Bollywood Hits shelf:', err);
+          checkDone();
+        }
+      });
+
+    this.youtubeApi.searchMusic('lo fi chill beats', 8)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.lofiRelax.set(res);
+          checkDone();
+        },
+        error: (err) => {
+          console.warn('Failed to load Lo-Fi shelf:', err);
+          checkDone();
+        }
       });
   }
 
