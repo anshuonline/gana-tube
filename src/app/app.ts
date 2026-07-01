@@ -61,6 +61,10 @@ export class App implements OnInit {
     }
   }
 
+  getShelvesStateInfo(): string {
+    return `hasSearched: ${this.hasSearched()}, isLoading: ${this.isLoading()}, shelvesLoading: ${this.shelvesLoading()}, trendingCount: ${this.trendingIndia().length}, bollywoodCount: ${this.bollywoodHits().length}, lofiCount: ${this.lofiRelax().length}`;
+  }
+
   logDebug(msg: string): void {
     console.log(msg);
     this.debugLogs.push(`${new Date().toLocaleTimeString()} - ${msg}`);
@@ -102,6 +106,7 @@ export class App implements OnInit {
       if (loadedCount >= 3) {
         this.shelvesLoading.set(false);
         this.logDebug('All recommendation shelves loading lifecycle complete.');
+        this.logDebug(`Current state: ${this.getShelvesStateInfo()}`);
       }
     };
 
