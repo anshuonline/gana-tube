@@ -30,9 +30,9 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 export class App implements OnInit {
   @ViewChild(SearchBarComponent) searchBar!: SearchBarComponent;
 
-  results: YouTubeSearchResult[] = [];
-  isLoading = false;
-  hasSearched = false;
+  results = signal<YouTubeSearchResult[]>([]);
+  isLoading = signal<boolean>(false);
+  hasSearched = signal<boolean>(false);
   apiKeyMissing = false;
 
   // Recommendation Shelves using Signals to trigger zoneless CD instantly
@@ -51,9 +51,9 @@ export class App implements OnInit {
 
   resetSearchState(event: Event): void {
     event.preventDefault();
-    this.results = [];
-    this.hasSearched = false;
-    this.isLoading = false;
+    this.results.set([]);
+    this.hasSearched.set(false);
+    this.isLoading.set(false);
     if (this.searchBar) {
       this.searchBar.clearQuery();
     }
@@ -68,8 +68,8 @@ export class App implements OnInit {
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((query) => {
         if (!query) {
-          this.results = [];
-          this.hasSearched = false;
+          this.results.set([]);
+          this.hasSearched.set(false);
           return;
         }
         this.performSearch(query);
@@ -113,16 +113,16 @@ export class App implements OnInit {
   }
 
   performSearch(query: string): void {
-    this.isLoading = true;
-    this.hasSearched = true;
+    this.isLoading.set(true);
+    this.hasSearched.set(true);
     this.youtubeApi.searchMusic(query).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
-        this.results = res;
-        this.isLoading = false;
+        this.results.set(res);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.results = [];
-        this.isLoading = false;
+        this.results.set([]);
+        this.isLoading.set(false);
       },
     });
   }

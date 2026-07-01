@@ -23,7 +23,7 @@ async function getYTMusic() {
 }
 
 // Search endpoint
-app.get('/api/search', async (req, res) => {
+app.get('/api/tracks', async (req, res) => {
   const query = req.query.q;
   if (!query) {
     return res.status(400).json({ error: 'Search query parameter "q" is required' });
@@ -66,7 +66,7 @@ app.get('/api/search', async (req, res) => {
 });
 
 // Suggestions endpoint
-app.get('/api/suggest', async (req, res) => {
+app.get('/api/autocomplete', async (req, res) => {
   const query = req.query.q;
   if (!query) {
     return res.status(400).json({ error: 'Query parameter "q" is required' });

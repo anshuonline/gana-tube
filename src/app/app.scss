@@ -108,9 +108,24 @@
 
 // ---- Hero ----
 .hero-section {
-  padding: 56px 24px 40px;
+  padding: 96px 24px 80px;
   position: relative;
   z-index: 100;
+  background-image: 
+    linear-gradient(to bottom, rgba(5, 5, 12, 0.3) 0%, rgba(5, 5, 12, 0.95) 90%),
+    url('/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 30%, rgba(5, 5, 12, 0.7) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 .hero-content {

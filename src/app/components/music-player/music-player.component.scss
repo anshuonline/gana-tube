@@ -448,76 +448,33 @@
   justify-content: center;
 }
 
-.vinyl-record-wrap {
-  position: relative;
-  width: clamp(280px, 32vw, 480px);
+.fs-cover-card {
+  width: 80%;
+  max-width: 480px;
   aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, #0d0d0d 15%, #181818 30%, #000 65%);
-  box-shadow: 
-    0 25px 70px rgba(0, 0, 0, 0.75), 
-    0 0 120px rgba(139, 92, 246, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  // Vinyl grooves texture simulation
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 15px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    background: repeating-radial-gradient(
-      circle,
-      transparent,
-      transparent 3px,
-      rgba(255, 255, 255, 0.015) 3px,
-      rgba(255, 255, 255, 0.015) 4px
-    );
-    pointer-events: none;
-  }
-
-  // Spin rotation animation
-  animation: spinVinyl 16s linear infinite;
-  animation-play-state: paused;
-
-  &.spinning {
-    animation-play-state: running;
-  }
-}
-
-.vinyl-grooves {
-  position: absolute;
-  inset: 45px;
-  border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, 0.03);
-}
-
-.vinyl-center-image {
-  position: absolute;
-  width: 33%;
-  height: 33%;
-  border-radius: 50%;
+  border-radius: 28px;
   overflow: hidden;
-  border: 4px solid #000;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-  
+  box-shadow: 
+    0 35px 80px rgba(0, 0, 0, 0.85), 
+    0 0 100px rgba(139, 92, 246, 0.3);
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
   }
-}
 
-.vinyl-center-pin {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  background: #333;
-  border-radius: 50%;
-  border: 3px solid #000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  &:hover {
+    transform: scale(1.03);
+    border-color: rgba(139, 92, 246, 0.4);
+
+    img {
+      transform: scale(1.04);
+    }
+  }
 }
 
 // Right Pane Information and Controls

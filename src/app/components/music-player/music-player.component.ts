@@ -196,14 +196,10 @@ import { PlayerService } from '../../services/player.service';
 
       <!-- Main Content Grid -->
       <div class="fs-container" [class.with-queue]="showFSQueue()">
-        <!-- Left Pane: Rotating Vinyl Disc & Cover Art -->
+        <!-- Left Pane: Large Modern Cover Art (80% size) -->
         <div class="fs-vinyl-section" *ngIf="!showFSQueue()">
-          <div class="vinyl-record-wrap" [class.spinning]="playerService.playerState() === 'playing'">
-            <div class="vinyl-grooves"></div>
-            <div class="vinyl-center-image" *ngIf="playerService.currentTrack() as track">
-              <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" />
-            </div>
-            <div class="vinyl-center-pin"></div>
+          <div class="fs-cover-card" *ngIf="playerService.currentTrack() as track">
+            <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" />
           </div>
         </div>
 

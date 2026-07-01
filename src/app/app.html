@@ -122,16 +122,16 @@
       </div>
 
       <!-- Search Results Area -->
-      <div class="results-header" *ngIf="hasSearched && !isLoading && results.length > 0">
+      <div class="results-header" *ngIf="hasSearched() && !isLoading() && results().length > 0">
         <h2 class="results-title">
-          Results <span class="results-count">{{ results.length }} songs</span>
+          Results <span class="results-count">{{ results().length }} songs</span>
         </h2>
       </div>
       <app-search-results
-        *ngIf="hasSearched || isLoading"
-        [results]="results"
-        [isLoading]="isLoading"
-        [hasSearched]="hasSearched"
+        *ngIf="hasSearched() || isLoading()"
+        [results]="results()"
+        [isLoading]="isLoading()"
+        [hasSearched]="hasSearched()"
         (suggestSearch)="onSuggestSearch($event)"
       ></app-search-results>
     </div>
