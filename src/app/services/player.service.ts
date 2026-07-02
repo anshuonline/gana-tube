@@ -45,6 +45,9 @@ export class PlayerService {
   }
 
   playTrack(track: Track): void {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     const q = this.queue();
     const existingIdx = q.findIndex((t) => t.videoId === track.videoId);
     if (existingIdx >= 0) {
@@ -58,6 +61,9 @@ export class PlayerService {
   }
 
   setQueue(tracks: Track[], startIndex = 0): void {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     this.queue.set(tracks);
     this.currentIndex.set(startIndex);
     this.playerState.set('loading');
