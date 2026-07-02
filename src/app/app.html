@@ -54,7 +54,7 @@
           <div class="shelf-grid" #shelf1>
             <div class="song-card" *ngFor="let track of trendingIndia()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, trendingIndia())">
               <div class="card-thumbnail">
-                <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
+                <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                 <div class="thumbnail-overlay">
                   <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
                     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -88,7 +88,7 @@
           <div class="shelf-grid" #shelf2>
             <div class="song-card" *ngFor="let track of bollywoodHits()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, bollywoodHits())">
               <div class="card-thumbnail">
-                <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
+                <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                 <div class="thumbnail-overlay">
                   <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
                     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -122,7 +122,7 @@
           <div class="shelf-grid" #shelf3>
             <div class="song-card" *ngFor="let track of lofiRelax()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, lofiRelax())">
               <div class="card-thumbnail">
-                <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
+                <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                 <div class="thumbnail-overlay">
                   <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
                     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>

@@ -149,6 +149,11 @@ export class App implements OnInit {
     element.scrollBy({ left: distance, behavior: 'smooth' });
   }
 
+  onImgError(event: Event, track: YouTubeSearchResult): void {
+    const img = event.target as HTMLImageElement;
+    img.src = `https://img.youtube.com/vi/${track.videoId}/hqdefault.jpg`;
+  }
+
   onPlaySearchTrack(track: YouTubeSearchResult): void {
     // 1. Play track immediately and clear searched query duplicates from queue
     this.playerService.setQueue([track as any], 0);

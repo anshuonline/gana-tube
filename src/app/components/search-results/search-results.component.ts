@@ -52,6 +52,7 @@ import { PlayerService } from '../../services/player.service';
             [src]="track.thumbnailHigh || track.thumbnail"
             [alt]="track.title"
             loading="lazy"
+            referrerpolicy="no-referrer"
             (error)="onImgError($event, track)"
           />
           <div class="thumbnail-overlay">

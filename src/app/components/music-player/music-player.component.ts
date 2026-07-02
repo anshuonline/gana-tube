@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -51,6 +51,7 @@ import { PlayerService } from '../../services/player.service';
             class="album-art"
             [src]="track.thumbnailHigh || track.thumbnail"
             [alt]="track.title"
+            referrerpolicy="no-referrer"
           />
           <div class="vinyl-overlay" [class.spinning]="playerService.playerState() === 'playing'"></div>
         </div>
@@ -202,7 +203,7 @@ import { PlayerService } from '../../services/player.service';
         <!-- Left Pane: Large Modern Cover Art (80% size) -->
         <div class="fs-vinyl-section" *ngIf="!showFSQueue()">
           <div class="fs-cover-card" *ngIf="playerService.currentTrack() as track">
-            <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" />
+            <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" referrerpolicy="no-referrer" />
           </div>
         </div>
 
@@ -374,6 +375,47 @@ export class MusicPlayerComponent {
     const isInteractive = target.closest('button, input, .progress-section, .control-buttons, a, .volume-slider');
     if (!isInteractive) {
       this.toggleFullScreen();
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement;
+    // Safely ignore shortcuts when typing in inputs/textareas
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return;
+    }
+
+    if (this.playerService.currentTrack() === null) {
+      return;
+    }
+
+    switch (event.key) {
+      case ' ':
+        // Spacebar: play/pause
+        event.preventDefault();
+        this.playerService.togglePlayPause();
+        break;
+      case 'ArrowLeft':
+        // Left arrow: previous
+        event.preventDefault();
+        this.playerService.previous();
+        break;
+      case 'ArrowRight':
+        // Right arrow: next
+        event.preventDefault();
+        this.playerService.next();
+        break;
+      case 'ArrowUp':
+        // Up arrow: volume +5%
+        event.preventDefault();
+        this.playerService.setVolume(Math.min(100, this.playerService.volume() + 5));
+        break;
+      case 'ArrowDown':
+        // Down arrow: volume -5%
+        event.preventDefault();
+        this.playerService.setVolume(Math.max(0, this.playerService.volume() - 5));
+        break;
     }
   }
 }
