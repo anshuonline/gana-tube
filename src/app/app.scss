@@ -111,8 +111,7 @@
 .hero-section {
   padding: 96px 24px 80px;
   position: relative;
-  z-index: 100;
-  overflow: hidden;
+  z-index: 1100;
   background-image: 
     linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.7) 60%, #000000 100%),
     url('/hero-bg.jpg');

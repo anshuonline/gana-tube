@@ -65,10 +65,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // 1-second debounce for suggestions as requested
+    // 250ms fast debounce for instant suggestions
     this.querySubject
       .pipe(
-        debounceTime(1000),
+        debounceTime(250),
         distinctUntilChanged(),
         switchMap((q) => {
           if (!q.trim()) {
@@ -97,6 +97,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     } else {
       this.showSuggestions = true;
       this.querySubject.next(value);
+      this.search.emit(value.trim());
     }
   }
 

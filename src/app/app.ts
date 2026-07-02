@@ -134,22 +134,36 @@ export class App implements OnInit {
   loadInitialShelves(): void {
     this.shelvesLoading.set(true);
     const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
-    const requests = initialDefinitions.map(def => this.youtubeApi.searchMusic(def.query, 12));
+    let loadedCount = 0;
 
-    forkJoin(requests).subscribe({
-      next: (resultsArray) => {
-        const shelves = initialDefinitions.map((def, idx) => ({
-          title: def.title,
-          query: def.query,
-          songs: resultsArray[idx]
-        }));
-        this.loadedShelves.set(shelves);
-        this.shelvesLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Failed to load initial shelves:', err);
-        this.shelvesLoading.set(false);
-      }
+    initialDefinitions.forEach((def) => {
+      this.youtubeApi.searchMusic(def.query, 12).subscribe({
+        next: (songs) => {
+          if (songs && songs.length > 0) {
+            this.loadedShelves.update(shelves => {
+              const updated = [...shelves];
+              updated.push({ title: def.title, query: def.query, songs });
+              // Sort by their original definition index to preserve order
+              return updated.sort((a, b) => {
+                const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
+                const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
+                return idxA - idxB;
+              });
+            });
+          }
+          loadedCount++;
+          if (loadedCount >= initialDefinitions.length) {
+            this.shelvesLoading.set(false);
+          }
+        },
+        error: (err) => {
+          console.error(`Failed to load shelf: ${def.title}`, err);
+          loadedCount++;
+          if (loadedCount >= initialDefinitions.length) {
+            this.shelvesLoading.set(false);
+          }
+        }
+      });
     });
   }
 
