@@ -93,7 +93,7 @@ export class App implements OnInit {
       }
     };
 
-    this.youtubeApi.searchMusic('Trending in India', 8)
+    this.youtubeApi.searchMusic('New Hindi Songs 2026', 8)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -106,7 +106,7 @@ export class App implements OnInit {
         }
       });
 
-    this.youtubeApi.searchMusic('Bollywood Hits 2026', 8)
+    this.youtubeApi.searchMusic('New Bollywood Releases 2026', 8)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -119,7 +119,7 @@ export class App implements OnInit {
         }
       });
 
-    this.youtubeApi.searchMusic('lo fi chill beats', 8)
+    this.youtubeApi.searchMusic('Latest Punjabi Hits 2026', 8)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -143,6 +143,29 @@ export class App implements OnInit {
 
   onPlayTrack(track: YouTubeSearchResult, list: YouTubeSearchResult[]): void {
     this.playerService.setQueue(list as any, list.indexOf(track));
+  }
+
+  onPlaySearchTrack(track: YouTubeSearchResult): void {
+    // 1. Play track immediately and clear searched query duplicates from queue
+    this.playerService.setQueue([track as any], 0);
+
+    // 2. Automatically query other popular songs by this artist to build autoplay queue
+    const artist = track.channelTitle || '';
+    if (artist && artist !== 'Unknown Artist') {
+      this.youtubeApi.searchMusic(`${artist} hits`, 12).subscribe({
+        next: (relatedTracks) => {
+          const currentQueue = this.playerService.queue();
+          const existingIds = new Set(currentQueue.map(t => t.videoId));
+          const uniqueRelated = relatedTracks.filter(t => !existingIds.has(t.videoId));
+
+          // Append related popular hits to player queue
+          this.playerService.queue.set([...currentQueue, ...uniqueRelated]);
+        },
+        error: (err) => {
+          console.warn('Failed to load related autoplay tracks:', err);
+        }
+      });
+    }
   }
 
   performSearch(query: string): void {

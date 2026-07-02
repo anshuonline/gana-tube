@@ -39,7 +39,7 @@
         
         <!-- Shelf 1: Trending in India -->
         <div class="shelf-section" *ngIf="trendingIndia().length > 0">
-          <h2 class="shelf-title">🔥 Trending in India</h2>
+          <h2 class="shelf-title">🔥 Latest Hits</h2>
           <div class="shelf-grid">
             <div class="song-card" *ngFor="let track of trendingIndia()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, trendingIndia())">
               <div class="card-thumbnail">
@@ -63,7 +63,7 @@
 
         <!-- Shelf 2: Bollywood Hits -->
         <div class="shelf-section" *ngIf="bollywoodHits().length > 0">
-          <h2 class="shelf-title">🎬 Bollywood Hits</h2>
+          <h2 class="shelf-title">🎬 New Releases</h2>
           <div class="shelf-grid">
             <div class="song-card" *ngFor="let track of bollywoodHits()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, bollywoodHits())">
               <div class="card-thumbnail">
@@ -87,7 +87,7 @@
 
         <!-- Shelf 3: Chill & Lo-Fi -->
         <div class="shelf-section" *ngIf="lofiRelax().length > 0">
-          <h2 class="shelf-title">☕ Chill &amp; Lo-Fi</h2>
+          <h2 class="shelf-title">✨ Trending Punjabi</h2>
           <div class="shelf-grid">
             <div class="song-card" *ngFor="let track of lofiRelax()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, lofiRelax())">
               <div class="card-thumbnail">
@@ -133,6 +133,7 @@
         [isLoading]="isLoading()"
         [hasSearched]="hasSearched()"
         (suggestSearch)="onSuggestSearch($event)"
+        (playTrack)="onPlaySearchTrack($event)"
       ></app-search-results>
 
       <!-- Lazy Loading Spinner Placeholder -->

@@ -88,13 +88,14 @@ export class SearchResultsComponent {
   @Input() isLoading = false;
   @Input() hasSearched = false;
   @Output() suggestSearch = new EventEmitter<string>();
+  @Output() playTrack = new EventEmitter<YouTubeSearchResult>();
 
   skeletons = Array(12).fill(0);
 
   constructor(private playerService: PlayerService) {}
 
   onPlay(track: YouTubeSearchResult): void {
-    this.playerService.setQueue(this.results as any, this.results.indexOf(track));
+    this.playTrack.emit(track);
   }
 
   addToQueue(event: Event, track: YouTubeSearchResult): void {
