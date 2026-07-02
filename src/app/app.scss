@@ -638,6 +638,12 @@
   }
 }
 
+.artists-grid {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .app-footer-modern {
   background-color: #0c0c0c;
   color: #fff;

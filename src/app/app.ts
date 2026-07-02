@@ -51,21 +51,36 @@ export class App implements OnInit {
       { name: 'Shreya Ghoshal', image: 'https://i.scdn.co/image/ab6761610000e5ebf89cfb6df8fb44bc141b71d9' },
       { name: 'AR Rahman', image: 'https://i.scdn.co/image/ab6761610000e5ebb19af0ea736c6228d6eb539c' },
       { name: 'Neha Kakkar', image: 'https://i.scdn.co/image/ab6761610000e5eb73602166946cb84bf9cbdbff' },
-      { name: 'Armaan Malik', image: 'https://i.scdn.co/image/ab6761610000e5eb8e2a3eeaf4ebc29a8a76056b' }
+      { name: 'Armaan Malik', image: 'https://i.scdn.co/image/ab6761610000e5eb8e2a3eeaf4ebc29a8a76056b' },
+      { name: 'Atif Aslam', image: 'https://i.scdn.co/image/ab6761610000e5ebc40600b0235b19452427a14c' },
+      { name: 'Jubin Nautiyal', image: 'https://i.scdn.co/image/ab6761610000e5eb121fdbdc922c26210f9ba9ee' },
+      { name: 'Darshan Raval', image: 'https://i.scdn.co/image/ab6761610000e5eb21b0dc3cc4ce03126992be01' },
+      { name: 'Sonu Nigam', image: 'https://i.scdn.co/image/ab6761610000e5eb0933fb0c7db27d5308696ec8' },
+      { name: 'Vishal Mishra', image: 'https://i.scdn.co/image/ab6761610000e5eb5d648b251ad0eec49e494b29' }
     ],
     'English': [
       { name: 'Taylor Swift', image: 'https://i.scdn.co/image/ab6761610000e5eb5a00969a4698c3132a15fbb0' },
       { name: 'Ed Sheeran', image: 'https://i.scdn.co/image/ab6761610000e5eb12a2ef08d00dd7451a6dbed6' },
       { name: 'Dua Lipa', image: 'https://i.scdn.co/image/ab6761610000e5ebd4cb39aebfb784402ebed733' },
       { name: 'The Weeknd', image: 'https://i.scdn.co/image/ab6761610000e5eb214f3cf1cbe7139c1e26ffbb' },
-      { name: 'Billie Eilish', image: 'https://i.scdn.co/image/ab6761610000e5ebd8b9980db67272cb4d2c3daf' }
+      { name: 'Billie Eilish', image: 'https://i.scdn.co/image/ab6761610000e5ebd8b9980db67272cb4d2c3daf' },
+      { name: 'Ariana Grande', image: 'https://i.scdn.co/image/ab6761610000e5ebcdce7620dc940db079bf4952' },
+      { name: 'Justin Bieber', image: 'https://i.scdn.co/image/ab6761610000e5eb8ae7f2aaa9817a704a87ea36' },
+      { name: 'Bruno Mars', image: 'https://i.scdn.co/image/ab6761610000e5ebfdd896594247af851c1103c8' },
+      { name: 'Eminem', image: 'https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b' },
+      { name: 'Drake', image: 'https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9' }
     ],
     'Punjabi': [
       { name: 'Diljit Dosanjh', image: 'https://i.scdn.co/image/ab6761610000e5ebf3801f9c3ff45a820f4c0bd3' },
       { name: 'Karan Aujla', image: 'https://i.scdn.co/image/ab6761610000e5ebb5fdf9cb43216b2c2eb6357d' },
       { name: 'Sidhu Moose Wala', image: 'https://i.scdn.co/image/ab6761610000e5eb19d436bd3e4bcfcbddae818a' },
       { name: 'AP Dhillon', image: 'https://i.scdn.co/image/ab6761610000e5eb662c55fbc4006c9a3bf336fc' },
-      { name: 'Guru Randhawa', image: 'https://i.scdn.co/image/ab6761610000e5ebddedc897f1f0a049e3cb1eec' }
+      { name: 'Guru Randhawa', image: 'https://i.scdn.co/image/ab6761610000e5ebddedc897f1f0a049e3cb1eec' },
+      { name: 'Harrdy Sandhu', image: 'https://i.scdn.co/image/ab6761610000e5eb0b9a9d701ee63a923507ed6b' },
+      { name: 'Ammy Virk', image: 'https://i.scdn.co/image/ab6761610000e5eb9615dd04b11e29c0d9c42c75' },
+      { name: 'Shubh', image: 'https://i.scdn.co/image/ab6761610000e5eb118c7bc932f1ea30c6aeb851' },
+      { name: 'B Praak', image: 'https://i.scdn.co/image/ab6761610000e5ebeb3e346d0a79cfc4f4d1e2e7' },
+      { name: 'Mankirt Aulakh', image: 'https://i.scdn.co/image/ab6761610000e5ebbf3bd5cb65ff6dbecf005c48' }
     ]
   };
 
