@@ -1,111 +1,105 @@
-.search-overlay {
-  &.active {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(16px);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 15vh;
-    animation: fadeIn 0.2s ease-out;
-
-    .search-wrapper {
-      width: 100%;
-      max-width: 800px;
-    }
-
-    .search-bar {
-      padding: 16px 24px;
-      border-radius: 16px;
-      background: rgba(30, 30, 40, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    }
-
-    .search-input {
-      font-size: 1.5rem;
-    }
-
-    .search-icon {
-      width: 28px;
-      height: 28px;
-    }
-
-    .search-btn {
-      font-size: 1rem;
-      padding: 10px 20px;
-      border-radius: 12px;
-    }
-  }
+// ---- Fullscreen backdrop ----
+.search-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: backdropFadeIn 0.2s ease-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
+// ---- Search wrapper ----
 .search-wrapper {
   width: 100%;
   max-width: 100%;
   margin: 0;
+  position: relative;
+  z-index: 9999;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.overlay-mode {
+    position: fixed;
+    top: 15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 700px;
+    animation: searchSlideIn 0.25s ease-out;
+  }
 }
 
+@keyframes searchSlideIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+// ---- Search bar ----
 .search-bar {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 
   &.focused {
-    border-color: rgba(139, 92, 246, 0.6);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 16px 24px;
+    border-radius: 16px;
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   }
 
   &:hover:not(.focused) {
-    border-color: rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
   }
 }
 
+// ---- Search icon ----
 .search-icon {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   flex-shrink: 0;
   transition: all 0.3s ease;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 
   .focused & {
     color: #8b5cf6;
+    width: 24px;
+    height: 24px;
   }
 }
 
+// ---- Keyboard shortcut hint ----
 .shortcut-hint {
   display: flex;
   gap: 4px;
   align-items: center;
-  margin-right: 8px;
+  margin-right: 4px;
 
   kbd {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 4px;
     padding: 2px 6px;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.5);
     font-family: inherit;
   }
 }
 
+// ---- Search input ----
 .search-input {
   flex: 1;
   background: none;
@@ -117,11 +111,16 @@
   font-weight: 400;
   width: 100%;
 
+  .focused & {
+    font-size: 1.4rem;
+  }
+
   &::placeholder {
     color: rgba(255, 255, 255, 0.35);
   }
 }
 
+// ---- Clear button ----
 .clear-btn {
   background: rgba(255, 255, 255, 0.1);
   border: none;
@@ -143,6 +142,7 @@
   }
 }
 
+// ---- Search button ----
 .search-btn {
   background: linear-gradient(135deg, #8b5cf6, #6366f1);
   border: none;
@@ -157,6 +157,12 @@
   flex-shrink: 0;
   letter-spacing: 0.02em;
 
+  .focused & {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 12px;
+  }
+
   &:hover {
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     transform: translateY(-1px);
@@ -168,12 +174,7 @@
   }
 }
 
-// Suggestions Dropdown Styling
-.search-wrapper {
-  position: relative;
-  z-index: 1010;
-}
-
+// ---- Suggestions Dropdown ----
 .suggestions-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -187,10 +188,10 @@
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   z-index: 10000;
-  animation: fadeIn 0.2s ease;
+  animation: suggestFadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
+@keyframes suggestFadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -232,7 +233,7 @@
   }
 }
 
-// Media queries for search bar responsiveness
+// ---- Responsive ----
 @media (max-width: 480px) {
   .search-bar {
     padding: 8px 12px !important;
@@ -248,4 +249,3 @@
     font-size: 0.75rem !important;
   }
 }
-

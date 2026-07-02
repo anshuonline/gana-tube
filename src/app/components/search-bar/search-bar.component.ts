@@ -11,44 +11,46 @@ import { YoutubeApiService } from '../../services/youtube-api.service';
   standalone: true,
   imports: [CommonModule, FormsModule, LucideSearch, LucideX],
   template: `
-    <div class="search-overlay" [class.active]="isFocused" (mousedown)="onOverlayClick($event)">
-      <div class="search-wrapper" (click)="$event.stopPropagation()">
-        <div class="search-bar" [class.focused]="isFocused">
-          <svg lucideSearch class="search-icon" [attr.size]="20"></svg>
-          <input
-            #searchInput
-            id="music-search-input"
-            type="text"
-            [(ngModel)]="query"
-            (ngModelChange)="onQueryChange($event)"
-            (focus)="onInputFocus()"
-            placeholder="Search for songs, artists, albums..."
-            class="search-input"
-            autocomplete="off"
-            (keydown.enter)="onSearch()"
-            (keydown.escape)="closeOverlay()"
-          />
-          <div class="shortcut-hint" *ngIf="!query && !isFocused">
-            <kbd>Ctrl</kbd> <kbd>K</kbd>
-          </div>
-          <button *ngIf="query" class="clear-btn" (click)="clearQuery()" title="Clear">
-            <svg lucideX [attr.size]="16"></svg>
-          </button>
-          <button class="search-btn" (click)="onSearch()" title="Search">
-            Search
-          </button>
-        </div>
+    <!-- Fullscreen backdrop (only rendered when focused) -->
+    <div class="search-backdrop" *ngIf="isFocused" (click)="closeOverlay()"></div>
 
-        <!-- Suggestions Dropdown -->
-        <div class="suggestions-dropdown" *ngIf="showSuggestions && suggestions.length > 0">
-          <div
-            class="suggestion-item"
-            *ngFor="let suggestion of suggestions"
-            (click)="selectSuggestion(suggestion)"
-          >
-            <svg lucideSearch class="item-icon" [attr.size]="14"></svg>
-            <span class="suggestion-text">{{ suggestion }}</span>
-          </div>
+    <!-- Search bar (always visible in header) -->
+    <div class="search-wrapper" [class.overlay-mode]="isFocused">
+      <div class="search-bar" [class.focused]="isFocused">
+        <svg lucideSearch class="search-icon" [attr.size]="20"></svg>
+        <input
+          #searchInput
+          id="music-search-input"
+          type="text"
+          [(ngModel)]="query"
+          (ngModelChange)="onQueryChange($event)"
+          (focus)="onInputFocus()"
+          placeholder="Search for songs, artists, albums..."
+          class="search-input"
+          autocomplete="off"
+          (keydown.enter)="onSearch()"
+          (keydown.escape)="closeOverlay()"
+        />
+        <div class="shortcut-hint" *ngIf="!query && !isFocused">
+          <kbd>Ctrl</kbd> <kbd>K</kbd>
+        </div>
+        <button *ngIf="query" class="clear-btn" (click)="clearQuery()" title="Clear">
+          <svg lucideX [attr.size]="16"></svg>
+        </button>
+        <button class="search-btn" (click)="onSearch()" title="Search">
+          Search
+        </button>
+      </div>
+
+      <!-- Suggestions Dropdown -->
+      <div class="suggestions-dropdown" *ngIf="isFocused && showSuggestions && suggestions.length > 0">
+        <div
+          class="suggestion-item"
+          *ngFor="let suggestion of suggestions"
+          (click)="selectSuggestion(suggestion)"
+        >
+          <svg lucideSearch class="item-icon" [attr.size]="14"></svg>
+          <span class="suggestion-text">{{ suggestion }}</span>
         </div>
       </div>
     </div>
@@ -101,24 +103,20 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   handleKeyboardEvent(event: KeyboardEvent) {
     if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
       event.preventDefault();
-      this.isFocused = true;
-      setTimeout(() => {
-        if (this.searchInput && this.searchInput.nativeElement) {
-          this.searchInput.nativeElement.focus();
-        }
-      }, 50);
+      this.openOverlay();
     }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event) {
-    // We handle overlay click to close it now.
-  }
-
-  onOverlayClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget) {
+    if (event.key === 'Escape' && this.isFocused) {
       this.closeOverlay();
     }
+  }
+
+  openOverlay(): void {
+    this.isFocused = true;
+    setTimeout(() => {
+      if (this.searchInput && this.searchInput.nativeElement) {
+        this.searchInput.nativeElement.focus();
+      }
+    }, 50);
   }
 
   closeOverlay(): void {
@@ -126,6 +124,13 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.showSuggestions = false;
     if (this.searchInput && this.searchInput.nativeElement) {
       this.searchInput.nativeElement.blur();
+    }
+  }
+
+  onInputFocus(): void {
+    this.isFocused = true;
+    if (this.query.trim().length >= 2) {
+      this.showSuggestions = true;
     }
   }
 
@@ -138,13 +143,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.showSuggestions = true;
       this.querySubject.next(value);
       this.search.emit(value.trim());
-    }
-  }
-
-  onInputFocus(): void {
-    this.isFocused = true;
-    if (this.query.trim().length >= 2) {
-      this.showSuggestions = true;
     }
   }
 
@@ -167,13 +165,5 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.suggestions = [];
     this.showSuggestions = false;
     this.search.emit('');
-  }
-
-  @HostListener('document:click', ['$event'])
-  clickout(event: MouseEvent) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.showSuggestions = false;
-      this.isFocused = false;
-    }
   }
 }
