@@ -415,10 +415,11 @@ export class App implements OnInit {
     event.preventDefault();
   }
 
-  @HostListener('window:keydown', ['$event'])
+  @HostListener('document:keydown', ['$event'])
   handleGlobalKeyboard(event: KeyboardEvent): void {
-    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault();
+      event.stopPropagation();
       this.openSearchPage();
     }
     if (event.key === 'Escape' && this.isSearchMode()) {
