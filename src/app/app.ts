@@ -11,7 +11,9 @@ import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil, catchError } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { PAGE_CONTENT } from './data/static-pages';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +28,7 @@ import { debounceTime, distinctUntilChanged, takeUntil, catchError } from 'rxjs/
     SearchResultsComponent,
     MusicPlayerComponent,
     YtPlayerComponent,
+    RouterModule
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -104,85 +107,7 @@ export class App implements OnInit {
   loadingShelfTitle = signal<string>('');
 
   currentPage = signal<string>('home');
-  pageContent: Record<string, { title: string; html: string }> = {
-    'how-it-works': {
-      title: 'How It Works',
-      html: `
-        <p>GanaTube leverages advanced algorithms to provide a seamless, continuous music experience. We connect directly to the largest media libraries in the world and instantly extract high-quality audio streams without the need for bloated video downloads.</p>
-        <p>Simply search for a song, pick a mood, or select your preferred language. Our engine will dynamically queue related songs and ensure infinite playback.</p>
-      `
-    },
-    'features': {
-      title: 'Features',
-      html: `
-        <ul>
-          <li><strong>Distraction-Free Audio:</strong> Enjoy pure music without visual clutter or heavy video buffering.</li>
-          <li><strong>Infinite Playback:</strong> Smart algorithmic queuing ensures the music never stops.</li>
-          <li><strong>Language Preferences:</strong> Instantly filter recommendations by your preferred regional language.</li>
-          <li><strong>Background Play:</strong> Designed to work smoothly in the background while you multitask.</li>
-          <li><strong>Zero Cost:</strong> A completely free, community-driven platform.</li>
-        </ul>
-      `
-    },
-    'faq': {
-      title: 'Frequently Asked Questions',
-      html: `
-        <p><strong>Is GanaTube free?</strong><br>Yes, it is entirely free to use.</p>
-        <p><strong>Do I need an account?</strong><br>No account is required. We save your preferences locally on your device for privacy.</p>
-        <p><strong>How do I change the language?</strong><br>Use the language chips on the home screen to instantly filter suggestions.</p>
-      `
-    },
-    'about': {
-      title: 'About Us',
-      html: `
-        <p>GanaTube is an independent project built for music lovers who want a fast, lightweight, and privacy-respecting way to stream their favorite songs.</p>
-        <p>We prioritize performance and user experience over everything else, stripping away the heavy elements of traditional streaming platforms to give you pure, uninterrupted audio.</p>
-      `
-    },
-    'contact': {
-      title: 'Contact Us',
-      html: `
-        <p>We'd love to hear from you. For general inquiries, suggestions, or feedback, please reach out to us at:</p>
-        <p><strong>support@ganatube.in</strong></p>
-      `
-    },
-    'privacy-policy': {
-      title: 'Privacy Policy',
-      html: `
-        <p>Your privacy is important to us. GanaTube operates locally within your browser as much as possible. We do not store your personal listening history on any centralized servers.</p>
-        <p>We may use anonymous telemetry to improve platform stability, but your musical tastes remain yours alone.</p>
-      `
-    },
-    'terms-of-service': {
-      title: 'Terms of Service',
-      html: `
-        <p>By using GanaTube, you agree to these terms. GanaTube is provided "as is" without any warranties.</p>
-        <p>You agree not to misuse the platform, attempt to reverse-engineer our APIs, or use our services for any illegal activities.</p>
-      `
-    },
-    'cookie-policy': {
-      title: 'Cookie Policy',
-      html: `
-        <p>We use essential cookies and local storage to save your language preferences and UI settings.</p>
-        <p>We do not use tracking cookies or third-party advertisement cookies. Your data stays on your device.</p>
-      `
-    },
-    'dmca': {
-      title: 'DMCA Policy',
-      html: `
-        <p>GanaTube acts strictly as a search engine and streaming client. We do not host any media files on our servers.</p>
-        <p>If you are a copyright owner and believe your content is being indexed inappropriately, please contact us at:</p>
-        <p><strong>dmca@ganatube.in</strong></p>
-      `
-    },
-    'disclaimer': {
-      title: 'Disclaimer',
-      html: `
-        <p>GanaTube is a third-party client. All content provided by the search results is owned by their respective creators and publishers.</p>
-        <p>We make no claim of ownership over the audio streams provided through the platform.</p>
-      `
-    }
-  };
+  pageContent = PAGE_CONTENT;
 
   carouselIndex = 0;
   private carouselInterval: any;
@@ -193,8 +118,22 @@ export class App implements OnInit {
   constructor(
     private youtubeApi: YoutubeApiService,
     public playerService: PlayerService,
-    private algorithmService: AlgorithmService
-  ) {}
+    private algorithmService: AlgorithmService,
+    private router: Router
+  ) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      let url = event.urlAfterRedirects.split('/')[1] || 'home';
+      url = url.split('?')[0]; // Ignore query params
+      if (this.pageContent[url]) {
+        this.currentPage.set(url);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        this.currentPage.set('home');
+      }
+    });
+  }
 
   resetSearchState(event?: Event): void {
     if (event) event.preventDefault();

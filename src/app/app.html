@@ -5,7 +5,7 @@
   <!-- Header -->
   <header class="app-header" [class.scrolled]="isScrolled()">
     <div class="header-inner">
-      <div class="logo" (click)="resetSearchState($event)" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
+      <div class="logo" routerLink="/" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
         <img src="ganatube.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
         <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube</span>
       </div>
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Header Genre & Mood Chips (Below Navbar) -->
-    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode()">
+    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode() && currentPage() === 'home'">
       <div class="header-chips-scroll">
         <button class="header-chip" [class.active]="!hasSearched()" (click)="resetSearchState($event)">All</button>
         <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Romantic Songs 2026'" (click)="onSuggestSearch('Hindi Romantic Songs 2026')">Romantic</button>
@@ -263,25 +263,26 @@
         <div class="footer-col">
           <h3 class="col-title">Platform</h3>
           <ul class="col-links">
-            <li><a href="javascript:void(0)" (click)="currentPage.set('how-it-works')">How It Works</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('features')">Features</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('faq')">FAQ</a></li>
+            <li><a routerLink="/how-it-works">How It Works</a></li>
+            <li><a routerLink="/features">Features</a></li>
+            <li><a routerLink="/faq">FAQ</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h3 class="col-title">Company & Legal</h3>
           <ul class="col-links">
-            <li><a href="javascript:void(0)" (click)="currentPage.set('about')">About</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('contact')">Contact</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('privacy-policy')">Privacy Policy</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('terms-of-service')">Terms of Service</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('cookie-policy')">Cookie Policy</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('dmca')">DMCA</a></li>
-            <li><a href="javascript:void(0)" (click)="currentPage.set('disclaimer')">Disclaimer</a></li>
+            <li><a routerLink="/about">About</a></li>
+            <li><a routerLink="/contact">Contact</a></li>
+            <li><a routerLink="/privacy-policy">Privacy Policy</a></li>
+            <li><a routerLink="/terms-of-service">Terms of Service</a></li>
+            <li><a routerLink="/cookie-policy">Cookie Policy</a></li>
+            <li><a routerLink="/dmca">DMCA</a></li>
+            <li><a routerLink="/disclaimer">Disclaimer</a></li>
           </ul>
         </div>
       </div>
     </footer>
+    <router-outlet style="display: none;"></router-outlet>
 
   </main>
 
