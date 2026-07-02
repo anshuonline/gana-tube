@@ -229,13 +229,28 @@ export class App implements OnInit {
     });
   }
 
+  @HostListener('document:contextmenu', ['$event'])
+  onRightClick(event: Event): void {
+    event.preventDefault();
+  }
+
+  @HostListener('document:copy', ['$event'])
+  onCopy(event: Event): void {
+    event.preventDefault();
+  }
+
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
     const scrollOffset = document.documentElement.scrollTop || document.body.scrollTop;
-    if (scrollOffset > 50) {
-      this.isScrolled.set(true);
-    } else {
-      this.isScrolled.set(false);
+    this.isScrolled.set(scrollOffset > 50);
+
+    // Parallax: fade out hero as user scrolls
+    const heroEl = document.querySelector('.hero-section') as HTMLElement;
+    if (heroEl) {
+      const heroHeight = heroEl.offsetHeight;
+      const ratio = Math.min(scrollOffset / (heroHeight * 0.6), 1);
+      heroEl.style.opacity = `${1 - ratio}`;
+      heroEl.style.transform = `translateY(-${scrollOffset * 0.3}px)`;
     }
 
     if (this.isLoading() || this.isLazyLoading() || this.shelfLoading() || this.shelvesLoading()) {

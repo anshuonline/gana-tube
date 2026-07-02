@@ -321,9 +321,10 @@
   .player-bar {
     display: flex !important;
     flex-direction: row !important;
-    height: 72px !important;
+    height: 68px !important;
     padding: 0 16px !important;
     gap: 12px !important;
+    border-radius: 16px 16px 0 0 !important;
     justify-content: space-between !important;
   }
 
@@ -334,8 +335,9 @@
     gap: 10px !important;
 
     .album-art-wrapper {
-      width: 44px !important;
-      height: 44px !important;
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 10px !important;
     }
 
     .track-name {
