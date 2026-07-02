@@ -406,15 +406,6 @@ export class App implements OnInit {
     });
   }
 
-  @HostListener('document:contextmenu', ['$event'])
-  onRightClick(event: Event): void {
-    event.preventDefault();
-  }
-
-  @HostListener('document:copy', ['$event'])
-  onCopy(event: Event): void {
-    event.preventDefault();
-  }
 
   @HostListener('document:keydown', ['$event'])
   handleGlobalKeyboard(event: KeyboardEvent): void {
