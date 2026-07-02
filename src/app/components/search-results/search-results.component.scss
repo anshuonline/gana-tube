@@ -167,11 +167,6 @@
   flex-direction: column;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(139, 92, 246, 0.3);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.2);
-
     .play-btn-overlay {
       opacity: 1;
       transform: scale(1);
@@ -203,12 +198,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
     display: block;
-  }
-
-  .song-card:hover & img {
-    transform: scale(1.05);
   }
 }
 
@@ -293,8 +283,8 @@
 }
 
 .track-title {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: rgba(255,255,255,0.9);
   margin: 0 0 4px;
   white-space: nowrap;
@@ -304,8 +294,8 @@
 }
 
 .track-channel {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.6);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;

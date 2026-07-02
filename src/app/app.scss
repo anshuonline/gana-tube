@@ -625,7 +625,7 @@
   flex-direction: row;
   overflow-x: auto;
   scroll-behavior: smooth;
-  gap: 20px;
+  gap: 12px;
   padding: 4px 0 16px;
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -633,8 +633,8 @@
   }
 
   .song-card {
-    flex: 0 0 260px !important;
-    width: 260px !important;
+    flex: 0 0 200px !important;
+    width: 200px !important;
   }
 }
 

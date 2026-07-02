@@ -69,8 +69,8 @@ import { PlayerService } from '../../services/player.service';
           <div class="track-number">{{ i + 1 }}</div>
         </div>
         <div class="card-info">
+          <p class="track-channel">{{ track.channelTitle | uppercase }}</p>
           <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
-          <p class="track-channel">{{ track.channelTitle }}</p>
         </div>
         <button
           class="add-queue-btn"

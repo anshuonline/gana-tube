@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideDisc3, LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
 
@@ -41,8 +41,38 @@ export class App implements OnInit {
   currentQuery = '';
 
   // Language filter
-  homeScreenLanguage = signal<string>('Hindi'); // Default is Hindi, but user can change it
-  availableLanguages = ['English', 'Telugu', 'Hindi', 'Tamil', 'Punjabi', 'Bhojpuri'];
+  availableLanguages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Haryanvi', 'Tamil', 'Telugu'];
+  homeScreenLanguage = signal<string>('Hindi');
+
+  // Top Artists Data
+  topArtistsByLang: Record<string, {name: string, image: string}[]> = {
+    'Hindi': [
+      { name: 'Arijit Singh', image: 'https://i.scdn.co/image/ab6761610000e5eb0261696c5df3be99da6ed3f3' },
+      { name: 'Shreya Ghoshal', image: 'https://i.scdn.co/image/ab6761610000e5ebf89cfb6df8fb44bc141b71d9' },
+      { name: 'AR Rahman', image: 'https://i.scdn.co/image/ab6761610000e5ebb19af0ea736c6228d6eb539c' },
+      { name: 'Neha Kakkar', image: 'https://i.scdn.co/image/ab6761610000e5eb73602166946cb84bf9cbdbff' },
+      { name: 'Armaan Malik', image: 'https://i.scdn.co/image/ab6761610000e5eb8e2a3eeaf4ebc29a8a76056b' }
+    ],
+    'English': [
+      { name: 'Taylor Swift', image: 'https://i.scdn.co/image/ab6761610000e5eb5a00969a4698c3132a15fbb0' },
+      { name: 'Ed Sheeran', image: 'https://i.scdn.co/image/ab6761610000e5eb12a2ef08d00dd7451a6dbed6' },
+      { name: 'Dua Lipa', image: 'https://i.scdn.co/image/ab6761610000e5ebd4cb39aebfb784402ebed733' },
+      { name: 'The Weeknd', image: 'https://i.scdn.co/image/ab6761610000e5eb214f3cf1cbe7139c1e26ffbb' },
+      { name: 'Billie Eilish', image: 'https://i.scdn.co/image/ab6761610000e5ebd8b9980db67272cb4d2c3daf' }
+    ],
+    'Punjabi': [
+      { name: 'Diljit Dosanjh', image: 'https://i.scdn.co/image/ab6761610000e5ebf3801f9c3ff45a820f4c0bd3' },
+      { name: 'Karan Aujla', image: 'https://i.scdn.co/image/ab6761610000e5ebb5fdf9cb43216b2c2eb6357d' },
+      { name: 'Sidhu Moose Wala', image: 'https://i.scdn.co/image/ab6761610000e5eb19d436bd3e4bcfcbddae818a' },
+      { name: 'AP Dhillon', image: 'https://i.scdn.co/image/ab6761610000e5eb662c55fbc4006c9a3bf336fc' },
+      { name: 'Guru Randhawa', image: 'https://i.scdn.co/image/ab6761610000e5ebddedc897f1f0a049e3cb1eec' }
+    ]
+  };
+
+  currentTopArtists = computed(() => {
+    return this.topArtistsByLang[this.homeScreenLanguage()] || [];
+  });
+
   lazyLoadPage = 0;
   isLazyLoading = signal<boolean>(false);
   isScrolled = signal<boolean>(false);
