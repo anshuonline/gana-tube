@@ -413,7 +413,7 @@ export class MusicPlayerComponent {
     }
   }
 
-  @HostListener('window:keydown', ['$event'])
+  @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     const target = event.target as HTMLElement;
     // Safely ignore shortcuts when typing in inputs/textareas

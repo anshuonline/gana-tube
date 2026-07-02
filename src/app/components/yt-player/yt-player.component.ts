@@ -96,6 +96,14 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
               // Only forward events from the active player
               if (i === this.activePlayerIndex) {
                 this.playerService.onPlayerStateChange(event);
+                if (event.data === YT.PlayerState.PLAYING) {
+                  // The YouTube IFrame API steals keyboard focus when starting playback.
+                  // This returns focus to the main window so global shortcuts continue to work.
+                  window.focus();
+                  if (document.activeElement instanceof HTMLIFrameElement) {
+                    document.activeElement.blur();
+                  }
+                }
               }
             },
             onError: (event: any) => {
