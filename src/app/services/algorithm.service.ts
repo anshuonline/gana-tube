@@ -268,8 +268,7 @@ export class AlgorithmService {
       { title: `🎵 Unplugged & Acoustic ${language}`, query: `unplugged acoustic cover ${language}` },
       { title: `🎻 Classical & Sufi ${language}`, query: `classical sufi soulful ${language}` },
       { title: `🚀 Viral ${language} Tracks`, query: `viral trending reels ${language} songs` },
-      { title: `🎙️ Best of ${language} Playback`, query: `best playback singers ${language} hits` },
-      { title: `🕉️ Devotional ${language}`, query: `devotional spiritual bhakti ${language}` }
+      { title: `🎙️ Best of ${language} Playback`, query: `best playback singers ${language} hits` }
     );
 
     return of(shelves);

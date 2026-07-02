@@ -550,10 +550,125 @@
   }
 
   .song-card {
-    flex: 0 0 200px !important;
-    width: 200px !important;
+    flex: 0 0 260px !important;
+    width: 260px !important;
   }
 }
+
+.app-footer-modern {
+  background-color: #0c0c0c;
+  color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'Outfit', sans-serif;
+  margin-top: 60px;
+}
+
+.footer-giant-brand {
+  font-size: clamp(4rem, 10vw, 12rem);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  text-align: left;
+  line-height: 0.8;
+  padding: 40px 40px 0;
+  letter-spacing: -0.05em;
+  user-select: none;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  padding: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  margin-top: 20px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.col-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.col-desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.col-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  li a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.footer-social-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.footer-copy {
+  margin-top: 24px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.shelf-section {
+  animation: shelfFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes shelfFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shelf-section:nth-child(1) { animation-delay: 0.1s; }
+.shelf-section:nth-child(2) { animation-delay: 0.2s; }
+.shelf-section:nth-child(3) { animation-delay: 0.3s; }
+.shelf-section:nth-child(4) { animation-delay: 0.4s; }
+.shelf-section:nth-child(5) { animation-delay: 0.5s; }
 
 .shelf-header {
   display: flex;

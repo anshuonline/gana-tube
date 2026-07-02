@@ -12,7 +12,7 @@
 
       <!-- Compact Fake Search Button in Header -->
       <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">
-        <svg lucideSearch class="trigger-icon" [attr.size]="18"></svg>
+        <svg lucideSearch class="trigger-icon" style="color: #fff; display: block;" [attr.size]="18"></svg>
         <span class="trigger-text">Search for songs, artists...</span>
         <div class="trigger-shortcut"><kbd>Ctrl</kbd> + <kbd>K</kbd></div>
       </button>
@@ -201,9 +201,42 @@
       </div>
     </div>
 
-    <!-- Footer / About Us -->
-    <footer class="app-footer" style="margin-top: 60px; padding: 24px 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.35); font-size: 0.82rem; letter-spacing: 0.02em;">
-      <p>This project is just for timepass made by Rajdeep Pandit</p>
+    <!-- Modern Footer -->
+    <footer class="app-footer-modern">
+      <div class="footer-giant-brand">GanaTube.in</div>
+      <div class="footer-content">
+        <div class="footer-col">
+          <h3 class="col-title">GanaTube</h3>
+          <p class="col-desc">Fast, privacy respecting music streaming with offline support, collaborative rooms, enhanced video previews and smart playlists.</p>
+        </div>
+        <div class="footer-col">
+          <h3 class="col-title">Platform</h3>
+          <ul class="col-links">
+            <li><a href="#">How It Works</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3 class="col-title">Company & Legal</h3>
+          <ul class="col-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+            <li><a href="#">DMCA</a></li>
+            <li><a href="#">Disclaimer</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3 class="col-title">Stay Updated</h3>
+          <p class="col-desc">Join our socials for updates, changelogs and roadmap polls.</p>
+          <button class="footer-social-btn">Visit Social Hub</button>
+          <div class="footer-copy">© 2026 GanaTube. All rights reserved.</div>
+        </div>
+      </div>
     </footer>
 
   </main>
