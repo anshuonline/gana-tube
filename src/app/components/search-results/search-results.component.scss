@@ -1,7 +1,7 @@
 // Loading skeletons
 .loading-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
   padding: 8px 0;
   justify-content: center;
@@ -144,7 +144,7 @@
 // Results Grid
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
   padding-bottom: 8px;
   animation: fadeInUp 0.4s ease;
@@ -293,7 +293,7 @@
 }
 
 .track-title {
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: rgba(255,255,255,0.9);
   margin: 0 0 4px;
@@ -304,7 +304,7 @@
 }
 
 .track-channel {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: rgba(255,255,255,0.4);
   margin: 0;
   white-space: nowrap;

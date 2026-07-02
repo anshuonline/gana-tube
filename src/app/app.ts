@@ -46,7 +46,7 @@ export class App implements OnInit {
 
   // Curated list of 40 dynamic shelves for infinite home recommendations scroll
   allShelfDefinitions: ShelfDefinition[] = [
-    { title: '🔥 Latest Hits', query: 'New Hindi Songs 2026' },
+    { title: '🔥 Today\'s Trending', query: 'Trending Hindi Songs' },
     { title: '🎬 New Releases', query: 'New Bollywood Releases 2026' },
     { title: '✨ Trending Punjabi', query: 'Latest Punjabi Hits 2026' },
     { title: '❤️ Romantic Melodies', query: 'Hindi Romantic Songs 2026' },
