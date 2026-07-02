@@ -93,7 +93,7 @@ export class App implements OnInit {
       }
     };
 
-    this.youtubeApi.searchMusic('New Hindi Songs 2026', 8)
+    this.youtubeApi.searchMusic('New Hindi Songs 2026', 12)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -106,7 +106,7 @@ export class App implements OnInit {
         }
       });
 
-    this.youtubeApi.searchMusic('New Bollywood Releases 2026', 8)
+    this.youtubeApi.searchMusic('New Bollywood Releases 2026', 12)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -119,7 +119,7 @@ export class App implements OnInit {
         }
       });
 
-    this.youtubeApi.searchMusic('Latest Punjabi Hits 2026', 8)
+    this.youtubeApi.searchMusic('Latest Punjabi Hits 2026', 12)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
