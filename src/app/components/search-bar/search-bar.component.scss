@@ -1,7 +1,56 @@
+.search-overlay {
+  &.active {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(16px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 15vh;
+    animation: fadeIn 0.2s ease-out;
+
+    .search-wrapper {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .search-bar {
+      padding: 16px 24px;
+      border-radius: 16px;
+      background: rgba(30, 30, 40, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .search-input {
+      font-size: 1.5rem;
+    }
+
+    .search-icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .search-btn {
+      font-size: 1rem;
+      padding: 10px 20px;
+      border-radius: 12px;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .search-wrapper {
   width: 100%;
   max-width: 100%;
   margin: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-bar {
@@ -30,12 +79,29 @@
 .search-icon {
   color: rgba(255, 255, 255, 0.35);
   flex-shrink: 0;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
   width: 15px;
   height: 15px;
 
   .focused & {
     color: #8b5cf6;
+  }
+}
+
+.shortcut-hint {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-right: 8px;
+
+  kbd {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: inherit;
   }
 }
 

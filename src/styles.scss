@@ -42,13 +42,6 @@ body {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-
-  /* Subtle amoled purple top & side gradients */
-  background-image:
-    radial-gradient(ellipse at 50% -20%, rgba(139, 92, 246, 0.16) 0%, transparent 60%),
-    radial-gradient(ellipse at 20% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 40%),
-    radial-gradient(ellipse at 80% 80%, rgba(99, 102, 241, 0.03) 0%, transparent 40%);
-  background-attachment: fixed;
 }
 
 /* Scrollbar */

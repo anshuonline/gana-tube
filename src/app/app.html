@@ -3,27 +3,11 @@
   <app-yt-player></app-yt-player>
 
   <!-- Header -->
-  <header class="app-header">
+  <header class="app-header" [class.scrolled]="isScrolled()">
     <div class="header-inner">
       <div class="logo" (click)="resetSearchState($event)" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
         <img src="ganatube.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
         <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube</span>
-      </div>
-
-      <!-- Header Genre & Mood Chips -->
-      <div class="header-chips-scroll" *ngIf="!apiKeyMissing">
-        <button class="header-chip" [class.active]="!hasSearched()" (click)="resetSearchState($event)">All</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Romantic Songs 2026'" (click)="onSuggestSearch('Hindi Romantic Songs 2026')">Romantic</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Bollywood Party Hits'" (click)="onSuggestSearch('Bollywood Party Hits')">Party</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'lo-fi chill beats'" (click)="onSuggestSearch('lo-fi chill beats')">Lo-Fi</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Sufi Music Hits'" (click)="onSuggestSearch('Sufi Music Hits')">Sufi</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Sad Melodies'" (click)="onSuggestSearch('Hindi Sad Melodies')">Sad</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Arijit Singh Hits'" (click)="onSuggestSearch('Arijit Singh Hits')">Arijit Singh</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Latest Punjabi Hits 2026'" (click)="onSuggestSearch('Latest Punjabi Hits 2026')">Punjabi</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Desi Hip Hop Hits'" (click)="onSuggestSearch('Desi Hip Hop Hits')">Hip Hop</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === '90s Bollywood Hits'" (click)="onSuggestSearch('90s Bollywood Hits')">Retro</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Indian Classical Instrumental'" (click)="onSuggestSearch('Indian Classical Instrumental')">Instrumental</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Coke Studio Hits'" (click)="onSuggestSearch('Coke Studio Hits')">Coke Studio</button>
       </div>
 
       <!-- Compact Search Bar in Header -->
@@ -38,11 +22,28 @@
         <svg lucideDisc3 [attr.size]="20" class="header-icon"></svg>
       </div>
     </div>
+
+    <!-- Header Genre & Mood Chips (Below Navbar) -->
+    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing">
+      <div class="header-chips-scroll">
+        <button class="header-chip" [class.active]="!hasSearched()" (click)="resetSearchState($event)">All</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Romantic Songs 2026'" (click)="onSuggestSearch('Hindi Romantic Songs 2026')">Romantic</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Bollywood Party Hits'" (click)="onSuggestSearch('Bollywood Party Hits')">Party</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'lo-fi chill beats'" (click)="onSuggestSearch('lo-fi chill beats')">Lo-Fi</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Sufi Music Hits'" (click)="onSuggestSearch('Sufi Music Hits')">Sufi</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Sad Melodies'" (click)="onSuggestSearch('Hindi Sad Melodies')">Sad</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Arijit Singh Hits'" (click)="onSuggestSearch('Arijit Singh Hits')">Arijit Singh</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Latest Punjabi Hits 2026'" (click)="onSuggestSearch('Latest Punjabi Hits 2026')">Punjabi</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Desi Hip Hop Hits'" (click)="onSuggestSearch('Desi Hip Hop Hits')">Hip Hop</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === '90s Bollywood Hits'" (click)="onSuggestSearch('90s Bollywood Hits')">Retro</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Indian Classical Instrumental'" (click)="onSuggestSearch('Indian Classical Instrumental')">Instrumental</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Coke Studio Hits'" (click)="onSuggestSearch('Coke Studio Hits')">Coke Studio</button>
+      </div>
+    </div>
   </header>
 
   <!-- Hero Banner -->
   <section class="hero-section" *ngIf="!hasSearched()">
-    <div class="hero-glow"></div>
     <div class="hero-inner-wrap full-width">
       
       <!-- Full Width Carousel -->

@@ -41,6 +41,7 @@ export class App implements OnInit {
   currentQuery = '';
   lazyLoadPage = 0;
   isLazyLoading = signal<boolean>(false);
+  isScrolled = signal<boolean>(false);
 
   // Dynamic algorithmic shelves for home recommendations
   allShelfDefinitions: ShelfDefinition[] = [];
@@ -230,11 +231,18 @@ export class App implements OnInit {
 
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
+    const scrollOffset = document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollOffset > 50) {
+      this.isScrolled.set(true);
+    } else {
+      this.isScrolled.set(false);
+    }
+
     if (this.isLoading() || this.isLazyLoading() || this.shelfLoading() || this.shelvesLoading()) {
       return;
     }
 
-    const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
+    const pos = scrollOffset + window.innerHeight;
     const max = document.documentElement.scrollHeight;
     
     // If we are within 350px of the bottom of the page
