@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3 } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -23,6 +23,8 @@ export interface ShelfDefinition {
   imports: [
     CommonModule,
     LucideDisc3,
+    LucideChevronLeft,
+    LucideChevronRight,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -316,11 +318,45 @@ export class App implements OnInit {
 
   startCarouselTimer(): void {
     this.carouselInterval = setInterval(() => {
-      const firstShelf = this.loadedShelves()[0];
-      if (firstShelf && firstShelf.songs && firstShelf.songs.length > 0) {
-        this.carouselIndex = (this.carouselIndex + 1) % firstShelf.songs.length;
-      }
+      this.nextCarouselSlide();
     }, 4000);
+  }
+
+  resetCarouselTimer(): void {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
+    this.startCarouselTimer();
+  }
+
+  nextCarouselSlide(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      this.resetCarouselTimer();
+    }
+    const firstShelf = this.loadedShelves()[0];
+    if (firstShelf && firstShelf.songs && firstShelf.songs.length > 0) {
+      this.carouselIndex = (this.carouselIndex + 1) % firstShelf.songs.length;
+    }
+  }
+
+  prevCarouselSlide(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      this.resetCarouselTimer();
+    }
+    const firstShelf = this.loadedShelves()[0];
+    if (firstShelf && firstShelf.songs && firstShelf.songs.length > 0) {
+      this.carouselIndex = (this.carouselIndex - 1 + firstShelf.songs.length) % firstShelf.songs.length;
+    }
+  }
+
+  setCarouselSlide(index: number, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      this.resetCarouselTimer();
+    }
+    this.carouselIndex = index;
   }
 
   playLatestHits(): void {

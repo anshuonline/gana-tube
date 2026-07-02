@@ -1,14 +1,7 @@
 .search-wrapper {
   width: 100%;
-  max-width: 320px;
+  max-width: 100%;
   margin: 0;
-  
-  @media (max-width: 768px) {
-    max-width: 220px;
-  }
-  @media (max-width: 480px) {
-    max-width: 140px;
-  }
 }
 
 .search-bar {
