@@ -199,6 +199,9 @@ export class App implements OnInit {
   }
 
   onSuggestSearch(query: string): void {
+    if (this.searchBar) {
+      this.searchBar.query = query;
+    }
     this.performSearch(query);
   }
 
