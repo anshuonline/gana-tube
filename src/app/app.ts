@@ -94,6 +94,9 @@ export class App implements OnInit {
   shelfLoading = signal<boolean>(false);
   loadingShelfTitle = signal<string>('');
 
+  carouselIndex = 0;
+  private carouselInterval: any;
+
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
@@ -129,6 +132,7 @@ export class App implements OnInit {
       });
 
     this.loadInitialShelves();
+    this.startCarouselTimer();
   }
 
   loadInitialShelves(): void {
@@ -310,7 +314,26 @@ export class App implements OnInit {
     });
   }
 
+  startCarouselTimer(): void {
+    this.carouselInterval = setInterval(() => {
+      const firstShelf = this.loadedShelves()[0];
+      if (firstShelf && firstShelf.songs && firstShelf.songs.length > 0) {
+        this.carouselIndex = (this.carouselIndex + 1) % firstShelf.songs.length;
+      }
+    }, 4000);
+  }
+
+  playLatestHits(): void {
+    const firstShelf = this.loadedShelves()[0];
+    if (firstShelf && firstShelf.songs && firstShelf.songs.length > 0) {
+      this.playerService.setQueue(firstShelf.songs as any, 0);
+    }
+  }
+
   ngOnDestroy(): void {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }
