@@ -66,7 +66,6 @@ import { PlayerService } from '../../services/player.service';
               <svg lucidePlay [attr.size]="28"></svg>
             </button>
           </div>
-          <div class="track-number">{{ i + 1 }}</div>
         </div>
         <div class="card-info">
           <p class="track-channel">{{ track.channelTitle | uppercase }}</p>

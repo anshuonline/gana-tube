@@ -47,40 +47,40 @@ export class App implements OnInit {
   // Top Artists Data
   topArtistsByLang: Record<string, {name: string, image: string}[]> = {
     'Hindi': [
-      { name: 'Arijit Singh', image: 'https://i.scdn.co/image/ab6761610000e5eb0261696c5df3be99da6ed3f3' },
-      { name: 'Shreya Ghoshal', image: 'https://i.scdn.co/image/ab6761610000e5ebf89cfb6df8fb44bc141b71d9' },
-      { name: 'AR Rahman', image: 'https://i.scdn.co/image/ab6761610000e5ebb19af0ea736c6228d6eb539c' },
-      { name: 'Neha Kakkar', image: 'https://i.scdn.co/image/ab6761610000e5eb73602166946cb84bf9cbdbff' },
-      { name: 'Armaan Malik', image: 'https://i.scdn.co/image/ab6761610000e5eb8e2a3eeaf4ebc29a8a76056b' },
-      { name: 'Atif Aslam', image: 'https://i.scdn.co/image/ab6761610000e5ebc40600b0235b19452427a14c' },
-      { name: 'Jubin Nautiyal', image: 'https://i.scdn.co/image/ab6761610000e5eb121fdbdc922c26210f9ba9ee' },
-      { name: 'Darshan Raval', image: 'https://i.scdn.co/image/ab6761610000e5eb21b0dc3cc4ce03126992be01' },
-      { name: 'Sonu Nigam', image: 'https://i.scdn.co/image/ab6761610000e5eb0933fb0c7db27d5308696ec8' },
-      { name: 'Vishal Mishra', image: 'https://i.scdn.co/image/ab6761610000e5eb5d648b251ad0eec49e494b29' }
+      { name: 'Arijit Singh', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Arijit_Singh_performance_at_Chandigarh_2025.jpg/500px-Arijit_Singh_performance_at_Chandigarh_2025.jpg' },
+      { name: 'Shreya Ghoshal', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Shreya_Ghoshal_Behindwoods_Gold_Icons_Awards_2023_%28cropped%29.jpg/500px-Shreya_Ghoshal_Behindwoods_Gold_Icons_Awards_2023_%28cropped%29.jpg' },
+      { name: 'AR Rahman', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/AR_Rahman_at_Premier_Futsal_Press_Meet_%28cropped%29.jpg/500px-AR_Rahman_at_Premier_Futsal_Press_Meet_%28cropped%29.jpg' },
+      { name: 'Neha Kakkar', image: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Neha_Kakkar_in_January_2020.jpg' },
+      { name: 'Armaan Malik', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Armaan_Malik_2016.jpg/500px-Armaan_Malik_2016.jpg' },
+      { name: 'Atif Aslam', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Atif_Aslam_at_Badlapur_%28cropped%29.jpg/500px-Atif_Aslam_at_Badlapur_%28cropped%29.jpg' },
+      { name: 'Jubin Nautiyal', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Jubin_Nauityal_at_the_Good_Homes_Awards_2015.jpg/500px-Jubin_Nauityal_at_the_Good_Homes_Awards_2015.jpg' },
+      { name: 'Darshan Raval', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Darshan-Raval-grace-the-12th-radio-mirchi-music-awards-2020.jpg/500px-Darshan-Raval-grace-the-12th-radio-mirchi-music-awards-2020.jpg' },
+      { name: 'Sonu Nigam', image: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Sonu_Nigam123.jpg' },
+      { name: 'Vishal Mishra', image: '' }
     ],
     'English': [
-      { name: 'Taylor Swift', image: 'https://i.scdn.co/image/ab6761610000e5eb5a00969a4698c3132a15fbb0' },
-      { name: 'Ed Sheeran', image: 'https://i.scdn.co/image/ab6761610000e5eb12a2ef08d00dd7451a6dbed6' },
-      { name: 'Dua Lipa', image: 'https://i.scdn.co/image/ab6761610000e5ebd4cb39aebfb784402ebed733' },
-      { name: 'The Weeknd', image: 'https://i.scdn.co/image/ab6761610000e5eb214f3cf1cbe7139c1e26ffbb' },
-      { name: 'Billie Eilish', image: 'https://i.scdn.co/image/ab6761610000e5ebd8b9980db67272cb4d2c3daf' },
-      { name: 'Ariana Grande', image: 'https://i.scdn.co/image/ab6761610000e5ebcdce7620dc940db079bf4952' },
-      { name: 'Justin Bieber', image: 'https://i.scdn.co/image/ab6761610000e5eb8ae7f2aaa9817a704a87ea36' },
-      { name: 'Bruno Mars', image: 'https://i.scdn.co/image/ab6761610000e5ebfdd896594247af851c1103c8' },
-      { name: 'Eminem', image: 'https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b' },
-      { name: 'Drake', image: 'https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9' }
+      { name: 'Taylor Swift', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/500px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png' },
+      { name: 'Ed Sheeran', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ed_Sheeran-6886_%28cropped%29.jpg/500px-Ed_Sheeran-6886_%28cropped%29.jpg' },
+      { name: 'Dua Lipa', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Dua_Lipa-69798_%28cropped%29.jpg/500px-Dua_Lipa-69798_%28cropped%29.jpg' },
+      { name: 'The Weeknd', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/The_Weeknd_Portrait_by_Brian_Ziff.jpg/500px-The_Weeknd_Portrait_by_Brian_Ziff.jpg' },
+      { name: 'Billie Eilish', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/BillieEilishO2140725-39_-_54665577407_%28cropped%29.jpg/500px-BillieEilishO2140725-39_-_54665577407_%28cropped%29.jpg' },
+      { name: 'Ariana Grande', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Ariana_Grande_promoting_Wicked_%282024%29.jpg/500px-Ariana_Grande_promoting_Wicked_%282024%29.jpg' },
+      { name: 'Justin Bieber', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Justin_Bieber_in_2015.jpg/500px-Justin_Bieber_in_2015.jpg' },
+      { name: 'Bruno Mars', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/BrunoMars24KMagicWorldTourLive_%28cropped%29.jpg/500px-BrunoMars24KMagicWorldTourLive_%28cropped%29.jpg' },
+      { name: 'Eminem', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Eminem_2021_Color_Corrected.jpg/500px-Eminem_2021_Color_Corrected.jpg' },
+      { name: 'Drake', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Drake_at_The_Carter_Effect_2017_%2836818935200%29_%28cropped%29.jpg/500px-Drake_at_The_Carter_Effect_2017_%2836818935200%29_%28cropped%29.jpg' }
     ],
     'Punjabi': [
-      { name: 'Diljit Dosanjh', image: 'https://i.scdn.co/image/ab6761610000e5ebf3801f9c3ff45a820f4c0bd3' },
-      { name: 'Karan Aujla', image: 'https://i.scdn.co/image/ab6761610000e5ebb5fdf9cb43216b2c2eb6357d' },
-      { name: 'Sidhu Moose Wala', image: 'https://i.scdn.co/image/ab6761610000e5eb19d436bd3e4bcfcbddae818a' },
-      { name: 'AP Dhillon', image: 'https://i.scdn.co/image/ab6761610000e5eb662c55fbc4006c9a3bf336fc' },
-      { name: 'Guru Randhawa', image: 'https://i.scdn.co/image/ab6761610000e5ebddedc897f1f0a049e3cb1eec' },
-      { name: 'Harrdy Sandhu', image: 'https://i.scdn.co/image/ab6761610000e5eb0b9a9d701ee63a923507ed6b' },
-      { name: 'Ammy Virk', image: 'https://i.scdn.co/image/ab6761610000e5eb9615dd04b11e29c0d9c42c75' },
-      { name: 'Shubh', image: 'https://i.scdn.co/image/ab6761610000e5eb118c7bc932f1ea30c6aeb851' },
-      { name: 'B Praak', image: 'https://i.scdn.co/image/ab6761610000e5ebeb3e346d0a79cfc4f4d1e2e7' },
-      { name: 'Mankirt Aulakh', image: 'https://i.scdn.co/image/ab6761610000e5ebbf3bd5cb65ff6dbecf005c48' }
+      { name: 'Diljit Dosanjh', image: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Diljit_Dosanjh.jpg' },
+      { name: 'Karan Aujla', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Karan_Aujla_2020.jpg/500px-Karan_Aujla_2020.jpg' },
+      { name: 'Sidhu Moose Wala', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Sidhu_Moose_Wala_during_the_shooting_of_his_film_Moosa_Jatt_%28cropped%29.jpg/500px-Sidhu_Moose_Wala_during_the_shooting_of_his_film_Moosa_Jatt_%28cropped%29.jpg' },
+      { name: 'AP Dhillon', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/AP_Dhillon_CA.jpg/500px-AP_Dhillon_CA.jpg' },
+      { name: 'Guru Randhawa', image: 'https://upload.wikimedia.org/wikipedia/commons/b/be/Guru_Randhawa_at_the_launch_of_MTV_Unplugged_Season_8_%28cropped%29.jpg' },
+      { name: 'Harrdy Sandhu', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Harrdy_Sandhu_snapped_promoting_his_film_on_Jhalak_Dikhhla_Jaa_10.jpg/500px-Harrdy_Sandhu_snapped_promoting_his_film_on_Jhalak_Dikhhla_Jaa_10.jpg' },
+      { name: 'Ammy Virk', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Ammy_Virk_2019.jpg/500px-Ammy_Virk_2019.jpg' },
+      { name: 'Shubh', image: '' },
+      { name: 'B Praak', image: 'https://upload.wikimedia.org/wikipedia/commons/6/67/National_Awards_B_Praak_%28cropped%29.jpg' },
+      { name: 'Mankirt Aulakh', image: '' }
     ]
   };
 
