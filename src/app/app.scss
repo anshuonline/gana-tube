@@ -681,16 +681,19 @@
   color: #fff;
   letter-spacing: -0.03em;
   margin: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 12px;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.25) 0%, rgba(168, 85, 247, 0) 100%);
+  padding: 8px 40px 8px 12px;
+  border-radius: 8px;
 
   &::before {
     content: '';
     display: inline-block;
     width: 6px;
     height: 28px;
-    background: linear-gradient(180deg, #8b5cf6, #06b6d4);
+    background: linear-gradient(180deg, #a855f7, #ffffff);
     border-radius: 4px;
   }
 }
