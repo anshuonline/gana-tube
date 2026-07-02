@@ -1,5 +1,6 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { YouTubeSearchResult } from './youtube-api.service';
+import { AlgorithmService } from './algorithm.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -9,6 +10,9 @@ export type PlayerState = 'unstarted' | 'loading' | 'playing' | 'paused' | 'ende
   providedIn: 'root',
 })
 export class PlayerService {
+  private algorithmService = inject(AlgorithmService);
+  private trackStartTime: number = 0;
+
   // Signals for state management
   queue = signal<Track[]>([]);
   currentIndex = signal<number>(-1);
@@ -45,6 +49,7 @@ export class PlayerService {
   }
 
   playTrack(track: Track): void {
+    this.triggerEngagement();
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -61,6 +66,7 @@ export class PlayerService {
   }
 
   setQueue(tracks: Track[], startIndex = 0): void {
+    this.triggerEngagement();
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -82,6 +88,7 @@ export class PlayerService {
   }
 
   next(): void {
+    this.triggerEngagement();
     const q = this.queue();
     if (!q.length) return;
     let nextIdx = this.currentIndex() + 1;
@@ -97,6 +104,7 @@ export class PlayerService {
   }
 
   previous(): void {
+    this.triggerEngagement();
     const q = this.queue();
     if (!q.length) return;
     // If > 3s into song, restart; otherwise go to previous
@@ -112,6 +120,7 @@ export class PlayerService {
   }
 
   playFromQueue(index: number): void {
+    this.triggerEngagement();
     const q = this.queue();
     if (index >= 0 && index < q.length) {
       this.currentIndex.set(index);
@@ -129,6 +138,7 @@ export class PlayerService {
     this.queue.set(newQueue);
 
     if (currIdx === index) {
+      this.triggerEngagement();
       if (newQueue.length === 0) {
         this.currentIndex.set(-1);
         this.playerState.set('unstarted');
@@ -185,6 +195,9 @@ export class PlayerService {
     // YT.PlayerState: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
     switch (event.data) {
       case 1: // playing
+        if (this.trackStartTime === 0) {
+          this.trackStartTime = Date.now();
+        }
         this.playerState.set('playing');
         this.duration.set(this.ytPlayer?.getDuration() || 0);
         this.startProgressTracking();
@@ -212,11 +225,35 @@ export class PlayerService {
   }
 
   private handleTrackEnd(): void {
+    this.triggerEngagement();
     if (this.repeatMode() === 'one') {
       this.seekTo(0);
       this.ytPlayer?.playVideo();
     } else {
-      this.next();
+      const q = this.queue();
+      // Auto-generate queue if we reach the end
+      if (this.currentIndex() === q.length - 1) {
+        const current = this.currentTrack();
+        if (current) {
+          this.algorithmService.getAutoplayQueue(current).subscribe(newTracks => {
+            if (newTracks && newTracks.length > 0) {
+              this.queue.set([...q, ...newTracks]);
+            }
+            this.next();
+          });
+        }
+      } else {
+        this.next();
+      }
+    }
+  }
+
+  private triggerEngagement(): void {
+    const current = this.currentTrack();
+    if (current && this.trackStartTime > 0) {
+      const listenDuration = (Date.now() - this.trackStartTime) / 1000;
+      this.algorithmService.trackEngagement(current, listenDuration, this.duration() || 240);
+      this.trackStartTime = 0; // reset
     }
   }
 

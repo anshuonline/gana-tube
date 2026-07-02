@@ -8,14 +8,10 @@ import { MusicPlayerComponent } from './components/music-player/music-player.com
 import { YtPlayerComponent } from './components/yt-player/yt-player.component';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
 import { PlayerService } from './services/player.service';
+import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
-
-export interface ShelfDefinition {
-  title: string;
-  query: string;
-}
 
 @Component({
   selector: 'app-root',
@@ -46,49 +42,8 @@ export class App implements OnInit {
   lazyLoadPage = 0;
   isLazyLoading = signal<boolean>(false);
 
-  // Curated list of 40 dynamic shelves for infinite home recommendations scroll
-  allShelfDefinitions: ShelfDefinition[] = [
-    { title: '🔥 Today\'s Trending', query: 'Trending Hindi Songs' },
-    { title: '🎬 New Releases', query: 'New Bollywood Releases 2026' },
-    { title: '✨ Trending Punjabi', query: 'Latest Punjabi Hits 2026' },
-    { title: '❤️ Romantic Melodies', query: 'Hindi Romantic Songs 2026' },
-    { title: '🎉 Party Dance Anthems', query: 'Bollywood Party Hits' },
-    { title: '🕊️ Sufi & Soulful', query: 'Sufi Music Hits' },
-    { title: '☕ Lo-Fi Chill Beats', query: 'lo-fi chill beats' },
-    { title: '🎸 Indie Pop Hits', query: 'Indian Indie Pop' },
-    { title: '🌙 Late Night Vibes', query: 'Late Night Hindi Songs' },
-    { title: '🎶 90s Golden Hits', query: '90s Bollywood Hits' },
-    { title: '🎤 Arijit Singh Essentials', query: 'Arijit Singh Hits' },
-    { title: '⚡ Workout Energy', query: 'Workout Music India' },
-    { title: '🌧️ Monsoon Magic', query: 'Rainy Day Melodies India' },
-    { title: '🕌 Ghazal Classics', query: 'Best Hindi Ghazals' },
-    { title: '🕉️ Devotional Peace', query: 'Bhakti Bhajan Songs' },
-    { title: '🎻 Classical Instrumental', query: 'Indian Classical Instrumental' },
-    { title: '🎧 Hip Hop India', query: 'Desi Hip Hop Hits' },
-    { title: '🎵 Acoustic Unplugged', query: 'Hindi Acoustic Unplugged' },
-    { title: '💔 Sad Love Songs', query: 'Hindi Sad Melodies' },
-    { title: '🌟 AR Rahman Masterpieces', query: 'AR Rahman Best Songs' },
-    { title: '🔥 Badshah Party Hits', query: 'Badshah Honey Singh Party Hits' },
-    { title: '🌴 Travel Playlist', query: 'Road Trip Hindi Songs' },
-    { title: '💐 Evergreen Duets', query: 'Old Hindi Duet Hits' },
-    { title: '🎹 Lata & Kishore Hits', query: 'Lata Mangeshkar Kishore Kumar Hits' },
-    { title: '✨ Shreya Ghoshal Hits', query: 'Shreya Ghoshal Hits' },
-    { title: '🌹 Best of KK', query: 'Best of KK Singer' },
-    { title: '💥 EDM Festival Vibes', query: 'EDM Dance Hits' },
-    { title: '⚡ Gaming Focus', query: 'Gaming Focus Beats' },
-    { title: '📖 Study Instrumentals', query: 'Chill Study Beats' },
-    { title: '🎤 Latest Desi Rap', query: 'Latest Desi Rap' },
-    { title: '🎬 South Movie Hits', query: 'South Indian Movie Hits' },
-    { title: '🕺 80s Bollywood Dance', query: '80s Bollywood Dance' },
-    { title: '💫 Soulful Rahat Hits', query: 'Rahat Fateh Ali Khan Songs' },
-    { title: '🍁 Punjabi Sad Hits', query: 'Punjabi Sad Songs' },
-    { title: '🌠 Atif Aslam Essentials', query: 'Atif Aslam Hits' },
-    { title: '🥁 Wedding Specials', query: 'Bollywood Wedding Songs' },
-    { title: '🌌 Spiritual Healing', query: 'Meditation Soundtracks' },
-    { title: '🎸 Classic Rock Hits', query: 'Classic Rock Hits' },
-    { title: '☕ Coffee & Acoustic', query: 'Coffee Shop Acoustic Chill' },
-    { title: '🎙️ Coke Studio Masterpieces', query: 'Coke Studio Hits' }
-  ];
+  // Dynamic algorithmic shelves for home recommendations
+  allShelfDefinitions: ShelfDefinition[] = [];
 
   // Dynamic shelves signal holding loaded categories
   loadedShelves = signal<Array<{ title: string; query: string; songs: YouTubeSearchResult[] }>>([]);
@@ -104,7 +59,8 @@ export class App implements OnInit {
 
   constructor(
     private youtubeApi: YoutubeApiService,
-    public playerService: PlayerService
+    public playerService: PlayerService,
+    private algorithmService: AlgorithmService
   ) {}
 
   resetSearchState(event: Event): void {
@@ -139,36 +95,44 @@ export class App implements OnInit {
 
   loadInitialShelves(): void {
     this.shelvesLoading.set(true);
-    const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
-    let loadedCount = 0;
+    this.algorithmService.getVariableRewardShelves().subscribe(shelves => {
+      this.allShelfDefinitions = shelves;
+      const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
+      let loadedCount = 0;
 
-    initialDefinitions.forEach((def) => {
-      this.youtubeApi.searchMusic(def.query, 12).subscribe({
-        next: (songs) => {
-          if (songs && songs.length > 0) {
-            this.loadedShelves.update(shelves => {
-              const updated = [...shelves];
-              updated.push({ title: def.title, query: def.query, songs });
-              // Sort by their original definition index to preserve order
-              return updated.sort((a, b) => {
-                const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
-                const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
-                return idxA - idxB;
+      if (initialDefinitions.length === 0) {
+        this.shelvesLoading.set(false);
+        return;
+      }
+
+      initialDefinitions.forEach((def) => {
+        this.youtubeApi.searchMusic(def.query, 12).subscribe({
+          next: (songs) => {
+            if (songs && songs.length > 0) {
+              this.loadedShelves.update(shelvesList => {
+                const updated = [...shelvesList];
+                updated.push({ title: def.title, query: def.query, songs });
+                // Sort by their original definition index to preserve order
+                return updated.sort((a, b) => {
+                  const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
+                  const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
+                  return idxA - idxB;
+                });
               });
-            });
+            }
+            loadedCount++;
+            if (loadedCount >= initialDefinitions.length) {
+              this.shelvesLoading.set(false);
+            }
+          },
+          error: (err) => {
+            console.error(`Failed to load shelf: ${def.title}`, err);
+            loadedCount++;
+            if (loadedCount >= initialDefinitions.length) {
+              this.shelvesLoading.set(false);
+            }
           }
-          loadedCount++;
-          if (loadedCount >= initialDefinitions.length) {
-            this.shelvesLoading.set(false);
-          }
-        },
-        error: (err) => {
-          console.error(`Failed to load shelf: ${def.title}`, err);
-          loadedCount++;
-          if (loadedCount >= initialDefinitions.length) {
-            this.shelvesLoading.set(false);
-          }
-        }
+        });
       });
     });
   }

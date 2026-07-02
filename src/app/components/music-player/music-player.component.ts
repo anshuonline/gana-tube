@@ -17,8 +17,10 @@ import {
   LucideMinimize2,
   LucideListMusic,
   LucideTrash2,
+  LucideHeart
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
+import { AlgorithmService } from '../../services/algorithm.service';
 
 @Component({
   selector: 'app-music-player',
@@ -41,6 +43,7 @@ import { PlayerService } from '../../services/player.service';
     LucideMinimize2,
     LucideListMusic,
     LucideTrash2,
+    LucideHeart
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
@@ -71,6 +74,15 @@ import { PlayerService } from '../../services/player.service';
       <!-- Center Controls -->
       <div class="player-center">
         <div class="control-buttons">
+          <button
+            class="ctrl-btn secondary"
+            [class.active]="isCurrentTrackLiked()"
+            (click)="toggleLike($event)"
+            title="Like"
+            *ngIf="playerService.currentTrack() !== null"
+          >
+            <svg lucideHeart [attr.size]="18" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+          </button>
           <button
             class="ctrl-btn secondary"
             [class.active]="playerService.isShuffled()"
@@ -255,6 +267,15 @@ import { PlayerService } from '../../services/player.service';
           <div class="fs-dashboard-controls">
             <button
               class="fs-ctrl-btn secondary"
+              [class.active]="isCurrentTrackLiked()"
+              (click)="toggleLike($event)"
+              title="Like"
+            >
+              <svg lucideHeart [attr.size]="28" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+            </button>
+
+            <button
+              class="fs-ctrl-btn secondary"
               [class.active]="playerService.isShuffled()"
               (click)="playerService.toggleShuffle()"
               title="Shuffle"
@@ -322,7 +343,7 @@ export class MusicPlayerComponent {
   showQueue = signal<boolean>(false);
   showFSQueue = signal<boolean>(false);
 
-  constructor(public playerService: PlayerService) {}
+  constructor(public playerService: PlayerService, public algorithmService: AlgorithmService) {}
 
   get progressPercent(): number {
     const duration = this.playerService.duration();
@@ -347,6 +368,20 @@ export class MusicPlayerComponent {
   onRemoveFromQueue(event: Event, index: number): void {
     event.stopPropagation();
     this.playerService.removeFromQueue(index);
+  }
+
+  isCurrentTrackLiked(): boolean {
+    const track = this.playerService.currentTrack();
+    if (!track) return false;
+    return this.algorithmService.isLiked(track.videoId);
+  }
+
+  toggleLike(event: Event): void {
+    event.stopPropagation();
+    const track = this.playerService.currentTrack();
+    if (track) {
+      this.algorithmService.toggleLike(track);
+    }
   }
 
   formatTime(seconds: number): string {
