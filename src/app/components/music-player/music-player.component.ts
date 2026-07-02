@@ -413,7 +413,7 @@ export class MusicPlayerComponent {
     }
   }
 
-  @HostListener('document:keydown', ['$event'])
+  @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     const target = event.target as HTMLElement;
     // Safely ignore shortcuts when typing in inputs/textareas
@@ -425,35 +425,28 @@ export class MusicPlayerComponent {
       return;
     }
 
-    console.log(`Keyboard Shortcut Detected: ${event.key}`);
-
-    switch (event.key) {
-      case ' ':
-      case 'Spacebar':
+    switch (event.code) {
+      case 'Space':
         // Spacebar: play/pause
         event.preventDefault();
         this.playerService.togglePlayPause();
         break;
       case 'ArrowLeft':
-      case 'Left':
         // Left arrow: previous
         event.preventDefault();
         this.playerService.previous();
         break;
       case 'ArrowRight':
-      case 'Right':
         // Right arrow: next
         event.preventDefault();
         this.playerService.next();
         break;
       case 'ArrowUp':
-      case 'Up':
         // Up arrow: volume +5%
         event.preventDefault();
         this.playerService.setVolume(Math.min(100, this.playerService.volume() + 5));
         break;
       case 'ArrowDown':
-      case 'Down':
         // Down arrow: volume -5%
         event.preventDefault();
         this.playerService.setVolume(Math.max(0, this.playerService.volume() - 5));
