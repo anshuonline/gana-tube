@@ -91,27 +91,6 @@ export class App implements OnInit {
 
     this.loadInitialShelves();
     this.startCarouselTimer();
-    this.fetchWeatherShelf();
-  }
-
-  fetchWeatherShelf(): void {
-    this.algorithmService.getWeatherShelf().then(shelfDef => {
-      if (shelfDef) {
-        this.youtubeApi.searchMusic(shelfDef.query, 12).subscribe({
-          next: (songs) => {
-            if (songs && songs.length > 0) {
-              this.loadedShelves.update(shelvesList => {
-                // Insert the weather shelf at index 1 (just below the time-based greeting)
-                const updated = [...shelvesList];
-                updated.splice(1, 0, { title: shelfDef.title, query: shelfDef.query, songs });
-                return updated;
-              });
-            }
-          },
-          error: (err) => console.error("Failed to load weather shelf", err)
-        });
-      }
-    });
   }
 
   loadInitialShelves(): void {
