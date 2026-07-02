@@ -49,178 +49,186 @@
     </div>
   </header>
 
-  <!-- Hero Banner (Hidden in Search Mode) -->
-  <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
-    <div class="hero-inner-wrap full-width">
-      
-      <!-- Full Width Carousel -->
-      <div class="carousel-container" *ngIf="loadedShelves().length > 0">
-        <!-- Navigation Controls -->
-        <button class="carousel-control prev" (click)="prevCarouselSlide($event)" aria-label="Previous Slide">
-          <svg lucideChevronLeft [attr.size]="28"></svg>
-        </button>
-        <button class="carousel-control next" (click)="nextCarouselSlide($event)" aria-label="Next Slide">
-          <svg lucideChevronRight [attr.size]="28"></svg>
-        </button>
-
-        <!-- Slides -->
-        <div class="carousel-slide" *ngFor="let song of loadedShelves()[0].songs; let idx = index" [class.active]="idx === carouselIndex">
-          <div class="carousel-card" (click)="onPlayTrack(song, loadedShelves()[0].songs)">
-            <div class="card-bg-overlay"></div>
-            <img [src]="song.thumbnailHigh || song.thumbnail" [alt]="song.title" referrerpolicy="no-referrer" />
-            <div class="carousel-card-info">
-              <span class="carousel-badge">FEATURED HIT</span>
-              <h3 [title]="song.title">{{ song.title }}</h3>
-              <p>{{ song.channelTitle }}</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Indicators -->
-        <div class="carousel-indicators">
-          <button class="indicator" *ngFor="let song of loadedShelves()[0].songs; let idx = index" 
-            [class.active]="idx === carouselIndex" 
-            (click)="setCarouselSlide(idx, $event)"
-            [attr.aria-label]="'Go to slide ' + (idx + 1)">
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()">
-    <div class="results-container">
-      
-      <!-- Dedicated Search Page View -->
-      <div class="search-page-view" *ngIf="isSearchMode()">
-        <button class="back-btn" (click)="closeSearchPage()">
-          <svg lucideChevronLeft [attr.size]="24"></svg> Back to Home
-        </button>
-        <div class="search-page-header">
-          <app-search-bar (search)="onSearch($event)" class="main-search-bar" style="width: 100%; max-width: 800px;"></app-search-bar>
-        </div>
-      </div>
-
-      <!-- Recommendation Shelves (Home Screen) -->
-      <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !shelvesLoading() && !isSearchMode()">
-
-        <!-- Language Filter -->
-        <div class="language-filter-section">
-          <div class="section-title" style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 12px; text-transform: uppercase;">HOME SCREEN SUGGESTIONS</div>
-          <div class="language-chips" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px;">
-            <button 
-              class="lang-chip" 
-              *ngFor="let lang of availableLanguages"
-              [class.active]="homeScreenLanguage() === lang"
-              (click)="setLanguage(lang)"
-              style="background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 6px 16px; color: #fff; font-family: 'Outfit', sans-serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;"
-              [style.background]="homeScreenLanguage() === lang ? '#e2e8f0' : 'transparent'"
-              [style.color]="homeScreenLanguage() === lang ? '#0f172a' : '#fff'">
-              {{ lang }}
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()">
+    
+    <div *ngIf="currentPage() === 'home'">
+      <!-- Hero Banner (Hidden in Search Mode) -->
+      <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
+        <div class="hero-inner-wrap full-width">
+          
+          <!-- Full Width Carousel -->
+          <div class="carousel-container" *ngIf="loadedShelves().length > 0">
+            <!-- Navigation Controls -->
+            <button class="carousel-control prev" (click)="prevCarouselSlide($event)" aria-label="Previous Slide">
+              <svg lucideChevronLeft [attr.size]="28"></svg>
             </button>
-          </div>
-        </div>
+            <button class="carousel-control next" (click)="nextCarouselSlide($event)" aria-label="Next Slide">
+              <svg lucideChevronRight [attr.size]="28"></svg>
+            </button>
 
-        <!-- Dynamic Shelves Loop -->
-        <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">
-          <!-- Standard Shelf Layout -->
-          <ng-container *ngIf="shelf.title !== 'Suggested for You'">
-            <div class="shelf-header">
-              <h2 class="shelf-title">{{ shelf.title }}</h2>
-              <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
-                <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                </button>
+            <!-- Slides -->
+            <div class="carousel-slide" *ngFor="let song of loadedShelves()[0].songs; let idx = index" [class.active]="idx === carouselIndex">
+              <div class="carousel-card" (click)="onPlayTrack(song, loadedShelves()[0].songs)">
+                <div class="card-bg-overlay"></div>
+                <img [src]="song.thumbnailHigh || song.thumbnail" [alt]="song.title" referrerpolicy="no-referrer" />
+                <div class="carousel-card-info">
+                  <span class="carousel-badge">FEATURED HIT</span>
+                  <h3 [title]="song.title">{{ song.title }}</h3>
+                  <p>{{ song.channelTitle }}</p>
+                </div>
               </div>
             </div>
-            <div class="shelf-grid" #shelfGrid>
-              <div class="song-card" *ngFor="let track of shelf.songs" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
-                <div class="card-thumbnail">
-                  <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
-                  <div class="thumbnail-overlay">
-                    <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
-                      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            
+            <!-- Indicators -->
+            <div class="carousel-indicators">
+              <button class="indicator" *ngFor="let song of loadedShelves()[0].songs; let idx = index" 
+                [class.active]="idx === carouselIndex" 
+                (click)="setCarouselSlide(idx, $event)"
+                [attr.aria-label]="'Go to slide ' + (idx + 1)">
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <div class="results-container">
+        
+        <!-- Dedicated Search Page View -->
+        <div class="search-page-view" *ngIf="isSearchMode()">
+          <button class="back-btn" (click)="closeSearchPage()">
+            <svg lucideChevronLeft [attr.size]="24"></svg> Back to Home
+          </button>
+          <div class="search-page-header">
+            <app-search-bar (search)="onSearch($event)" class="main-search-bar" style="width: 100%; max-width: 800px;"></app-search-bar>
+          </div>
+        </div>
+
+        <!-- Recommendation Shelves (Home Screen) -->
+        <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !shelvesLoading() && !isSearchMode()">
+
+          <!-- Language Filter -->
+          <div class="language-filter-section">
+            <div class="section-title" style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 12px; text-transform: uppercase;">HOME SCREEN SUGGESTIONS</div>
+            <div class="language-chips" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px;">
+              <button 
+                class="lang-chip" 
+                *ngFor="let lang of availableLanguages"
+                [class.active]="homeScreenLanguage() === lang"
+                (click)="setLanguage(lang)"
+                style="background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 6px 16px; color: #fff; font-family: 'Outfit', sans-serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;"
+                [style.background]="homeScreenLanguage() === lang ? '#e2e8f0' : 'transparent'"
+                [style.color]="homeScreenLanguage() === lang ? '#0f172a' : '#fff'">
+                {{ lang }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Shelves Loop -->
+          <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">
+            <!-- Standard Shelf Layout -->
+            <ng-container *ngIf="shelf.title !== 'Suggested for You'">
+              <div class="shelf-header">
+                <h2 class="shelf-title">{{ shelf.title }}</h2>
+                <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
+                  <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="shelf-grid" #shelfGrid>
+                <div class="song-card" *ngFor="let track of shelf.songs" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                  <div class="card-thumbnail">
+                    <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
+                    <div class="thumbnail-overlay">
+                      <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                      </div>
+                      <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
+                      </button>
                     </div>
-                    <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
+                  </div>
+                  <div class="card-info">
+                    <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
+                    <p class="track-channel">{{ track.channelTitle }}</p>
                   </div>
                 </div>
-                <div class="card-info">
-                  <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
-                  <p class="track-channel">{{ track.channelTitle }}</p>
+              </div>
+            </ng-container>
+            
+            <!-- Suggested for You List Layout -->
+            <ng-container *ngIf="shelf.title === 'Suggested for You'">
+              <div class="shelf-header">
+                <h2 class="shelf-title">{{ shelf.title }}</h2>
+              </div>
+              <div class="suggested-list-grid">
+                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8)" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                  <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
+                  <div class="suggested-info">
+                    <div class="suggested-artist">{{ track.channelTitle | uppercase }}</div>
+                    <div class="suggested-title" [title]="track.title">{{ track.title }}</div>
+                  </div>
+                  <div class="suggested-actions">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                  </div>
                 </div>
               </div>
-            </div>
-          </ng-container>
-          
-          <!-- Suggested for You List Layout -->
-          <ng-container *ngIf="shelf.title === 'Suggested for You'">
+            </ng-container>
+          </div>
+
+          <!-- Shimmering Skeleton for Next Lazy Loaded Shelf -->
+          <div class="shelf-section loading-shelf" *ngIf="shelfLoading()">
             <div class="shelf-header">
-              <h2 class="shelf-title">{{ shelf.title }}</h2>
+              <h2 class="shelf-title" style="opacity: 0.5;">Loading: {{ loadingShelfTitle() }}...</h2>
             </div>
-            <div class="suggested-list-grid">
-              <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8)" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
-                <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
-                <div class="suggested-info">
-                  <div class="suggested-artist">{{ track.channelTitle | uppercase }}</div>
-                  <div class="suggested-title" [title]="track.title">{{ track.title }}</div>
-                </div>
-                <div class="suggested-actions">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-                </div>
-              </div>
+            <div class="shelf-grid" style="overflow-x: hidden; display: flex; flex-direction: row; gap: 20px;">
+              <div class="song-card skeleton-card" *ngFor="let dummy of [1,2,3,4,5,6]" style="flex: 0 0 230px !important; width: 230px !important; height: 320px; border-radius: 16px; background: rgba(255, 255, 255, 0.03); opacity: 0.4; border: 1px solid rgba(255, 255, 255, 0.05);"></div>
             </div>
-          </ng-container>
+          </div>
+
         </div>
 
-        <!-- Shimmering Skeleton for Next Lazy Loaded Shelf -->
-        <div class="shelf-section loading-shelf" *ngIf="shelfLoading()">
-          <div class="shelf-header">
-            <h2 class="shelf-title" style="opacity: 0.5;">Loading: {{ loadingShelfTitle() }}...</h2>
-          </div>
-          <div class="shelf-grid" style="overflow-x: hidden; display: flex; flex-direction: row; gap: 20px;">
-            <div class="song-card skeleton-card" *ngFor="let dummy of [1,2,3,4,5,6]" style="flex: 0 0 230px !important; width: 230px !important; height: 320px; border-radius: 16px; background: rgba(255, 255, 255, 0.03); opacity: 0.4; border: 1px solid rgba(255, 255, 255, 0.05);"></div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Shelves Loading Skeletons -->
-      <div class="recommendations-wrap" *ngIf="!hasSearched() && shelvesLoading() && !isSearchMode()">
-        <div class="shelf-section" *ngFor="let s of [1,2]">
-          <div class="skeleton-title" style="width: 200px; height: 28px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
-          <div class="loading-grid">
-            <div class="skeleton-card" *ngFor="let sc of [1,2,3,4]"></div>
+        <!-- Shelves Loading Skeletons -->
+        <div class="recommendations-wrap" *ngIf="!hasSearched() && shelvesLoading() && !isSearchMode()">
+          <div class="shelf-section" *ngFor="let s of [1,2]">
+            <div class="skeleton-title" style="width: 200px; height: 28px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
+            <div class="loading-grid">
+              <div class="skeleton-card" *ngFor="let sc of [1,2,3,4]"></div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Search Results Area -->
-      <div class="results-header" *ngIf="hasSearched() && !isLoading() && results().length > 0">
-        <h2 class="results-title">
-          Results <span class="results-count">{{ results().length }} songs</span>
-        </h2>
-      </div>
-      <app-search-results
-        *ngIf="hasSearched() || isLoading()"
-        [results]="results()"
-        [isLoading]="isLoading()"
-        [hasSearched]="hasSearched()"
-        (suggestSearch)="onSuggestSearch($event)"
-        (playTrack)="onPlaySearchTrack($event)"
-      ></app-search-results>
+        <!-- Search Results Area -->
+        <div class="results-header" *ngIf="hasSearched() && !isLoading() && results().length > 0">
+          <h2 class="results-title">
+            Results <span class="results-count">{{ results().length }} songs</span>
+          </h2>
+        </div>
+        <app-search-results
+          *ngIf="hasSearched() || isLoading()"
+          [results]="results()"
+          [isLoading]="isLoading()"
+          [hasSearched]="hasSearched()"
+          (suggestSearch)="onSuggestSearch($event)"
+          (playTrack)="onPlaySearchTrack($event)"
+        ></app-search-results>
 
-      <!-- Lazy Loading Spinner Placeholder -->
-      <div class="lazy-loading-placeholder" *ngIf="isLazyLoading()" style="padding: 30px 0; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-        <div class="spinner" style="width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #8b5cf6; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
-        <span>Searching more songs...</span>
+        <!-- Lazy Loading Spinner Placeholder -->
+        <div class="lazy-loading-placeholder" *ngIf="isLazyLoading()" style="padding: 30px 0; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div class="spinner" style="width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #8b5cf6; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
+          <span>Searching more songs...</span>
+        </div>
       </div>
+    </div>
+    
+    <!-- Static Pages Section -->
+    <div class="static-page-container" *ngIf="currentPage() !== 'home'">
+      <div class="static-page-content" [innerHTML]="pageContent[currentPage()]?.html"></div>
     </div>
 
     <!-- Modern Footer -->
@@ -234,22 +242,21 @@
         <div class="footer-col">
           <h3 class="col-title">Platform</h3>
           <ul class="col-links">
-            <li><a href="#">How It Works</a></li>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Blog</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('how-it-works')">How It Works</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('features')">Features</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('faq')">FAQ</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h3 class="col-title">Company & Legal</h3>
           <ul class="col-links">
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Cookie Policy</a></li>
-            <li><a href="#">DMCA</a></li>
-            <li><a href="#">Disclaimer</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('about')">About</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('contact')">Contact</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('privacy-policy')">Privacy Policy</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('terms-of-service')">Terms of Service</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('cookie-policy')">Cookie Policy</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('dmca')">DMCA</a></li>
+            <li><a href="javascript:void(0)" (click)="currentPage.set('disclaimer')">Disclaimer</a></li>
           </ul>
         </div>
       </div>

@@ -10,8 +10,8 @@ import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.s
 import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { environment } from '../environments/environment';
-import { Subject, forkJoin } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { Subject, forkJoin, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -57,6 +57,87 @@ export class App implements OnInit {
   shelfLoading = signal<boolean>(false);
   loadingShelfTitle = signal<string>('');
 
+  currentPage = signal<string>('home');
+  pageContent: Record<string, { title: string; html: string }> = {
+    'how-it-works': {
+      title: 'How It Works',
+      html: `
+        <p>GanaTube leverages advanced algorithms to provide a seamless, continuous music experience. We connect directly to the largest media libraries in the world and instantly extract high-quality audio streams without the need for bloated video downloads.</p>
+        <p>Simply search for a song, pick a mood, or select your preferred language. Our engine will dynamically queue related songs and ensure infinite playback.</p>
+      `
+    },
+    'features': {
+      title: 'Features',
+      html: `
+        <ul>
+          <li><strong>Distraction-Free Audio:</strong> Enjoy pure music without visual clutter or heavy video buffering.</li>
+          <li><strong>Infinite Playback:</strong> Smart algorithmic queuing ensures the music never stops.</li>
+          <li><strong>Language Preferences:</strong> Instantly filter recommendations by your preferred regional language.</li>
+          <li><strong>Background Play:</strong> Designed to work smoothly in the background while you multitask.</li>
+          <li><strong>Zero Cost:</strong> A completely free, community-driven platform.</li>
+        </ul>
+      `
+    },
+    'faq': {
+      title: 'Frequently Asked Questions',
+      html: `
+        <p><strong>Is GanaTube free?</strong><br>Yes, it is entirely free to use.</p>
+        <p><strong>Do I need an account?</strong><br>No account is required. We save your preferences locally on your device for privacy.</p>
+        <p><strong>How do I change the language?</strong><br>Use the language chips on the home screen to instantly filter suggestions.</p>
+      `
+    },
+    'about': {
+      title: 'About Us',
+      html: `
+        <p>GanaTube is an independent project built for music lovers who want a fast, lightweight, and privacy-respecting way to stream their favorite songs.</p>
+        <p>We prioritize performance and user experience over everything else, stripping away the heavy elements of traditional streaming platforms to give you pure, uninterrupted audio.</p>
+      `
+    },
+    'contact': {
+      title: 'Contact Us',
+      html: `
+        <p>We'd love to hear from you. For general inquiries, suggestions, or feedback, please reach out to us at:</p>
+        <p><strong>support@ganatube.in</strong></p>
+      `
+    },
+    'privacy-policy': {
+      title: 'Privacy Policy',
+      html: `
+        <p>Your privacy is important to us. GanaTube operates locally within your browser as much as possible. We do not store your personal listening history on any centralized servers.</p>
+        <p>We may use anonymous telemetry to improve platform stability, but your musical tastes remain yours alone.</p>
+      `
+    },
+    'terms-of-service': {
+      title: 'Terms of Service',
+      html: `
+        <p>By using GanaTube, you agree to these terms. GanaTube is provided "as is" without any warranties.</p>
+        <p>You agree not to misuse the platform, attempt to reverse-engineer our APIs, or use our services for any illegal activities.</p>
+      `
+    },
+    'cookie-policy': {
+      title: 'Cookie Policy',
+      html: `
+        <p>We use essential cookies and local storage to save your language preferences and UI settings.</p>
+        <p>We do not use tracking cookies or third-party advertisement cookies. Your data stays on your device.</p>
+      `
+    },
+    'dmca': {
+      title: 'DMCA Policy',
+      html: `
+        <p>GanaTube acts strictly as a search engine and streaming client. We do not host any media files on our servers.</p>
+        <p>If you are a copyright owner and believe your content is being indexed inappropriately, please contact us at:</p>
+        <p><strong>dmca@ganatube.in</strong></p>
+      `
+    },
+    'disclaimer': {
+      title: 'Disclaimer',
+      html: `
+        <p>GanaTube is a third-party client. All content provided by the search results is owned by their respective creators and publishers.</p>
+        <p>We make no claim of ownership over the audio streams provided through the platform.</p>
+      `
+    }
+  };
+
   carouselIndex = 0;
   private carouselInterval: any;
 
@@ -69,15 +150,16 @@ export class App implements OnInit {
     private algorithmService: AlgorithmService
   ) {}
 
-  resetSearchState(event: Event): void {
-    event.preventDefault();
-    this.results.set([]);
+  resetSearchState(event?: Event): void {
+    if (event) event.preventDefault();
+    this.isSearchMode.set(false);
     this.hasSearched.set(false);
-    this.isLoading.set(false);
+    this.currentQuery = '';
+    this.results.set([]);
+    this.currentPage.set('home');
     if (this.searchBar) {
       this.searchBar.clearQuery();
     }
-    this.isSearchMode.set(false);
   }
 
   openSearchPage(): void {
@@ -164,22 +246,43 @@ export class App implements OnInit {
       return;
     }
 
-    const nextDef = this.allShelfDefinitions[currentCount];
-    this.loadingShelfTitle.set(nextDef.title);
+    // Load up to 5 shelves at once
+    const batchSize = 5;
+    const nextDefs = this.allShelfDefinitions.slice(currentCount, currentCount + batchSize);
+    
+    this.loadingShelfTitle.set(nextDefs[0].title + (nextDefs.length > 1 ? ' & more...' : ''));
     this.shelfLoading.set(true);
 
-    this.youtubeApi.searchMusic(nextDef.query, 50).subscribe({
-      next: (songs) => {
-        if (songs && songs.length > 0) {
-          this.loadedShelves.update(shelves => [
-            ...shelves,
-            { title: nextDef.title, query: nextDef.query, songs }
-          ]);
+    const observables = nextDefs.map(def => 
+      this.youtubeApi.searchMusic(def.query, 50).pipe(
+        // Catch errors for individual shelf loads so the whole batch doesn't fail
+        catchError((err: any) => {
+          console.error(`Failed to load shelf: ${def.title}`, err);
+          return of(null);
+        })
+      )
+    );
+
+    forkJoin(observables).subscribe({
+      next: (results: any[]) => {
+        const newShelves: any[] = [];
+        results.forEach((songs: any, index: number) => {
+          if (songs && songs.length > 0) {
+            newShelves.push({
+              title: nextDefs[index].title,
+              query: nextDefs[index].query,
+              songs
+            });
+          }
+        });
+        
+        if (newShelves.length > 0) {
+          this.loadedShelves.update(shelves => [...shelves, ...newShelves]);
         }
         this.shelfLoading.set(false);
       },
-      error: (err) => {
-        console.error(`Failed to load shelf: ${nextDef.title}`, err);
+      error: (err: any) => {
+        console.error('Failed to load shelf batch', err);
         this.shelfLoading.set(false);
       }
     });
