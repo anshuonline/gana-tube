@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -21,6 +21,7 @@ import { debounceTime, distinctUntilChanged, takeUntil, catchError } from 'rxjs/
     LucideDisc3,
     LucideChevronLeft,
     LucideChevronRight,
+    LucideSearch,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
