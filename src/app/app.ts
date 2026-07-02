@@ -127,7 +127,7 @@ export class App implements OnInit {
       }
 
       initialDefinitions.forEach((def) => {
-        this.youtubeApi.searchMusic(def.query, 12).subscribe({
+        this.youtubeApi.searchMusic(def.query, 50).subscribe({
           next: (songs) => {
             if (songs && songs.length > 0) {
               this.loadedShelves.update(shelvesList => {
@@ -168,7 +168,7 @@ export class App implements OnInit {
     this.loadingShelfTitle.set(nextDef.title);
     this.shelfLoading.set(true);
 
-    this.youtubeApi.searchMusic(nextDef.query, 12).subscribe({
+    this.youtubeApi.searchMusic(nextDef.query, 50).subscribe({
       next: (songs) => {
         if (songs && songs.length > 0) {
           this.loadedShelves.update(shelves => [
