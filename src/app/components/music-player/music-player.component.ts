@@ -183,8 +183,9 @@ import { PlayerService } from '../../services/player.service';
 
       <!-- Header Controls -->
       <div class="fs-header">
-        <div class="logo">
-          <img src="ganatube.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; max-width: 160px; object-fit: contain;" />
+        <div class="logo" style="display: flex; align-items: center; gap: 8px;">
+          <img src="ganatube.png" alt="GanaTube Logo" class="logo-img" style="height: 32px; width: auto;" />
+          <span class="logo-text" style="font-size: 1.3rem; font-weight: 800; color: #8b5cf6; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Gana<span style="color: #ffffff;">Tube</span></span>
         </div>
         <div style="display: flex; gap: 16px;">
           <button class="fs-close-btn" [class.active]="showFSQueue()" (click)="toggleFSQueue()" title="Toggle Queue">

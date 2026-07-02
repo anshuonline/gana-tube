@@ -754,6 +754,12 @@
     margin: 0 auto;
   }
 
+  .fs-queue-section {
+    max-width: 480px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
   .fs-info-section {
     gap: 24px;
     align-items: center;
@@ -808,6 +814,9 @@
     max-height: 40vh !important; // Reduce height on mobile so controls fit without page scrolling
     padding: 16px !important;
     border-radius: 16px !important;
+    max-width: 480px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
   }
 
   .fs-queue-item {
