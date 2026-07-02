@@ -90,7 +90,7 @@
   </section>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched()">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()">
     <div class="results-container">
       
       <!-- Dedicated Search Page View -->
@@ -99,7 +99,7 @@
           <svg lucideChevronLeft [attr.size]="24"></svg> Back to Home
         </button>
         <div class="search-page-header">
-          <app-search-bar (search)="onSearch($event)" class="main-search-bar"></app-search-bar>
+          <app-search-bar (search)="onSearch($event)" class="main-search-bar" style="width: 100%; max-width: 800px;"></app-search-bar>
         </div>
       </div>
 
