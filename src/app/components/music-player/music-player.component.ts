@@ -43,7 +43,7 @@ import { PlayerService } from '../../services/player.service';
     LucideTrash2,
   ],
   template: `
-    <div class="player-bar" [class.visible]="playerService.currentTrack() !== null">
+    <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
       <!-- Album Art -->
       <div class="player-left" (click)="toggleFullScreen()">
         <div class="album-art-wrapper" *ngIf="playerService.currentTrack() as track">
@@ -366,5 +366,14 @@ export class MusicPlayerComponent {
   onVolumeChange(event: Event): void {
     const val = +(event.target as HTMLInputElement).value;
     this.playerService.setVolume(val);
+  }
+
+  onPlayerBarClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Intercept clicks to expand player, ignoring clicks on interactive slider, buttons or queue triggers
+    const isInteractive = target.closest('button, input, .progress-section, .control-buttons, a, .volume-slider');
+    if (!isInteractive) {
+      this.toggleFullScreen();
+    }
   }
 }

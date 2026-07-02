@@ -34,17 +34,30 @@ app.get('/api/songs', async (req, res) => {
     console.log(`Searching songs for query: "${query}"`);
     const results = await yt.searchSongs(query);
 
+    // Helper to upgrade YouTube Music / Video thumbnails to high resolution (HD)
+    const toHDUrl = (url) => {
+      if (!url) return '';
+      if (url.includes('img.youtube.com')) {
+        return url.replace('/default.jpg', '/hqdefault.jpg');
+      }
+      // Replace dynamic sizing parameters in Google UserContent URLs (album art) to 600x600 for sharp HD
+      return url
+        .replace(/=w\d+-h\d+/, '=w600-h600')
+        .replace(/-w\d+-h\d+/, '-w600-h600')
+        .replace(/\/s\d+-/, '/s600-');
+    };
+
     // Map to standard YouTubeSearchResult format expected by Angular frontend
     const mappedResults = results.map(item => {
       const artistName = item.artist && typeof item.artist === 'object' 
         ? item.artist.name 
         : (typeof item.artist === 'string' ? item.artist : 'Unknown Artist');
         
-      const thumbnailLow = item.thumbnails && item.thumbnails.length > 0
+      let thumbnailLow = item.thumbnails && item.thumbnails.length > 0
         ? item.thumbnails[0].url
         : `https://img.youtube.com/vi/${item.videoId}/default.jpg`;
 
-      const thumbnailHigh = item.thumbnails && item.thumbnails.length > 0
+      let thumbnailHigh = item.thumbnails && item.thumbnails.length > 0
         ? item.thumbnails[item.thumbnails.length - 1].url
         : `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
 
@@ -52,8 +65,8 @@ app.get('/api/songs', async (req, res) => {
         videoId: item.videoId,
         title: item.name,
         channelTitle: artistName,
-        thumbnail: thumbnailLow,
-        thumbnailHigh: thumbnailHigh,
+        thumbnail: toHDUrl(thumbnailLow),
+        thumbnailHigh: toHDUrl(thumbnailHigh),
         publishedAt: new Date().toISOString(),
       };
     });
