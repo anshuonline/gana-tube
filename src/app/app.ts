@@ -178,6 +178,17 @@ export class App implements OnInit {
 
     this.loadInitialShelves();
     this.startCarouselTimer();
+
+    // Prevent focus from getting trapped in iframes (e.g. YouTube player)
+    // This ensures global keyboard shortcuts (Ctrl+K, Space, Arrows) always work
+    window.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement instanceof HTMLIFrameElement) {
+          document.activeElement.blur();
+          window.focus();
+        }
+      }, 50);
+    });
   }
 
   loadInitialShelves(language?: string): void {
@@ -348,7 +359,7 @@ export class App implements OnInit {
 
   @HostListener('document:keydown', ['$event'])
   handleGlobalKeyboard(event: KeyboardEvent): void {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+    if ((event.ctrlKey || event.metaKey) && (event.key.toLowerCase() === 'k' || event.code === 'KeyK')) {
       event.preventDefault();
       event.stopPropagation();
       this.openSearchPage();
