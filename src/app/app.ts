@@ -359,13 +359,45 @@ export class App implements OnInit {
 
   @HostListener('document:keydown', ['$event'])
   handleGlobalKeyboard(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement;
+    const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
     if ((event.ctrlKey || event.metaKey) && (event.key.toLowerCase() === 'k' || event.code === 'KeyK')) {
       event.preventDefault();
       event.stopPropagation();
       this.openSearchPage();
+      return;
     }
+
     if (event.key === 'Escape' && this.isSearchMode()) {
       this.closeSearchPage();
+      return;
+    }
+
+    // Media shortcuts (only when not typing in an input)
+    if (!isInput && this.playerService.currentTrack()) {
+      switch (event.code) {
+        case 'Space':
+          event.preventDefault();
+          this.playerService.togglePlayPause();
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.playerService.previous();
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          this.playerService.next();
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          this.playerService.setVolume(Math.min(100, this.playerService.volume() + 5));
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          this.playerService.setVolume(Math.max(0, this.playerService.volume() - 5));
+          break;
+      }
     }
   }
 

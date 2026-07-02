@@ -413,44 +413,5 @@ export class MusicPlayerComponent {
     }
   }
 
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    const target = event.target as HTMLElement;
-    // Safely ignore shortcuts when typing in inputs/textareas
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-      return;
-    }
-
-    if (this.playerService.currentTrack() === null) {
-      return;
-    }
-
-    switch (event.code) {
-      case 'Space':
-        // Spacebar: play/pause
-        event.preventDefault();
-        this.playerService.togglePlayPause();
-        break;
-      case 'ArrowLeft':
-        // Left arrow: previous
-        event.preventDefault();
-        this.playerService.previous();
-        break;
-      case 'ArrowRight':
-        // Right arrow: next
-        event.preventDefault();
-        this.playerService.next();
-        break;
-      case 'ArrowUp':
-        // Up arrow: volume +5%
-        event.preventDefault();
-        this.playerService.setVolume(Math.min(100, this.playerService.volume() + 5));
-        break;
-      case 'ArrowDown':
-        // Down arrow: volume -5%
-        event.preventDefault();
-        this.playerService.setVolume(Math.max(0, this.playerService.volume() - 5));
-        break;
-    }
-  }
+  // Keyboard shortcuts are now handled globally in app.ts
 }
