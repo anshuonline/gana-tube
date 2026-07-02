@@ -125,36 +125,58 @@
 
         <!-- Dynamic Shelves Loop -->
         <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">
-          <div class="shelf-header">
-            <h2 class="shelf-title">{{ shelf.title }}</h2>
-            <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
-              <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-              </button>
-              <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
+          <!-- Standard Shelf Layout -->
+          <ng-container *ngIf="shelf.title !== 'Suggested for You'">
+            <div class="shelf-header">
+              <h2 class="shelf-title">{{ shelf.title }}</h2>
+              <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
+                <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
             </div>
-          </div>
-          <div class="shelf-grid" #shelfGrid>
-            <div class="song-card" *ngFor="let track of shelf.songs" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
-              <div class="card-thumbnail">
-                <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
-                <div class="thumbnail-overlay">
-                  <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
-                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="shelf-grid" #shelfGrid>
+              <div class="song-card" *ngFor="let track of shelf.songs" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <div class="card-thumbnail">
+                  <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
+                  <div class="thumbnail-overlay">
+                    <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
+                      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
+                      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
                   </div>
-                  <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
-                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
-                  </button>
+                </div>
+                <div class="card-info">
+                  <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
+                  <p class="track-channel">{{ track.channelTitle }}</p>
                 </div>
               </div>
-              <div class="card-info">
-                <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
-                <p class="track-channel">{{ track.channelTitle }}</p>
+            </div>
+          </ng-container>
+          
+          <!-- Suggested for You List Layout -->
+          <ng-container *ngIf="shelf.title === 'Suggested for You'">
+            <div class="shelf-header">
+              <h2 class="shelf-title">{{ shelf.title }}</h2>
+            </div>
+            <div class="suggested-list-grid">
+              <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8)" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
+                <div class="suggested-info">
+                  <div class="suggested-artist">{{ track.channelTitle | uppercase }}</div>
+                  <div class="suggested-title" [title]="track.title">{{ track.title }}</div>
+                </div>
+                <div class="suggested-actions">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                </div>
               </div>
             </div>
-          </div>
+          </ng-container>
         </div>
 
         <!-- Shimmering Skeleton for Next Lazy Loaded Shelf -->
@@ -203,11 +225,11 @@
 
     <!-- Modern Footer -->
     <footer class="app-footer-modern">
-      <div class="footer-giant-brand">GanaTube.in</div>
+      <div class="footer-giant-brand">GanaTube</div>
       <div class="footer-content">
-        <div class="footer-col">
-          <h3 class="col-title">GanaTube</h3>
-          <p class="col-desc">Fast, privacy respecting music streaming with offline support, collaborative rooms, enhanced video previews and smart playlists.</p>
+        <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
+          <h3 class="col-title" style="font-size: 1.8rem; margin-bottom: 8px;">GanaTube is built for fast, distraction-free music and video discovery.</h3>
+          <p class="col-desc" style="font-size: 1rem; color: rgba(255, 255, 255, 0.7); max-width: 600px;">Performance, privacy and resilience drive every release: instant search, adaptive audio quality, background playback, collaborative rooms, and lightweight video previews. We iterate publicly so listeners see how stability and memory usage improve over time.</p>
         </div>
         <div class="footer-col">
           <h3 class="col-title">Platform</h3>
@@ -229,12 +251,6 @@
             <li><a href="#">DMCA</a></li>
             <li><a href="#">Disclaimer</a></li>
           </ul>
-        </div>
-        <div class="footer-col">
-          <h3 class="col-title">Stay Updated</h3>
-          <p class="col-desc">Join our socials for updates, changelogs and roadmap polls.</p>
-          <button class="footer-social-btn">Visit Social Hub</button>
-          <div class="footer-copy">© 2026 GanaTube. All rights reserved.</div>
         </div>
       </div>
     </footer>

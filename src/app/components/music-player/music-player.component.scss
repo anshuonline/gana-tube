@@ -610,7 +610,7 @@
   }
 
   .progress-fill {
-    background: linear-gradient(90deg, #8b5cf6, #ec4899) !important;
+    background: #ffffff !important;
   }
 
   .progress-thumb {
@@ -679,24 +679,20 @@
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8b5cf6, #d946ef);
+  background: #ffffff;
   border: none;
-  color: #fff;
+  color: #000000;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 
-    0 15px 35px rgba(139, 92, 246, 0.45), 
-    0 0 50px rgba(217, 70, 239, 0.2);
+  box-shadow: none;
 
   &:hover {
     transform: scale(1.08);
-    box-shadow: 
-      0 20px 45px rgba(139, 92, 246, 0.55), 
-      0 0 60px rgba(217, 70, 239, 0.35);
-    background: linear-gradient(135deg, #7c3aed, #c084fc);
+    box-shadow: none;
+    background: #e5e5e5;
   }
 
   &:active {

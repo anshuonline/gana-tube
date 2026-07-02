@@ -196,7 +196,12 @@ export class AlgorithmService {
       .slice(0, 3)
       .map(e => e[0]);
 
-    const shelves: ShelfDefinition[] = [];
+    const shelves: ShelfDefinition[] = [
+      {
+        title: "Suggested for You",
+        query: `top hit ${language} songs playlist`
+      }
+    ];
 
     // Context-Aware Naming
     const hour = new Date().getHours();
