@@ -31,8 +31,41 @@ app.get('/api/songs', async (req, res) => {
 
   try {
     const yt = await getYTMusic();
-    console.log(`Searching songs for query: "${query}"`);
-    const results = await yt.searchSongs(query);
+    const limit = parseInt(req.query.limit) || 20;
+    console.log(`Searching songs for query: "${query}" (Limit: ${limit})`);
+    
+    let results = await yt.searchSongs(query);
+    
+    // ytmusic-api natively returns 20 results per search.
+    // If the client requested more (e.g. 50), run parallel searches with varied terms to combine them
+    if (limit > 20 && results && results.length > 0) {
+      try {
+        const parallelSearches = await Promise.all([
+          yt.searchSongs(`${query} hit songs`),
+          yt.searchSongs(`best ${query} tracks`)
+        ]);
+        
+        for (const extraResults of parallelSearches) {
+          if (extraResults && extraResults.length > 0) {
+            results = results.concat(extraResults);
+          }
+        }
+        
+        // Remove exact duplicates by videoId
+        const seen = new Set();
+        results = results.filter(item => {
+          if (!seen.has(item.videoId)) {
+            seen.add(item.videoId);
+            return true;
+          }
+          return false;
+        });
+        
+        results = results.slice(0, limit);
+      } catch (err) {
+        console.warn('Failed parallel extra searches, returning initial 20', err);
+      }
+    }
 
     // Helper to upgrade YouTube Music / Video thumbnails to high resolution (HD)
     const toHDUrl = (url) => {

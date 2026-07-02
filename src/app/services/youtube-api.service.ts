@@ -25,7 +25,9 @@ export class YoutubeApiService {
   searchMusic(query: string, maxResults = 20): Observable<YouTubeSearchResult[]> {
     // Primary: fetch from our local backend server (powered by ytmusicapi)
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
-    const params = new HttpParams().set('q', query);
+    const params = new HttpParams()
+      .set('q', query)
+      .set('limit', maxResults.toString());
 
     return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/songs`, { params }).pipe(
       catchError((err) => {

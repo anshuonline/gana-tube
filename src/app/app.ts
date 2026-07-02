@@ -348,7 +348,7 @@ export class App implements OnInit {
     this.lazyLoadPage = 0;
     this.isLoading.set(true);
     this.hasSearched.set(true);
-    this.youtubeApi.searchMusic(query).pipe(takeUntil(this.destroy$)).subscribe({
+    this.youtubeApi.searchMusic(query, 50).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.results.set(res);
         this.isLoading.set(false);
