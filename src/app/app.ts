@@ -39,6 +39,10 @@ export class App implements OnInit {
   apiKeyMissing = false;
 
   currentQuery = '';
+
+  // Language filter
+  homeScreenLanguage = signal<string>('Hindi'); // Default is Hindi, but user can change it
+  availableLanguages = ['English', 'Telugu', 'Hindi', 'Tamil', 'Punjabi', 'Bhojpuri'];
   lazyLoadPage = 0;
   isLazyLoading = signal<boolean>(false);
   isScrolled = signal<boolean>(false);
@@ -109,9 +113,10 @@ export class App implements OnInit {
     this.startCarouselTimer();
   }
 
-  loadInitialShelves(): void {
+  loadInitialShelves(language?: string): void {
     this.shelvesLoading.set(true);
-    this.algorithmService.getVariableRewardShelves().subscribe(shelves => {
+    this.loadedShelves.set([]);
+    this.algorithmService.getVariableRewardShelves(language || this.homeScreenLanguage()).subscribe(shelves => {
       this.allShelfDefinitions = shelves;
       const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
       let loadedCount = 0;
@@ -294,6 +299,12 @@ export class App implements OnInit {
         this.loadNextShelf();
       }
     }
+  }
+
+  setLanguage(lang: string): void {
+    if (this.homeScreenLanguage() === lang) return;
+    this.homeScreenLanguage.set(lang);
+    this.loadInitialShelves(lang);
   }
 
   loadMoreResults(): void {

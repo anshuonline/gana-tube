@@ -24,7 +24,7 @@
     </div>
 
     <!-- Header Genre & Mood Chips (Below Navbar) -->
-    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing">
+    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode()">
       <div class="header-chips-scroll">
         <button class="header-chip" [class.active]="!hasSearched()" (click)="resetSearchState($event)">All</button>
         <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Romantic Songs 2026'" (click)="onSuggestSearch('Hindi Romantic Songs 2026')">Romantic</button>
@@ -105,6 +105,23 @@
 
       <!-- Recommendation Shelves (Home Screen) -->
       <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !shelvesLoading() && !isSearchMode()">
+
+        <!-- Language Filter -->
+        <div class="language-filter-section">
+          <div class="section-title" style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 12px; text-transform: uppercase;">HOME SCREEN SUGGESTIONS</div>
+          <div class="language-chips" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px;">
+            <button 
+              class="lang-chip" 
+              *ngFor="let lang of availableLanguages"
+              [class.active]="homeScreenLanguage() === lang"
+              (click)="setLanguage(lang)"
+              style="background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 6px 16px; color: #fff; font-family: 'Outfit', sans-serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;"
+              [style.background]="homeScreenLanguage() === lang ? '#e2e8f0' : 'transparent'"
+              [style.color]="homeScreenLanguage() === lang ? '#0f172a' : '#fff'">
+              {{ lang }}
+            </button>
+          </div>
+        </div>
 
         <!-- Dynamic Shelves Loop -->
         <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">

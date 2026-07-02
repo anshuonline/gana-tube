@@ -190,7 +190,7 @@ export class AlgorithmService {
     return this.profile.liked_songs.includes(videoId);
   }
 
-  public getVariableRewardShelves(): Observable<ShelfDefinition[]> {
+  public getVariableRewardShelves(language: string = 'Hindi'): Observable<ShelfDefinition[]> {
     const topArtists = Object.entries(this.profile.taste_profile.artist_scores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
@@ -201,20 +201,20 @@ export class AlgorithmService {
     // Context-Aware Naming
     const hour = new Date().getHours();
     let timeGreeting = "Day";
-    let timeQuery = "bollywood hits";
+    let timeQuery = `bollywood ${language} hits`;
     
     if (hour >= 6 && hour < 12) {
       timeGreeting = "Morning Boost ☀️";
-      timeQuery = "morning motivation hindi songs";
+      timeQuery = `morning motivation ${language} songs`;
     } else if (hour >= 12 && hour < 17) {
       timeGreeting = "Afternoon Vibes 🎵";
-      timeQuery = "latest pop hindi songs";
+      timeQuery = `latest pop ${language} songs`;
     } else if (hour >= 17 && hour < 21) {
       timeGreeting = "Evening Melodies 🌆";
-      timeQuery = "romantic evening hindi songs";
+      timeQuery = `romantic evening ${language} songs`;
     } else {
       timeGreeting = "Late Night Feels 🌙";
-      timeQuery = "lofi sad hindi songs";
+      timeQuery = `lofi sad ${language} songs`;
     }
 
     shelves.push({
@@ -224,10 +224,10 @@ export class AlgorithmService {
 
     if (this.profile.history.length < 3) {
       // New user - Safe defaults
-      shelves.push({ title: "🔥 Trending Right Now", query: "trending hindi songs today" });
-      shelves.push({ title: "Trending Punjabi", query: "latest punjabi hits" });
-      shelves.push({ title: "Bollywood Party", query: "bollywood dance hits" });
-      shelves.push({ title: "Romantic Melodies", query: "best romantic hindi songs" });
+      shelves.push({ title: "🔥 Trending Right Now", query: `trending ${language} songs today` });
+      shelves.push({ title: `Trending ${language}`, query: `latest ${language} hits` });
+      shelves.push({ title: "Party Hits", query: `${language} dance hits` });
+      shelves.push({ title: "Romantic Melodies", query: `best romantic ${language} songs` });
     } else {
       // Personalized shelves
       if (topArtists.length > 0) {
@@ -239,17 +239,17 @@ export class AlgorithmService {
 
       shelves.push({
         title: "Made For You 💜",
-        query: topArtists.length > 1 ? (topArtists[1] + " hits") : "trending hindi songs"
+        query: topArtists.length > 1 ? (topArtists[1] + " hits") : `trending ${language} songs`
       });
 
       shelves.push({
         title: "Fresh Finds For You ✨",
-        query: "new release hindi pop songs"
+        query: `new release ${language} pop songs`
       });
 
       shelves.push({
-        title: "India's Top Hits 🇮🇳",
-        query: "top 50 hindi songs india"
+        title: "Hidden Gems 💎",
+        query: `underrated ${language} indie songs`
       });
     }
 

@@ -472,7 +472,7 @@
   }
 
   &.searched {
-    padding-top: 140px;
+    padding-top: 110px;
   }
 }
 
@@ -610,6 +610,10 @@
     &.has-player {
       padding-bottom: 88px; // 72px mobile player + padding gap
     }
+
+    &.searched {
+      padding-top: 90px;
+    }
   }
 
   .header-inner {
@@ -716,12 +720,21 @@
   }
 
   @media (max-width: 768px) {
-    max-width: 100%;
-    margin-left: 4px;
-    margin-right: 4px;
-    padding: 8px 12px;
-    .trigger-text { font-size: 0.8rem; }
+    max-width: 40px;
+    height: 40px;
+    margin-left: auto;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    flex: 0 0 40px;
+
+    .trigger-text { display: none; }
     .trigger-shortcut { display: none; }
+    
+    .trigger-icon {
+      width: 20px;
+      height: 20px;
+    }
   }
 }
 
