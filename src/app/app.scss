@@ -182,7 +182,9 @@
 }
 
 .hero-inner-wrap {
-  width: 100%;
+  width: 90%;
+  max-width: 90%;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 40px;
@@ -194,6 +196,9 @@
     grid-template-columns: 1fr;
     gap: 32px;
     text-align: center;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 16px;
   }
 }
 
@@ -272,12 +277,17 @@
 .carousel-container {
   position: relative;
   width: 100%;
-  max-width: 400px;
-  height: 250px;
-  border-radius: 16px;
+  max-width: 520px;
+  height: 330px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.3s ease;
+
+  @media (max-width: 480px) {
+    height: 220px;
+  }
 }
 
 .carousel-slide {
