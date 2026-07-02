@@ -56,11 +56,11 @@ export class App implements OnInit {
       { name: 'AR Rahman', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/AR_Rahman_at_Premier_Futsal_Press_Meet_%28cropped%29.jpg/500px-AR_Rahman_at_Premier_Futsal_Press_Meet_%28cropped%29.jpg' },
       { name: 'Neha Kakkar', image: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Neha_Kakkar_in_January_2020.jpg' },
       { name: 'Armaan Malik', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Armaan_Malik_2016.jpg/500px-Armaan_Malik_2016.jpg' },
-      { name: 'Sunidhi Chauhan', image: '' },
-      { name: 'Jubin Nautiyal', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Jubin_Nauityal_at_the_Good_Homes_Awards_2015.jpg/500px-Jubin_Nauityal_at_the_Good_Homes_Awards_2015.jpg' },
+      { name: 'Sunidhi Chauhan', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5BAm4r9Y80jFMiRlqTJEU_8Pt-1mF9q1APFLmpW8hbyozQcbXo5yF-AeYdeeoXl-ImjuA1nOpmHrdk05H9__xWFxUY_5xJwJ0DXlVto13gg&s=10' },
+      { name: 'Jubin Nautiyal', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS3crbcdJBTFuIOusxtwsqUoLUdjVlkYHxAagcfnPlhn9hMhlhMR61OsVSBK4YoDYflZKsd_vMq3dVpdGOZwMT441Old4qCx875VQj2Orp0A&s=10' },
       { name: 'Darshan Raval', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Darshan-Raval-grace-the-12th-radio-mirchi-music-awards-2020.jpg/500px-Darshan-Raval-grace-the-12th-radio-mirchi-music-awards-2020.jpg' },
       { name: 'Sonu Nigam', image: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Sonu_Nigam123.jpg' },
-      { name: 'Vishal Mishra', image: '' }
+      { name: 'Vishal Mishra', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5nWJytsnV4xt2lYhsgN70PmLdmQbGP3z2c0XZu2jVzLPaEaOC99mdfoXbk1i77TbUyKO-mGKiVThFcH4FIKpyS8ESDWtm8wzr1FCPWaEt7w&s=10' }
     ],
     'English': [
       { name: 'Taylor Swift', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/500px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png' },
