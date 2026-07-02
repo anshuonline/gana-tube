@@ -145,6 +145,10 @@ export class App implements OnInit {
     this.playerService.setQueue(list as any, list.indexOf(track));
   }
 
+  scrollShelf(element: HTMLElement, distance: number): void {
+    element.scrollBy({ left: distance, behavior: 'smooth' });
+  }
+
   onPlaySearchTrack(track: YouTubeSearchResult): void {
     // 1. Play track immediately and clear searched query duplicates from queue
     this.playerService.setQueue([track as any], 0);

@@ -40,8 +40,18 @@
         
         <!-- Shelf 1: Trending in India -->
         <div class="shelf-section" *ngIf="trendingIndia().length > 0">
-          <h2 class="shelf-title">🔥 Latest Hits</h2>
-          <div class="shelf-grid">
+          <div class="shelf-header">
+            <h2 class="shelf-title">🔥 Latest Hits</h2>
+            <div class="shelf-nav-buttons" *ngIf="trendingIndia().length > 4">
+              <button class="shelf-nav-btn" (click)="scrollShelf(shelf1, -600)" title="Scroll Left">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="shelf-nav-btn" (click)="scrollShelf(shelf1, 600)" title="Scroll Right">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="shelf-grid" #shelf1>
             <div class="song-card" *ngFor="let track of trendingIndia()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, trendingIndia())">
               <div class="card-thumbnail">
                 <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
@@ -64,8 +74,18 @@
 
         <!-- Shelf 2: Bollywood Hits -->
         <div class="shelf-section" *ngIf="bollywoodHits().length > 0">
-          <h2 class="shelf-title">🎬 New Releases</h2>
-          <div class="shelf-grid">
+          <div class="shelf-header">
+            <h2 class="shelf-title">🎬 New Releases</h2>
+            <div class="shelf-nav-buttons" *ngIf="bollywoodHits().length > 4">
+              <button class="shelf-nav-btn" (click)="scrollShelf(shelf2, -600)" title="Scroll Left">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="shelf-nav-btn" (click)="scrollShelf(shelf2, 600)" title="Scroll Right">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="shelf-grid" #shelf2>
             <div class="song-card" *ngFor="let track of bollywoodHits()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, bollywoodHits())">
               <div class="card-thumbnail">
                 <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
@@ -88,8 +108,18 @@
 
         <!-- Shelf 3: Chill & Lo-Fi -->
         <div class="shelf-section" *ngIf="lofiRelax().length > 0">
-          <h2 class="shelf-title">✨ Trending Punjabi</h2>
-          <div class="shelf-grid">
+          <div class="shelf-header">
+            <h2 class="shelf-title">✨ Trending Punjabi</h2>
+            <div class="shelf-nav-buttons" *ngIf="lofiRelax().length > 4">
+              <button class="shelf-nav-btn" (click)="scrollShelf(shelf3, -600)" title="Scroll Left">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="shelf-nav-btn" (click)="scrollShelf(shelf3, 600)" title="Scroll Right">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="shelf-grid" #shelf3>
             <div class="song-card" *ngFor="let track of lofiRelax()" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, lofiRelax())">
               <div class="card-thumbnail">
                 <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
