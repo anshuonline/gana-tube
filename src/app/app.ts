@@ -313,25 +313,33 @@ export class App implements OnInit {
   }
 
   onPlaySearchTrack(track: YouTubeSearchResult): void {
-    // 1. Play track immediately and clear searched query duplicates from queue
-    this.playerService.setQueue([track as any], 0);
+    // 1. Play track immediately and queue the rest of the search results
+    // This ensures that the queue matches the genre/context of what the user searched for.
+    const currentResults = this.results();
+    const trackIndex = currentResults.findIndex(t => t.videoId === track.videoId);
+    
+    if (trackIndex !== -1) {
+      this.playerService.setQueue(currentResults as any, trackIndex);
+    } else {
+      this.playerService.setQueue([track as any], 0);
+      
+      // Fallback: Automatically query other popular songs by this artist to build autoplay queue
+      const artist = track.channelTitle || '';
+      if (artist && artist !== 'Unknown Artist') {
+        this.youtubeApi.searchMusic(`${artist} hits`, 12).subscribe({
+          next: (relatedTracks) => {
+            const currentQueue = this.playerService.queue();
+            const existingIds = new Set(currentQueue.map(t => t.videoId));
+            const uniqueRelated = relatedTracks.filter(t => !existingIds.has(t.videoId));
 
-    // 2. Automatically query other popular songs by this artist to build autoplay queue
-    const artist = track.channelTitle || '';
-    if (artist && artist !== 'Unknown Artist') {
-      this.youtubeApi.searchMusic(`${artist} hits`, 12).subscribe({
-        next: (relatedTracks) => {
-          const currentQueue = this.playerService.queue();
-          const existingIds = new Set(currentQueue.map(t => t.videoId));
-          const uniqueRelated = relatedTracks.filter(t => !existingIds.has(t.videoId));
-
-          // Append related popular hits to player queue
-          this.playerService.queue.set([...currentQueue, ...uniqueRelated]);
-        },
-        error: (err) => {
-          console.warn('Failed to load related autoplay tracks:', err);
-        }
-      });
+            // Append related popular hits to player queue
+            this.playerService.queue.set([...currentQueue, ...uniqueRelated]);
+          },
+          error: (err) => {
+            console.warn('Failed to load related autoplay tracks:', err);
+          }
+        });
+      }
     }
   }
 
