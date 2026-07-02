@@ -255,7 +255,7 @@ export class AlgorithmService {
 
     // Append 20 additional curated shelves for infinite scrolling depth
     shelves.push(
-      { title: '🕊️ Sufi & Soulful', query: 'Sufi Music Hits' },
+      { title: '🕉️ Hindu Lofi & Chill', query: 'Hindu Lofi Bhakti Songs' },
       { title: '☕ Lo-Fi Chill Beats', query: 'lo-fi chill beats hindi' },
       { title: '🎸 Indie Pop Hits', query: 'Indian Indie Pop' },
       { title: '🌙 Late Night Vibes', query: 'Late Night Hindi Songs' },
