@@ -253,28 +253,23 @@ export class AlgorithmService {
       });
     }
 
-    // Append 20 additional curated shelves for infinite scrolling depth
+    // Append language-specific curated shelves for infinite scrolling depth
     shelves.push(
-      { title: '🕉️ Hindu Lofi & Chill', query: 'Hindu Lofi Bhakti Songs' },
-      { title: '☕ Lo-Fi Chill Beats', query: 'lo-fi chill beats hindi' },
-      { title: '🎸 Indie Pop Hits', query: 'Indian Indie Pop' },
-      { title: '🌙 Late Night Vibes', query: 'Late Night Hindi Songs' },
-      { title: '🎶 90s Golden Hits', query: '90s Bollywood Hits' },
-      { title: '🎤 Arijit Singh Essentials', query: 'Arijit Singh Hits' },
-      { title: '⚡ Workout Energy', query: 'Workout Music India' },
-      { title: '🌧️ Monsoon Magic', query: 'Rainy Day Melodies India' },
-      { title: '🕌 Ghazal Classics', query: 'Best Hindi Ghazals' },
-      { title: '🕉️ Devotional Peace', query: 'Bhakti Bhajan Songs' },
-      { title: '🎻 Classical Instrumental', query: 'Indian Classical Instrumental' },
-      { title: '🎧 Hip Hop India', query: 'Desi Hip Hop Hits' },
-      { title: '🎵 Acoustic Unplugged', query: 'Hindi Acoustic Unplugged' },
-      { title: '💔 Sad Love Songs', query: 'Hindi Sad Melodies' },
-      { title: '🌟 AR Rahman Masterpieces', query: 'AR Rahman Best Songs' },
-      { title: '🔥 Badshah Party Hits', query: 'Badshah Honey Singh Party Hits' },
-      { title: '🌴 Travel Playlist', query: 'Road Trip Hindi Songs' },
-      { title: '💐 Evergreen Duets', query: 'Old Hindi Duet Hits' },
-      { title: '🎹 Lata & Kishore Hits', query: 'Lata Mangeshkar Kishore Kumar Hits' },
-      { title: '✨ Shreya Ghoshal Hits', query: 'Shreya Ghoshal Hits' }
+      { title: `🔥 Top 50 ${language}`, query: `top 50 ${language} songs playlist` },
+      { title: `☕ Lo-Fi Chill ${language}`, query: `lo-fi chill beats ${language}` },
+      { title: `🎸 ${language} Indie Pop`, query: `${language} Indie Pop` },
+      { title: `❤️ Romantic ${language} Melodies`, query: `romantic ${language} love songs` },
+      { title: `🕺 Party & Dance ${language}`, query: `${language} party dance dj hits` },
+      { title: `🎧 90s & 2000s ${language} Nostalgia`, query: `90s 2000s throwback ${language} hits` },
+      { title: `🌧️ Rainy Day ${language}`, query: `rainy day ${language} soft songs` },
+      { title: `💪 Workout & Gym ${language}`, query: `workout gym motivation ${language}` },
+      { title: `🛣️ Long Drive ${language}`, query: `road trip long drive ${language} songs` },
+      { title: `😔 Heartbreak & Sad ${language}`, query: `sad emotional heartbreak ${language} songs` },
+      { title: `🎵 Unplugged & Acoustic ${language}`, query: `unplugged acoustic cover ${language}` },
+      { title: `🎻 Classical & Sufi ${language}`, query: `classical sufi soulful ${language}` },
+      { title: `🚀 Viral ${language} Tracks`, query: `viral trending reels ${language} songs` },
+      { title: `🎙️ Best of ${language} Playback`, query: `best playback singers ${language} hits` },
+      { title: `🕉️ Devotional ${language}`, query: `devotional spiritual bhakti ${language}` }
     );
 
     return of(shelves);
