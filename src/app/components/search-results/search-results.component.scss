@@ -336,3 +336,34 @@
     color: #fff;
   }
 }
+
+// Media queries for search results responsiveness
+@media (max-width: 768px) {
+  .add-queue-btn {
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .results-grid, .loading-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .welcome-content {
+    padding: 0 16px;
+    
+    h2 {
+      font-size: 1.8rem !important;
+    }
+    
+    p {
+      font-size: 0.875rem !important;
+    }
+  }
+
+  .chip {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+  }
+}

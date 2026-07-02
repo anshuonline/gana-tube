@@ -245,6 +245,45 @@
   justify-content: center;
 }
 
+// Media queries for general layout responsiveness
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 64px 16px 48px;
+  }
+
+  .main-content {
+    padding: 0 16px 24px;
+    
+    &.has-player {
+      padding-bottom: 88px; // 72px mobile player + padding gap
+    }
+  }
+
+  .shelf-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .api-notice {
+    display: none !important; // Hide warning notice in header on small mobile screens
+  }
+
+  .header-inner {
+    padding: 0 16px;
+    height: 56px;
+  }
+
+  .logo-img {
+    height: 32px;
+  }
+
+  .shelf-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+}
+
 // Reusing card and image styles since they are global imports or scoped
 @import './components/search-results/search-results.component.scss';
 

@@ -162,3 +162,20 @@
   }
 }
 
+// Media queries for search bar responsiveness
+@media (max-width: 480px) {
+  .search-bar {
+    padding: 8px 12px !important;
+    gap: 8px !important;
+  }
+  
+  .search-input {
+    font-size: 0.875rem !important;
+  }
+
+  .search-btn {
+    padding: 6px 14px !important;
+    font-size: 0.75rem !important;
+  }
+}
+

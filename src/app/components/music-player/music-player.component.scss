@@ -315,27 +315,109 @@
   }
 }
 
-// Responsive
+// Responsive mobile player bar
 @media (max-width: 768px) {
   .player-bar {
-    height: auto;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    padding: 12px 16px;
-    gap: 10px;
+    display: flex !important;
+    flex-direction: row !important;
+    height: 72px !important;
+    padding: 0 16px !important;
+    gap: 12px !important;
+    justify-content: space-between !important;
   }
 
   .player-left {
-    .track-name, .track-artist { max-width: 200px; }
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    gap: 10px !important;
+
+    .album-art-wrapper {
+      width: 44px !important;
+      height: 44px !important;
+    }
+
+    .track-name {
+      font-size: 0.82rem !important;
+      max-width: 140px !important;
+    }
+    
+    .track-artist {
+      font-size: 0.72rem !important;
+      max-width: 140px !important;
+    }
   }
 
   .player-center {
-    width: 100%;
-    order: -1;
+    width: auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+    order: unset !important;
+
+    .control-buttons {
+      button:nth-child(1),
+      button:nth-child(2),
+      button:nth-child(5) {
+        display: none !important; // Hide shuffle, prev, repeat on small bar
+      }
+    }
+
+    .progress-section {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 0;
+      gap: 0;
+      height: 3px;
+
+      .time-label {
+        display: none !important;
+      }
+
+      .progress-track {
+        height: 3px !important;
+        border-radius: 0 !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+
+        &:hover {
+          height: 3px !important;
+        }
+
+        .progress-fill {
+          border-radius: 0 !important;
+        }
+
+        .progress-thumb {
+          display: none !important;
+        }
+      }
+    }
   }
 
   .player-right {
-    justify-content: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 4px !important;
+
+    button:nth-child(2),
+    input.volume-slider {
+      display: none !important; // Hide mute and volume slider on small bar
+    }
+
+    .maximize-btn {
+      display: flex !important;
+    }
+  }
+
+  .queue-drawer {
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
+    bottom: 80px !important;
+    max-height: 55vh !important;
   }
 }
 
@@ -667,8 +749,9 @@
     padding-bottom: 40px;
   }
 
-  .vinyl-record-wrap {
-    width: clamp(220px, 45vw, 320px);
+  .fs-cover-card {
+    width: 70%;
+    margin: 0 auto;
   }
 
   .fs-info-section {
@@ -688,6 +771,80 @@
   .fs-volume-wrap {
     justify-content: center;
     margin: 0 auto;
+  }
+}
+
+// Media Query for Mobile Screen Dashboard
+@media (max-width: 600px) {
+  .fs-header {
+    height: 70px !important;
+    padding: 0 20px !important;
+    
+    .logo-text {
+      font-size: 1.3rem !important;
+    }
+  }
+
+  .fs-close-btn {
+    width: 40px !important;
+    height: 40px !important;
+    
+    svg {
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  .fs-container {
+    padding: 0 20px 24px !important;
+    gap: 24px !important;
+  }
+
+  .fs-cover-card {
+    width: 65% !important;
+  }
+
+  .fs-info-section {
+    gap: 20px !important;
+  }
+
+  .track-header {
+    .track-title-large {
+      font-size: 1.5rem !important;
+      margin-bottom: 6px !important;
+    }
+    
+    .track-artist-large {
+      font-size: 0.95rem !important;
+    }
+  }
+
+  .fs-dashboard-controls {
+    gap: 12px !important;
+  }
+
+  .fs-ctrl-btn {
+    width: 48px !important;
+    height: 48px !important;
+    
+    svg {
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  .fs-play-btn-large {
+    width: 72px !important;
+    height: 72px !important;
+    
+    svg {
+      width: 24px !important;
+      height: 24px !important;
+    }
+  }
+
+  .fs-volume-wrap {
+    max-width: 280px !important;
   }
 }
 
