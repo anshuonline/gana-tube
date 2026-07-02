@@ -660,3 +660,90 @@
 // Reusing card and image styles since they are global imports or scoped
 @import './components/search-results/search-results.component.scss';
 
+// ---- Search Mode Additions ----
+.header-search-trigger {
+  margin-left: auto;
+  width: 100%;
+  max-width: 320px;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+  padding: 8px 16px;
+  cursor: text;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(24px);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .trigger-icon {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .trigger-text {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+    flex: 1;
+    text-align: left;
+  }
+
+  .trigger-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+
+    kbd {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    margin-left: 4px;
+    margin-right: 4px;
+    padding: 8px 12px;
+    .trigger-text { font-size: 0.8rem; }
+    .trigger-shortcut { display: none; }
+  }
+}
+
+.search-page-view {
+  animation: fadeIn 0.3s ease-out;
+  padding-bottom: 20px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 10px 0 20px 0;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+.search-page-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+

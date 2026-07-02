@@ -10,8 +10,12 @@
         <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube</span>
       </div>
 
-      <!-- Compact Search Bar in Header -->
-      <app-search-bar (search)="onSearch($event)" class="header-search-bar"></app-search-bar>
+      <!-- Compact Fake Search Button in Header -->
+      <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">
+        <svg lucideSearch class="trigger-icon" [attr.size]="18"></svg>
+        <span class="trigger-text">Search for songs, artists...</span>
+        <div class="trigger-shortcut"><kbd>Ctrl</kbd> + <kbd>K</kbd></div>
+      </button>
 
       <!-- API Key Warning Banner -->
       <div class="api-notice" *ngIf="apiKeyMissing">
@@ -45,8 +49,8 @@
     </div>
   </header>
 
-  <!-- Hero Banner -->
-  <section class="hero-section" *ngIf="!hasSearched()">
+  <!-- Hero Banner (Hidden in Search Mode) -->
+  <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
     <div class="hero-inner-wrap full-width">
       
       <!-- Full Width Carousel -->
@@ -89,8 +93,18 @@
   <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched()">
     <div class="results-container">
       
+      <!-- Dedicated Search Page View -->
+      <div class="search-page-view" *ngIf="isSearchMode()">
+        <button class="back-btn" (click)="closeSearchPage()">
+          <svg lucideChevronLeft [attr.size]="24"></svg> Back to Home
+        </button>
+        <div class="search-page-header">
+          <app-search-bar (search)="onSearch($event)" class="main-search-bar"></app-search-bar>
+        </div>
+      </div>
+
       <!-- Recommendation Shelves (Home Screen) -->
-      <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !shelvesLoading()">
+      <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !shelvesLoading() && !isSearchMode()">
 
         <!-- Dynamic Shelves Loop -->
         <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">
@@ -139,7 +153,7 @@
       </div>
 
       <!-- Shelves Loading Skeletons -->
-      <div class="recommendations-wrap" *ngIf="!hasSearched() && shelvesLoading()">
+      <div class="recommendations-wrap" *ngIf="!hasSearched() && shelvesLoading() && !isSearchMode()">
         <div class="shelf-section" *ngFor="let s of [1,2]">
           <div class="skeleton-title" style="width: 200px; height: 28px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
           <div class="loading-grid">

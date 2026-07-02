@@ -42,6 +42,7 @@ export class App implements OnInit {
   lazyLoadPage = 0;
   isLazyLoading = signal<boolean>(false);
   isScrolled = signal<boolean>(false);
+  isSearchMode = signal<boolean>(false);
 
   // Dynamic algorithmic shelves for home recommendations
   allShelfDefinitions: ShelfDefinition[] = [];
@@ -72,6 +73,20 @@ export class App implements OnInit {
     if (this.searchBar) {
       this.searchBar.clearQuery();
     }
+    this.isSearchMode.set(false);
+  }
+
+  openSearchPage(): void {
+    this.isSearchMode.set(true);
+    setTimeout(() => {
+      if (this.searchBar) {
+        this.searchBar.focusInput();
+      }
+    }, 100);
+  }
+
+  closeSearchPage(): void {
+    this.isSearchMode.set(false);
   }
 
   ngOnInit(): void {
@@ -237,6 +252,17 @@ export class App implements OnInit {
   @HostListener('document:copy', ['$event'])
   onCopy(event: Event): void {
     event.preventDefault();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleGlobalKeyboard(event: KeyboardEvent): void {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      event.preventDefault();
+      this.openSearchPage();
+    }
+    if (event.key === 'Escape' && this.isSearchMode()) {
+      this.closeSearchPage();
+    }
   }
 
   @HostListener('window:scroll', [])
