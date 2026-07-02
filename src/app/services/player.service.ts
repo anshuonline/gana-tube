@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { YouTubeSearchResult } from './youtube-api.service';
 import { AlgorithmService } from './algorithm.service';
+import { YoutubeApiService } from './youtube-api.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -11,7 +12,9 @@ export type PlayerState = 'unstarted' | 'loading' | 'playing' | 'paused' | 'ende
 })
 export class PlayerService {
   private algorithmService = inject(AlgorithmService);
+  private youtubeApi = inject(YoutubeApiService);
   private trackStartTime: number = 0;
+  private isFetchingMore = false;
 
   // Signals for state management
   queue = signal<Track[]>([]);
@@ -23,6 +26,7 @@ export class PlayerService {
   isMuted = signal<boolean>(false);
   isShuffled = signal<boolean>(false);
   repeatMode = signal<'none' | 'one' | 'all'>('none');
+  currentLanguage = signal<string>('Hindi');
 
   // Computed signal for the current track
   currentTrack = computed(() => {
@@ -63,6 +67,7 @@ export class PlayerService {
     }
     this.playerState.set('loading');
     this.loadInPlayer(track.videoId);
+    this.fetchMoreTracksIfNeeded();
   }
 
   setQueue(tracks: Track[], startIndex = 0): void {
@@ -76,6 +81,7 @@ export class PlayerService {
     if (tracks[startIndex]) {
       this.loadInPlayer(tracks[startIndex].videoId);
     }
+    this.fetchMoreTracksIfNeeded();
   }
 
   togglePlayPause(): void {
@@ -101,6 +107,7 @@ export class PlayerService {
     this.currentIndex.set(nextIdx);
     this.playerState.set('loading');
     this.loadInPlayer(q[nextIdx].videoId);
+    this.fetchMoreTracksIfNeeded();
   }
 
   previous(): void {
@@ -219,8 +226,49 @@ export class PlayerService {
   }
 
   private loadInPlayer(videoId: string): void {
-    if (this.ytPlayer) {
+    if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
       this.ytPlayer.loadVideoById(videoId);
+    }
+  }
+
+  private fetchMoreTracksIfNeeded(): void {
+    const q = this.queue();
+    const idx = this.currentIndex();
+    // Fetch more if we have 3 or fewer tracks left to play, and not repeating all
+    if (idx >= q.length - 3 && !this.isFetchingMore && this.repeatMode() !== 'all') {
+      this.isFetchingMore = true;
+      const lang = this.currentLanguage();
+      
+      // Use the current language to find trending/popular songs for the infinite loop
+      // If we had a direct "getRelatedVideos" API, we would use that, but since we are
+      // using searchMusic, we will use a diverse language-specific query.
+      const queryOptions = [
+        `trending ${lang} songs`,
+        `latest ${lang} hits`,
+        `best ${lang} music`,
+        `popular ${lang} songs`,
+        `new release ${lang}`
+      ];
+      const randomQuery = queryOptions[Math.floor(Math.random() * queryOptions.length)];
+      
+      this.youtubeApi.searchMusic(randomQuery, 10).subscribe({
+        next: (songs) => {
+          if (songs && songs.length > 0) {
+            // Filter out songs already in the queue to avoid immediate duplicates
+            const currentVideoIds = new Set(this.queue().map(t => t.videoId));
+            const newSongs = songs.filter(s => !currentVideoIds.has(s.videoId));
+            
+            if (newSongs.length > 0) {
+              this.queue.set([...this.queue(), ...newSongs]);
+            }
+          }
+          this.isFetchingMore = false;
+        },
+        error: (err) => {
+          console.error('Failed to fetch more tracks for queue', err);
+          this.isFetchingMore = false;
+        }
+      });
     }
   }
 

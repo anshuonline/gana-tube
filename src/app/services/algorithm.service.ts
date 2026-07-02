@@ -222,14 +222,14 @@ export class AlgorithmService {
       query: timeQuery
     });
 
-    if (this.profile.history.length < 3) {
-      // New user - Safe defaults
+    if (this.profile.history.length < 3 || language !== 'Hindi') {
+      // New user or specific language selected - Safe defaults
       shelves.push({ title: "🔥 Trending Right Now", query: `trending ${language} songs today` });
       shelves.push({ title: `Trending ${language}`, query: `latest ${language} hits` });
       shelves.push({ title: "Party Hits", query: `${language} dance hits` });
       shelves.push({ title: "Romantic Melodies", query: `best romantic ${language} songs` });
     } else {
-      // Personalized shelves
+      // Personalized shelves (Only for default language/Hindi)
       if (topArtists.length > 0) {
         shelves.push({
           title: "Because you like " + topArtists[0],

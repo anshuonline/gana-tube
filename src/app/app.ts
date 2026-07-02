@@ -304,6 +304,7 @@ export class App implements OnInit {
   setLanguage(lang: string): void {
     if (this.homeScreenLanguage() === lang) return;
     this.homeScreenLanguage.set(lang);
+    this.playerService.currentLanguage.set(lang);
     this.loadInitialShelves(lang);
   }
 
