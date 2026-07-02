@@ -284,4 +284,56 @@ export class AlgorithmService {
     const query = currentTrack.channelTitle + " songs like " + currentTrack.title;
     return this.youtubeApi.searchMusic(query, 10);
   }
+
+  public async getWeatherShelf(): Promise<ShelfDefinition | null> {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+          
+          const response = await fetch(url);
+          const data = await response.json();
+          
+          if (data && data.current_weather) {
+            const code = data.current_weather.weathercode;
+            let title = "Weather Vibes";
+            let query = "trending hindi songs";
+
+            if (code <= 1) {
+              title = "Sunny & Bright ☀️";
+              query = "upbeat energetic bollywood songs";
+            } else if (code <= 3 || code === 45 || code === 48) {
+              title = "Cloudy & Chill ☁️";
+              query = "chill lofi hindi songs";
+            } else if ((code >= 51 && code <= 65) || (code >= 80 && code <= 82)) {
+              title = "Rainy Day Melodies 🌧️";
+              query = "monsoon romantic hindi songs";
+            } else if (code >= 71 && code <= 77) {
+              title = "Cozy & Warm ❄️";
+              query = "acoustic hindi unplugged";
+            } else if (code >= 95) {
+              title = "Thunder & Storm ⛈️";
+              query = "intense emotional hindi songs";
+            }
+
+            resolve({ title, query });
+          } else {
+            resolve(null);
+          }
+        } catch (e) {
+          console.error("Failed to fetch weather", e);
+          resolve(null);
+        }
+      }, (err) => {
+        console.warn("Geolocation blocked or failed", err);
+        resolve(null);
+      }, { timeout: 10000 });
+    });
+  }
 }
