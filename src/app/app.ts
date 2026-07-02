@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, signal, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideDisc3 } from '@lucide/angular';
 
@@ -34,6 +34,10 @@ export class App implements OnInit {
   isLoading = signal<boolean>(false);
   hasSearched = signal<boolean>(false);
   apiKeyMissing = false;
+
+  currentQuery = '';
+  lazyLoadPage = 0;
+  isLazyLoading = signal<boolean>(false);
 
   // Recommendation Shelves using Signals to trigger zoneless CD instantly
   trendingIndia = signal<YouTubeSearchResult[]>([]);
@@ -142,6 +146,8 @@ export class App implements OnInit {
   }
 
   performSearch(query: string): void {
+    this.currentQuery = query;
+    this.lazyLoadPage = 0;
     this.isLoading.set(true);
     this.hasSearched.set(true);
     this.youtubeApi.searchMusic(query).pipe(takeUntil(this.destroy$)).subscribe({
@@ -153,6 +159,51 @@ export class App implements OnInit {
         this.results.set([]);
         this.isLoading.set(false);
       },
+    });
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll(): void {
+    if (this.hasSearched() && !this.isLoading() && !this.isLazyLoading()) {
+      const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
+      const max = document.documentElement.scrollHeight;
+      // If we are within 250px of the bottom of the page
+      if (pos >= max - 250) {
+        this.loadMoreResults();
+      }
+    }
+  }
+
+  loadMoreResults(): void {
+    if (!this.currentQuery || this.lazyLoadPage >= 3) {
+      return;
+    }
+
+    this.isLazyLoading.set(true);
+    this.lazyLoadPage++;
+
+    // Generate query variations for paginated mock feel
+    let queryVariation = this.currentQuery;
+    if (this.lazyLoadPage === 1) {
+      queryVariation = `${this.currentQuery} music`;
+    } else if (this.lazyLoadPage === 2) {
+      queryVariation = `${this.currentQuery} song`;
+    } else if (this.lazyLoadPage === 3) {
+      queryVariation = `${this.currentQuery} audio`;
+    }
+
+    this.youtubeApi.searchMusic(queryVariation).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (newItems) => {
+        const currentItems = this.results();
+        const existingIds = new Set(currentItems.map(item => item.videoId));
+        const uniqueNewItems = newItems.filter(item => !existingIds.has(item.videoId));
+
+        this.results.set([...currentItems, ...uniqueNewItems]);
+        this.isLazyLoading.set(false);
+      },
+      error: () => {
+        this.isLazyLoading.set(false);
+      }
     });
   }
 

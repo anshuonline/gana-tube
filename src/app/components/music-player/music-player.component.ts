@@ -183,7 +183,9 @@ import { PlayerService } from '../../services/player.service';
 
       <!-- Header Controls -->
       <div class="fs-header">
-        <div class="logo-text">Gana<span class="logo-accent">Tube</span></div>
+        <div class="logo">
+          <img src="ganatube.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; max-width: 160px; object-fit: contain;" />
+        </div>
         <div style="display: flex; gap: 16px;">
           <button class="fs-close-btn" [class.active]="showFSQueue()" (click)="toggleFSQueue()" title="Toggle Queue">
             <svg lucideListMusic [attr.size]="24"></svg>
