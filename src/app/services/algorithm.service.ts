@@ -253,6 +253,30 @@ export class AlgorithmService {
       });
     }
 
+    // Append 20 additional curated shelves for infinite scrolling depth
+    shelves.push(
+      { title: '🕊️ Sufi & Soulful', query: 'Sufi Music Hits' },
+      { title: '☕ Lo-Fi Chill Beats', query: 'lo-fi chill beats hindi' },
+      { title: '🎸 Indie Pop Hits', query: 'Indian Indie Pop' },
+      { title: '🌙 Late Night Vibes', query: 'Late Night Hindi Songs' },
+      { title: '🎶 90s Golden Hits', query: '90s Bollywood Hits' },
+      { title: '🎤 Arijit Singh Essentials', query: 'Arijit Singh Hits' },
+      { title: '⚡ Workout Energy', query: 'Workout Music India' },
+      { title: '🌧️ Monsoon Magic', query: 'Rainy Day Melodies India' },
+      { title: '🕌 Ghazal Classics', query: 'Best Hindi Ghazals' },
+      { title: '🕉️ Devotional Peace', query: 'Bhakti Bhajan Songs' },
+      { title: '🎻 Classical Instrumental', query: 'Indian Classical Instrumental' },
+      { title: '🎧 Hip Hop India', query: 'Desi Hip Hop Hits' },
+      { title: '🎵 Acoustic Unplugged', query: 'Hindi Acoustic Unplugged' },
+      { title: '💔 Sad Love Songs', query: 'Hindi Sad Melodies' },
+      { title: '🌟 AR Rahman Masterpieces', query: 'AR Rahman Best Songs' },
+      { title: '🔥 Badshah Party Hits', query: 'Badshah Honey Singh Party Hits' },
+      { title: '🌴 Travel Playlist', query: 'Road Trip Hindi Songs' },
+      { title: '💐 Evergreen Duets', query: 'Old Hindi Duet Hits' },
+      { title: '🎹 Lata & Kishore Hits', query: 'Lata Mangeshkar Kishore Kumar Hits' },
+      { title: '✨ Shreya Ghoshal Hits', query: 'Shreya Ghoshal Hits' }
+    );
+
     return of(shelves);
   }
 
