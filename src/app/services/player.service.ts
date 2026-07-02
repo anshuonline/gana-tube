@@ -251,7 +251,15 @@ export class PlayerService {
       ];
       const randomQuery = queryOptions[Math.floor(Math.random() * queryOptions.length)];
       
-      this.youtubeApi.searchMusic(randomQuery, 10).subscribe({
+      const current = this.currentTrack();
+      let query = randomQuery;
+      
+      // If we have a current track, use its title and artist to get highly relevant continuous music
+      if (current) {
+        query = `${current.channelTitle} ${current.title} similar hit songs`;
+      }
+      
+      this.youtubeApi.searchMusic(query, 25).subscribe({
         next: (songs) => {
           if (songs && songs.length > 0) {
             // Filter out songs already in the queue to avoid immediate duplicates
@@ -260,6 +268,10 @@ export class PlayerService {
             
             if (newSongs.length > 0) {
               this.queue.set([...this.queue(), ...newSongs]);
+            } else {
+              // If all were duplicates, just append them anyway to keep the loop going!
+              // But shuffle them slightly so it doesn't feel repetitive
+              this.queue.set([...this.queue(), ...songs.sort(() => 0.5 - Math.random())]);
             }
           }
           this.isFetchingMore = false;
@@ -285,7 +297,14 @@ export class PlayerService {
         if (current) {
           this.algorithmService.getAutoplayQueue(current).subscribe(newTracks => {
             if (newTracks && newTracks.length > 0) {
-              this.queue.set([...q, ...newTracks]);
+              const currentVideoIds = new Set(this.queue().map(t => t.videoId));
+              let uniqueNew = newTracks.filter(s => !currentVideoIds.has(s.videoId));
+              
+              if (uniqueNew.length === 0) {
+                // If we ran out of unique tracks, just loop the related tracks infinitely
+                uniqueNew = newTracks;
+              }
+              this.queue.set([...q, ...uniqueNew]);
             }
             this.next();
           });
