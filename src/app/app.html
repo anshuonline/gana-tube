@@ -17,10 +17,6 @@
       <div class="api-notice" *ngIf="apiKeyMissing">
         <span>🔑 Demo mode — Add your <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">YouTube API Key</a> in <code>environment.ts</code> to enable real search</span>
       </div>
-
-      <div class="header-right">
-        <svg lucideDisc3 [attr.size]="20" class="header-icon"></svg>
-      </div>
     </div>
 
     <!-- Header Genre & Mood Chips (Below Navbar) -->
@@ -38,6 +34,13 @@
         <button class="header-chip" [class.active]="hasSearched() && currentQuery === '90s Bollywood Hits'" (click)="onSuggestSearch('90s Bollywood Hits')">Retro</button>
         <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Indian Classical Instrumental'" (click)="onSuggestSearch('Indian Classical Instrumental')">Instrumental</button>
         <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Coke Studio Hits'" (click)="onSuggestSearch('Coke Studio Hits')">Coke Studio</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Devotional Songs'" (click)="onSuggestSearch('Devotional Songs')">Devotional</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Ghazal Classics'" (click)="onSuggestSearch('Ghazal Classics')">Ghazal</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Indian Indie Music'" (click)="onSuggestSearch('Indian Indie Music')">Indie</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'K-Pop Trending'" (click)="onSuggestSearch('K-Pop Trending')">K-Pop</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Electronic Dance Music'" (click)="onSuggestSearch('Electronic Dance Music')">EDM</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Workout Motivation Songs'" (click)="onSuggestSearch('Workout Motivation Songs')">Workout</button>
+        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Bhojpuri Hits'" (click)="onSuggestSearch('Bhojpuri Hits')">Bhojpuri</button>
       </div>
     </div>
   </header>
@@ -83,7 +86,7 @@
   </section>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched()">
     <div class="results-container">
       
       <!-- Recommendation Shelves (Home Screen) -->

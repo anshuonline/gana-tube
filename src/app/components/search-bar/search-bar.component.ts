@@ -11,7 +11,7 @@ import { YoutubeApiService } from '../../services/youtube-api.service';
   standalone: true,
   imports: [CommonModule, FormsModule, LucideSearch, LucideX],
   template: `
-    <div class="search-overlay" [class.active]="isFocused" (click)="closeOverlay()">
+    <div class="search-overlay" [class.active]="isFocused" (mousedown)="onOverlayClick($event)">
       <div class="search-wrapper" (click)="$event.stopPropagation()">
         <div class="search-bar" [class.focused]="isFocused">
           <svg lucideSearch class="search-icon" [attr.size]="20"></svg>
@@ -113,6 +113,12 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     // We handle overlay click to close it now.
+  }
+
+  onOverlayClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeOverlay();
+    }
   }
 
   closeOverlay(): void {
