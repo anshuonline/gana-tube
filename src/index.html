@@ -66,5 +66,18 @@
   </head>
   <body>
     <app-root></app-root>
+    <script>
+      document.addEventListener('contextmenu', event => event.preventDefault());
+      document.addEventListener('copy', event => {
+        if (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') event.preventDefault();
+      });
+      document.addEventListener('cut', event => {
+        if (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') event.preventDefault();
+      });
+      document.addEventListener('selectstart', event => {
+        if (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') event.preventDefault();
+      });
+      document.addEventListener('dragstart', event => event.preventDefault());
+    </script>
   </body>
 </html>
