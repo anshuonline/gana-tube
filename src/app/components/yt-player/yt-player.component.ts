@@ -183,8 +183,8 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
   private schedulePreloading(queue: any[], currentIndex: number): void {
     const upcomingIds: string[] = [];
     
-    // Get up to 3 upcoming videos (taking repeatMode into account if needed)
-    for (let i = 1; i <= 3; i++) {
+    // Get only the next 1 upcoming video to save user bandwidth
+    for (let i = 1; i <= 1; i++) {
       let idx = currentIndex + i;
       // Handle loop 'all'
       if (idx >= queue.length && this.playerService.repeatMode() === 'all') {
