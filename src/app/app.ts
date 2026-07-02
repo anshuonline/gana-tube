@@ -12,6 +12,11 @@ import { environment } from '../environments/environment';
 import { Subject, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
+export interface ShelfDefinition {
+  title: string;
+  query: string;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -39,11 +44,55 @@ export class App implements OnInit {
   lazyLoadPage = 0;
   isLazyLoading = signal<boolean>(false);
 
-  // Recommendation Shelves using Signals to trigger zoneless CD instantly
-  trendingIndia = signal<YouTubeSearchResult[]>([]);
-  bollywoodHits = signal<YouTubeSearchResult[]>([]);
-  lofiRelax = signal<YouTubeSearchResult[]>([]);
+  // Curated list of 40 dynamic shelves for infinite home recommendations scroll
+  allShelfDefinitions: ShelfDefinition[] = [
+    { title: '🔥 Latest Hits', query: 'New Hindi Songs 2026' },
+    { title: '🎬 New Releases', query: 'New Bollywood Releases 2026' },
+    { title: '✨ Trending Punjabi', query: 'Latest Punjabi Hits 2026' },
+    { title: '❤️ Romantic Melodies', query: 'Hindi Romantic Songs 2026' },
+    { title: '🎉 Party Dance Anthems', query: 'Bollywood Party Hits' },
+    { title: '🕊️ Sufi & Soulful', query: 'Sufi Music Hits' },
+    { title: '☕ Lo-Fi Chill Beats', query: 'lo-fi chill beats' },
+    { title: '🎸 Indie Pop Hits', query: 'Indian Indie Pop' },
+    { title: '🌙 Late Night Vibes', query: 'Late Night Hindi Songs' },
+    { title: '🎶 90s Golden Hits', query: '90s Bollywood Hits' },
+    { title: '🎤 Arijit Singh Essentials', query: 'Arijit Singh Hits' },
+    { title: '⚡ Workout Energy', query: 'Workout Music India' },
+    { title: '🌧️ Monsoon Magic', query: 'Rainy Day Melodies India' },
+    { title: '🕌 Ghazal Classics', query: 'Best Hindi Ghazals' },
+    { title: '🕉️ Devotional Peace', query: 'Bhakti Bhajan Songs' },
+    { title: '🎻 Classical Instrumental', query: 'Indian Classical Instrumental' },
+    { title: '🎧 Hip Hop India', query: 'Desi Hip Hop Hits' },
+    { title: '🎵 Acoustic Unplugged', query: 'Hindi Acoustic Unplugged' },
+    { title: '💔 Sad Love Songs', query: 'Hindi Sad Melodies' },
+    { title: '🌟 AR Rahman Masterpieces', query: 'AR Rahman Best Songs' },
+    { title: '🔥 Badshah Party Hits', query: 'Badshah Honey Singh Party Hits' },
+    { title: '🌴 Travel Playlist', query: 'Road Trip Hindi Songs' },
+    { title: '💐 Evergreen Duets', query: 'Old Hindi Duet Hits' },
+    { title: '🎹 Lata & Kishore Hits', query: 'Lata Mangeshkar Kishore Kumar Hits' },
+    { title: '✨ Shreya Ghoshal Hits', query: 'Shreya Ghoshal Hits' },
+    { title: '🌹 Best of KK', query: 'Best of KK Singer' },
+    { title: '💥 EDM Festival Vibes', query: 'EDM Dance Hits' },
+    { title: '⚡ Gaming Focus', query: 'Gaming Focus Beats' },
+    { title: '📖 Study Instrumentals', query: 'Chill Study Beats' },
+    { title: '🎤 Latest Desi Rap', query: 'Latest Desi Rap' },
+    { title: '🎬 South Movie Hits', query: 'South Indian Movie Hits' },
+    { title: '🕺 80s Bollywood Dance', query: '80s Bollywood Dance' },
+    { title: '💫 Soulful Rahat Hits', query: 'Rahat Fateh Ali Khan Songs' },
+    { title: '🍁 Punjabi Sad Hits', query: 'Punjabi Sad Songs' },
+    { title: '🌠 Atif Aslam Essentials', query: 'Atif Aslam Hits' },
+    { title: '🥁 Wedding Specials', query: 'Bollywood Wedding Songs' },
+    { title: '🌌 Spiritual Healing', query: 'Meditation Soundtracks' },
+    { title: '🎸 Classic Rock Hits', query: 'Classic Rock Hits' },
+    { title: '☕ Coffee & Acoustic', query: 'Coffee Shop Acoustic Chill' },
+    { title: '🎙️ Coke Studio Masterpieces', query: 'Coke Studio Hits' }
+  ];
+
+  // Dynamic shelves signal holding loaded categories
+  loadedShelves = signal<Array<{ title: string; query: string; songs: YouTubeSearchResult[] }>>([]);
   shelvesLoading = signal<boolean>(false);
+  shelfLoading = signal<boolean>(false);
+  loadingShelfTitle = signal<string>('');
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -79,58 +128,56 @@ export class App implements OnInit {
         this.performSearch(query);
       });
 
-    this.loadRecommendationShelves();
+    this.loadInitialShelves();
   }
 
-  loadRecommendationShelves(): void {
+  loadInitialShelves(): void {
     this.shelvesLoading.set(true);
+    const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
+    const requests = initialDefinitions.map(def => this.youtubeApi.searchMusic(def.query, 12));
 
-    let loadedCount = 0;
-    const checkDone = () => {
-      loadedCount++;
-      if (loadedCount >= 3) {
+    forkJoin(requests).subscribe({
+      next: (resultsArray) => {
+        const shelves = initialDefinitions.map((def, idx) => ({
+          title: def.title,
+          query: def.query,
+          songs: resultsArray[idx]
+        }));
+        this.loadedShelves.set(shelves);
+        this.shelvesLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load initial shelves:', err);
         this.shelvesLoading.set(false);
       }
-    };
+    });
+  }
 
-    this.youtubeApi.searchMusic('New Hindi Songs 2026', 12)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.trendingIndia.set(res);
-          checkDone();
-        },
-        error: (err) => {
-          console.error('Failed to load Trending India shelf:', err);
-          checkDone();
-        }
-      });
+  loadNextShelf(): void {
+    const currentCount = this.loadedShelves().length;
+    if (currentCount >= this.allShelfDefinitions.length || this.shelfLoading()) {
+      return;
+    }
 
-    this.youtubeApi.searchMusic('New Bollywood Releases 2026', 12)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.bollywoodHits.set(res);
-          checkDone();
-        },
-        error: (err) => {
-          console.error('Failed to load Bollywood Hits shelf:', err);
-          checkDone();
-        }
-      });
+    const nextDef = this.allShelfDefinitions[currentCount];
+    this.loadingShelfTitle.set(nextDef.title);
+    this.shelfLoading.set(true);
 
-    this.youtubeApi.searchMusic('Latest Punjabi Hits 2026', 12)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.lofiRelax.set(res);
-          checkDone();
-        },
-        error: (err) => {
-          console.error('Failed to load Lo-Fi shelf:', err);
-          checkDone();
+    this.youtubeApi.searchMusic(nextDef.query, 12).subscribe({
+      next: (songs) => {
+        if (songs && songs.length > 0) {
+          this.loadedShelves.update(shelves => [
+            ...shelves,
+            { title: nextDef.title, query: nextDef.query, songs }
+          ]);
         }
-      });
+        this.shelfLoading.set(false);
+      },
+      error: (err) => {
+        console.error(`Failed to load shelf: ${nextDef.title}`, err);
+        this.shelfLoading.set(false);
+      }
+    });
   }
 
   onSearch(query: string): void {
@@ -196,12 +243,19 @@ export class App implements OnInit {
 
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
-    if (this.hasSearched() && !this.isLoading() && !this.isLazyLoading()) {
-      const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
-      const max = document.documentElement.scrollHeight;
-      // If we are within 250px of the bottom of the page
-      if (pos >= max - 250) {
+    if (this.isLoading() || this.isLazyLoading() || this.shelfLoading() || this.shelvesLoading()) {
+      return;
+    }
+
+    const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
+    const max = document.documentElement.scrollHeight;
+    
+    // If we are within 350px of the bottom of the page
+    if (pos >= max - 350) {
+      if (this.hasSearched()) {
         this.loadMoreResults();
+      } else {
+        this.loadNextShelf();
       }
     }
   }
