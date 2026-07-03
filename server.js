@@ -213,6 +213,11 @@ app.get('/api/songs', async (req, res) => {
         console.warn('Failed parallel extra searches, returning initial 20', err);
       }
     }
+    
+    // Always enforce the limit, whether it is 1 or 50.
+    if (results && results.length > limit) {
+      results = results.slice(0, limit);
+    }
 
 
     // Helper to upgrade YouTube Music / Video thumbnails to high resolution (HD)
