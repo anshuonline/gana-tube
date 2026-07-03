@@ -13,7 +13,28 @@ export const PLAYLISTS: PlaylistMeta[] = [
     title: 'English Latest Hits',
     language: 'English',
     coverImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=500',
-    searchQueries: ['Top English Songs 2024', 'Latest English Pop Hits', 'Billboard Hot 100']
+    searchQueries: [
+      'Risk It All — Bruno Mars',
+      'Stateside (feat. Zara Larsson) — PinkPantheress',
+      'My Body Isn\'t Ready — sombr',
+      'American Girls — Harry Styles',
+      'drop dead — Olivia Rodrigo',
+      'Man I Need — Olivia Dean',
+      'Potential — Bella Kay',
+      'SHE DID IT AGAIN — Tyla & Zara Larsson',
+      'White Keys — Dominic Fike',
+      'The Great Divide — Noah Kahan',
+      'No One Noticed — The Marías',
+      'Birds of a Feather — Billie Eilish',
+      'Die With A Smile — Lady Gaga & Bruno Mars',
+      'Espresso — Sabrina Carpenter',
+      'Beautiful Things — Benson Boone',
+      'Lose Control — Teddy Swims',
+      'Too Sweet — Hozier',
+      'APT. — ROSÉ & Bruno Mars',
+      'Fortnight — Taylor Swift feat. Post Malone',
+      'Stargazing — Myles Smith'
+    ]
   },
   {
     id: 'hero-hindi',
