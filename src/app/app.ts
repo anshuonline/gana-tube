@@ -676,8 +676,8 @@ export class App implements OnInit {
 
   explorePlaylist(lang: string): void {
     const langLower = lang.toLowerCase();
-    const playlistId = `hero-${langLower}`;
-    const targetPlaylist = PLAYLISTS.find(p => p.id === playlistId);
+    const playlistSlug = `hero-${langLower}`;
+    const targetPlaylist = PLAYLISTS.find(p => p.slug === playlistSlug || p.id === playlistSlug);
     
     if (targetPlaylist) {
       this.openPlaylist(targetPlaylist);
