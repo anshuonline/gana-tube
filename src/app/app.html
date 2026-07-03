@@ -71,41 +71,35 @@
     <div *ngIf="currentPage() === 'home'">
       <!-- Hero Banner (Hidden in Search Mode) -->
       <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
-        <div class="hero-inner-wrap full-width">
-          
-          <!-- Full Width Carousel -->
-          <div class="carousel-container" *ngIf="loadedShelves().length > 0">
-            <!-- Navigation Controls -->
-            <button class="carousel-control prev" (click)="prevCarouselSlide($event)" aria-label="Previous Slide">
-              <svg lucideChevronLeft [attr.size]="28"></svg>
-            </button>
-            <button class="carousel-control next" (click)="nextCarouselSlide($event)" aria-label="Next Slide">
-              <svg lucideChevronRight [attr.size]="28"></svg>
-            </button>
-
-            <!-- Slides -->
-            <div class="carousel-slide" *ngFor="let song of loadedShelves()[0].songs; let idx = index" [class.active]="idx === carouselIndex">
-              <div class="carousel-card" (click)="onPlayTrack(song, loadedShelves()[0].songs)">
-                <div class="card-bg-overlay"></div>
-                <img [src]="song.thumbnailHigh || song.thumbnail" [alt]="song.title" referrerpolicy="no-referrer" />
-                <div class="carousel-card-info">
-                  <span class="carousel-badge">FEATURED HIT</span>
-                  <h3 [title]="song.title">{{ song.title }}</h3>
-                  <p>{{ song.channelTitle }}</p>
+        <div class="hero-inner-wrap full-width" #heroInner>
+          <div class="hero-content-grid">
+            <div class="hero-text-content">
+              <div class="hero-suggestions-header">
+                <span class="suggestions-title">HOME SCREEN SUGGESTIONS</span>
+                <div class="hero-language-tabs">
+                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'English'" (click)="setLanguage('English')">English</button>
+                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Hindi'" (click)="setLanguage('Hindi')">Hindi</button>
+                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Punjabi'" (click)="setLanguage('Punjabi')">Punjabi</button>
+                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Bhojpuri'" (click)="setLanguage('Bhojpuri')">Bhojpuri</button>
                 </div>
+              </div>
+              
+              <div class="hero-main-text">
+                <span class="hero-badge">TRENDING PLAYLIST</span>
+                <h1 class="hero-title">{{ homeScreenLanguage() }} Hits</h1>
+                <p class="hero-subtitle">KICK BACK TO THE BEST NEW AND RECENT COVER</p>
+                
+                <button class="explore-btn" (click)="explorePlaylist(homeScreenLanguage())">
+                  <svg lucidePlay [attr.size]="24" [attr.fill]="'currentColor'"></svg>
+                  <span>EXPLORE PLAYLIST</span>
+                </button>
               </div>
             </div>
             
-            <!-- Indicators -->
-            <div class="carousel-indicators">
-              <button class="indicator" *ngFor="let song of loadedShelves()[0].songs; let idx = index" 
-                [class.active]="idx === carouselIndex" 
-                (click)="setCarouselSlide(idx, $event)"
-                [attr.aria-label]="'Go to slide ' + (idx + 1)">
-              </button>
+            <div class="hero-image-content">
+              <img [src]="getHeroImage(homeScreenLanguage())" [alt]="homeScreenLanguage() + ' Singers'" class="hero-singers-img">
             </div>
           </div>
-
         </div>
       </section>
 

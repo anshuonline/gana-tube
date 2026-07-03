@@ -479,13 +479,22 @@ export class App implements OnInit {
     const scrollOffset = document.documentElement.scrollTop || document.body.scrollTop;
     this.isScrolled.set(scrollOffset > 50);
 
-    // Parallax: fade out hero as user scrolls
+    // Parallax: fade out hero and zoom out as user scrolls
     const heroEl = document.querySelector('.hero-section') as HTMLElement;
     if (heroEl) {
-      const heroHeight = heroEl.offsetHeight;
-      const ratio = Math.min(scrollOffset / (heroHeight * 0.6), 1);
+      const heroHeight = heroEl.offsetHeight || 500;
+      const scrollProgress = scrollOffset / heroHeight;
+      const ratio = Math.min(scrollProgress * 1.5, 1);
+      
+      const imgContent = document.querySelector('.hero-image-content img') as HTMLElement;
+      if (imgContent) {
+        // Zoom out the image
+        const scale = Math.max(1 - (scrollProgress * 0.2), 0.8);
+        const translateY = scrollOffset * 0.4;
+        imgContent.style.transform = `translateY(${translateY}px) scale(${scale})`;
+      }
+      
       heroEl.style.opacity = `${1 - ratio}`;
-      heroEl.style.transform = `translateY(-${scrollOffset * 0.3}px)`;
     }
 
     if (this.isLoading() || this.isLazyLoading() || this.shelfLoading() || this.shelvesLoading()) {
@@ -506,6 +515,20 @@ export class App implements OnInit {
   setLanguage(lang: string): void {
     this.homeScreenLanguage.set(lang);
     this.loadInitialShelves(); // Reload dynamic shelves for the new language
+  }
+
+  getHeroImage(lang: string): string {
+    const langLower = lang.toLowerCase();
+    const availableImages = ['hindi', 'english', 'punjabi', 'bhojpuri', 'bengali', 'haryanvi'];
+    if (availableImages.includes(langLower)) {
+      return `images/${langLower}-singers.png`;
+    }
+    return 'images/hindi-singers.png'; // default fallback
+  }
+
+  explorePlaylist(lang: string): void {
+    const query = `${lang} Hits`;
+    this.onSuggestSearch(query);
   }
 
   openPlaylist(playlist: PlaylistMeta): void {
