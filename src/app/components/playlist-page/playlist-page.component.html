@@ -11,9 +11,14 @@
       <span class="badge">{{ playlist.language }}</span>
       <h1 class="playlist-title">{{ playlist.title }}</h1>
       <p class="playlist-meta">GanaTube Curated • {{ songs().length > 0 ? songs().length + ' songs' : 'Loading...' }}</p>
-      <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
-        <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
-      </button>
+      <div class="playlist-actions">
+        <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
+          <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
+        </button>
+        <button class="share-btn" (click)="sharePlaylist()">
+          <svg lucideShare2 [attr.size]="20"></svg> Share
+        </button>
+      </div>
     </div>
   </div>
 

@@ -3,5 +3,5 @@ import { BlankComponent } from './pages/blank/blank.component';
 
 export const routes: Routes = [
   { path: '', component: BlankComponent },
-  { path: ':page', component: BlankComponent }
+  { path: '**', component: BlankComponent }
 ];

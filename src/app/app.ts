@@ -201,6 +201,18 @@ export class App implements OnInit {
       let url = event.urlAfterRedirects.split('/')[1] || 'home';
       url = url.split('?')[0]; // Ignore query params
       
+      if (url === 'playlist') {
+        const playlistId = event.urlAfterRedirects.split('/')[2];
+        const targetPlaylist = PLAYLISTS.find(p => p.id === playlistId);
+        if (targetPlaylist) {
+          this.selectedPlaylist.set(targetPlaylist);
+          this.currentPage.set('playlist');
+          this.isSearchMode.set(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+      }
+
       // Check if it's a valid static page or one of our main pages
       if (['home', 'profile', 'search', 'library', 'socials'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);

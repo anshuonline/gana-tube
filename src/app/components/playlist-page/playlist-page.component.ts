@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 import { PlaylistMeta } from '../../data/playlists.data';
-import { LucidePlay, LucideArrowLeft } from '@lucide/angular';
+import { LucidePlay, LucideArrowLeft, LucideShare2 } from '@lucide/angular';
 
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideArrowLeft],
+  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -55,5 +55,16 @@ export class PlaylistPageComponent implements OnInit {
 
   goBack(): void {
     this.back.emit();
+  }
+
+  sharePlaylist(): void {
+    const url = `https://listenfree.in/playlist/${this.playlist.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Playlist link copied to clipboard!');
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+      // Fallback
+      prompt('Copy this link:', url);
+    });
   }
 }

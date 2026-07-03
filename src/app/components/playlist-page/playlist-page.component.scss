@@ -89,12 +89,16 @@
     margin: 0 0 16px 0;
   }
   
-  .play-all-btn {
-    align-self: flex-start;
+  .playlist-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .play-all-btn, .share-btn {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #8b5cf6;
     color: white;
     border: none;
     padding: 12px 32px;
@@ -104,14 +108,25 @@
     cursor: pointer;
     transition: transform 0.2s, background 0.3s;
     
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .play-all-btn {
+    background: #8b5cf6;
     &:hover:not(:disabled) {
       transform: scale(1.05);
       background: #9c72f7;
     }
-    
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+  }
+
+  .share-btn {
+    background: rgba(255, 255, 255, 0.1);
+    &:hover:not(:disabled) {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
     }
   }
 }
