@@ -12,7 +12,7 @@ export const PLAYLISTS: PlaylistMeta[] = [
     id: '76069476',
     title: '100-song English Trending Playlist',
     language: 'English',
-    coverImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=500', // Placeholder
+    coverImage: 'assets/images/english_trending_cover.png',
     searchQueries: [
       'Risk It All — Bruno Mars',
       'Stateside — PinkPantheress & Zara Larsson',
