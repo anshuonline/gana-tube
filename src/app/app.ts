@@ -515,7 +515,7 @@ export class App implements OnInit {
 
   setLanguage(lang: string): void {
     this.homeScreenLanguage.set(lang);
-    this.loadInitialShelves(); // Reload dynamic shelves for the new language
+    this.loadInitialShelves(lang); // Pass lang explicitly to avoid stale signal
   }
 
   getHeroImage(lang: string): string {
