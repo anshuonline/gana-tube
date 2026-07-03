@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const YTMusic = require('ytmusic-api');
+const ytdl = require('@distube/ytdl-core');
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -327,6 +328,40 @@ app.get('/api/synced-lyrics', async (req, res) => {
   } catch (error) {
     console.error('Error fetching synced lyrics:', error);
     res.status(500).json({ error: 'An error occurred during fetching synced lyrics' });
+  }
+});
+
+// Stream endpoint
+app.get('/api/stream/:videoId', (req, res) => {
+  const videoId = req.params.videoId;
+  if (!videoId) {
+    return res.status(400).send('Missing videoId');
+  }
+
+  const url = `https://www.youtube.com/watch?v=${videoId}`;
+  
+  // Try sending webm/opus or mp4 depending on what we fetch, let browser handle the pipeline
+  try {
+    const stream = ytdl(url, {
+      filter: 'audioonly',
+      quality: 'highestaudio',
+      highWaterMark: 1 << 25 // 32MB
+    });
+
+    stream.on('response', (response) => {
+      res.setHeader('Content-Type', response.headers['content-type']);
+      res.setHeader('Content-Length', response.headers['content-length']);
+    });
+
+    stream.on('error', (err) => {
+      console.error(`Streaming error for ${videoId}:`, err.message);
+      if (!res.headersSent) res.status(500).send('Streaming error');
+    });
+
+    stream.pipe(res);
+  } catch (error) {
+    console.error('Failed to init stream:', error);
+    if (!res.headersSent) res.status(500).send('Internal Server Error');
   }
 });
 
