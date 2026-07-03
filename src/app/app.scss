@@ -452,7 +452,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 40px;
+  margin-bottom: -112px;
   position: relative;
   z-index: 10;
 }
@@ -589,6 +589,18 @@
   justify-content: flex-end;
   position: relative;
   min-height: 400px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(to top, #000000 0%, transparent 100%);
+    z-index: 5;
+    pointer-events: none;
+  }
   
   img {
     width: 100%;
