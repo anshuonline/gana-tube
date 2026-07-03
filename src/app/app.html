@@ -2,6 +2,35 @@
   <!-- Hidden YouTube Player -->
   <app-yt-player></app-yt-player>
 
+  <!-- Sidebar -->
+  <nav class="app-sidebar">
+    <div class="sidebar-items">
+      <div class="sidebar-item" (click)="resetSearchState()" [class.active]="currentPage() === 'home'">
+        <svg lucideHome [attr.size]="24"></svg>
+        <span class="sidebar-label">Home</span>
+      </div>
+      <div class="sidebar-item" (click)="openSearchPage()" [class.active]="currentPage() === 'search'">
+        <svg lucideSearch [attr.size]="24"></svg>
+        <span class="sidebar-label">Search</span>
+      </div>
+      <div class="sidebar-item" (click)="openLibraryPage()" [class.active]="currentPage() === 'library'">
+        <svg lucideLibrary [attr.size]="24"></svg>
+        <span class="sidebar-label">Library</span>
+      </div>
+      <div class="sidebar-item" (click)="openSocialsPage()" [class.active]="currentPage() === 'socials'">
+        <svg lucideMessageSquare [attr.size]="24"></svg>
+        <span class="sidebar-label">Socials</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-footer">
+      <div class="sidebar-item profile" (click)="openProfilePage()" [class.active]="currentPage() === 'profile'">
+        <svg lucideUser [attr.size]="24"></svg>
+        <span class="sidebar-label">Profile</span>
+      </div>
+    </div>
+  </nav>
+
   <!-- Header -->
   <header class="app-header" [class.scrolled]="isScrolled()">
     <div class="header-inner">
@@ -19,11 +48,6 @@
         >
           <svg lucideDownload [attr.size]="16"></svg>
           <span class="btn-text">Install App</span>
-        </button>
-
-        <button class="listen-together-btn" (click)="openListenTogether()">
-          <svg lucideUsers [attr.size]="16"></svg>
-          <span class="btn-text">Listen Together</span>
         </button>
 
         <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">
@@ -67,32 +91,100 @@
 
   <!-- Main Content -->
   <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()">
-    
-    <div *ngIf="currentPage() === 'home'">
+    <div *ngIf="currentPage() === 'profile'" class="profile-page-container">
+      <div class="profile-page-header">
+        <h1>Profile & Settings</h1>
+      </div>
+      
+      <div class="profile-page-grid">
+        <div class="profile-card user-card">
+          <div class="avatar-large">
+            <svg lucideUser [attr.size]="48"></svg>
+          </div>
+          <div class="user-details">
+            <h2>Guest User</h2>
+            <span class="account-type">Free Account</span>
+          </div>
+          <button class="login-action-btn disabled" disabled>Login (Coming Soon)</button>
+        </div>
+
+        <div class="profile-card settings-card">
+          <h3>Music Quality</h3>
+          <p>Choose the audio quality for playback.</p>
+          <div class="quality-selector">
+            <button class="q-btn" [class.active]="musicQuality() === 'High'" (click)="setMusicQuality('High')">High Quality</button>
+            <button class="q-btn" [class.active]="musicQuality() === 'Standard'" (click)="setMusicQuality('Standard')">Standard</button>
+            <button class="q-btn" [class.active]="musicQuality() === 'Data Saver'" (click)="setMusicQuality('Data Saver')">Data Saver</button>
+          </div>
+        </div>
+
+        <div class="profile-card social-card">
+          <h3>Listen Together</h3>
+          <p>Create a room and listen to music perfectly synced with your friends.</p>
+          <button class="action-btn" (click)="openListenTogether()">
+            <svg lucideUsers [attr.size]="20"></svg>
+            Create Room
+          </button>
+        </div>
+
+        <div class="profile-card settings-card" style="grid-column: 1 / -1;">
+          <h3>Preferred Languages</h3>
+          <p>Select the languages you want to see on your home screen.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button *ngFor="let lang of availableLanguages" 
+                    class="q-btn" 
+                    style="width: auto; padding: 10px 16px; border-radius: 30px;"
+                    [class.active]="preferredLanguages().includes(lang)"
+                    (click)="togglePreferredLanguage(lang)">
+              {{ lang }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="currentPage() === 'library'" class="static-page-container">
+      <div class="static-page-content" style="text-align: center; margin-top: 100px;">
+        <svg lucideLibrary [attr.size]="64" style="color: rgba(255,255,255,0.2); margin-bottom: 20px;"></svg>
+        <h1>Your Library</h1>
+        <p>Your saved playlists, liked songs, and listening history will appear here.</p>
+        <p style="color: var(--color-primary); font-weight: bold;">Coming Soon</p>
+      </div>
+    </div>
+
+    <div *ngIf="currentPage() === 'socials'" class="static-page-container">
+      <div class="static-page-content" style="text-align: center; margin-top: 100px;">
+        <svg lucideMessageSquare [attr.size]="64" style="color: rgba(255,255,255,0.2); margin-bottom: 20px;"></svg>
+        <h1>Socials</h1>
+        <p>Connect with friends, see what they're listening to, and join public Listen Together rooms.</p>
+        <p style="color: var(--color-primary); font-weight: bold;">Coming Soon</p>
+      </div>
+    </div>
+
+    <div *ngIf="currentPage() === 'home' || currentPage() === 'search'">
       <!-- Hero Banner (Hidden in Search Mode) -->
       <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
         <div class="hero-inner-wrap full-width" #heroInner>
           
-          <div class="hero-suggestions-header">
-            <span class="suggestions-title">HOME SCREEN SUGGESTIONS</span>
-            <div class="hero-language-tabs">
-              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'English'" (click)="setLanguage('English')">English</button>
-              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Hindi'" (click)="setLanguage('Hindi')">Hindi</button>
-              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Punjabi'" (click)="setLanguage('Punjabi')">Punjabi</button>
-              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Bhojpuri'" (click)="setLanguage('Bhojpuri')">Bhojpuri</button>
-              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Bengali'" (click)="setLanguage('Bengali')">Bengali</button>
-              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Haryanvi'" (click)="setLanguage('Haryanvi')">Haryanvi</button>
-              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Tamil'" (click)="setLanguage('Tamil')">Tamil</button>
-            </div>
-          </div>
-
           <div class="hero-content-grid">
             <div class="hero-text-content">
               
+              <div class="hero-suggestions-header">
+                <span class="suggestions-title">YOUR MUSIC PREFERENCES</span>
+                <div class="hero-language-tabs">
+                  <button *ngFor="let lang of preferredLanguages()"
+                          class="hero-tab" 
+                          [class.active]="homeScreenLanguage() === lang" 
+                          (click)="setLanguage(lang)">
+                    {{ lang }}
+                  </button>
+                </div>
+              </div>
+
               <div class="hero-main-text">
                 <span class="hero-badge">TRENDING PLAYLIST</span>
-                <h1 class="hero-title">{{ homeScreenLanguage() }} Hits</h1>
-                <p class="hero-subtitle">KICK BACK TO THE BEST NEW AND RECENT COVER</p>
+                <h1 class="hero-title">{{ getHeroTitle(homeScreenLanguage()) }}</h1>
+                <p class="hero-subtitle">{{ getHeroSubtitle(homeScreenLanguage()) }}</p>
                 
                 <button class="explore-btn" (click)="explorePlaylist(homeScreenLanguage())">
                   <svg lucidePlay [attr.size]="24" [attr.fill]="'currentColor'"></svg>
@@ -102,7 +194,7 @@
             </div>
             
             <div class="hero-image-content">
-              <img *ngFor="let lang of ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi', 'Tamil']"
+              <img *ngFor="let lang of preferredLanguages()"
                    [src]="getHeroImage(lang)" 
                    [alt]="lang + ' Singers'" 
                    class="hero-singers-img"
@@ -200,8 +292,11 @@
                 </div>
                 <div class="artists-grid" #artistsGrid>
                   <div class="artist-circle" *ngFor="let artist of currentTopArtists()" (click)="performSearch(artist.name + ' songs')">
-                    <div class="artist-img-wrapper">
-                      <img [src]="artist.image" [alt]="artist.name" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + artist.name + '&background=random&color=fff&size=200'" />
+                    <div class="artist-img-wrapper" [style.background]="!artist.image ? getGradient(artist.name) : ''">
+                      <img *ngIf="artist.image" [src]="artist.image" [alt]="artist.name" (error)="artist.image = ''" />
+                      <div *ngIf="!artist.image" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; color: white;">
+                        <span style="font-size: 2rem; font-weight: 700;">{{ getInitials(artist.name) }}</span>
+                      </div>
                     </div>
                     <span class="artist-name">{{ artist.name }}</span>
                   </div>
@@ -223,8 +318,12 @@
                 </div>
                 <div class="shelf-grid" #playlistsGrid>
                   <div class="song-card" *ngFor="let playlist of homePlaylists()" (click)="openPlaylist(playlist)">
-                    <div class="card-thumbnail" style="aspect-ratio: 2/3;">
-                      <img [src]="playlist.coverImage" [alt]="playlist.title" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;" />
+                    <div class="card-thumbnail" style="aspect-ratio: 2/3;" [style.background]="!playlist.coverImage ? getGradient(playlist.title) : ''">
+                      <img *ngIf="playlist.coverImage" [src]="playlist.coverImage" [alt]="playlist.title" (error)="playlist.coverImage = ''" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;" />
+                      <div *ngIf="!playlist.coverImage" style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; border-radius: 8px;">
+                        <svg lucideMusic [attr.size]="48" style="opacity: 0.6; margin-bottom: 12px;"></svg>
+                        <span style="font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;">{{ getInitials(playlist.title) }}</span>
+                      </div>
                       <div class="thumbnail-overlay">
                         <button class="play-btn-overlay">
                           <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>

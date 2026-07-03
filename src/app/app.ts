@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -28,9 +28,14 @@ import { PwaService } from './services/pwa.service';
     LucideChevronLeft,
     LucideChevronRight,
     LucideSearch,
+    LucideMusic,
     LucideUsers,
     LucideDownload,
     LucidePlay,
+    LucideHome,
+    LucideLibrary,
+    LucideUser,
+    LucideMessageSquare,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -59,7 +64,7 @@ export class App implements OnInit {
   currentQuery = '';
 
   // Language filter
-  availableLanguages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Haryanvi', 'Tamil', 'Telugu'];
+  availableLanguages = ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi', 'Tamil'];
   homeScreenLanguage = signal<string>('Hindi');
 
   // Playlists State
@@ -118,6 +123,7 @@ export class App implements OnInit {
   isLazyLoading = signal<boolean>(false);
   isScrolled = signal<boolean>(false);
   isSearchMode = signal<boolean>(false);
+  isSearchFocused = signal<boolean>(false);
 
   // Dynamic algorithmic shelves for home recommendations
   allShelfDefinitions: ShelfDefinition[] = [];
@@ -137,6 +143,51 @@ export class App implements OnInit {
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
+  // Helpers for Fallback Design
+  getInitials(name: string): string {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
+
+  getGradient(name: string): string {
+    const colors = [
+      ['#ff9a9e', '#fecfef'],
+      ['#a18cd1', '#fbc2eb'],
+      ['#84fab0', '#8fd3f4'],
+      ['#e0c3fc', '#8ec5fc'],
+      ['#f093fb', '#f5576c'],
+      ['#4facfe', '#00f2fe'],
+      ['#43e97b', '#38f9d7'],
+      ['#fa709a', '#fee140'],
+      ['#30cfd0', '#330867'],
+      ['#a8edea', '#fed6e3']
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const colorPair = colors[Math.abs(hash) % colors.length];
+    return `linear-gradient(135deg, ${colorPair[0]} 0%, ${colorPair[1]} 100%)`;
+  }
+
+  // Profile & Settings State
+  musicQuality = signal<'High' | 'Standard' | 'Data Saver'>('High');
+  preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
+
+  togglePreferredLanguage(lang: string): void {
+    const current = this.preferredLanguages();
+    if (current.includes(lang)) {
+      if (current.length > 1) {
+        const next = current.filter(l => l !== lang);
+        this.preferredLanguages.set(next);
+        if (this.homeScreenLanguage() === lang) {
+          this.setLanguage(next[0]);
+        }
+      }
+    } else {
+      this.preferredLanguages.set([...current, lang]);
+    }
+  }
+
   constructor(
     private youtubeApi: YoutubeApiService,
     public playerService: PlayerService,
@@ -149,13 +200,60 @@ export class App implements OnInit {
     ).subscribe((event: any) => {
       let url = event.urlAfterRedirects.split('/')[1] || 'home';
       url = url.split('?')[0]; // Ignore query params
-      if (this.pageContent[url]) {
+      
+      // Check if it's a valid static page or one of our main pages
+      if (['home', 'profile', 'search', 'library', 'socials'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
+        
+        if (url === 'search') {
+          this.isSearchMode.set(true);
+        } else {
+          this.isSearchMode.set(false);
+        }
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         this.currentPage.set('home');
+        this.isSearchMode.set(false);
+        this.router.navigate(['/home']);
       }
     });
+  }
+
+  @HostListener('window:click', ['$event'])
+  onWindowClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    
+    // Close search dropdown
+    if (this.isSearchFocused() && this.results().length > 0) {
+      if (!target.closest('.search-box-container') && !target.closest('.search-results-dropdown')) {
+        this.isSearchFocused.set(false);
+      }
+    }
+  }
+
+  openProfilePage(): void {
+    this.router.navigate(['/profile']);
+    this.isSearchMode.set(false);
+  }
+
+  openLibraryPage(): void {
+    this.router.navigate(['/library']);
+    this.isSearchMode.set(false);
+  }
+
+  openSocialsPage(): void {
+    this.router.navigate(['/socials']);
+    this.isSearchMode.set(false);
+  }
+
+  setMusicQuality(quality: 'High' | 'Standard' | 'Data Saver'): void {
+    this.musicQuality.set(quality);
+    // In a real app, this would also tell the YT player to change quality if possible
+  }
+
+  onSearchFocus(): void {
+    this.isSearchMode.set(false);
   }
 
   resetSearchState(event?: Event): void {
@@ -164,7 +262,7 @@ export class App implements OnInit {
     this.hasSearched.set(false);
     this.currentQuery = '';
     this.results.set([]);
-    this.currentPage.set('home');
+    this.router.navigate(['/home']);
     this.selectedPlaylist.set(null);
     if (this.searchBar) {
       this.searchBar.clearQuery();
@@ -172,7 +270,7 @@ export class App implements OnInit {
   }
 
   openSearchPage(): void {
-    this.isSearchMode.set(true);
+    this.router.navigate(['/search']);
     setTimeout(() => {
       if (this.searchBar) {
         this.searchBar.focusInput();
@@ -530,6 +628,32 @@ export class App implements OnInit {
       return `images/${langLower}-singers.png`;
     }
     return 'images/hindi-singers.png'; // fallback
+  }
+
+  getHeroTitle(lang: string): string {
+    const titles: Record<string, string> = {
+      'English': 'Global Essentials',
+      'Hindi': 'Bollywood Blockbusters',
+      'Punjabi': 'Punjabi Powerhouse',
+      'Bhojpuri': 'Bhojpuri Chartbusters',
+      'Bengali': 'Soulful Bengali',
+      'Haryanvi': 'Haryanvi Dominance',
+      'Tamil': 'Kollywood Supreme'
+    };
+    return titles[lang] || `${lang} Essentials`;
+  }
+
+  getHeroSubtitle(lang: string): string {
+    const subtitles: Record<string, string> = {
+      'English': 'EXPERIENCE THE BIGGEST INTERNATIONAL TRACKS STREAMING RIGHT NOW',
+      'Hindi': 'DIVE INTO THE MOST TRENDING HINDI MELODIES AND CLUB ANTHEMS',
+      'Punjabi': 'HIGH-ENERGY BEATS AND VOCALS THAT RULE THE CHARTS WORLDWIDE',
+      'Bhojpuri': 'FEEL THE PULSE WITH THE MOST VIRAL BHOJPURI DANCE NUMBERS',
+      'Bengali': 'IMMERSE YOURSELF IN THE RICH MUSICAL HERITAGE OF BENGAL',
+      'Haryanvi': 'UNSTOPPABLE GROOVES AND REGIONAL HITS TAKING OVER THE NATION',
+      'Tamil': 'DISCOVER TOP CHARTING TAMIL COMPOSITIONS AND BLOCKBUSTER HITS'
+    };
+    return subtitles[lang] || `DISCOVER THE LATEST AND GREATEST ${lang.toUpperCase()} HITS`;
   }
 
   explorePlaylist(lang: string): void {
