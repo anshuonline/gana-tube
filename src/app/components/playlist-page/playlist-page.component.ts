@@ -58,7 +58,8 @@ export class PlaylistPageComponent implements OnInit {
   }
 
   sharePlaylist(): void {
-    const url = `https://listenfree.in/playlist/${this.playlist.id}`;
+    const baseUrl = window.location.origin.includes('localhost') ? 'https://ganatube.in' : window.location.origin;
+    const url = `${baseUrl}/playlist/${this.playlist.id}`;
     navigator.clipboard.writeText(url).then(() => {
       alert('Playlist link copied to clipboard!');
     }).catch(err => {
