@@ -403,14 +403,14 @@
 
 // ---- Hero ----
 .hero-section {
-  padding: 160px 0 30px;
+  padding: 160px 0 60px;
   position: relative;
   z-index: 1100;
   background: #000000;
   overflow: hidden;
 
   @media (max-width: 992px) {
-    padding: 120px 0 20px;
+    padding: 120px 0 30px;
   }
 }
 
@@ -430,7 +430,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  min-height: 380px;
+  min-height: 480px;
   width: 100%;
 
   @media (max-width: 992px) {
@@ -454,7 +454,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: -112px;
+  margin-bottom: 30px;
   position: relative;
   z-index: 10;
 
@@ -600,8 +600,7 @@
   display: flex;
   justify-content: flex-end;
   position: relative;
-  min-height: 350px;
-  max-height: 420px;
+  min-height: 450px;
 
   &::after {
     content: '';
@@ -609,7 +608,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 120px;
+    height: 150px;
     background: linear-gradient(to top, #000000 0%, transparent 100%);
     z-index: 5;
     pointer-events: none;
@@ -617,7 +616,7 @@
   
   img {
     width: 100%;
-    max-width: 700px;
+    max-width: 800px;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
