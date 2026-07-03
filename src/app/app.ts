@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -30,6 +30,7 @@ import { PwaService } from './services/pwa.service';
     LucideSearch,
     LucideUsers,
     LucideDownload,
+    LucidePlay,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,

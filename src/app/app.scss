@@ -529,24 +529,25 @@
 }
 
 .explore-btn {
-  background: #ffffff;
-  color: #000000;
+  width: max-content;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: #ffffff;
   border: none;
   font-size: 0.9rem;
   font-weight: 700;
-  padding: 10px 24px;
+  padding: 12px 28px;
   border-radius: 50px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   letter-spacing: 0.05em;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
 
   &:hover {
-    background: #e5e5e5;
-    transform: scale(1.03);
-    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.6);
   }
 
   &:active {
