@@ -175,7 +175,7 @@
                   <button *ngFor="let lang of preferredLanguages()"
                           class="hero-tab" 
                           [class.active]="homeScreenLanguage() === lang" 
-                          (click)="setLanguage(lang)">
+                          (click)="setLanguage(lang, $event)">
                     {{ lang }}
                   </button>
                 </div>

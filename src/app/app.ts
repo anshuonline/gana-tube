@@ -262,6 +262,7 @@ export class App implements OnInit {
     this.hasSearched.set(false);
     this.currentQuery = '';
     this.results.set([]);
+    this.currentPage.set('home'); // Ensure page state updates even if URL is already /home
     this.router.navigate(['/home']);
     this.selectedPlaylist.set(null);
     if (this.searchBar) {
@@ -616,7 +617,11 @@ export class App implements OnInit {
     }
   }
 
-  setLanguage(lang: string): void {
+  setLanguage(lang: string, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.homeScreenLanguage.set(lang);
     this.loadInitialShelves(lang); // Pass lang explicitly to avoid stale signal
   }
