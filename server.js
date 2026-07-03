@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const YTMusic = require('ytmusic-api');
-const ytdl = require('@distube/ytdl-core');
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -185,35 +184,11 @@ app.get('/api/songs', async (req, res) => {
     let results = await yt.searchSongs(query);
     
     // ytmusic-api natively returns 20 results per search.
-    // If the client requested more (e.g. 50), run parallel searches with varied terms to combine them
+    // We removed parallel searches to avoid triggering Google's 403 rate limits.
     if (limit > 20 && results && results.length > 0) {
-      try {
-        const parallelSearches = await Promise.all([
-          yt.searchSongs(`${query} hit songs`),
-          yt.searchSongs(`best ${query} tracks`)
-        ]);
-        
-        for (const extraResults of parallelSearches) {
-          if (extraResults && extraResults.length > 0) {
-            results = results.concat(extraResults);
-          }
-        }
-        
-        // Remove exact duplicates by videoId
-        const seen = new Set();
-        results = results.filter(item => {
-          if (!seen.has(item.videoId)) {
-            seen.add(item.videoId);
-            return true;
-          }
-          return false;
-        });
-        
-        results = results.slice(0, limit);
-      } catch (err) {
-        console.warn('Failed parallel extra searches, returning initial 20', err);
-      }
+      // Just return what we have to prevent API blocks
     }
+
     
     // Always enforce the limit, whether it is 1 or 50.
     if (results && results.length > limit) {
@@ -328,40 +303,6 @@ app.get('/api/synced-lyrics', async (req, res) => {
   } catch (error) {
     console.error('Error fetching synced lyrics:', error);
     res.status(500).json({ error: 'An error occurred during fetching synced lyrics' });
-  }
-});
-
-// Stream endpoint
-app.get('/api/stream/:videoId', (req, res) => {
-  const videoId = req.params.videoId;
-  if (!videoId) {
-    return res.status(400).send('Missing videoId');
-  }
-
-  const url = `https://www.youtube.com/watch?v=${videoId}`;
-  
-  // Try sending webm/opus or mp4 depending on what we fetch, let browser handle the pipeline
-  try {
-    const stream = ytdl(url, {
-      filter: 'audioonly',
-      quality: 'highestaudio',
-      highWaterMark: 1 << 25 // 32MB
-    });
-
-    stream.on('response', (response) => {
-      res.setHeader('Content-Type', response.headers['content-type']);
-      res.setHeader('Content-Length', response.headers['content-length']);
-    });
-
-    stream.on('error', (err) => {
-      console.error(`Streaming error for ${videoId}:`, err.message);
-      if (!res.headersSent) res.status(500).send('Streaming error');
-    });
-
-    stream.pipe(res);
-  } catch (error) {
-    console.error('Failed to init stream:', error);
-    if (!res.headersSent) res.status(500).send('Internal Server Error');
   }
 });
 

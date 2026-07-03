@@ -5,6 +5,7 @@ import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, Lucid
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { MusicPlayerComponent } from './components/music-player/music-player.component';
+import { YtPlayerComponent } from './components/yt-player/yt-player.component';
 import { FullScreenPlayerComponent } from './components/full-screen-player/full-screen-player.component';
 import { ListenTogetherComponent } from './components/listen-together/listen-together.component';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
@@ -38,6 +39,7 @@ import { PwaService } from './services/pwa.service';
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
+    YtPlayerComponent,
     FullScreenPlayerComponent,
     ListenTogetherComponent,
     PlaylistPageComponent,
