@@ -62,35 +62,63 @@ export class YoutubeApiService {
     );
   }
 
-  getPlaylistSongs(queries: string[]): Observable<YouTubeSearchResult[]> {
+  private playlistCache = new Map<string, YouTubeSearchResult[]>();
+
+  getPlaylistSongs(queries: string[], cacheKey?: string): Observable<YouTubeSearchResult[]> {
     if (!queries || queries.length === 0) return of([]);
     
-    // If there are many queries, assume it's a specific tracklist and fetch 1 result per query.
-    // Otherwise, fetch enough results to get a good mix.
-    const limitPerQuery = queries.length > 10 ? 1 : Math.max(20, Math.ceil(100 / queries.length));
+    if (cacheKey && this.playlistCache.has(cacheKey)) {
+      return of(this.playlistCache.get(cacheKey)!);
+    }
     
+    const limitPerQuery = queries.length > 10 ? 1 : Math.max(20, Math.ceil(100 / queries.length));
     const requests = queries.map(q => this.searchMusic(q, limitPerQuery));
     
-    return forkJoin(requests).pipe(
-      map(resultsArray => {
-        const allSongs: YouTubeSearchResult[] = [];
-        const seenIds = new Set<string>();
-        
-        // Flatten and deduplicate
-        for (const list of resultsArray) {
-          for (const song of list) {
-            if (!seenIds.has(song.videoId)) {
-              seenIds.add(song.videoId);
-              allSongs.push(song);
+    return new Observable<YouTubeSearchResult[]>(observer => {
+      let completed = 0;
+      const allSongsArrays: YouTubeSearchResult[][] = new Array(queries.length).fill([]);
+      const seenIds = new Set<string>();
+
+      requests.forEach((req, index) => {
+        req.subscribe({
+          next: (list) => {
+            const uniqueList: YouTubeSearchResult[] = [];
+            for (const song of list) {
+              if (!seenIds.has(song.videoId)) {
+                seenIds.add(song.videoId);
+                uniqueList.push(song);
+              }
+            }
+            allSongsArrays[index] = uniqueList;
+            
+            // Flatten to emit in order
+            const flattened: YouTubeSearchResult[] = [];
+            for (const arr of allSongsArrays) {
+               flattened.push(...arr);
+            }
+            
+            // Optional: update cache as we go, or just at the end
+            if (cacheKey) {
+              this.playlistCache.set(cacheKey, flattened);
+            }
+            observer.next(flattened);
+          },
+          error: (err) => {
+            console.warn('Error loading song:', err);
+            completed++;
+            if (completed === requests.length) {
+              observer.complete();
+            }
+          },
+          complete: () => {
+            completed++;
+            if (completed === requests.length) {
+              observer.complete();
             }
           }
-        }
-        
-        // Shuffle the results slightly for variety, or just return as is
-        return allSongs;
-      }),
-      catchError(() => of([]))
-    );
+        });
+      });
+    });
   }
 
   getSuggestions(query: string): Observable<string[]> {

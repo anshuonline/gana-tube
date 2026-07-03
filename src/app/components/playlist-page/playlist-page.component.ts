@@ -33,7 +33,7 @@ export class PlaylistPageComponent implements OnInit {
 
   loadSongs(): void {
     this.isLoading.set(true);
-    this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries).subscribe((results) => {
+    this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries, this.playlist.id).subscribe((results) => {
       this.songs.set(results);
       this.isLoading.set(false);
     });
