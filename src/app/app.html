@@ -72,17 +72,19 @@
       <!-- Hero Banner (Hidden in Search Mode) -->
       <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
         <div class="hero-inner-wrap full-width" #heroInner>
+          
+          <div class="hero-suggestions-header">
+            <span class="suggestions-title">HOME SCREEN SUGGESTIONS</span>
+            <div class="hero-language-tabs">
+              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'English'" (click)="setLanguage('English')">English</button>
+              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Hindi'" (click)="setLanguage('Hindi')">Hindi</button>
+              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Punjabi'" (click)="setLanguage('Punjabi')">Punjabi</button>
+              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Bhojpuri'" (click)="setLanguage('Bhojpuri')">Bhojpuri</button>
+            </div>
+          </div>
+
           <div class="hero-content-grid">
             <div class="hero-text-content">
-              <div class="hero-suggestions-header">
-                <span class="suggestions-title">HOME SCREEN SUGGESTIONS</span>
-                <div class="hero-language-tabs">
-                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'English'" (click)="setLanguage('English')">English</button>
-                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Hindi'" (click)="setLanguage('Hindi')">Hindi</button>
-                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Punjabi'" (click)="setLanguage('Punjabi')">Punjabi</button>
-                  <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Bhojpuri'" (click)="setLanguage('Bhojpuri')">Bhojpuri</button>
-                </div>
-              </div>
               
               <div class="hero-main-text">
                 <span class="hero-badge">TRENDING PLAYLIST</span>
