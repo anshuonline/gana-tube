@@ -676,7 +676,7 @@ export class App implements OnInit {
 
   explorePlaylist(lang: string): void {
     const langLower = lang.toLowerCase();
-    const playlistSlug = `hero-${langLower}`;
+    const playlistSlug = langLower === 'english' ? '76069476' : `hero-${langLower}`;
     const targetPlaylist = PLAYLISTS.find(p => p.slug === playlistSlug || p.id === playlistSlug);
     
     if (targetPlaylist) {
