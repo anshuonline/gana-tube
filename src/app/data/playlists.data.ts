@@ -36,6 +36,20 @@ export const PLAYLISTS: PlaylistMeta[] = [
     coverImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=500',
     searchQueries: ['Latest Bhojpuri Songs', 'Pawan Singh New Song', 'Khesari Lal Yadav Hits']
   },
+  {
+    id: 'hero-bengali',
+    title: 'Bengali Latest Hits',
+    language: 'Bengali',
+    coverImage: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=500',
+    searchQueries: ['Latest Bengali Songs 2024', 'Top Bengali Hits', 'Arijit Singh Bengali']
+  },
+  {
+    id: 'hero-haryanvi',
+    title: 'Haryanvi Latest Hits',
+    language: 'Haryanvi',
+    coverImage: 'https://images.unsplash.com/photo-1493225457124-a1a2a5956020?auto=format&fit=crop&q=80&w=500',
+    searchQueries: ['Latest Haryanvi Songs 2024', 'Sapna Choudhary Dance', 'Haryanvi DJ Hits']
+  },
   // HINDI
   {
     id: 'hi-top-100',

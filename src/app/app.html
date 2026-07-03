@@ -80,6 +80,8 @@
               <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Hindi'" (click)="setLanguage('Hindi')">Hindi</button>
               <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Punjabi'" (click)="setLanguage('Punjabi')">Punjabi</button>
               <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Bhojpuri'" (click)="setLanguage('Bhojpuri')">Bhojpuri</button>
+              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Bengali'" (click)="setLanguage('Bengali')">Bengali</button>
+              <button class="hero-tab" [class.active]="homeScreenLanguage() === 'Haryanvi'" (click)="setLanguage('Haryanvi')">Haryanvi</button>
             </div>
           </div>
 
@@ -99,7 +101,7 @@
             </div>
             
             <div class="hero-image-content">
-              <img *ngFor="let lang of ['English', 'Hindi', 'Punjabi', 'Bhojpuri']"
+              <img *ngFor="let lang of ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi']"
                    [src]="getHeroImage(lang)" 
                    [alt]="lang + ' Singers'" 
                    class="hero-singers-img"
