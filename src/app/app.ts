@@ -18,6 +18,7 @@ import { Router, NavigationEnd, RouterModule, ActivatedRoute } from '@angular/ro
 import { PAGE_CONTENT } from './data/static-pages';
 import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
 import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
+import { PwaService } from './services/pwa.service';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,7 @@ import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
     LucideChevronRight,
     LucideSearch,
     LucideUsers,
+    LucideDownload,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -43,6 +45,8 @@ import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 })
 export class App implements OnInit {
   @ViewChild(SearchBarComponent) searchBar!: SearchBarComponent;
+
+  public pwaService = inject(PwaService);
 
   results = signal<YouTubeSearchResult[]>([]);
   isLoading = signal<boolean>(false);

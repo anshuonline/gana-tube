@@ -11,10 +11,19 @@
       </div>
 
       <!-- Compact Fake Search Button in Header -->
-      <div class="header-actions" style="display: flex; gap: 12px; align-items: center; margin-left: auto;">
-        <button class="listen-together-btn" (click)="openListenTogether()" style="display: flex; align-items: center; gap: 8px; background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #c4b5fd; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      <div class="header-actions">
+        <button 
+          class="install-app-btn" 
+          *ngIf="pwaService.canInstall()" 
+          (click)="pwaService.installApp()"
+        >
+          <svg lucideDownload [attr.size]="16"></svg>
+          <span class="btn-text">Install App</span>
+        </button>
+
+        <button class="listen-together-btn" (click)="openListenTogether()">
           <svg lucideUsers [attr.size]="16"></svg>
-          Listen Together
+          <span class="btn-text">Listen Together</span>
         </button>
 
         <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">

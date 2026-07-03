@@ -56,6 +56,8 @@
     </script>
 
     <meta name="theme-color" content="#0d0d1a" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="ganatube.png" />
     <link rel="icon" type="image/png" href="ganatube.png" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -63,6 +65,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <!-- YouTube IFrame API -->
     <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(
+            (registration) => { console.log('SW registered: ', registration); },
+            (err) => { console.log('SW registration failed: ', err); }
+          );
+        });
+      }
+    </script>
   </head>
   <body>
     <app-root></app-root>

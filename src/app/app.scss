@@ -196,6 +196,51 @@
   }
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: auto;
+
+  .install-app-btn, .listen-together-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #c4b5fd;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(139, 92, 246, 0.3);
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 600px) {
+      .btn-text {
+        display: none;
+      }
+      padding: 8px;
+      border-radius: 50%;
+    }
+  }
+  
+  .install-app-btn {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #6ee7b7;
+    
+    &:hover {
+      background: rgba(16, 185, 129, 0.3);
+    }
+  }
+}
+
 .header-search-bar {
   margin-left: auto;
   width: 100%;
@@ -1048,6 +1093,8 @@
   width: 100%;
   max-width: 320px;
   height: 44px;
+
+
   flex: 0 1 320px;
   display: flex;
   align-items: center;
