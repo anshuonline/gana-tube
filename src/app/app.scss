@@ -399,7 +399,7 @@
 
 // ---- Hero ----
 .hero-section {
-  padding: 190px 0 60px; /* Increased top padding due to fixed header */
+  padding: 240px 0 80px;
   position: relative;
   z-index: 1100;
   background: #000000;
@@ -545,9 +545,9 @@
   background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 40%, #ec4899 100%);
   color: #ffffff;
   border: none;
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   font-weight: 800;
-  padding: 18px 44px;
+  padding: 22px 52px;
   border-radius: 60px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
