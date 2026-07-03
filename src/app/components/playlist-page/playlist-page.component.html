@@ -15,8 +15,10 @@
         <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
           <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
         </button>
-        <button class="share-btn" (click)="sharePlaylist()">
-          <svg lucideShare2 [attr.size]="20"></svg> Share
+        <button class="share-btn" (click)="sharePlaylist()" [class.copied]="isCopied()">
+          <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="20"></svg>
+          <svg *ngIf="isCopied()" lucideCheck [attr.size]="20"></svg>
+          {{ isCopied() ? 'Copied!' : 'Share' }}
         </button>
       </div>
     </div>

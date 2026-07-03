@@ -128,6 +128,11 @@
       transform: scale(1.05);
       background: rgba(255, 255, 255, 0.2);
     }
+    &.copied {
+      background: #10b981;
+      color: white;
+      transform: scale(1.05);
+    }
   }
 }
 

@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 import { PlaylistMeta } from '../../data/playlists.data';
-import { LucidePlay, LucideArrowLeft, LucideShare2 } from '@lucide/angular';
+import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck } from '@lucide/angular';
 
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2],
+  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -18,6 +18,7 @@ export class PlaylistPageComponent implements OnInit {
 
   songs = signal<YouTubeSearchResult[]>([]);
   isLoading = signal<boolean>(true);
+  isCopied = signal<boolean>(false);
 
   constructor(
     private youtubeApi: YoutubeApiService,
@@ -61,10 +62,12 @@ export class PlaylistPageComponent implements OnInit {
     const baseUrl = window.location.origin.includes('localhost') ? 'https://ganatube.in' : window.location.origin;
     const url = `${baseUrl}/playlist/${this.playlist.id}`;
     navigator.clipboard.writeText(url).then(() => {
-      alert('Playlist link copied to clipboard!');
+      this.isCopied.set(true);
+      setTimeout(() => {
+        this.isCopied.set(false);
+      }, 2000);
     }).catch(err => {
       console.error('Could not copy text: ', err);
-      // Fallback
       prompt('Copy this link:', url);
     });
   }
