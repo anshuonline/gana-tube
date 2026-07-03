@@ -1,0 +1,82 @@
+<div class="modal-overlay" (click)="close.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="close.emit()">
+      <svg lucideX [attr.size]="24"></svg>
+    </button>
+
+    <div class="modal-header">
+      <div class="icon-circle">
+        <svg lucideUsers [attr.size]="32"></svg>
+      </div>
+      <h2>Listen Together</h2>
+      <p *ngIf="!roomService.currentRoom()">Create or join a room to sync playback with friends.</p>
+    </div>
+
+    <!-- NOT IN A ROOM -->
+    <div class="setup-container" *ngIf="!roomService.currentRoom()">
+      <div class="input-group">
+        <label>Your Nickname</label>
+        <input type="text" [(ngModel)]="nickname" placeholder="e.g. Rahul" />
+      </div>
+
+      <div class="divider">
+        <span>CREATE</span>
+      </div>
+
+      <button class="primary-btn" [disabled]="!nickname.trim()" (click)="createRoom()">
+        Create New Room
+      </button>
+
+      <div class="divider">
+        <span>OR JOIN</span>
+      </div>
+
+      <div class="input-group">
+        <label>Room ID</label>
+        <div class="join-row">
+          <input type="text" [(ngModel)]="roomIdInput" placeholder="Enter 6-digit code" />
+          <button class="secondary-btn" [disabled]="!nickname.trim() || !roomIdInput.trim()" (click)="joinRoom()">
+            Join
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- IN A ROOM -->
+    <div class="active-room-container" *ngIf="roomService.currentRoom()">
+      <div class="room-info">
+        <span class="room-label">Room ID</span>
+        <div class="room-id-box">
+          <h2>{{ roomService.currentRoom() }}</h2>
+          <button class="icon-btn" (click)="copyRoomId()" title="Copy Room ID">
+            <svg lucideCopy [attr.size]="20"></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="users-list">
+        <h3>Participants ({{ roomService.users().length }})</h3>
+        <p class="host-note" *ngIf="!roomService.isHost()">👑 Only the host can control the music</p>
+        <p class="host-note" *ngIf="roomService.isHost()">👑 You are the host — you control the music!</p>
+        <ul>
+          <li *ngFor="let user of roomService.users()">
+            <div class="avatar">{{ user.nickname.charAt(0).toUpperCase() }}</div>
+            <span class="name">
+              {{ user.nickname }} 
+              <span class="host-badge" *ngIf="user.id === roomService.hostId()">👑 Host</span>
+              <span class="you-badge" *ngIf="user.id === roomService.getSocketId()">(You)</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <button class="danger-btn" (click)="leaveRoom()">
+        <svg lucideLogOut [attr.size]="20"></svg>
+        Leave Room
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" [class.show]="showToast">Room ID copied!</div>
+  </div>
+</div>

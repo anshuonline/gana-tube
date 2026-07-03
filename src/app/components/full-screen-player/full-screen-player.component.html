@@ -1,0 +1,162 @@
+<div class="fs-player-overlay" [class.visible]="isVisible">
+  
+  <!-- Dynamic blurred background -->
+  <div class="fs-bg-blur" [style.background-image]="'url(' + playerService.currentTrack()?.thumbnailHigh + ')'"></div>
+  <div class="fs-bg-overlay"></div>
+
+  <div class="fs-container">
+    
+    <!-- Top Header -->
+    <div class="fs-header">
+      <button class="icon-btn" (click)="close()" title="Minimize">
+        <svg lucideChevronDown [attr.size]="32"></svg>
+      </button>
+      <div class="fs-header-text">
+        <span class="fs-now-playing">NOW PLAYING</span>
+        <span class="fs-source">{{ playerService.currentTrack()?.channelTitle }}</span>
+      </div>
+      <button class="icon-btn" (click)="copyShareLink()" title="Share Link">
+        <svg lucideShare2 [attr.size]="24"></svg>
+      </button>
+    </div>
+
+    <!-- Main Content Area (Artwork / Queue / Lyrics) -->
+    <div class="fs-main">
+      
+      <!-- Artwork View -->
+      <div class="fs-artwork-view" *ngIf="activeView === 'artwork'">
+        <img 
+          [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
+          [alt]="playerService.currentTrack()?.title"
+          class="fs-album-art"
+        />
+      </div>
+
+      <!-- Queue View (Up Next) -->
+      <div class="fs-queue-view" *ngIf="activeView === 'queue'">
+        <h3 class="view-title">Up Next</h3>
+        <div class="queue-list">
+          <div 
+            class="queue-item" 
+            *ngFor="let track of playerService.queue(); let i = index"
+            [class.active]="playerService.currentIndex() === i"
+            (click)="playQueueTrack(i)"
+          >
+            <div class="queue-item-thumb">
+              <img [src]="track.thumbnail" [alt]="track.title" />
+              <div class="play-overlay" *ngIf="playerService.currentIndex() === i">
+                <div class="play-ripple">
+                  <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+              </div>
+            </div>
+            <div class="queue-item-info">
+              <div class="queue-title">{{ track.title }}</div>
+              <div class="queue-artist">{{ track.channelTitle }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lyrics View -->
+      <div class="fs-lyrics-view" *ngIf="activeView === 'lyrics'">
+        <h3 class="view-title">Lyrics</h3>
+        <div class="lyrics-container" #lyricsContainer>
+          <div *ngIf="lyricsLoading" class="lyrics-loading">
+            <div class="spinner"></div>
+            <span>Fetching lyrics...</span>
+          </div>
+
+          <!-- Synced Lyrics Mode -->
+          <div *ngIf="!lyricsLoading && parsedLyrics.length > 0" class="synced-lyrics-text">
+            <p 
+              *ngFor="let line of parsedLyrics; let i = index"
+              class="lyric-line"
+              [class.active]="i === activeLineIndex"
+              [class.passed]="i < activeLineIndex"
+              (click)="playerService.seekTo(line.time)"
+            >
+              {{ line.text }}
+            </p>
+          </div>
+
+          <!-- Plain Lyrics Fallback Mode -->
+          <div *ngIf="!lyricsLoading && parsedLyrics.length === 0 && lyrics" class="lyrics-text" [innerHTML]="lyrics"></div>
+
+          <!-- Not Found -->
+          <div *ngIf="!lyricsLoading && parsedLyrics.length === 0 && !lyrics" class="lyrics-not-found">
+            <svg lucideMic2 [attr.size]="48" style="opacity: 0.5; margin-bottom: 16px;"></svg>
+            <p>Looks like we don't have lyrics for this song yet.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Controls Area -->
+    <div class="fs-bottom">
+      
+      <!-- Track Info -->
+      <div class="fs-track-info">
+        <h2 class="fs-title" [title]="playerService.currentTrack()?.title">{{ playerService.currentTrack()?.title }}</h2>
+        <p class="fs-artist">{{ playerService.currentTrack()?.channelTitle }}</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="fs-progress-container">
+        <span class="fs-time">{{ formatTime(playerService.currentTime()) }}</span>
+        <input 
+          type="range" 
+          class="fs-progress-bar" 
+          min="0" 
+          [max]="playerService.duration() || 100" 
+          [value]="playerService.currentTime()" 
+          (input)="onSeek($event)"
+        />
+        <span class="fs-time">{{ formatTime(playerService.duration()) }}</span>
+      </div>
+
+      <!-- Playback Controls -->
+      <div class="fs-controls">
+        
+        <!-- Additional controls toggles (Lyrics / Queue) -->
+        <div class="fs-side-controls">
+          <button class="fs-toggle-btn" [class.active]="activeView === 'lyrics'" (click)="toggleView('lyrics')" title="Lyrics">
+            <svg lucideMic2 [attr.size]="24"></svg>
+          </button>
+        </div>
+
+        <!-- Main Center Controls -->
+        <div class="fs-center-controls">
+          <button class="fs-control-btn skip" (click)="playerService.previous()" [disabled]="playerService.currentIndex() <= 0">
+            <svg lucideSkipBack [attr.size]="32" fill="currentColor"></svg>
+          </button>
+          
+          <button class="fs-control-btn play-pause" (click)="playerService.togglePlayPause()">
+            <svg lucidePause [attr.size]="40" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
+            <svg lucidePlay [attr.size]="40" fill="currentColor" style="margin-left: 4px;" *ngIf="!playerService.isPlaying()"></svg>
+          </button>
+          
+          <button class="fs-control-btn skip" (click)="playerService.next()" [disabled]="playerService.currentIndex() >= playerService.queue().length - 1">
+            <svg lucideSkipForward [attr.size]="32" fill="currentColor"></svg>
+          </button>
+        </div>
+
+        <!-- Additional controls toggles (Lyrics / Queue) -->
+        <div class="fs-side-controls" style="justify-content: flex-end;">
+          <button class="fs-toggle-btn" [class.active]="activeView === 'queue'" (click)="toggleView('queue')" title="Up Next">
+            <svg lucideListMusic [attr.size]="24"></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-notification" [class.show]="showToast">
+    Link copied to clipboard!
+  </div>
+
+</div>

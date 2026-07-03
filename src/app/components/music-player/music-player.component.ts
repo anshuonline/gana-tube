@@ -1,4 +1,4 @@
-import { Component, signal, HostListener } from '@angular/core';
+import { Component, signal, HostListener, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -17,7 +17,8 @@ import {
   LucideMinimize2,
   LucideListMusic,
   LucideTrash2,
-  LucideHeart
+  LucideHeart,
+  LucideShare2
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
@@ -43,7 +44,8 @@ import { AlgorithmService } from '../../services/algorithm.service';
     LucideMinimize2,
     LucideListMusic,
     LucideTrash2,
-    LucideHeart
+    LucideHeart,
+    LucideShare2
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
@@ -141,6 +143,9 @@ import { AlgorithmService } from '../../services/algorithm.service';
           title="Play Queue"
         >
           <svg lucideListMusic [attr.size]="18"></svg>
+        </button>
+        <button class="ctrl-btn secondary" (click)="copyShareLink()" title="Share Link">
+          <svg lucideShare2 [attr.size]="18"></svg>
         </button>
         <button class="ctrl-btn secondary" (click)="playerService.toggleMute()" title="Toggle Mute">
           <svg *ngIf="playerService.isMuted() || playerService.volume() === 0" lucideVolumeX [attr.size]="18"></svg>
@@ -334,14 +339,21 @@ import { AlgorithmService } from '../../services/algorithm.service';
           </div>
         </div>
       </div>
+      <!-- Toast Notification -->
+      <div class="toast-notification" [class.show]="showToast()">
+        Link copied to clipboard!
+      </div>
     </div>
   `,
   styleUrls: ['./music-player.component.scss'],
 })
 export class MusicPlayerComponent {
+  @Output() expand = new EventEmitter<void>();
+  
   isFullScreen = signal<boolean>(false);
   showQueue = signal<boolean>(false);
   showFSQueue = signal<boolean>(false);
+  showToast = signal<boolean>(false);
 
   constructor(public playerService: PlayerService, public algorithmService: AlgorithmService) {}
 
@@ -353,7 +365,7 @@ export class MusicPlayerComponent {
 
   toggleFullScreen(): void {
     if (this.playerService.currentTrack() !== null) {
-      this.isFullScreen.set(!this.isFullScreen());
+      this.expand.emit();
     }
   }
 
@@ -397,6 +409,17 @@ export class MusicPlayerComponent {
     const ratio = (event.clientX - rect.left) / rect.width;
     const seekTime = ratio * this.playerService.duration();
     this.playerService.seekTo(Math.max(0, Math.min(seekTime, this.playerService.duration())));
+  }
+
+  copyShareLink(): void {
+    const track = this.playerService.currentTrack();
+    if (!track) return;
+    
+    const url = `${window.location.origin}/?play=${track.videoId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.showToast.set(true);
+      setTimeout(() => this.showToast.set(false), 3000);
+    });
   }
 
   onVolumeChange(event: Event): void {

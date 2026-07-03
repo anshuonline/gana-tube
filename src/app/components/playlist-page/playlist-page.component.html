@@ -1,0 +1,54 @@
+<div class="playlist-page">
+  <button class="back-btn" (click)="goBack()">
+    <svg lucideArrowLeft [attr.size]="24"></svg>
+  </button>
+
+  <div class="playlist-header">
+    <div class="playlist-cover-container">
+      <img [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'">
+    </div>
+    <div class="playlist-info">
+      <span class="badge">{{ playlist.language }}</span>
+      <h1 class="playlist-title">{{ playlist.title }}</h1>
+      <p class="playlist-meta">GanaTube Curated • {{ songs().length > 0 ? songs().length + ' songs' : 'Loading...' }}</p>
+      <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
+        <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
+      </button>
+    </div>
+  </div>
+
+  <div class="playlist-content">
+    <div *ngIf="isLoading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Curating songs for you...</p>
+    </div>
+
+    <div *ngIf="!isLoading() && songs().length === 0" class="empty-state">
+      <p>No songs found for this playlist.</p>
+    </div>
+
+    <div *ngIf="!isLoading() && songs().length > 0" class="songs-list">
+      <div class="song-header-row">
+        <div class="col-index">#</div>
+        <div class="col-title">Title</div>
+        <div class="col-artist">Artist</div>
+        <div class="col-time">Published</div>
+      </div>
+      <div class="song-row" *ngFor="let song of songs(); let i = index" (click)="playSong(i)" [class.active]="playerService.currentTrack()?.videoId === song.videoId">
+        <div class="col-index">
+          <span class="index-num" *ngIf="playerService.currentTrack()?.videoId !== song.videoId">{{ i + 1 }}</span>
+          <div class="play-ripple-small" *ngIf="playerService.currentTrack()?.videoId === song.videoId">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          </div>
+          <svg lucidePlay class="hover-play-icon" [attr.size]="16" fill="currentColor"></svg>
+        </div>
+        <div class="col-title song-title-col">
+          <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
+          <span class="song-title" [title]="song.title">{{ song.title }}</span>
+        </div>
+        <div class="col-artist song-artist-col" [title]="song.channelTitle">{{ song.channelTitle }}</div>
+        <div class="col-time song-time-col">{{ song.publishedAt | date:'mediumDate' }}</div>
+      </div>
+    </div>
+  </div>
+</div>

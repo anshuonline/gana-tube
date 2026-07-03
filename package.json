@@ -23,8 +23,12 @@
     "@lucide/angular": "^1.23.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "mysql2": "^3.22.5",
     "rxjs": "~7.8.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "tslib": "^2.3.0",
+    "youtubei.js": "^17.2.0",
     "ytmusic-api": "^5.3.1"
   },
   "devDependencies": {

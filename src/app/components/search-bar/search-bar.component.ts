@@ -40,7 +40,8 @@ import { YoutubeApiService } from '../../services/youtube-api.service';
         <div
           class="suggestion-item"
           *ngFor="let suggestion of suggestions"
-          (mousedown)="selectSuggestion(suggestion)"
+          (mousedown)="onSuggestionMousedown($event)"
+          (click)="selectSuggestion(suggestion)"
         >
           <svg lucideSearch class="item-icon" [attr.size]="16"></svg>
           <span class="suggestion-text">{{ suggestion }}</span>
@@ -58,6 +59,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   isFocused = false;
   showSuggestions = false;
   suggestions: string[] = [];
+  private isSelectingSuggestion = false;
 
   private querySubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -102,7 +104,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onInputBlur(): void {
-    // Timeout allows click on suggestion to register before blur hides it
+    // Don't close if user is clicking a suggestion
+    if (this.isSelectingSuggestion) {
+      return;
+    }
     setTimeout(() => {
       this.isFocused = false;
       this.showSuggestions = false;
@@ -113,18 +118,25 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     if (!value.trim()) {
       this.suggestions = [];
       this.showSuggestions = false;
-      this.search.emit('');
     } else {
       this.showSuggestions = true;
       this.querySubject.next(value);
-      this.search.emit(value.trim());
     }
   }
 
+  onSuggestionMousedown(event: MouseEvent): void {
+    // Prevent the blur from firing before click registers
+    event.preventDefault();
+    this.isSelectingSuggestion = true;
+  }
+
   selectSuggestion(suggestion: string): void {
+    this.isSelectingSuggestion = false;
     this.query = suggestion;
     this.showSuggestions = false;
-    this.onSearch();
+    this.isFocused = false;
+    // Directly emit so we bypass the 300ms debounce in app.ts
+    this.search.emit(suggestion.trim());
   }
 
   onSearch(): void {

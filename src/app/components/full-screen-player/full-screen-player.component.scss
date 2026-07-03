@@ -1,0 +1,445 @@
+.fs-player-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+
+  &.visible {
+    transform: translateY(0);
+  }
+}
+
+.fs-bg-blur {
+  position: absolute;
+  inset: -10%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(80px) saturate(1.5);
+  opacity: 0.6;
+  z-index: 0;
+  transition: background-image 0.5s ease;
+}
+
+.fs-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
+  z-index: 1;
+}
+
+.fs-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.fs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+
+  .icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+  }
+}
+
+.fs-header-text {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+
+  .fs-now-playing {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .fs-source {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+}
+
+.fs-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+// Artwork View
+.fs-artwork-view {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 1;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+
+  .fs-album-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Shared View Title
+.view-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+// Queue View
+.fs-queue-view {
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .queue-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 16px;
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+    &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+  }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 8px;
+
+    &:hover { background: rgba(255,255,255,0.1); }
+    &.active { background: rgba(255,255,255,0.15); }
+
+    .queue-item-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .play-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .queue-item-info {
+      flex: 1;
+      overflow: hidden;
+
+      .queue-title {
+        font-weight: 600;
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .queue-artist {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.6);
+        margin-top: 4px;
+      }
+    }
+  }
+}
+
+// Lyrics View
+.fs-lyrics-view {
+  width: 100%;
+  max-width: 700px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .lyrics-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 16px;
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+  }
+
+  .lyrics-text {
+    font-size: 2rem;
+    line-height: 1.6;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: capitalize;
+    white-space: pre-wrap;
+    padding-bottom: 100px;
+  }
+
+  .synced-lyrics-text {
+    display: flex;
+    flex-direction: column;
+    padding: 100px 0 200px 0; // Add padding to allow scrolling to middle
+  }
+
+  .lyric-line {
+    font-size: 2rem;
+    line-height: 1.5;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.3);
+    margin: 0 0 16px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    transform-origin: left center;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    &.passed {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    &.active {
+      color: #fff;
+      font-size: 2.2rem;
+      text-shadow: 0 0 20px rgba(255,255,255,0.4);
+    }
+  }
+
+  .lyrics-loading, .lyrics-not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255,255,255,0.6);
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+}
+
+// Bottom Controls Area
+.fs-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fs-track-info {
+  text-align: center;
+  
+  .fs-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fs-artist {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.7);
+    margin: 8px 0 0 0;
+  }
+}
+
+.fs-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .fs-time {
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,0.6);
+    min-width: 40px;
+  }
+
+  .fs-progress-bar {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+    cursor: pointer;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    &:hover::-webkit-slider-thumb {
+      transform: scale(1.3);
+    }
+  }
+}
+
+.fs-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 24px;
+}
+
+.fs-center-controls {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+
+  .fs-control-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, color 0.2s;
+
+    &:disabled {
+      color: rgba(255,255,255,0.3);
+      cursor: not-allowed;
+    }
+
+    &:not(:disabled):hover {
+      transform: scale(1.1);
+    }
+
+    &.play-pause {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #fff;
+      color: #000;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+.fs-side-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100px; // Keep it balanced with center
+}
+
+.fs-toggle-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.1);
+  }
+
+  &.active {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.15);
+  }
+}
+
+.toast-notification {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+
+  &.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+// Reuse ripple animation from other files
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}

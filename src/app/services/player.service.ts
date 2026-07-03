@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { YouTubeSearchResult } from './youtube-api.service';
 import { AlgorithmService } from './algorithm.service';
 import { YoutubeApiService } from './youtube-api.service';
+import { RoomService } from './room.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -13,8 +14,14 @@ export type PlayerState = 'unstarted' | 'loading' | 'playing' | 'paused' | 'ende
 export class PlayerService {
   private algorithmService = inject(AlgorithmService);
   private youtubeApi = inject(YoutubeApiService);
+  private roomService = inject(RoomService);
   private trackStartTime: number = 0;
   private isFetchingMore = false;
+  private isRemoteUpdate = false;
+
+  constructor() {
+    this.setupSocketListeners();
+  }
 
   // Signals for state management
   queue = signal<Track[]>([]);
@@ -50,6 +57,81 @@ export class PlayerService {
     if (this.isMuted()) {
       this.ytPlayer.mute();
     }
+    
+    // If a track was selected before ytPlayer was initialized, load it now
+    const current = this.currentTrack();
+    if (current) {
+      this.loadInPlayer(current.videoId);
+      
+      // If we have a pending seek (from room_state), apply it
+      if ((this as any)._pendingSeekTime > 0) {
+        setTimeout(() => {
+          this.seekTo((this as any)._pendingSeekTime);
+          (this as any)._pendingSeekTime = 0;
+        }, 500);
+      }
+    }
+  }
+  
+  private setupSocketListeners() {
+    const socket = this.roomService.getSocket();
+    if (!socket) return;
+    
+    socket.on('room_state', (state: any) => {
+      this.isRemoteUpdate = true;
+      if (state.queue && state.queue.length > 0) {
+        this.queue.set(state.queue);
+        // Find current index based on currentTrack
+        if (state.currentTrack) {
+          const idx = state.queue.findIndex((t: any) => t.videoId === state.currentTrack.videoId);
+          this.currentIndex.set(idx >= 0 ? idx : 0);
+          this.playTrack(state.currentTrack);
+          
+          if (state.currentTime > 0) {
+            if (this.ytPlayer) {
+              setTimeout(() => {
+                if (this.ytPlayer) this.ytPlayer.seekTo(state.currentTime, true);
+              }, 1000);
+            } else {
+              (this as any)._pendingSeekTime = state.currentTime;
+            }
+          }
+        }
+      }
+      this.isRemoteUpdate = false;
+    });
+
+    socket.on('track_changed', (track: Track) => {
+      this.isRemoteUpdate = true;
+      this.playTrack(track);
+    });
+
+    socket.on('playback_synced', ({ isPlaying, currentTime }) => {
+      if (!this.ytPlayer) return;
+      this.isRemoteUpdate = true;
+      
+      // Sync time if there's a big drift (> 2 seconds)
+      const current = this.ytPlayer.getCurrentTime();
+      if (currentTime !== undefined && Math.abs(current - currentTime) > 2) {
+        this.ytPlayer.seekTo(currentTime, true);
+      }
+      
+      if (isPlaying) {
+        this.ytPlayer.playVideo();
+      } else {
+        this.ytPlayer.pauseVideo();
+      }
+      
+      // Reset immediately since native calls don't trigger wrapper functions
+      this.isRemoteUpdate = false;
+    });
+
+    socket.on('queue_synced', ({ queue, currentIndex }) => {
+      this.isRemoteUpdate = true;
+      this.queue.set(queue);
+      this.currentIndex.set(currentIndex);
+      this.isRemoteUpdate = false;
+    });
   }
 
   playTrack(track: Track): void {
@@ -78,6 +160,16 @@ export class PlayerService {
     this.queue.set(tracks);
     this.currentIndex.set(startIndex);
     this.playerState.set('loading');
+    
+    if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
+      this.roomService.getSocket().emit('sync_queue', {
+        roomId: this.roomService.currentRoom(),
+        queue: tracks,
+        currentIndex: startIndex
+      });
+    }
+    this.isRemoteUpdate = false;
+    
     if (tracks[startIndex]) {
       this.loadInPlayer(tracks[startIndex].videoId);
     }
@@ -88,8 +180,20 @@ export class PlayerService {
     if (!this.ytPlayer) return;
     if (this.playerState() === 'playing') {
       this.ytPlayer.pauseVideo();
+      this.broadcastPlaybackSync(false);
     } else {
       this.ytPlayer.playVideo();
+      this.broadcastPlaybackSync(true);
+    }
+  }
+  
+  private broadcastPlaybackSync(isPlaying: boolean) {
+    if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
+      this.roomService.getSocket().emit('sync_playback', {
+        roomId: this.roomService.currentRoom(),
+        isPlaying,
+        currentTime: this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0
+      });
     }
   }
 
@@ -163,6 +267,14 @@ export class PlayerService {
   seekTo(seconds: number): void {
     if (this.ytPlayer) {
       this.ytPlayer.seekTo(seconds, true);
+      
+      if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
+        this.roomService.getSocket().emit('sync_playback', {
+          roomId: this.roomService.currentRoom(),
+          isPlaying: this.playerState() === 'playing',
+          currentTime: seconds
+        });
+      }
     }
   }
 
@@ -228,7 +340,22 @@ export class PlayerService {
   private loadInPlayer(videoId: string): void {
     if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
       this.ytPlayer.loadVideoById(videoId);
+      
+      const current = this.currentTrack();
+      if (!this.isRemoteUpdate && current && this.roomService.currentRoom()) {
+        this.roomService.getSocket().emit('play_track', { 
+          roomId: this.roomService.currentRoom(), 
+          track: current
+        });
+        // also sync queue when song auto-changes
+        this.roomService.getSocket().emit('sync_queue', {
+          roomId: this.roomService.currentRoom(),
+          queue: this.queue(),
+          currentIndex: this.currentIndex()
+        });
+      }
     }
+    this.isRemoteUpdate = false;
   }
 
   private fetchMoreTracksIfNeeded(): void {

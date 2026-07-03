@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
@@ -62,6 +62,36 @@ export class YoutubeApiService {
     );
   }
 
+  getPlaylistSongs(queries: string[]): Observable<YouTubeSearchResult[]> {
+    if (!queries || queries.length === 0) return of([]);
+    
+    // We fetch around 35 results per query to try and hit ~100 total (after deduping)
+    const limitPerQuery = Math.max(10, Math.ceil(120 / queries.length));
+    
+    const requests = queries.map(q => this.searchMusic(q, limitPerQuery));
+    
+    return forkJoin(requests).pipe(
+      map(resultsArray => {
+        const allSongs: YouTubeSearchResult[] = [];
+        const seenIds = new Set<string>();
+        
+        // Flatten and deduplicate
+        for (const list of resultsArray) {
+          for (const song of list) {
+            if (!seenIds.has(song.videoId)) {
+              seenIds.add(song.videoId);
+              allSongs.push(song);
+            }
+          }
+        }
+        
+        // Shuffle the results slightly for variety, or just return as is
+        return allSongs;
+      }),
+      catchError(() => of([]))
+    );
+  }
+
   getSuggestions(query: string): Observable<string[]> {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams().set('q', query);
@@ -69,6 +99,38 @@ export class YoutubeApiService {
       catchError((err) => {
         console.warn('Failed to fetch suggestions:', err);
         return of([]);
+      })
+    );
+  }
+
+  getLyrics(videoId: string): Observable<string | null> {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams().set('videoId', videoId);
+    return this.http.get<{ lyrics: any }>(`${backendUrl}/lyrics`, { params }).pipe(
+      map(res => {
+        if (!res.lyrics) return null;
+        if (Array.isArray(res.lyrics)) {
+          return res.lyrics.join('<br>');
+        }
+        if (typeof res.lyrics === 'object' && res.lyrics.content) {
+            return res.lyrics.content.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+        }
+        return String(res.lyrics).replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+      }),
+      catchError(err => {
+        console.warn('Failed to fetch lyrics:', err);
+        return of(null);
+      })
+    );
+  }
+
+  getSyncedLyrics(query: string): Observable<any | null> {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams().set('q', query);
+    return this.http.get<any>(`${backendUrl}/synced-lyrics`, { params }).pipe(
+      catchError(err => {
+        console.warn('Failed to fetch synced lyrics:', err);
+        return of(null);
       })
     );
   }

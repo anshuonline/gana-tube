@@ -11,11 +11,18 @@
       </div>
 
       <!-- Compact Fake Search Button in Header -->
-      <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">
-        <svg lucideSearch class="trigger-icon" style="color: #fff; display: block;" [attr.size]="18"></svg>
-        <span class="trigger-text">Search for songs, artists...</span>
-        <div class="trigger-shortcut"><kbd>Ctrl</kbd> + <kbd>K</kbd></div>
-      </button>
+      <div class="header-actions" style="display: flex; gap: 12px; align-items: center; margin-left: auto;">
+        <button class="listen-together-btn" (click)="openListenTogether()" style="display: flex; align-items: center; gap: 8px; background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #c4b5fd; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+          <svg lucideUsers [attr.size]="16"></svg>
+          Listen Together
+        </button>
+
+        <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">
+          <svg lucideSearch class="trigger-icon" style="color: #fff; display: block;" [attr.size]="18"></svg>
+          <span class="trigger-text">Search for songs, artists...</span>
+          <div class="trigger-shortcut"><kbd>Ctrl</kbd> + <kbd>K</kbd></div>
+        </button>
+      </div>
 
       <!-- API Key Warning Banner -->
       <div class="api-notice" *ngIf="apiKeyMissing">
@@ -24,7 +31,7 @@
     </div>
 
     <!-- Header Genre & Mood Chips (Below Navbar) -->
-    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode() && currentPage() === 'home'">
+    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode() && !hasSearched() && currentPage() === 'home'">
       <div class="header-chips-scroll">
         <button class="header-chip" [class.active]="!hasSearched()" (click)="resetSearchState($event)">All</button>
         <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Romantic Songs 2026'" (click)="onSuggestSearch('Hindi Romantic Songs 2026')">Romantic</button>
@@ -97,7 +104,7 @@
         
         <!-- Dedicated Search Page View -->
         <div class="search-page-view" *ngIf="isSearchMode()">
-          <button class="back-btn" (click)="closeSearchPage()">
+          <button class="back-btn" (click)="resetSearchState($event)">
             <svg lucideChevronLeft [attr.size]="24"></svg> Back to Home
           </button>
           <div class="search-page-header">
@@ -125,28 +132,7 @@
             </div>
           </div>
 
-          <!-- Dynamic Artists Section -->
-          <div class="artists-section" *ngIf="currentTopArtists().length > 0" style="margin-bottom: 40px;">
-            <div class="artists-header" style="text-align: center; margin-bottom: 24px; display: flex; justify-content: center; align-items: center; gap: 20px;">
-              <h2 style="font-size: 1.5rem; letter-spacing: 0.2em; font-weight: 800; text-transform: uppercase;">ARTISTS</h2>
-              <div class="shelf-nav-buttons" style="display: flex; gap: 8px;">
-                <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, -600)" title="Scroll Left">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, 600)" title="Scroll Right">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                </button>
-              </div>
-            </div>
-            <div class="artists-grid" #artistsGrid>
-              <div class="artist-circle" *ngFor="let artist of currentTopArtists()" (click)="performSearch(artist.name + ' songs')">
-                <div class="artist-img-wrapper">
-                  <img [src]="artist.image" [alt]="artist.name" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + artist.name + '&background=random&color=fff&size=200'" />
-                </div>
-                <span class="artist-name">{{ artist.name }}</span>
-              </div>
-            </div>
-          </div>
+
 
           <!-- Dynamic Shelves Loop -->
           <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">
@@ -202,6 +188,65 @@
                 </div>
               </div>
             </ng-container>
+
+            <!-- Inject Artists and Playlists after 3rd shelf (index 2) -->
+            <ng-container *ngIf="shelfIdx === 2">
+              
+              <!-- Dynamic Artists Section -->
+              <div class="artists-section" *ngIf="currentTopArtists().length > 0" style="margin: 60px 0 40px;">
+                <div class="artists-header" style="text-align: center; margin-bottom: 24px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+                  <h2 style="font-size: 1.5rem; letter-spacing: 0.2em; font-weight: 800; text-transform: uppercase;">ARTISTS</h2>
+                  <div class="shelf-nav-buttons" style="display: flex; gap: 8px;">
+                    <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, -600)" title="Scroll Left">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, 600)" title="Scroll Right">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="artists-grid" #artistsGrid>
+                  <div class="artist-circle" *ngFor="let artist of currentTopArtists()" (click)="performSearch(artist.name + ' songs')">
+                    <div class="artist-img-wrapper">
+                      <img [src]="artist.image" [alt]="artist.name" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + artist.name + '&background=random&color=fff&size=200'" />
+                    </div>
+                    <span class="artist-name">{{ artist.name }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dynamic Playlists Section -->
+              <div class="playlists-section" *ngIf="homePlaylists().length > 0" style="margin-bottom: 40px;">
+                <div class="artists-header" style="text-align: center; margin-bottom: 24px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+                  <h2 style="font-size: 1.5rem; letter-spacing: 0.2em; font-weight: 800; text-transform: uppercase;">PLAYLISTS</h2>
+                  <div class="shelf-nav-buttons" style="display: flex; gap: 8px;">
+                    <button class="shelf-nav-btn" (click)="scrollShelf(playlistsGrid, -600)" title="Scroll Left">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button class="shelf-nav-btn" (click)="scrollShelf(playlistsGrid, 600)" title="Scroll Right">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="shelf-grid" #playlistsGrid>
+                  <div class="song-card" *ngFor="let playlist of homePlaylists()" (click)="openPlaylist(playlist)">
+                    <div class="card-thumbnail" style="aspect-ratio: 2/3;">
+                      <img [src]="playlist.coverImage" [alt]="playlist.title" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;" />
+                      <div class="thumbnail-overlay">
+                        <button class="play-btn-overlay">
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="card-info">
+                      <p class="track-channel">{{ playlist.language | uppercase }}</p>
+                      <h3 class="track-title" [title]="playlist.title">{{ playlist.title }}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </ng-container>
           </div>
 
           <!-- Shimmering Skeleton for Next Lazy Loaded Shelf -->
@@ -227,10 +272,16 @@
         </div>
 
         <!-- Search Results Area -->
-        <div class="results-header" *ngIf="hasSearched() && !isLoading() && results().length > 0">
-          <h2 class="results-title">
-            Results
-          </h2>
+        <div *ngIf="hasSearched()">
+          <!-- Back to Home Button -->
+          <button class="results-back-btn" (click)="resetSearchState($event)">
+            <svg lucideChevronLeft [attr.size]="20"></svg>
+            Back to Home
+          </button>
+
+          <div class="results-header" *ngIf="!isLoading() && results().length > 0">
+            <h2 class="results-title">Results for <span class="results-query">"{{ currentQuery }}"</span></h2>
+          </div>
         </div>
         <app-search-results
           *ngIf="hasSearched() || isLoading()"
@@ -250,9 +301,16 @@
     </div>
     
     <!-- Static Pages Section -->
-    <div class="static-page-container" *ngIf="currentPage() !== 'home'">
+    <div class="static-page-container" *ngIf="currentPage() !== 'home' && currentPage() !== 'playlist'">
       <div class="static-page-content" [innerHTML]="pageContent[currentPage()]?.html"></div>
     </div>
+
+    <!-- Playlist Page Section -->
+    <app-playlist-page 
+      *ngIf="currentPage() === 'playlist' && selectedPlaylist()" 
+      [playlist]="selectedPlaylist()!" 
+      (back)="closePlaylist()">
+    </app-playlist-page>
 
     <!-- Modern Footer -->
     <footer class="app-footer-modern">
@@ -289,5 +347,19 @@
   </main>
 
   <!-- Fixed Music Player -->
-  <app-music-player></app-music-player>
+  <app-music-player 
+    (expand)="openFullScreenPlayer()">
+  </app-music-player>
+
+  <!-- Full Screen Player Overlay -->
+  <app-full-screen-player 
+    [isVisible]="isFullScreenPlayerVisible()"
+    (closePlayer)="closeFullScreenPlayer()">
+  </app-full-screen-player>
+
+  <!-- Listen Together Modal -->
+  <app-listen-together
+    *ngIf="isListenTogetherVisible()"
+    (close)="closeListenTogether()">
+  </app-listen-together>
 </div>

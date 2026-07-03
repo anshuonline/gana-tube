@@ -1,33 +1,40 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { MusicPlayerComponent } from './components/music-player/music-player.component';
 import { YtPlayerComponent } from './components/yt-player/yt-player.component';
+import { FullScreenPlayerComponent } from './components/full-screen-player/full-screen-player.component';
+import { ListenTogetherComponent } from './components/listen-together/listen-together.component';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
 import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
-import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { Router, NavigationEnd, RouterModule, ActivatedRoute } from '@angular/router';
 import { PAGE_CONTENT } from './data/static-pages';
+import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
+import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     CommonModule,
-    LucideDisc3,
     LucideChevronLeft,
     LucideChevronRight,
     LucideSearch,
+    LucideUsers,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
     YtPlayerComponent,
+    FullScreenPlayerComponent,
+    ListenTogetherComponent,
+    PlaylistPageComponent,
     RouterModule
   ],
   templateUrl: './app.html',
@@ -40,6 +47,8 @@ export class App implements OnInit {
   results = signal<YouTubeSearchResult[]>([]);
   isLoading = signal<boolean>(false);
   hasSearched = signal<boolean>(false);
+  isFullScreenPlayerVisible = signal<boolean>(false);
+  isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
 
   currentQuery = '';
@@ -47,6 +56,14 @@ export class App implements OnInit {
   // Language filter
   availableLanguages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Haryanvi', 'Tamil', 'Telugu'];
   homeScreenLanguage = signal<string>('Hindi');
+
+  // Playlists State
+  allPlaylists = PLAYLISTS;
+  selectedPlaylist = signal<PlaylistMeta | null>(null);
+  
+  homePlaylists = computed(() => {
+    return this.allPlaylists.filter(p => p.language === this.homeScreenLanguage());
+  });
 
   // Top Artists Data
   topArtistsByLang: Record<string, {name: string, image: string}[]> = {
@@ -119,7 +136,8 @@ export class App implements OnInit {
     private youtubeApi: YoutubeApiService,
     public playerService: PlayerService,
     private algorithmService: AlgorithmService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -142,6 +160,7 @@ export class App implements OnInit {
     this.currentQuery = '';
     this.results.set([]);
     this.currentPage.set('home');
+    this.selectedPlaylist.set(null);
     if (this.searchBar) {
       this.searchBar.clearQuery();
     }
@@ -160,6 +179,25 @@ export class App implements OnInit {
     this.isSearchMode.set(false);
   }
 
+  openFullScreenPlayer(): void {
+    this.isFullScreenPlayerVisible.set(true);
+    // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeFullScreenPlayer(): void {
+    this.isFullScreenPlayerVisible.set(false);
+    document.body.style.overflow = '';
+  }
+
+  openListenTogether(): void {
+    this.isListenTogetherVisible.set(true);
+  }
+
+  closeListenTogether(): void {
+    this.isListenTogetherVisible.set(false);
+  }
+
   ngOnInit(): void {
     this.apiKeyMissing =
       !environment.youtubeApiKey ||
@@ -175,6 +213,22 @@ export class App implements OnInit {
         }
         this.performSearch(query);
       });
+
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const videoId = params.get('play');
+      if (videoId) {
+        // Simple search by videoId or fetch details to play
+        this.youtubeApi.searchMusic(videoId, 1).subscribe({
+          next: (res) => {
+            if (res && res.length > 0) {
+              this.playerService.playTrack(res[0]);
+              // Clear param from URL after playing
+              this.router.navigate([], { queryParams: { play: null }, queryParamsHandling: 'merge', replaceUrl: true });
+            }
+          }
+        });
+      }
+    });
 
     this.loadInitialShelves();
     this.startCarouselTimer();
@@ -222,6 +276,8 @@ export class App implements OnInit {
             loadedCount++;
             if (loadedCount >= initialDefinitions.length) {
               this.shelvesLoading.set(false);
+              // Trigger background loading of remaining shelves
+              setTimeout(() => this.loadNextShelf(), 500);
             }
           },
           error: (err) => {
@@ -229,6 +285,8 @@ export class App implements OnInit {
             loadedCount++;
             if (loadedCount >= initialDefinitions.length) {
               this.shelvesLoading.set(false);
+              // Trigger background loading of remaining shelves
+              setTimeout(() => this.loadNextShelf(), 500);
             }
           }
         });
@@ -276,10 +334,20 @@ export class App implements OnInit {
           this.loadedShelves.update(shelves => [...shelves, ...newShelves]);
         }
         this.shelfLoading.set(false);
+        
+        // Continue loading next batch in background if more shelves exist
+        if (this.loadedShelves().length < this.allShelfDefinitions.length) {
+          setTimeout(() => this.loadNextShelf(), 1000);
+        }
       },
       error: (err: any) => {
         console.error('Failed to load shelf batch', err);
         this.shelfLoading.set(false);
+        
+        // Continue loading next batch in background even if this one failed
+        if (this.loadedShelves().length < this.allShelfDefinitions.length) {
+          setTimeout(() => this.loadNextShelf(), 1000);
+        }
       }
     });
   }
@@ -344,6 +412,7 @@ export class App implements OnInit {
     this.lazyLoadPage = 0;
     this.isLoading.set(true);
     this.hasSearched.set(true);
+    this.isSearchMode.set(false);
     this.youtubeApi.searchMusic(query, 50).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.results.set(res);
@@ -426,18 +495,27 @@ export class App implements OnInit {
     if (pos >= max - 350) {
       if (this.hasSearched()) {
         this.loadMoreResults();
-      } else {
-        this.loadNextShelf();
       }
     }
   }
 
   setLanguage(lang: string): void {
-    if (this.homeScreenLanguage() === lang) return;
     this.homeScreenLanguage.set(lang);
-    this.playerService.currentLanguage.set(lang);
-    this.loadInitialShelves(lang);
+    this.loadInitialShelves(); // Reload dynamic shelves for the new language
   }
+
+  openPlaylist(playlist: PlaylistMeta): void {
+    this.selectedPlaylist.set(playlist);
+    this.currentPage.set('playlist');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  closePlaylist(): void {
+    this.selectedPlaylist.set(null);
+    this.currentPage.set('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
 
   loadMoreResults(): void {
     if (!this.currentQuery || this.lazyLoadPage >= 3) {
