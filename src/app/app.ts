@@ -528,8 +528,16 @@ export class App implements OnInit {
   }
 
   explorePlaylist(lang: string): void {
-    const query = `${lang} Hits`;
-    this.onSuggestSearch(query);
+    const langLower = lang.toLowerCase();
+    const playlistId = `hero-${langLower}`;
+    const targetPlaylist = PLAYLISTS.find(p => p.id === playlistId);
+    
+    if (targetPlaylist) {
+      this.openPlaylist(targetPlaylist);
+    } else {
+      // Fallback if playlist not found
+      this.onSuggestSearch(`${lang} Hits`);
+    }
   }
 
   openPlaylist(playlist: PlaylistMeta): void {

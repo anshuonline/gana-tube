@@ -7,6 +7,35 @@ export interface PlaylistMeta {
 }
 
 export const PLAYLISTS: PlaylistMeta[] = [
+  // LATEST HITS (Hero Section)
+  {
+    id: 'hero-english',
+    title: 'English Latest Hits',
+    language: 'English',
+    coverImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=500',
+    searchQueries: ['Top English Songs 2024', 'Latest English Pop Hits', 'Billboard Hot 100']
+  },
+  {
+    id: 'hero-hindi',
+    title: 'Hindi Latest Hits',
+    language: 'Hindi',
+    coverImage: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=500',
+    searchQueries: ['Top Bollywood Songs 2024', 'Latest Hindi Hits', 'Trending Hindi Music']
+  },
+  {
+    id: 'hero-punjabi',
+    title: 'Punjabi Latest Hits',
+    language: 'Punjabi',
+    coverImage: 'https://images.unsplash.com/photo-1533174000243-ea77699d7e5c?auto=format&fit=crop&q=80&w=500',
+    searchQueries: ['Latest Punjabi Songs 2024', 'Top Punjabi Hits', 'Punjabi Party Songs']
+  },
+  {
+    id: 'hero-bhojpuri',
+    title: 'Bhojpuri Latest Hits',
+    language: 'Bhojpuri',
+    coverImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=500',
+    searchQueries: ['Latest Bhojpuri Songs', 'Pawan Singh New Song', 'Khesari Lal Yadav Hits']
+  },
   // HINDI
   {
     id: 'hi-top-100',
