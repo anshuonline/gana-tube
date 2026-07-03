@@ -270,6 +270,10 @@
     padding-bottom: 0;
     pointer-events: none;
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .header-chips-scroll {
@@ -429,10 +433,7 @@
   width: 100%;
 
   @media (max-width: 992px) {
-    display: flex;
-    flex-direction: column-reverse;
-    text-align: center;
-    gap: 10px;
+    display: none;
   }
 }
 
@@ -455,6 +456,11 @@
   margin-bottom: -112px;
   position: relative;
   z-index: 10;
+
+  @media (max-width: 992px) {
+    margin-bottom: 0;
+    align-items: center;
+  }
 }
 
 .suggestions-title {
@@ -479,10 +485,10 @@
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #a0a0a0;
-  padding: 8px 24px;
+  padding: 10px 28px;
   border-radius: 30px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1.8rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -495,7 +501,12 @@
     background: rgba(255, 255, 255, 0.9);
     color: #000;
     border-color: transparent;
-    font-weight: 600;
+    font-weight: 800;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    padding: 8px 20px;
   }
 }
 
