@@ -12,7 +12,7 @@ export const PLAYLISTS: PlaylistMeta[] = [
     id: '76069476',
     title: '100-song English Trending Playlist',
     language: 'English',
-    coverImage: 'assets/images/top100.png',
+    coverImage: '/top100.png',
     searchQueries: [
       'Risk It All — Bruno Mars',
       'Stateside — PinkPantheress & Zara Larsson',
