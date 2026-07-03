@@ -266,6 +266,8 @@ export class App implements OnInit {
       initialDefinitions.forEach((def) => {
         this.youtubeApi.searchMusic(def.query, 50).subscribe({
           next: (songs) => {
+            if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
+            
             if (songs && songs.length > 0) {
               this.loadedShelves.update(shelvesList => {
                 const updated = [...shelvesList];
@@ -282,16 +284,17 @@ export class App implements OnInit {
             if (loadedCount >= initialDefinitions.length) {
               this.shelvesLoading.set(false);
               // Trigger background loading of remaining shelves
-              setTimeout(() => this.loadNextShelf(), 500);
+              setTimeout(() => this.loadNextShelf(language), 500);
             }
           },
           error: (err) => {
             console.error(`Failed to load shelf: ${def.title}`, err);
+            if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
             loadedCount++;
             if (loadedCount >= initialDefinitions.length) {
               this.shelvesLoading.set(false);
               // Trigger background loading of remaining shelves
-              setTimeout(() => this.loadNextShelf(), 500);
+              setTimeout(() => this.loadNextShelf(language), 500);
             }
           }
         });
@@ -299,7 +302,7 @@ export class App implements OnInit {
     });
   }
 
-  loadNextShelf(): void {
+  loadNextShelf(language?: string): void {
     const currentCount = this.loadedShelves().length;
     if (currentCount >= this.allShelfDefinitions.length || this.shelfLoading()) {
       return;
@@ -324,6 +327,7 @@ export class App implements OnInit {
 
     forkJoin(observables).subscribe({
       next: (results: any[]) => {
+        if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
         const newShelves: any[] = [];
         results.forEach((songs: any, index: number) => {
           if (songs && songs.length > 0) {
@@ -342,11 +346,12 @@ export class App implements OnInit {
         
         // Continue loading next batch in background if more shelves exist
         if (this.loadedShelves().length < this.allShelfDefinitions.length) {
-          setTimeout(() => this.loadNextShelf(), 1000);
+          setTimeout(() => this.loadNextShelf(language), 1000);
         }
       },
       error: (err: any) => {
         console.error('Failed to load shelf batch', err);
+        if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
         this.shelfLoading.set(false);
         
         // Continue loading next batch in background even if this one failed
