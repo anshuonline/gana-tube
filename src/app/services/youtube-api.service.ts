@@ -65,8 +65,9 @@ export class YoutubeApiService {
   getPlaylistSongs(queries: string[]): Observable<YouTubeSearchResult[]> {
     if (!queries || queries.length === 0) return of([]);
     
-    // We fetch around 35 results per query to try and hit ~100 total (after deduping)
-    const limitPerQuery = Math.max(10, Math.ceil(120 / queries.length));
+    // If there are many queries, assume it's a specific tracklist and fetch 1 result per query.
+    // Otherwise, fetch enough results to get a good mix.
+    const limitPerQuery = queries.length > 10 ? 1 : Math.max(20, Math.ceil(100 / queries.length));
     
     const requests = queries.map(q => this.searchMusic(q, limitPerQuery));
     
