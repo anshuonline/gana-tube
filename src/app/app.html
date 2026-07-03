@@ -97,7 +97,11 @@
             </div>
             
             <div class="hero-image-content">
-              <img [src]="getHeroImage(homeScreenLanguage())" [alt]="homeScreenLanguage() + ' Singers'" class="hero-singers-img">
+              <img *ngFor="let lang of ['English', 'Hindi', 'Punjabi', 'Bhojpuri']"
+                   [src]="getHeroImage(lang)" 
+                   [alt]="lang + ' Singers'" 
+                   class="hero-singers-img"
+                   [class.active]="homeScreenLanguage() === lang">
             </div>
           </div>
         </div>

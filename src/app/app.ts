@@ -487,13 +487,13 @@ export class App implements OnInit {
       const scrollProgress = scrollOffset / heroHeight;
       const ratio = Math.min(scrollProgress * 1.5, 1);
       
-      const imgContent = document.querySelector('.hero-image-content img') as HTMLElement;
-      if (imgContent) {
-        // Zoom out the image
+      const imgContents = document.querySelectorAll('.hero-image-content img');
+      imgContents.forEach((img) => {
+        const imgEl = img as HTMLElement;
         const scale = Math.max(1 - (scrollProgress * 0.2), 0.8);
         const translateY = scrollOffset * 0.4;
-        imgContent.style.transform = `translateY(${translateY}px) scale(${scale})`;
-      }
+        imgEl.style.transform = `translateY(${translateY}px) scale(${scale})`;
+      });
       
       heroEl.style.opacity = `${1 - ratio}`;
     }
