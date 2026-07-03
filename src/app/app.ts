@@ -271,6 +271,7 @@ export class App implements OnInit {
   }
 
   openSearchPage(): void {
+    this.isSearchMode.set(true);
     this.router.navigate(['/search']);
     setTimeout(() => {
       if (this.searchBar) {
