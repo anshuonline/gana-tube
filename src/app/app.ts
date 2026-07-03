@@ -525,11 +525,11 @@ export class App implements OnInit {
 
   getHeroImage(lang: string): string {
     const langLower = lang.toLowerCase();
-    const availableImages = ['hindi', 'english', 'punjabi', 'bhojpuri', 'bengali', 'haryanvi'];
+    const availableImages = ['hindi', 'english', 'punjabi', 'bhojpuri', 'bengali', 'haryanvi', 'tamil'];
     if (availableImages.includes(langLower)) {
       return `images/${langLower}-singers.png`;
     }
-    return 'images/hindi-singers.png'; // default fallback
+    return 'images/hindi-singers.png'; // fallback
   }
 
   explorePlaylist(lang: string): void {

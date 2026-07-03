@@ -50,6 +50,13 @@ export const PLAYLISTS: PlaylistMeta[] = [
     coverImage: 'https://images.unsplash.com/photo-1493225457124-a1a2a5956020?auto=format&fit=crop&q=80&w=500',
     searchQueries: ['Latest Haryanvi Songs 2024', 'Sapna Choudhary Dance', 'Haryanvi DJ Hits']
   },
+  {
+    id: 'hero-tamil',
+    title: 'Tamil Latest Hits',
+    language: 'Tamil',
+    coverImage: 'https://images.unsplash.com/photo-1598369936359-c2901323f463?auto=format&fit=crop&q=80&w=500',
+    searchQueries: ['Latest Tamil Songs', 'Anirudh Hits', 'AR Rahman Tamil']
+  },
   // HINDI
   {
     id: 'hi-top-100',

@@ -434,7 +434,10 @@
   width: 100%;
 
   @media (max-width: 992px) {
-    display: none;
+    display: flex;
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 30px;
   }
 }
 
@@ -486,12 +489,13 @@
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #a0a0a0;
-  padding: 10px 28px;
+  padding: 8px 22px;
   border-radius: 30px;
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 
   &:hover {
     border-color: rgba(255, 255, 255, 0.5);
@@ -502,7 +506,7 @@
     background: rgba(255, 255, 255, 0.9);
     color: #000;
     border-color: transparent;
-    font-weight: 800;
+    font-weight: 700;
   }
 
   @media (max-width: 768px) {
@@ -631,9 +635,11 @@
 
   @media (max-width: 992px) {
     justify-content: center;
+    min-height: 250px;
     
     img {
       right: auto;
+      max-width: 90%;
     }
   }
 }
