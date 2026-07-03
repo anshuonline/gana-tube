@@ -439,7 +439,7 @@
 .hero-text-content {
   display: flex;
   flex-direction: column;
-  gap: 60px;
+  gap: 0;
   padding-right: 40px;
 
   @media (max-width: 992px) {
@@ -503,7 +503,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
 
   @media (max-width: 992px) {
     align-items: center;
@@ -511,11 +511,15 @@
 }
 
 .hero-badge {
-  color: #a0a0a0;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
-  font-weight: 500;
+  color: #c084fc;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
   text-transform: uppercase;
+  background: rgba(139, 92, 246, 0.15);
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .hero-title {
@@ -528,38 +532,54 @@
 }
 
 .hero-subtitle {
-  color: #a0a0a0;
-  font-size: 0.9rem;
-  letter-spacing: 0.05em;
-  font-weight: 500;
-  margin: 0 0 16px 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  font-weight: 400;
+  margin: 0 0 10px 0;
   text-transform: uppercase;
 }
 
 .explore-btn {
   width: max-content;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 40%, #ec4899 100%);
   color: #ffffff;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  padding: 16px 36px;
-  border-radius: 50px;
+  padding: 18px 44px;
+  border-radius: 60px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  letter-spacing: 0.05em;
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+  gap: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(236, 72, 153, 0.15);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.6);
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(236, 72, 153, 0.25);
+
+    &::before {
+      opacity: 1;
+    }
   }
 
   &:active {
-    transform: scale(0.97);
+    transform: translateY(-1px) scale(0.98);
   }
 }
 
