@@ -690,12 +690,15 @@ export class App implements OnInit {
   openPlaylist(playlist: PlaylistMeta): void {
     this.selectedPlaylist.set(playlist);
     this.currentPage.set('playlist');
+    this.isSearchMode.set(false);
+    this.router.navigate(['/playlist', playlist.id]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   closePlaylist(): void {
     this.selectedPlaylist.set(null);
     this.currentPage.set('home');
+    this.router.navigate(['/home']);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
