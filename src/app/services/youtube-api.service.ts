@@ -29,7 +29,9 @@ export class YoutubeApiService {
       try {
         const parsed = JSON.parse(cached);
         if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) { // 24 hours expiry
-          return of(parsed.data);
+          // Shuffle the cached array so the user sees fresh songs at the front every time!
+          const shuffled = [...parsed.data].sort(() => 0.5 - Math.random());
+          return of(shuffled);
         }
       } catch (e) {
         console.error('Cache parsing error', e);
