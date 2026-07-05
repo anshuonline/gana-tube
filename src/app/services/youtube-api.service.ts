@@ -23,6 +23,19 @@ export class YoutubeApiService {
   constructor(private http: HttpClient) {}
 
   searchMusic(query: string, maxResults = 20): Observable<YouTubeSearchResult[]> {
+    const cacheKey = `search_${query}_${maxResults}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) { // 24 hours expiry
+          return of(parsed.data);
+        }
+      } catch (e) {
+        console.error('Cache parsing error', e);
+      }
+    }
+
     // Primary: fetch from our local backend server (powered by ytmusicapi)
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams()
@@ -58,9 +71,23 @@ export class YoutubeApiService {
           ),
           catchError(() => of([]))
         );
+      }),
+      map(results => {
+        if (results && results.length > 0) {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({
+              timestamp: Date.now(),
+              data: results
+            }));
+          } catch (e) {
+            // ignore quota exceeded
+          }
+        }
+        return results;
       })
     );
   }
+
 
   private playlistCache = new Map<string, YouTubeSearchResult[]>();
 
