@@ -1,0 +1,75 @@
+<div class="manage-ads-container">
+  <div class="admin-header">
+    <h1>Manage Sponsored Ads</h1>
+    <p>Configure the sponsored ad that appears above the music player.</p>
+  </div>
+
+  <div class="admin-card">
+    <div class="form-group">
+      <label for="adminPassword">Admin Password</label>
+      <input 
+        id="adminPassword" 
+        type="password" 
+        [ngModel]="password()" 
+        (ngModelChange)="password.set($event)"
+        placeholder="Enter admin password to save changes" 
+        class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label for="adStatus">Ad Status</label>
+      <label class="toggle-switch">
+        <input 
+          id="adStatus" 
+          type="checkbox" 
+          [ngModel]="isActive()" 
+          (ngModelChange)="isActive.set($event)" />
+        <span class="slider"></span>
+        <span class="toggle-label">{{ isActive() ? 'Active (Visible to users)' : 'Inactive (Hidden)' }}</span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="imageUrl">Ad Image URL</label>
+      <input 
+        id="imageUrl" 
+        type="text" 
+        [ngModel]="imageUrl()" 
+        (ngModelChange)="imageUrl.set($event)"
+        placeholder="https://example.com/ad-banner.jpg" 
+        class="form-control" />
+      <small>Recommended size: 728x90 or 320x100 for best fit above player.</small>
+    </div>
+
+    <div class="form-group">
+      <label for="linkUrl">Ad Destination Link</label>
+      <input 
+        id="linkUrl" 
+        type="text" 
+        [ngModel]="linkUrl()" 
+        (ngModelChange)="linkUrl.set($event)"
+        placeholder="https://example.com/product" 
+        class="form-control" />
+      <small>Where the user should go when they click the ad.</small>
+    </div>
+
+    <button class="save-btn" (click)="saveAd()">Save Ad Configuration</button>
+
+    <div class="message" *ngIf="message()" [ngClass]="{'error': isError(), 'success': !isError()}">
+      {{ message() }}
+    </div>
+  </div>
+
+  <div class="preview-section" *ngIf="imageUrl()">
+    <h3>Live Preview</h3>
+    <div class="ad-preview-container">
+      <a *ngIf="linkUrl(); else noLink" [href]="linkUrl()" target="_blank" rel="noopener noreferrer" class="ad-preview-link">
+        <img [src]="imageUrl()" alt="Advertisement Preview" class="ad-preview-image" (error)="previewImg.style.display='none'" #previewImg />
+      </a>
+      <ng-template #noLink>
+        <img [src]="imageUrl()" alt="Advertisement Preview" class="ad-preview-image" (error)="previewImg.style.display='none'" #previewImg />
+      </ng-template>
+      <div class="ad-badge">Sponsored</div>
+    </div>
+  </div>
+</div>

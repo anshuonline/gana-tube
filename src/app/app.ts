@@ -137,6 +137,10 @@ export class App implements OnInit {
   currentPage = signal<string>('home');
   pageContent = PAGE_CONTENT;
 
+  // Sponsored Ad State
+  sponsoredAd = signal<{ isActive: boolean, imageUrl: string, linkUrl: string } | null>(null);
+  showAd = signal<boolean>(true);
+
   carouselIndex = 0;
   private carouselInterval: any;
 
@@ -214,7 +218,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'manageads'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {
@@ -227,7 +231,7 @@ export class App implements OnInit {
       } else {
         this.currentPage.set('home');
         this.isSearchMode.set(false);
-        this.router.navigate(['/home']);
+        this.router.navigate(['/']);
       }
     });
   }
@@ -316,6 +320,16 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    fetch(`${backendUrl}/ads`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.isActive) {
+          this.sponsoredAd.set(data);
+        }
+      })
+      .catch(err => console.error('Failed to load sponsored ad', err));
+
     this.apiKeyMissing =
       !environment.youtubeApiKey ||
       environment.youtubeApiKey === 'YOUR_YOUTUBE_API_KEY_HERE';

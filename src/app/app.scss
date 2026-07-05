@@ -1069,6 +1069,61 @@
 
 // Reusing card and image styles since they are global imports or scoped
 @import './components/search-results/search-results.component.scss';
+@import 'search-page';
+@import './components/listen-together/listen-together.component.scss';
+@import './components/playlist-page/playlist-page.component.scss';
+@import 'profile-page';
+
+.sponsored-ad-banner {
+  position: fixed;
+  bottom: 90px; /* Right above music player */
+  left: 0;
+  width: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  padding: 5px 0;
+  backdrop-filter: blur(5px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .close-ad-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  a {
+    display: inline-block;
+  }
+
+  img {
+    max-width: 100%;
+    max-height: 100px;
+    vertical-align: middle;
+  }
+
+  .ad-label {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ccc;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    pointer-events: none;
+  }
+}
 
 // ---- Search Mode Additions ----
 .header-search-trigger {

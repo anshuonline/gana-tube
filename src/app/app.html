@@ -434,9 +434,17 @@
         </div>
       </div>
     </footer>
-    <router-outlet style="display: none;"></router-outlet>
-
+    <router-outlet *ngIf="['manageads', 'playlist'].includes(currentPage())"></router-outlet>
   </main>
+
+  <!-- Global Sponsored Ad Banner (Only shown if active and not hidden by user) -->
+  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && showAd()">
+    <button class="close-ad-btn" (click)="showAd.set(false)" title="Hide Ad">×</button>
+    <a [href]="sponsoredAd()?.linkUrl" target="_blank" rel="noopener noreferrer">
+      <img [src]="sponsoredAd()?.imageUrl" alt="Sponsored Ad" (error)="showAd.set(false)" />
+    </a>
+    <span class="ad-label">Sponsored</span>
+  </div>
 
   <!-- Fixed Music Player -->
   <app-music-player 
