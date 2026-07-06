@@ -890,7 +890,7 @@
 }
 
 .footer-giant-brand {
-  font-size: clamp(4rem, 10vw, 12rem);
+  font-size: clamp(2.5rem, 12vw, 12rem);
   font-weight: 900;
   color: rgba(255, 255, 255, 0.06);
   text-align: left;
@@ -898,6 +898,14 @@
   padding: 40px 40px 0;
   letter-spacing: -0.05em;
   user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    padding: 30px 20px 0;
+    font-size: clamp(2.5rem, 15vw, 4rem);
+  }
 }
 
 .footer-content {
