@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 export interface CustomPlaylist {
   id: string;
@@ -20,7 +21,7 @@ export interface CustomPlaylist {
 @Component({
   selector: 'app-managegt-playlists',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './managegt-playlists.html',
   styleUrls: ['./managegt-playlists.scss']
 })
@@ -38,6 +39,9 @@ export class ManagegtPlaylistsComponent implements OnInit {
   newPlaylistDate = '';
   jsonInput = '';
   newPlaylistCoverUrl = ''; // Replaced image upload with URL link
+  
+  // Edit State
+  editingPlaylistId: string | null = null;
 
   // Fetching state
   isFetching = false;
@@ -162,31 +166,44 @@ export class ManagegtPlaylistsComponent implements OnInit {
       // 2. Upload Image (Replaced with Link)
       const imageUrl = this.newPlaylistCoverUrl.trim();
 
-      // 3. Create Playlist Object
-      const newPlaylist: CustomPlaylist = {
-        id: 'cp-' + Date.now() + Math.floor(Math.random() * 1000),
-        title: this.newPlaylistTitle,
-        language: this.selectedLang,
-        coverImage: imageUrl,
-        searchQueries: searchQueries,
-        songs: allResults,
-        status: this.newPlaylistStatus,
-        publishDate: this.newPlaylistStatus === 'schedule' ? new Date(this.newPlaylistDate).toISOString() : undefined
-      };
+      if (this.editingPlaylistId) {
+        // Update existing playlist
+        const index = this.currentPlaylists.findIndex(p => p.id === this.editingPlaylistId);
+        if (index > -1) {
+          this.currentPlaylists[index] = {
+            ...this.currentPlaylists[index],
+            title: this.newPlaylistTitle,
+            coverImage: imageUrl,
+            searchQueries: searchQueries,
+            songs: allResults,
+            status: this.newPlaylistStatus,
+            publishDate: this.newPlaylistStatus === 'schedule' ? new Date(this.newPlaylistDate).toISOString() : undefined
+          };
+          this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
+        }
+      } else {
+        // 3. Create Playlist Object
+        const newPlaylist: CustomPlaylist = {
+          id: 'cp-' + Date.now() + Math.floor(Math.random() * 1000),
+          title: this.newPlaylistTitle,
+          language: this.selectedLang,
+          coverImage: imageUrl,
+          searchQueries: searchQueries,
+          songs: allResults,
+          status: this.newPlaylistStatus,
+          publishDate: this.newPlaylistStatus === 'schedule' ? new Date(this.newPlaylistDate).toISOString() : undefined
+        };
 
-      // 4. Update state
-      if (!this.allPlaylistsData[this.selectedLang]) {
-        this.allPlaylistsData[this.selectedLang] = [];
+        // 4. Update state
+        if (!this.allPlaylistsData[this.selectedLang]) {
+          this.allPlaylistsData[this.selectedLang] = [];
+        }
+        this.allPlaylistsData[this.selectedLang].unshift(newPlaylist);
+        this.updateCurrentPlaylists();
       }
-      this.allPlaylistsData[this.selectedLang].unshift(newPlaylist);
-      this.updateCurrentPlaylists();
 
       // Reset form
-      this.newPlaylistTitle = '';
-      this.jsonInput = '';
-      this.newPlaylistCoverUrl = '';
-      this.newPlaylistStatus = 'publish';
-      this.newPlaylistDate = '';
+      this.cancelEdit();
       this.fetchProgress = searchQueries.length;
       
       // Auto save
@@ -229,5 +246,43 @@ export class ManagegtPlaylistsComponent implements OnInit {
     }
     this.isPublishing = false;
     this.cdr.detectChanges();
+  }
+
+  editPlaylist(playlist: CustomPlaylist): void {
+    this.editingPlaylistId = playlist.id;
+    this.newPlaylistTitle = playlist.title;
+    this.newPlaylistCoverUrl = playlist.coverImage;
+    this.newPlaylistStatus = playlist.status;
+    
+    if (playlist.publishDate) {
+      // Convert ISO to yyyy-MM-ddThh:mm format for datetime-local input
+      const date = new Date(playlist.publishDate);
+      this.newPlaylistDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    } else {
+      this.newPlaylistDate = '';
+    }
+    
+    this.jsonInput = JSON.stringify(playlist.searchQueries, null, 2);
+    
+    // Scroll to top to see form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelEdit(): void {
+    this.editingPlaylistId = null;
+    this.newPlaylistTitle = '';
+    this.jsonInput = '';
+    this.newPlaylistCoverUrl = '';
+    this.newPlaylistStatus = 'publish';
+    this.newPlaylistDate = '';
+    this.fetchError = '';
+  }
+
+  drop(event: CdkDragDrop<CustomPlaylist[]>): void {
+    if (event.previousIndex !== event.currentIndex) {
+      moveItemInArray(this.currentPlaylists, event.previousIndex, event.currentIndex);
+      this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
+      this.publishPlaylists();
+    }
   }
 }
