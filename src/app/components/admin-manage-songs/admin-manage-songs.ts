@@ -135,7 +135,11 @@ export class AdminManageSongsComponent {
     } catch (e: any) {
       console.error('Publish error', e);
       this.publishError = true;
-      this.publishMessage = '❌ Failed to publish: ' + (e.error?.message || e.message || 'Unknown error');
+      if (e.status === 0) {
+        this.publishMessage = '❌ Failed to publish: Network error. The server (manageads.ganatube.in) cannot be reached. Please check if the subdomain is created and active on Hostinger.';
+      } else {
+        this.publishMessage = '❌ Failed to publish: ' + (e.error?.message || e.message || 'Unknown error');
+      }
     } finally {
       this.isPublishing = false;
       this.cdr.detectChanges();

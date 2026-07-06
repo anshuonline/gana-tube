@@ -184,9 +184,14 @@ export class AdBookingPageComponent implements OnInit {
           this.errorMessage.set(res.message || 'An error occurred.');
         }
       },
-      error: (err) => {
+      error: (error) => {
+        console.error('Booking submission failed:', error);
         this.isSubmitting.set(false);
-        this.errorMessage.set('Network error. Please try again.');
+        if (error.status === 0) {
+          this.errorMessage.set('Network error: Could not reach the booking server (manageads.ganatube.in). Please ensure the subdomain is active.');
+        } else {
+          this.errorMessage.set('Booking failed. Please try again.');
+        }
       }
     });
   }
