@@ -177,12 +177,13 @@
               <div class="hero-suggestions-header">
                 <span class="suggestions-title">YOUR MUSIC PREFERENCES</span>
                 <div class="hero-language-tabs">
-                  <button *ngFor="let lang of preferredLanguages()"
+                  <a *ngFor="let lang of preferredLanguages()"
                           class="hero-tab" 
                           [class.active]="homeScreenLanguage() === lang" 
-                          (click)="setLanguage(lang, $event)">
+                          [routerLink]="['/language', lang.toLowerCase()]"
+                          style="text-decoration: none; display: inline-block;">
                     {{ lang }}
-                  </button>
+                  </a>
                 </div>
               </div>
 
@@ -313,7 +314,7 @@
                   </div>
                 </div>
                 <div class="artists-grid" #artistsGrid>
-                  <div class="artist-circle" *ngFor="let artist of currentTopArtists()" (click)="performSearch(artist.name + ' songs')">
+                  <a class="artist-circle" *ngFor="let artist of currentTopArtists()" [routerLink]="['/artist', artist.name]" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center;">
                     <div class="artist-img-wrapper" [style.background]="!artist.image ? getGradient(artist.name) : ''">
                       <img *ngIf="artist.image" [src]="artist.image" [alt]="artist.name" (error)="artist.image = ''" />
                       <div *ngIf="!artist.image" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; color: white;">
@@ -321,7 +322,7 @@
                       </div>
                     </div>
                     <span class="artist-name">{{ artist.name }}</span>
-                  </div>
+                  </a>
                 </div>
               </div>
 

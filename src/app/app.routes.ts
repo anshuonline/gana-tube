@@ -9,6 +9,8 @@ export const routes: Routes = [
   { path: 'library', children: [] },
   { path: 'socials', children: [] },
   { path: 'profile', children: [] },
+  { path: 'language/:lang', children: [] },
+  { path: 'artist/:name', children: [] },
   { path: 'playlist/:id', children: [] },
   { path: 'admin/manage-songs', loadComponent: () => import('./components/admin-manage-songs/admin-manage-songs').then(m => m.AdminManageSongsComponent) },
   { 

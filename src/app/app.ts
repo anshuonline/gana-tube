@@ -24,7 +24,7 @@ import { AdProhibitedPageComponent } from './components/ad-prohibited-page/ad-pr
 import { AdminManageSongsComponent } from './components/admin-manage-songs/admin-manage-songs';
 import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 import { PwaService } from './services/pwa.service';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-browser';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -243,7 +243,9 @@ export class App implements OnInit {
     public playerService: PlayerService,
     private algorithmService: AlgorithmService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private meta: Meta,
+    private title: Title
   ) {
     this.fetchCustomPlaylists();
     this.router.events.pipe(
@@ -257,6 +259,10 @@ export class App implements OnInit {
         const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
         if (targetPlaylist) {
           this.selectedPlaylist.set(targetPlaylist);
+          this.updateSEO(
+            `${targetPlaylist.title} - GanaTube`,
+            `Listen to ${targetPlaylist.title} and other trending playlists for free on GanaTube.`
+          );
         }
         this.currentPage.set('playlist');
         this.isSearchMode.set(false);
@@ -274,6 +280,34 @@ export class App implements OnInit {
         this.currentPage.set('managegt');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
+      } else if (url === 'language') {
+        const langParam = event.urlAfterRedirects.split('/')[2];
+        if (langParam) {
+          const capitalizedLang = langParam.charAt(0).toUpperCase() + langParam.slice(1);
+          this.homeScreenLanguage.set(capitalizedLang);
+          this.loadInitialShelves(capitalizedLang);
+          this.updateSEO(
+            `${capitalizedLang} Songs & Trending Playlists - GanaTube`,
+            `Listen to the best ${capitalizedLang} songs, top artists, and trending playlists for free on GanaTube. Distraction-free music streaming.`
+          );
+        }
+        this.currentPage.set('home');
+        this.isSearchMode.set(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      } else if (url === 'artist') {
+        const artistParam = decodeURIComponent(event.urlAfterRedirects.split('/')[2] || '');
+        if (artistParam) {
+          this.performSearch(artistParam + ' songs');
+          this.updateSEO(
+            `${artistParam} Songs & Hits - GanaTube`,
+            `Listen to ${artistParam}'s top hits, latest songs, and popular albums for free on GanaTube.`
+          );
+        }
+        this.currentPage.set('search');
+        this.isSearchMode.set(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
 
       // Check if it's a valid static page or one of our main pages
@@ -286,13 +320,28 @@ export class App implements OnInit {
           this.isSearchMode.set(false);
         }
         
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         this.currentPage.set('home');
         this.isSearchMode.set(false);
         this.router.navigate(['/']);
       }
+
+      if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials') {
+        this.updateSEO(
+          'GanaTube - Seamless, distraction-free music streaming',
+          'Listen to your favorite songs, create playlists, and enjoy ad-free music on GanaTube.'
+        );
+      }
     });
+  }
+
+  updateSEO(titleText: string, descText: string) {
+    this.title.setTitle(titleText);
+    this.meta.updateTag({ name: 'description', content: descText });
+    this.meta.updateTag({ property: 'og:title', content: titleText });
+    this.meta.updateTag({ property: 'og:description', content: descText });
   }
 
   fetchCustomPlaylists(): void {
@@ -822,8 +871,7 @@ export class App implements OnInit {
       event.preventDefault();
       event.stopPropagation();
     }
-    this.homeScreenLanguage.set(lang);
-    this.loadInitialShelves(lang); // Pass lang explicitly to avoid stale signal
+    this.router.navigate(['/language', lang.toLowerCase()]);
   }
 
   getHeroImage(lang: string): string {
