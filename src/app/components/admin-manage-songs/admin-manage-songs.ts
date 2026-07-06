@@ -63,25 +63,31 @@ export class AdminManageSongsComponent {
     this.fetchProgress = 0;
     this.fetchedSongs = [];
 
-    for (const query of queries) {
-      try {
-        const searchQuery = `${query} ${this.selectedLang} song`;
-        const response = await this.http.get<any[]>(`${environment.backendUrl}/songs?q=${encodeURIComponent(searchQuery)}&limit=1`).toPromise();
-        
-        if (response && response.length > 0) {
-          this.fetchedSongs.push({
-            videoId: response[0].videoId,
-            title: response[0].title,
-            thumbnail: response[0].thumbnails?.[0]?.url || response[0].thumbnail,
-            artist: response[0].artist || response[0].channelTitle
-          });
+    // Process in chunks of 10 to speed up
+    const chunkSize = 10;
+    for (let i = 0; i < queries.length; i += chunkSize) {
+      const chunk = queries.slice(i, i + chunkSize);
+      
+      const promises = chunk.map(async (query) => {
+        try {
+          const searchQuery = `${query} ${this.selectedLang} song`;
+          const response = await this.http.get<any[]>(`${environment.backendUrl}/songs?q=${encodeURIComponent(searchQuery)}&limit=1`).toPromise();
+          
+          if (response && response.length > 0) {
+            this.fetchedSongs.push({
+              videoId: response[0].videoId,
+              title: response[0].title,
+              thumbnail: response[0].thumbnails?.[0]?.url || response[0].thumbnail,
+              artist: response[0].artist || response[0].channelTitle
+            });
+          }
+        } catch (e) {
+          console.error('Failed to fetch:', query, e);
         }
-      } catch (e) {
-        console.error('Failed to fetch:', query, e);
-      }
-      this.fetchProgress++;
-      // Small delay to avoid hammering the local API too hard
-      await new Promise(r => setTimeout(r, 200));
+        this.fetchProgress++;
+      });
+      
+      await Promise.all(promises);
     }
     
     this.isFetching = false;
