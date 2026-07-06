@@ -61,9 +61,9 @@
       <div class="space-y-2">
         <label class="text-sm font-medium text-white/60 flex justify-between">
           <span>Paste JSON Array of Songs OR Array of Section Objects</span>
-          <span class="text-white/30 text-xs">e.g. ["Song 1"] OR [{"section_name": "Name", "songs": ["Song 1"]}]</span>
+          <span class="text-white/30 text-xs">e.g. ["Song 1"] OR [{{ '{' }}"section_name": "Name", "songs": ["Song 1"]{{ '}' }}]</span>
         </label>
-        <textarea [(ngModel)]="jsonInput" rows="8" [placeholder]="'[\n  {\n    &quot;section_name&quot;: &quot;Romantic Hits&quot;,\n    &quot;songs&quot;: [&quot;Song 1&quot;, &quot;Song 2&quot;]\n  }\n]'" class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 font-mono text-sm focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all placeholder-white/20"></textarea>
+        <textarea [(ngModel)]="jsonInput" rows="8" placeholder='e.g. ["Song 1"] OR [{"section_name": "Name", "songs": ["Song 1"]}]' class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 font-mono text-sm focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all placeholder-white/20"></textarea>
       </div>
 
       <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start" *ngIf="fetchError">
