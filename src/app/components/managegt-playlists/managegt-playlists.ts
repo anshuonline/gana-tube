@@ -68,9 +68,12 @@ export class ManagegtPlaylistsComponent implements OnInit {
       const cacheBuster = Date.now();
       this.allPlaylistsData = await firstValueFrom(this.http.get<Record<string, CustomPlaylist[]>>(`${this.apiUrl}?action=get_playlists&t=${cacheBuster}`)) || {};
       this.updateCurrentPlaylists();
+      this.cdr.detectChanges();
     } catch (e) {
       console.error('Failed to load playlists', e);
       this.allPlaylistsData = {};
+      this.updateCurrentPlaylists();
+      this.cdr.detectChanges();
     }
   }
 
@@ -158,19 +161,24 @@ export class ManagegtPlaylistsComponent implements OnInit {
     if (!this.coverImageFile) return null;
     
     this.isUploading = true;
+    this.cdr.detectChanges();
+
     const formData = new FormData();
     formData.append('image', this.coverImageFile);
 
     try {
       const res = await firstValueFrom(this.http.post<any>(`${this.apiUrl}?action=upload_image`, formData));
       this.isUploading = false;
-      if (res.status === 'success') {
+      this.cdr.detectChanges();
+
+      if (res && res.status === 'success') {
         return res.url;
       }
-      throw new Error(res.message);
+      throw new Error(res ? res.message : 'Empty response from server. Make sure API URL is correct.');
     } catch (e: any) {
       this.isUploading = false;
       this.fetchError = 'Image upload failed: ' + (e.message || 'Unknown error');
+      this.cdr.detectChanges();
       return null;
     }
   }
