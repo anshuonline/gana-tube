@@ -41,7 +41,8 @@ export class AdvertisePageComponent implements OnInit {
   constructor(public app: App) {}
 
   ngOnInit() {
-    this.http.get<any>('http://localhost/manageads/api.php?action=prices').subscribe({
+    const apiUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/api.php?action=prices' : '/manageads/api.php?action=prices';
+    this.http.get<any>(apiUrl).subscribe({
       next: (data) => {
         if (data['bottom_player_banner']) this.bottomAdPrice.set(data['bottom_player_banner']);
         if (data['home_feed_banner']) this.homeAdPrice.set(data['home_feed_banner']);
