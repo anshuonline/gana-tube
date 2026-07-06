@@ -330,8 +330,8 @@ export class App implements OnInit {
 
       if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials') {
         this.updateSEO(
-          'GanaTube - Seamless, distraction-free music streaming',
-          'Listen to your favorite songs, create playlists, and enjoy ad-free music on GanaTube.'
+          'Free Music Online Without Ads | Best Online Music App - GanaTube',
+          'Play free music online without ads and without login on GanaTube. Enjoy the best free music app in India for streaming seamless, ad-free online music instantly.'
         );
       }
     });
