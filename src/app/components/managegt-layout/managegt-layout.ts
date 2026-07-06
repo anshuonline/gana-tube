@@ -11,6 +11,15 @@ import { RouterModule, Router } from '@angular/router';
 })
 export class ManagegtLayoutComponent implements OnInit {
   isLoggedIn = false;
+  isMobileMenuOpen = false;
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+  
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+  }
 
   constructor(private router: Router) {}
 

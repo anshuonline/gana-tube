@@ -50,7 +50,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
 
   apiUrl = window.location.origin.includes('localhost') 
     ? 'http://localhost/manageads/managegt-api.php'
-    : 'https://ganatube.in/managegt-api.php'; // Updated to main domain!
+    : 'https://manageads.ganatube.in/managegt-api.php';
 
   constructor(
     private http: HttpClient, 
