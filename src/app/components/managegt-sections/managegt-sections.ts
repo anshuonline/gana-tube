@@ -213,21 +213,25 @@ export class ManagegtSectionsComponent implements OnInit {
     this.publishMessage = 'Publishing...';
     
     try {
-      await firstValueFrom(this.http.post<any>(`${this.apiUrl}?action=save_sections`, {
+      const res = await firstValueFrom(this.http.post<any>(`${this.apiUrl}?action=save_sections`, {
         sectionsData: this.allSectionsData
       }, {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       }));
 
-      this.isPublishing = false;
-      this.publishMessage = '✅ Successfully updated live sections!';
-      
-      if (fromAdd) {
-        this.newSectionTitle = '';
-        this.jsonInput = '';
-        setTimeout(() => {
-          this.publishMessage = '';
-        }, 3000);
+      if (res && res.status === 'success') {
+        this.isPublishing = false;
+        this.publishMessage = '✅ Successfully updated live sections!';
+        
+        if (fromAdd) {
+          this.newSectionTitle = '';
+          this.jsonInput = '';
+          setTimeout(() => {
+            this.publishMessage = '';
+          }, 3000);
+        }
+      } else {
+        throw new Error(res ? res.message : 'Empty response from server. Check your adblocker or API URL.');
       }
     } catch (e: any) {
       this.isPublishing = false;

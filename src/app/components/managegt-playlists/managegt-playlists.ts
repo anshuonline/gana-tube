@@ -218,10 +218,11 @@ export class ManagegtPlaylistsComponent implements OnInit {
       const res = await firstValueFrom(this.http.post<any>(`${this.apiUrl}?action=save_playlists`, {
         playlistsData: this.allPlaylistsData
       }));
-      if (res.status === 'success') {
+      
+      if (res && res.status === 'success') {
         this.publishMessage = 'Playlists saved successfully!';
       } else {
-        throw new Error(res.message);
+        throw new Error(res ? res.message : 'Empty response from server. Check your adblocker or API URL.');
       }
     } catch (e: any) {
       this.fetchError = 'Failed to save playlists. ' + (e.message || '');
