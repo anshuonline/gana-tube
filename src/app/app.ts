@@ -257,7 +257,7 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       } else if (event.urlAfterRedirects.startsWith('/managegt')) {
-        this.currentPage.set('admin');
+        this.currentPage.set('managegt');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }

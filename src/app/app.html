@@ -3,7 +3,7 @@
   <app-yt-player></app-yt-player>
 
   <!-- Sidebar -->
-  <nav class="app-sidebar" *ngIf="currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
+  <nav class="app-sidebar" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
     <div class="sidebar-items">
       <div class="sidebar-item" (click)="resetSearchState()" [class.active]="currentPage() === 'home'">
         <svg lucideHome [attr.size]="24"></svg>
@@ -32,7 +32,7 @@
   </nav>
 
   <!-- Header -->
-  <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
+  <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
     <div class="header-inner">
       <div class="logo" routerLink="/" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
         <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
@@ -411,8 +411,13 @@
       </div>
     </div>
     
-    <!-- Admin Manage Songs Section -->
+    <!-- Admin Manage Songs Section (Old) -->
     <app-admin-manage-songs *ngIf="currentPage() === 'admin'"></app-admin-manage-songs>
+
+    <!-- ManageGT Section (New Router Outlet) -->
+    <div class="managegt-wrapper" *ngIf="currentPage() === 'managegt'">
+      <router-outlet></router-outlet>
+    </div>
 
     <!-- Static Pages Section -->
     <div class="static-page-container" *ngIf="pageContent[currentPage()]">
@@ -427,7 +432,7 @@
     </app-playlist-page>
 
     <!-- Modern Footer -->
-    <footer class="app-footer-modern" *ngIf="currentPage() !== 'playlist'">
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'playlist' && currentPage() !== 'managegt'">
       <div class="footer-giant-brand">ganatube.in</div>
       <div class="footer-content">
         <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
