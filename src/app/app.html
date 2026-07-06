@@ -187,13 +187,13 @@
               </div>
 
               <div class="hero-main-text">
-                <span class="hero-badge">TRENDING PLAYLIST</span>
+                <span class="hero-badge">{{ heroData()[homeScreenLanguage()]?.badge || 'TRENDING PLAYLIST' }}</span>
                 <h1 class="hero-title">{{ getHeroTitle(homeScreenLanguage()) }}</h1>
                 <p class="hero-subtitle">{{ getHeroSubtitle(homeScreenLanguage()) }}</p>
                 
                 <button class="explore-btn" (click)="explorePlaylist(homeScreenLanguage())">
                   <svg lucidePlay [attr.size]="24" [attr.fill]="'currentColor'"></svg>
-                  <span>EXPLORE PLAYLIST</span>
+                  <span>{{ heroData()[homeScreenLanguage()]?.buttonText || 'EXPLORE PLAYLIST' }}</span>
                 </button>
               </div>
             </div>

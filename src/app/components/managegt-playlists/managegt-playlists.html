@@ -12,7 +12,7 @@
     <div class="flex items-center space-x-3 bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-white/5">
       <button *ngFor="let lang of languages" 
               (click)="onLangChange(lang)"
-              [ngClass]="selectedLang === lang ? 'bg-white text-black shadow-sm' : 'text-white/60'"
+              [ngClass]="selectedLang === lang ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/60 hover:bg-white/5'"
               class="px-5 py-2 rounded-xl text-sm font-semibold transition-all hover:text-white duration-300">
         {{ lang }}
       </button>
@@ -57,17 +57,17 @@
           <label class="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 px-1">Visibility</label>
           <div class="flex space-x-2 bg-white/5 p-1.5 rounded-2xl border border-white/5">
             <button (click)="newPlaylistStatus = 'publish'" 
-                    [ngClass]="newPlaylistStatus === 'publish' ? 'bg-white text-black shadow-sm' : 'text-white/40'"
+                    [ngClass]="newPlaylistStatus === 'publish' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/40 hover:bg-white/5'"
                     class="flex-1 flex items-center justify-center py-2 rounded-xl text-sm font-semibold transition-all">
               <svg lucideEye class="w-4 h-4 mr-1.5"></svg> Publish
             </button>
             <button (click)="newPlaylistStatus = 'schedule'" 
-                    [ngClass]="newPlaylistStatus === 'schedule' ? 'bg-white text-black shadow-sm' : 'text-white/40'"
+                    [ngClass]="newPlaylistStatus === 'schedule' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/40 hover:bg-white/5'"
                     class="flex-1 flex items-center justify-center py-2 rounded-xl text-sm font-semibold transition-all">
               <svg lucideClock class="w-4 h-4 mr-1.5"></svg> Schedule
             </button>
             <button (click)="newPlaylistStatus = 'private'" 
-                    [ngClass]="newPlaylistStatus === 'private' ? 'bg-white text-black shadow-sm' : 'text-white/40'"
+                    [ngClass]="newPlaylistStatus === 'private' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/40 hover:bg-white/5'"
                     class="flex-1 flex items-center justify-center py-2 rounded-xl text-sm font-semibold transition-all">
               <svg lucideEyeOff class="w-4 h-4 mr-1.5"></svg> Private
             </button>
@@ -112,7 +112,7 @@
         <div class="flex gap-3">
           <button (click)="addPlaylist()"
                   [disabled]="!newPlaylistTitle.trim() || (!jsonInput.trim() && !editingPlaylistId) || isFetching"
-                  class="flex-1 bg-white hover:bg-gray-100 text-black py-4 px-6 rounded-2xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-4 px-6 rounded-2xl font-bold transition-all shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
             
             <ng-container *ngIf="!isFetching">
               {{ editingPlaylistId ? 'Update Playlist' : 'Create Playlist' }}
@@ -120,7 +120,7 @@
             
             <ng-container *ngIf="isFetching">
               <div class="flex items-center justify-center space-x-2">
-                <svg class="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -129,7 +129,7 @@
             </ng-container>
           </button>
           
-          <button *ngIf="editingPlaylistId" (click)="cancelEdit()" class="px-6 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-bold transition-all border border-white/10">
+          <button *ngIf="editingPlaylistId" (click)="cancelEdit()" class="px-6 bg-transparent hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/10">
             Cancel
           </button>
         </div>
@@ -173,7 +173,7 @@
              class="group relative overflow-hidden bg-[#0c0c14]/80 backdrop-blur-2xl border border-white/5 rounded-3xl transition-all duration-300 hover:border-white/10 flex flex-col sm:flex-row">
           
           <!-- Drag Handle -->
-          <div class="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white/30 z-10 cursor-move" cdkDragHandle>
+          <div class="absolute left-2 top-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white/50 z-10 cursor-move" cdkDragHandle>
             <svg lucideGripVertical class="w-5 h-5"></svg>
           </div>
           
@@ -205,8 +205,10 @@
               </div>
             </div>
             
-            <div class="flex justify-end pt-4 border-t border-white/5 mt-4">
-              <button (click)="deletePlaylist(i)" class="flex items-center text-red-400/50 hover:text-red-400 hover:bg-red-500/10 px-4 py-2 rounded-xl transition-all font-medium text-sm">
+              <button (click)="editPlaylist(playlist)" class="px-5 py-2.5 bg-transparent hover:bg-white/10 text-white rounded-xl text-sm font-semibold transition-all border border-white/10 whitespace-nowrap mr-2">
+                <svg lucideEdit2 class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></svg> Edit
+              </button>
+              <button (click)="deletePlaylist(i)" class="flex items-center text-red-400 bg-transparent hover:bg-red-500/10 px-4 py-2 rounded-xl transition-all font-medium text-sm border border-transparent hover:border-red-500/20">
                 <svg lucideTrash class="w-4 h-4 mr-2"></svg> Remove
               </button>
             </div>

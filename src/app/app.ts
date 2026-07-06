@@ -177,6 +177,11 @@ export class App implements OnInit {
   inFeedAd = signal<SponsoredAd | null>(null);
   showAd = signal<boolean>(true);
 
+  // Dynamic Hero Header Data (from ManageGT admin)
+  heroData = signal<Record<string, { badge: string; title: string; subtitle: string; imageUrl: string; buttonText: string }>>({});
+
+  private manageApiUrl = 'https://manageads.ganatube.in/managegt-api.php';
+
   carouselIndex = 0;
   private carouselInterval: any;
 
@@ -472,6 +477,7 @@ export class App implements OnInit {
 
     this.loadInitialShelves();
     this.startCarouselTimer();
+    this.fetchHeroData(); // Fetch dynamic hero header from admin
 
     // Prevent focus from getting trapped in iframes (e.g. YouTube player)
     // This ensures global keyboard shortcuts (Ctrl+K, Space, Arrows) always work
@@ -483,6 +489,20 @@ export class App implements OnInit {
         }
       }, 50);
     });
+  }
+
+  fetchHeroData(): void {
+    const url = window.location.hostname === 'localhost'
+      ? 'http://localhost/manageads/managegt-api.php'
+      : 'https://manageads.ganatube.in/managegt-api.php';
+    fetch(`${url}?action=get_header&t=${Date.now()}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          this.heroData.set(data);
+        }
+      })
+      .catch(err => console.warn('Could not load custom header data:', err));
   }
 
   loadInitialShelves(language?: string): void {
@@ -801,6 +821,8 @@ export class App implements OnInit {
   }
 
   getHeroImage(lang: string): string {
+    const dynamic = this.heroData()[lang];
+    if (dynamic?.imageUrl) return dynamic.imageUrl;
     const langLower = lang.toLowerCase();
     const availableImages = ['hindi', 'english', 'punjabi', 'bhojpuri', 'bengali', 'haryanvi', 'tamil'];
     if (availableImages.includes(langLower)) {
@@ -810,6 +832,8 @@ export class App implements OnInit {
   }
 
   getHeroTitle(lang: string): string {
+    const dynamic = this.heroData()[lang];
+    if (dynamic?.title) return dynamic.title;
     const titles: Record<string, string> = {
       'English': 'Global Essentials',
       'Hindi': 'Bollywood Blockbusters',
@@ -823,6 +847,8 @@ export class App implements OnInit {
   }
 
   getHeroSubtitle(lang: string): string {
+    const dynamic = this.heroData()[lang];
+    if (dynamic?.subtitle) return dynamic.subtitle;
     const subtitles: Record<string, string> = {
       'English': 'EXPERIENCE THE BIGGEST INTERNATIONAL TRACKS STREAMING RIGHT NOW',
       'Hindi': 'DIVE INTO THE MOST TRENDING HINDI MELODIES AND CLUB ANTHEMS',

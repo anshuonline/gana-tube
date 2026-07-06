@@ -18,7 +18,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'sections', pathMatch: 'full' },
       { path: 'login', loadComponent: () => import('./components/managegt-login/managegt-login').then(m => m.ManagegtLoginComponent) },
       { path: 'sections', loadComponent: () => import('./components/managegt-sections/managegt-sections').then(m => m.ManagegtSectionsComponent) },
-      { path: 'playlists', loadComponent: () => import('./components/managegt-playlists/managegt-playlists').then(m => m.ManagegtPlaylistsComponent) }
+      { path: 'playlists', loadComponent: () => import('./components/managegt-playlists/managegt-playlists').then(m => m.ManagegtPlaylistsComponent) },
+      { path: 'header', loadComponent: () => import('./components/managegt-header/managegt-header').then(m => m.ManagegtHeaderComponent) }
     ]
   },
   { path: '**', children: [] } // Catch all for static pages like /terms, /privacy

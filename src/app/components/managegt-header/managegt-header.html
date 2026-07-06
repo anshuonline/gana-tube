@@ -1,0 +1,175 @@
+<div class="max-w-5xl mx-auto p-8 font-sans">
+
+  <!-- Page Header -->
+  <header class="mb-10">
+    <h2 class="text-3xl font-bold text-white tracking-tight mb-2">Manage Hero Banner</h2>
+    <p class="text-white/50 text-sm">Customize the hero section (title, image, badge, button) shown on the homepage per language.</p>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <svg class="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span class="ml-3 text-white/60">Loading header data...</span>
+  </div>
+
+  <div *ngIf="!isLoading" class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+
+    <!-- LEFT: Language Tabs + Form -->
+    <div class="lg:col-span-3 space-y-6">
+
+      <!-- Language Tabs -->
+      <div class="bg-[#0a0a12] p-4 rounded-2xl border border-white/10">
+        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">Select Language</p>
+        <div class="flex flex-wrap gap-2">
+          <button *ngFor="let lang of languages"
+                  (click)="selectLanguage(lang)"
+                  [class.bg-purple-600]="selectedLanguage === lang"
+                  [class.text-white]="selectedLanguage === lang"
+                  [class.border-purple-500]="selectedLanguage === lang"
+                  [class.text-white-60]="selectedLanguage !== lang"
+                  [class.border-white-10]="selectedLanguage !== lang"
+                  class="px-4 py-2 rounded-xl border text-sm font-medium transition-all hover:bg-white/5">
+            {{ lang }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="bg-[#0a0a12] p-8 rounded-3xl border border-white/10 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-indigo-600"></div>
+
+        <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
+          {{ selectedLanguage }} Banner Settings
+        </h3>
+
+        <div class="space-y-5">
+
+          <!-- Badge Text -->
+          <div>
+            <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Badge Label</label>
+            <input type="text" [(ngModel)]="form.badge"
+                   placeholder="e.g. TRENDING PLAYLIST"
+                   class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all placeholder-white/20 text-sm uppercase tracking-wider" />
+            <p class="text-white/30 text-xs mt-1.5">The small label above the title (shown in uppercase)</p>
+          </div>
+
+          <!-- Title -->
+          <div>
+            <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Hero Title</label>
+            <input type="text" [(ngModel)]="form.title"
+                   placeholder="e.g. Bollywood Blockbusters"
+                   class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all placeholder-white/20" />
+            <p class="text-white/30 text-xs mt-1.5">The large bold headline on the left side</p>
+          </div>
+
+          <!-- Subtitle -->
+          <div>
+            <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Subtitle / Description</label>
+            <textarea [(ngModel)]="form.subtitle" rows="2"
+                      placeholder="e.g. DIVE INTO THE MOST TRENDING HINDI MELODIES AND CLUB ANTHEMS"
+                      class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all placeholder-white/20 text-sm uppercase tracking-wider resize-none"></textarea>
+            <p class="text-white/30 text-xs mt-1.5">Shown below the title (usually uppercase)</p>
+          </div>
+
+          <!-- Image URL -->
+          <div>
+            <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Hero Image URL</label>
+            <input type="text" [(ngModel)]="form.imageUrl"
+                   placeholder="e.g. https://example.com/image.png OR images/hindi-singers.png"
+                   class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all placeholder-white/20 text-sm font-mono" />
+            <p class="text-white/30 text-xs mt-1.5">Right-side image. Use a full URL or a local path like <code class="text-purple-400">images/hindi-singers.png</code></p>
+          </div>
+
+          <!-- Button Text -->
+          <div>
+            <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Button Text</label>
+            <input type="text" [(ngModel)]="form.buttonText"
+                   placeholder="e.g. EXPLORE PLAYLIST"
+                   class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all placeholder-white/20 text-sm uppercase tracking-wider" />
+          </div>
+
+          <!-- Messages -->
+          <div *ngIf="saveError" class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            {{ saveError }}
+          </div>
+          <div *ngIf="saveMessage" class="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
+            {{ saveMessage }}
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3 pt-2">
+            <button (click)="save()" [disabled]="isSaving"
+                    class="flex-1 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              <svg *ngIf="isSaving" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isSaving ? 'Saving...' : 'Save & Publish' }}
+            </button>
+            <button (click)="resetToDefault()"
+                    class="px-5 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white font-medium rounded-xl transition-all text-sm">
+              Reset Default
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Live Preview -->
+    <div class="lg:col-span-2">
+      <div class="sticky top-8">
+        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">Live Preview</p>
+        <div class="bg-[#0d0d18] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+
+          <!-- Mini hero preview -->
+          <div class="relative p-6 min-h-[280px] flex flex-col justify-between overflow-hidden"
+               style="background: linear-gradient(135deg, #0a0a1a 0%, #12101f 100%);">
+
+            <!-- Background glow -->
+            <div class="absolute inset-0 pointer-events-none"
+                 style="background: radial-gradient(ellipse at 70% 50%, rgba(139,92,246,0.08) 0%, transparent 70%)"></div>
+
+            <!-- Top: badge -->
+            <div>
+              <span class="inline-block text-[10px] font-bold tracking-widest text-white/50 border border-white/10 rounded-full px-3 py-1 uppercase mb-3">
+                {{ form.badge || 'BADGE' }}
+              </span>
+              <h2 class="text-2xl font-black text-white leading-tight mb-2" style="text-shadow: 0 2px 20px rgba(0,0,0,0.8)">
+                {{ form.title || 'Hero Title' }}
+              </h2>
+              <p class="text-[10px] text-white/40 uppercase tracking-widest leading-relaxed mb-4">
+                {{ form.subtitle || 'Subtitle text here...' }}
+              </p>
+              <button class="flex items-center gap-2 text-xs font-bold text-white bg-white/10 border border-white/20 rounded-full px-4 py-2 hover:bg-white/15 transition-all">
+                ▶ {{ form.buttonText || 'BUTTON' }}
+              </button>
+            </div>
+
+            <!-- Right image preview -->
+            <div *ngIf="form.imageUrl" class="absolute right-0 top-0 bottom-0 w-2/5 overflow-hidden">
+              <div class="absolute inset-y-0 left-0 w-8 z-10"
+                   style="background: linear-gradient(to right, #0d0d18, transparent)"></div>
+              <img [src]="form.imageUrl" alt="preview"
+                   class="w-full h-full object-cover object-top opacity-80"
+                   style="mask-image: linear-gradient(to left, black 60%, transparent 100%)">
+            </div>
+            <div *ngIf="!form.imageUrl"
+                 class="absolute right-4 top-4 bottom-4 w-2/5 rounded-xl border border-dashed border-white/10 flex items-center justify-center">
+              <p class="text-white/20 text-xs text-center">Image<br>Preview</p>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-white/5">
+            <p class="text-white/30 text-xs">Preview for: <span class="text-purple-400 font-medium">{{ selectedLanguage }}</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
