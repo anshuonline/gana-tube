@@ -206,7 +206,7 @@ export class AlgorithmService {
     // Context-Aware Naming
     const hour = new Date().getHours();
     let timeGreeting = "Day";
-    let timeQuery = `bollywood ${language} hits`;
+    let timeQuery = `popular ${language} hits`;
     
     if (hour >= 6 && hour < 12) {
       timeGreeting = "Morning Boost ☀️";
@@ -219,7 +219,7 @@ export class AlgorithmService {
       timeQuery = `romantic evening ${language} songs`;
     } else {
       timeGreeting = "Late Night Feels 🌙";
-      timeQuery = `lofi sad ${language} songs`;
+      timeQuery = `lofi chill sad ${language} songs`;
     }
 
     shelves.push({
