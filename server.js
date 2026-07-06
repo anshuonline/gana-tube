@@ -307,26 +307,6 @@ app.get('/api/synced-lyrics', async (req, res) => {
   }
 });
 
-// Ads Management Endpoints
-const ADS_FILE = path.join(__dirname, 'data', 'ads.json');
-
-app.get('/api/ads', (req, res) => {
-  if (fs.existsSync(ADS_FILE)) {
-    const adsData = fs.readFileSync(ADS_FILE, 'utf-8');
-    res.json(JSON.parse(adsData));
-  } else {
-    res.json({ isActive: false, imageUrl: '', linkUrl: '' });
-  }
-});
-
-app.post('/api/ads', (req, res) => {
-  const { password, adConfig } = req.body;
-  if (password !== 'admin123') {
-    return res.status(401).json({ error: 'Unauthorized: Incorrect password' });
-  }
-  fs.writeFileSync(ADS_FILE, JSON.stringify(adConfig, null, 2));
-  res.json({ success: true });
-});
 
 // Serve Angular static frontend files from 'browser' folder
 app.use(express.static(path.join(__dirname, 'dist', 'ganatube', 'browser')));

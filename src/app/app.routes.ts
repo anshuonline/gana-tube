@@ -1,10 +1,14 @@
 import { Routes } from '@angular/router';
 import { App } from './app';
 import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
-import { ManageAdsComponent } from './pages/manage-ads/manage-ads';
 
 export const routes: Routes = [
-  { path: '', component: App },
-  { path: 'manageads', component: ManageAdsComponent },
-  { path: 'playlist/:id', component: PlaylistPageComponent }
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'home', children: [] },
+  { path: 'search', children: [] },
+  { path: 'library', children: [] },
+  { path: 'socials', children: [] },
+  { path: 'profile', children: [] },
+  { path: 'playlist/:id', children: [] },
+  { path: '**', children: [] } // Catch all for static pages like /terms, /privacy
 ];

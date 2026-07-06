@@ -41,21 +41,37 @@
         <div class="col-artist">Artist</div>
         <div class="col-time">Published</div>
       </div>
-      <div class="song-row" *ngFor="let song of songs(); let i = index" (click)="playSong(i)" [class.active]="playerService.currentTrack()?.videoId === song.videoId">
-        <div class="col-index">
-          <span class="index-num" *ngIf="playerService.currentTrack()?.videoId !== song.videoId">{{ i + 1 }}</span>
-          <div class="play-ripple-small" *ngIf="playerService.currentTrack()?.videoId === song.videoId">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <ng-container *ngFor="let song of songs(); let i = index">
+        <div class="song-row" (click)="playSong(i)" [class.active]="playerService.currentTrack()?.videoId === song.videoId">
+          <div class="col-index">
+            <span class="index-num" *ngIf="playerService.currentTrack()?.videoId !== song.videoId">{{ i + 1 }}</span>
+            <div class="play-ripple-small" *ngIf="playerService.currentTrack()?.videoId === song.videoId">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <svg lucidePlay class="hover-play-icon" [attr.size]="16" fill="currentColor"></svg>
           </div>
-          <svg lucidePlay class="hover-play-icon" [attr.size]="16" fill="currentColor"></svg>
+          <div class="col-title song-title-col">
+            <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
+            <span class="song-title" [title]="song.title">{{ song.title }}</span>
+          </div>
+          <div class="col-artist song-artist-col" [title]="song.channelTitle">{{ song.channelTitle }}</div>
+          <div class="col-time song-time-col">{{ song.publishedAt | date:'mediumDate' }}</div>
         </div>
-        <div class="col-title song-title-col">
-          <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
-          <span class="song-title" [title]="song.title">{{ song.title }}</span>
+
+        <!-- Playlist In-Feed Ad (Every 10 songs, Max 5) -->
+        <div class="playlist-ad-row" *ngIf="playlistAd()?.isActive && i % 10 === 9 && i < 50">
+          <a *ngIf="!playlistAd()?.customCode" [href]="playlistAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">
+            <img [src]="playlistAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
+          </a>
+          <iframe *ngIf="playlistAd()?.customCode" 
+                  [src]="getSafeUrl('http://localhost/manageads/ad_iframe.php?placeholder=playlist_in_feed_banner')"
+                  class="sponsored-ad-iframe"
+                  scrolling="no"
+                  frameborder="0">
+          </iframe>
+          <span class="ad-label">Sponsored</span>
         </div>
-        <div class="col-artist song-artist-col" [title]="song.channelTitle">{{ song.channelTitle }}</div>
-        <div class="col-time song-time-col">{{ song.publishedAt | date:'mediumDate' }}</div>
-      </div>
+      </ng-container>
     </div>
   </div>
 </div>

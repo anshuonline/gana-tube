@@ -1,9 +1,9 @@
-<div class="app-layout">
+<div class="app-container" [class.player-active]="playerService.currentTrack() !== null">
   <!-- Hidden YouTube Player -->
   <app-yt-player></app-yt-player>
 
   <!-- Sidebar -->
-  <nav class="app-sidebar">
+  <nav class="app-sidebar" *ngIf="currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
     <div class="sidebar-items">
       <div class="sidebar-item" (click)="resetSearchState()" [class.active]="currentPage() === 'home'">
         <svg lucideHome [attr.size]="24"></svg>
@@ -32,7 +32,7 @@
   </nav>
 
   <!-- Header -->
-  <header class="app-header" [class.scrolled]="isScrolled()">
+  <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
     <div class="header-inner">
       <div class="logo" routerLink="/" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
         <img src="ganatube.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
@@ -161,7 +161,12 @@
       </div>
     </div>
 
-    <div *ngIf="currentPage() === 'home' || currentPage() === 'search'">
+    <app-advertise-page *ngIf="currentPage() === 'advertise'"></app-advertise-page>
+    <app-ad-booking-page *ngIf="currentPage() === 'ad-booking'"></app-ad-booking-page>
+    <app-ad-terms-page *ngIf="currentPage() === 'ad-terms'"></app-ad-terms-page>
+    <app-ad-prohibited-page *ngIf="currentPage() === 'ad-prohibited'"></app-ad-prohibited-page>
+
+    <div *ngIf="currentPage() === 'home' || currentPage() === 'search'" class="home-content">
       <!-- Hero Banner (Hidden in Search Mode) -->
       <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
         <div class="hero-inner-wrap full-width" #heroInner>
@@ -273,6 +278,20 @@
                 </div>
               </div>
             </ng-container>
+
+            <!-- Repeating In-Feed Ad Banner (Every 3 sections) -->
+            <div class="in-feed-ad-container" *ngIf="inFeedAd()?.isActive && shelfIdx % 3 === 0">
+              <a *ngIf="!inFeedAd()?.customCode" [href]="inFeedAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">
+                <img [src]="inFeedAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
+              </a>
+              <iframe *ngIf="inFeedAd()?.customCode" 
+                      [src]="getSafeUrl('http://localhost/manageads/ad_iframe.php?placeholder=home_feed_banner')"
+                      class="sponsored-ad-iframe"
+                      scrolling="no"
+                      frameborder="0">
+              </iframe>
+              <span class="ad-label">Sponsored</span>
+            </div>
 
             <!-- Inject Artists and Playlists after 3rd shelf (index 2) -->
             <ng-container *ngIf="shelfIdx === 2">
@@ -393,7 +412,7 @@
     </div>
     
     <!-- Static Pages Section -->
-    <div class="static-page-container" *ngIf="currentPage() !== 'home' && currentPage() !== 'playlist'">
+    <div class="static-page-container" *ngIf="pageContent[currentPage()]">
       <div class="static-page-content" [innerHTML]="pageContent[currentPage()]?.html"></div>
     </div>
 
@@ -405,7 +424,7 @@
     </app-playlist-page>
 
     <!-- Modern Footer -->
-    <footer class="app-footer-modern">
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'playlist'">
       <div class="footer-giant-brand">ganatube.in</div>
       <div class="footer-content">
         <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
@@ -423,6 +442,7 @@
         <div class="footer-col">
           <h3 class="col-title">Corporate & Legal</h3>
           <ul class="col-links">
+            <li><a routerLink="/advertise">Advertise With Us</a></li>
             <li><a routerLink="/about">About Us</a></li>
             <li><a routerLink="/privacy-policy">Privacy Policy</a></li>
             <li><a routerLink="/terms-of-service">Terms of Service</a></li>
@@ -434,15 +454,24 @@
         </div>
       </div>
     </footer>
-    <router-outlet *ngIf="['manageads', 'playlist'].includes(currentPage())"></router-outlet>
   </main>
 
-  <!-- Global Sponsored Ad Banner (Only shown if active and not hidden by user) -->
-  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && showAd()">
-    <button class="close-ad-btn" (click)="showAd.set(false)" title="Hide Ad">×</button>
-    <a [href]="sponsoredAd()?.linkUrl" target="_blank" rel="noopener noreferrer">
-      <img [src]="sponsoredAd()?.imageUrl" alt="Sponsored Ad" (error)="showAd.set(false)" />
+  <!-- Global Sponsored Ad Banner (Only shown if active) -->
+  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive">
+    
+    <!-- Show Image if no custom code -->
+    <a *ngIf="!sponsoredAd()?.customCode" [href]="sponsoredAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">
+      <img [src]="sponsoredAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
     </a>
+
+    <!-- Show Iframe if custom code exists -->
+    <iframe *ngIf="sponsoredAd()?.customCode" 
+            [src]="getSafeUrl('http://localhost/manageads/ad_iframe.php?placeholder=bottom_player_banner')"
+            class="sponsored-ad-iframe"
+            scrolling="no"
+            frameborder="0">
+    </iframe>
+
     <span class="ad-label">Sponsored</span>
   </div>
 

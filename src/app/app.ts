@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -17,8 +17,20 @@ import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } fro
 import { Router, NavigationEnd, RouterModule, ActivatedRoute } from '@angular/router';
 import { PAGE_CONTENT } from './data/static-pages';
 import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
+import { AdvertisePageComponent } from './components/advertise-page/advertise-page.component';
+import { AdBookingPageComponent } from './components/ad-booking-page/ad-booking-page.component';
+import { AdTermsPageComponent } from './components/ad-terms-page/ad-terms-page.component';
+import { AdProhibitedPageComponent } from './components/ad-prohibited-page/ad-prohibited-page.component';
 import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 import { PwaService } from './services/pwa.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
+export interface SponsoredAd {
+  isActive: boolean;
+  imageUrl?: string;
+  linkUrl?: string;
+  customCode?: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -36,6 +48,7 @@ import { PwaService } from './services/pwa.service';
     LucideLibrary,
     LucideUser,
     LucideMessageSquare,
+    LucideMegaphone,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -43,6 +56,10 @@ import { PwaService } from './services/pwa.service';
     FullScreenPlayerComponent,
     ListenTogetherComponent,
     PlaylistPageComponent,
+    AdvertisePageComponent,
+    AdBookingPageComponent,
+    AdTermsPageComponent,
+    AdProhibitedPageComponent,
     RouterModule
   ],
   templateUrl: './app.html',
@@ -60,6 +77,14 @@ export class App implements OnInit {
   isFullScreenPlayerVisible = signal<boolean>(false);
   isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
+
+  // Ad Booking State
+  bookingState: {
+    placementId?: string;
+    placementName?: string;
+    durationDays?: number;
+    totalPrice?: number;
+  } = {};
 
   currentQuery = '';
 
@@ -138,7 +163,8 @@ export class App implements OnInit {
   pageContent = PAGE_CONTENT;
 
   // Sponsored Ad State
-  sponsoredAd = signal<{ isActive: boolean, imageUrl: string, linkUrl: string } | null>(null);
+  sponsoredAd = signal<SponsoredAd | null>(null);
+  inFeedAd = signal<SponsoredAd | null>(null);
   showAd = signal<boolean>(true);
 
   carouselIndex = 0;
@@ -146,6 +172,11 @@ export class App implements OnInit {
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
+  sanitizer = inject(DomSanitizer);
+
+  getSafeUrl(url: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 
   // Helpers for Fallback Design
   getInitials(name: string): string {
@@ -218,7 +249,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'manageads'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'advertise'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {
@@ -260,6 +291,11 @@ export class App implements OnInit {
 
   openSocialsPage(): void {
     this.router.navigate(['/socials']);
+    this.isSearchMode.set(false);
+  }
+
+  openAdvertisePage(): void {
+    this.router.navigate(['/advertise']);
     this.isSearchMode.set(false);
   }
 
@@ -320,15 +356,31 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {
-    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
-    fetch(`${backendUrl}/ads`)
+    // Dynamic API URL for Localhost vs Live Domain (ganatube.in)
+    const host = window.location.hostname;
+    const adApiUrl = host === 'localhost' 
+      ? 'http://localhost/manageads/api.php' 
+      : 'https://ganatube.in/manageads/api.php';
+
+    // Fetch Bottom Banner
+    fetch(`${adApiUrl}?placeholder=bottom_player_banner`)
       .then(res => res.json())
       .then(data => {
         if (data && data.isActive) {
           this.sponsoredAd.set(data);
         }
       })
-      .catch(err => console.error('Failed to load sponsored ad', err));
+      .catch(err => console.error('Failed to load bottom banner', err));
+
+    // Fetch In-Feed Banner
+    fetch(`${adApiUrl}?placeholder=home_feed_banner`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.isActive) {
+          this.inFeedAd.set(data);
+        }
+      })
+      .catch(err => console.error('Failed to load in-feed banner', err));
 
     this.apiKeyMissing =
       !environment.youtubeApiKey ||

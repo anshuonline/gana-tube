@@ -1,0 +1,216 @@
+<div class="advertise-page-container">
+  <button class="back-home-btn" (click)="goHome()">
+    <i class="fas fa-chevron-left"></i> Back to Home
+  </button>
+  
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <svg lucideMegaphone [attr.size]="14"></svg>
+        <span>GanaTube Ads Network</span>
+      </div>
+      <h1 class="hero-title">Reach Millions of <span class="highlight">Music Lovers</span></h1>
+      <p class="hero-subtitle">Connect with a highly engaged audience through premium, non-intrusive ad placements on GanaTube.</p>
+      
+      <div class="stats-row">
+        <div class="stat-card">
+          <svg lucideUsers [attr.size]="24" class="stat-icon"></svg>
+          <div class="stat-info">
+            <span class="stat-val">5M+</span>
+            <span class="stat-label">Active Users</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <svg lucideZap [attr.size]="24" class="stat-icon text-yellow"></svg>
+          <div class="stat-info">
+            <span class="stat-val">High CTR</span>
+            <span class="stat-label">Engagement</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <svg lucideBarChart2 [attr.size]="24" class="stat-icon text-green"></svg>
+          <div class="stat-info">
+            <span class="stat-val">Weekly</span>
+            <span class="stat-label">Detailed Reports</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing & Placements -->
+  <div class="placements-section">
+    <div class="section-header">
+      <h2>Premium Ad Placements</h2>
+      <p>Choose the perfect spot to showcase your brand. Transparent pricing in INR.</p>
+    </div>
+
+    <!-- 1. Bottom Player Banner -->
+    <div class="placement-card">
+      <div class="placement-info">
+        <div class="placement-badge">Most Popular</div>
+        <h3>Bottom Player Banner</h3>
+        <p class="placement-desc">A sticky, highly visible banner that stays on screen while users listen to music. Maximum brand recall.</p>
+        
+        <div class="placement-details">
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Size:</strong> 728x90 (Leaderboard) or 468x60 (Banner)</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Format:</strong> Display Ads (Horizontal) / Anchor Ads</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Visibility:</strong> 100% Sticky across all pages</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideSettings [attr.size]="16"></svg>
+            <span><strong>Targeting:</strong> Hourly targeting available. Prices can be changed from the ManageAds portal.</span>
+          </div>
+        </div>
+
+        <div class="duration-slider">
+          <div class="slider-header">
+            <label>Campaign Duration</label>
+            <span class="duration-value">{{ bottomAdHours() }} Hour(s)</span>
+          </div>
+          <input type="range" min="1" max="168" [value]="bottomAdHours()" (input)="updateHours('bottom', $event)" class="range-slider">
+        </div>
+        
+        <div class="price-action-row">
+          <div class="price-display">
+            <span class="price-amount">₹{{ bottomAdPrice() }}</span>
+            <span class="price-unit">/hr</span>
+            <div class="divider"></div>
+            <span *ngIf="!isLoadingPrices()">₹{{ bottomAdPrice() * bottomAdHours() | number }}</span>
+            <span>/total</span>
+          </div>
+          <button class="book-btn" (click)="bookSpot('bottom_player_banner', 'Bottom Player Banner', bottomAdHours(), bottomAdPrice())">Book This Spot</button>
+        </div>
+      </div>
+      <div class="placement-demo">
+        <img src="/images/bottom-ad-demo.png" alt="Bottom Player Ad Demo" class="demo-screenshot">
+      </div>
+    </div>
+
+    <!-- 2. Home Feed Banner -->
+    <div class="placement-card reverse">
+      <div class="placement-demo">
+        <img src="/images/home-ad-demo.png" alt="Home Feed Ad Demo" class="demo-screenshot">
+      </div>
+      <div class="placement-info">
+        <h3>Home Feed Banner</h3>
+        <p class="placement-desc">A massive billboard-sized banner placed naturally between music sections on the home page.</p>
+        
+        <div class="placement-details">
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Size:</strong> 970x250 (Billboard)</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Format:</strong> In-feed Ads / Display Ads</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Visibility:</strong> High impact, scroll-stopping</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideSettings [attr.size]="16"></svg>
+            <span><strong>Targeting:</strong> Hourly targeting available. Prices can be changed from the ManageAds portal.</span>
+          </div>
+        </div>
+
+        <div class="duration-slider">
+          <div class="slider-header">
+            <label>Campaign Duration</label>
+            <span class="duration-value">{{ homeAdHours() }} Hour(s)</span>
+          </div>
+          <input type="range" min="1" max="168" [value]="homeAdHours()" (input)="updateHours('home', $event)" class="range-slider">
+        </div>
+        
+        <div class="price-action-row">
+          <div class="price-display">
+            <span class="price-amount">₹{{ homeAdPrice() }}</span>
+            <span class="price-unit">/hr</span>
+            <div class="divider"></div>
+            <span *ngIf="!isLoadingPrices()">₹{{ homeAdPrice() * homeAdHours() | number }}</span>
+            <span>/total</span>
+          </div>
+          <button class="book-btn" (click)="bookSpot('home_feed_banner', 'Home Feed Banner', homeAdHours(), homeAdPrice())">Book This Spot</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Playlist In-Feed Banner -->
+    <div class="placement-card">
+      <div class="placement-info">
+        <h3>Playlist In-Feed Banner</h3>
+        <p class="placement-desc">Appears dynamically between songs inside any playlist. Perfect for subtle, native advertising.</p>
+        
+        <div class="placement-details">
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Size:</strong> 728x90 (Leaderboard)</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Format:</strong> Native In-feed Ads</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideCheckCircle [attr.size]="16"></svg>
+            <span><strong>Frequency:</strong> Appears every 10 songs (Max 5 per playlist)</span>
+          </div>
+          <div class="detail-item">
+            <svg lucideSettings [attr.size]="16"></svg>
+            <span><strong>Targeting:</strong> Hourly targeting available. Prices can be changed from the ManageAds portal.</span>
+          </div>
+        </div>
+
+        <div class="duration-slider">
+          <div class="slider-header">
+            <label>Campaign Duration</label>
+            <span class="duration-value">{{ playlistAdHours() }} Hour(s)</span>
+          </div>
+          <input type="range" min="1" max="168" [value]="playlistAdHours()" (input)="updateHours('playlist', $event)" class="range-slider">
+        </div>
+        
+        <div class="price-action-row">
+          <div class="price-display">
+            <span class="price-amount">₹{{ playlistAdPrice() }}</span>
+            <span class="price-unit">/hr</span>
+            <div class="divider"></div>
+            <span *ngIf="!isLoadingPrices()">₹{{ playlistAdPrice() * playlistAdHours() | number }}</span>
+            <span>/total</span>
+          </div>
+          <button class="book-btn" (click)="bookSpot('playlist_in_feed_banner', 'Playlist In-Feed Banner', playlistAdHours(), playlistAdPrice())">Book This Spot</button>
+        </div>
+      </div>
+      <div class="placement-demo">
+        <img src="/images/playlist-ad-demo.png" alt="Playlist Ad Demo" class="demo-screenshot">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Reporting Section -->
+  <div class="reporting-section">
+    <div class="report-box">
+      <div class="report-icon-wrapper">
+        <svg lucideBarChart2 [attr.size]="32"></svg>
+      </div>
+      <div class="report-text">
+        <h3>Comprehensive Analytics & Reports</h3>
+        <p>You will receive detailed weekly reports including Impressions, Clicks, CTR, and audience engagement metrics. We ensure complete transparency for your campaign performance.</p>
+      </div>
+      <button class="contact-btn" (click)="contactUs()">
+        <svg lucideMail [attr.size]="18"></svg>
+        Contact Sales Team
+      </button>
+    </div>
+  </div>
+
+</div>

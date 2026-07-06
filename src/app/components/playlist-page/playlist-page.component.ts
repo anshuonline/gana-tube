@@ -1,8 +1,10 @@
-import { Component, Input, OnInit, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 import { PlaylistMeta } from '../../data/playlists.data';
+import { SponsoredAd } from '../../app';
 import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck } from '@lucide/angular';
 
 @Component({
@@ -19,6 +21,9 @@ export class PlaylistPageComponent implements OnInit {
   songs = signal<YouTubeSearchResult[]>([]);
   isLoading = signal<boolean>(true);
   isCopied = signal<boolean>(false);
+  playlistAd = signal<SponsoredAd | null>(null);
+
+  sanitizer = inject(DomSanitizer);
 
   constructor(
     private youtubeApi: YoutubeApiService,
@@ -29,6 +34,27 @@ export class PlaylistPageComponent implements OnInit {
     if (this.playlist) {
       this.loadSongs();
     }
+    this.loadAd();
+  }
+
+  loadAd(): void {
+    const host = window.location.hostname;
+    const adApiUrl = host === 'localhost' 
+      ? 'http://localhost/manageads/api.php' 
+      : 'https://ganatube.in/manageads/api.php';
+
+    fetch(`${adApiUrl}?placeholder=playlist_in_feed_banner`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.isActive) {
+          this.playlistAd.set(data);
+        }
+      })
+      .catch(err => console.error('Failed to load playlist ad', err));
+  }
+
+  getSafeUrl(url: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   loadSongs(): void {

@@ -1,0 +1,126 @@
+<div class="booking-container">
+  <button class="back-btn" (click)="goBack()">
+    <i class="fas fa-chevron-left"></i> Back to Advertising
+  </button>
+
+  <div class="booking-layout">
+    <div class="form-section">
+      <h1>Book Campaign Slot</h1>
+      <p class="subtitle">Complete the form below to secure your ad placement.</p>
+
+      <div class="success-message" *ngIf="successMessage()">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage() }}
+      </div>
+      
+      <div class="error-message" *ngIf="errorMessage()">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ errorMessage() }}
+      </div>
+
+      <form (submit)="submitBooking($event)" *ngIf="!successMessage()">
+        
+        <div class="form-section-title">Select Placements</div>
+        <div class="placements-grid">
+          <label class="placement-card" *ngFor="let p of availablePlacements" [class.selected]="p.selected">
+            <input type="checkbox" [(ngModel)]="p.selected" name="placement_{{p.id}}" (change)="onPlacementToggle()">
+            <div class="placement-info">
+              <span class="p-name">{{p.name}}</span>
+              <span class="p-price">₹{{p.pricePerHour}}/hr</span>
+            </div>
+            <div class="check-icon">
+              <i class="fas fa-check"></i>
+            </div>
+          </label>
+        </div>
+
+        <div class="form-section-title">Campaign Dates (Kab se Kab)</div>
+        <div class="date-row">
+          <div class="form-group half">
+            <label>Start Date & Time</label>
+            <input type="datetime-local" [(ngModel)]="startDateTime" name="startDateTime" (change)="onDateChange()" required>
+          </div>
+          <div class="form-group half">
+            <label>End Date & Time</label>
+            <input type="datetime-local" [(ngModel)]="endDateTime" name="endDateTime" (change)="onDateChange()" required>
+          </div>
+        </div>
+
+        <div class="form-section-title">Advertiser Details</div>
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" [(ngModel)]="name" name="name" placeholder="John Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" [(ngModel)]="email" name="email" placeholder="john@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Brand / Company Name</label>
+          <input type="text" [(ngModel)]="brandName" name="brandName" placeholder="My Awesome Brand" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Target Audience (Optional)</label>
+          <input type="text" [(ngModel)]="targetAudience" name="targetAudience" placeholder="e.g. Gen-Z, Music Lovers, Tech Enthusiasts">
+        </div>
+
+        <div class="form-group">
+          <label>Ad Destination Link</label>
+          <input type="url" [(ngModel)]="adLink" name="adLink" placeholder="https://yourwebsite.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Briefly describe what you are advertising</label>
+          <textarea [(ngModel)]="adDescription" name="adDescription" placeholder="Explain the product, service, or brand you are promoting..." rows="3" required></textarea>
+          <p class="field-hint">
+            Please make sure your ad does not fall under our <a href="#" (click)="viewProhibited($event)">Prohibited Ads Categories</a>.
+          </p>
+        </div>
+
+        <div class="checkbox-group">
+          <label class="custom-checkbox">
+            <input type="checkbox" [(ngModel)]="agreedTos" name="agreedTos" required>
+            <span class="checkmark"></span>
+            <span class="label-text">
+              I have read and agree to the strict <a href="#" (click)="viewTerms($event)">Terms of Service and Refund Policy</a>. I understand there are no refunds once a campaign starts.
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+          <span *ngIf="!isSubmitting()">Submit Booking Request</span>
+          <span *ngIf="isSubmitting()"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="summary-section">
+      <div class="summary-card">
+        <h3>Order Summary</h3>
+        <div class="summary-item">
+          <span class="label">Placements:</span>
+          <span class="value">{{ getSelectedPlacementNames() }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Duration:</span>
+          <span class="value">{{ durationHours }} Hour(s)</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="summary-total">
+          <span class="label">Total Cost:</span>
+          <span class="value">₹{{ totalPrice | number }}</span>
+        </div>
+
+        <div class="info-note">
+          <i class="fas fa-info-circle"></i> 
+          No payment is required right now. Our team will verify availability and contact you with a payment link.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
