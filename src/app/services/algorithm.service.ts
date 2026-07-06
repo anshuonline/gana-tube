@@ -191,74 +191,9 @@ export class AlgorithmService {
   }
 
   public getVariableRewardShelves(language: string = 'Hindi'): Observable<ShelfDefinition[]> {
-    const topArtists = Object.entries(this.profile.taste_profile.artist_scores)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(e => e[0]);
-
-    const shelves: ShelfDefinition[] = [
-      {
-        title: "Suggested for You",
-        query: `top hit ${language} songs playlist`
-      }
-    ];
-
-    // Context-Aware Naming
-    const hour = new Date().getHours();
-    let timeGreeting = "Day";
-    let timeQuery = `popular ${language} hits`;
-    
-    if (hour >= 6 && hour < 12) {
-      timeGreeting = "Morning Boost ☀️";
-      timeQuery = `morning motivation ${language} songs`;
-    } else if (hour >= 12 && hour < 17) {
-      timeGreeting = "Afternoon Vibes 🎵";
-      timeQuery = `latest pop ${language} songs`;
-    } else if (hour >= 17 && hour < 21) {
-      timeGreeting = "Evening Melodies 🌆";
-      timeQuery = `romantic evening ${language} songs`;
-    } else {
-      timeGreeting = "Late Night Feels 🌙";
-      timeQuery = `lofi chill sad ${language} songs`;
-    }
-
-    shelves.push({
-      title: "Your " + timeGreeting,
-      query: timeQuery
-    });
-
-    if (this.profile.history.length < 3 || language !== 'Hindi') {
-      // New user or specific language selected - Safe defaults
-      shelves.push({ title: "🔥 Trending Right Now", query: `trending ${language} songs today` });
-      shelves.push({ title: `Trending ${language}`, query: `latest ${language} hits` });
-      shelves.push({ title: "Party Hits", query: `${language} dance hits` });
-      shelves.push({ title: "Romantic Melodies", query: `best romantic ${language} songs` });
-    } else {
-      // Personalized shelves (Only for default language/Hindi)
-      if (topArtists.length > 0) {
-        shelves.push({
-          title: "Because you like " + topArtists[0],
-          query: topArtists[0] + " songs"
-        });
-      }
-
-      shelves.push({
-        title: "Made For You 💜",
-        query: topArtists.length > 1 ? (topArtists[1] + " hits") : `trending ${language} songs`
-      });
-
-      shelves.push({
-        title: "Fresh Finds For You ✨",
-        query: `new release ${language} pop songs`
-      });
-
-      shelves.push({
-        title: "Hidden Gems 💎",
-        query: `underrated ${language} indie songs`
-      });
-    }
-
-    return of(shelves);
+    // User requested to remove all dynamic/algorithmic shelves
+    // Custom sections from the admin panel will be the only ones shown.
+    return of([]);
   }
 
   public getAutoplayQueue(currentTrack: YouTubeSearchResult): Observable<YouTubeSearchResult[]> {
