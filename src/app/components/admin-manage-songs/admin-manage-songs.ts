@@ -32,6 +32,7 @@ export class AdminManageSongsComponent {
   totalToFetch = 0;
   
   fetchedSongs: FetchedSong[] = [];
+  fetchErrors: string[] = [];
   
   isPublishing = false;
   publishMessage: string = '';
@@ -62,6 +63,7 @@ export class AdminManageSongsComponent {
     this.totalToFetch = queries.length;
     this.fetchProgress = 0;
     this.fetchedSongs = [];
+    this.fetchErrors = [];
 
     // Process in chunks of 10 to speed up
     const chunkSize = 10;
@@ -81,8 +83,10 @@ export class AdminManageSongsComponent {
               artist: response[0].artist || response[0].channelTitle
             });
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error('Failed to fetch:', query, e);
+          const errMsg = e.error?.message || e.message || 'Unknown error';
+          this.fetchErrors.push(`Failed to fetch "${query}": ${errMsg}`);
         }
         this.fetchProgress++;
         this.cdr.detectChanges();

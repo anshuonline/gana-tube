@@ -35,6 +35,13 @@
         <div class="progress-text">Fetched {{ fetchProgress }} of {{ totalToFetch }} songs</div>
         <div class="progress-fill" [style.width.%]="totalToFetch ? (fetchProgress / totalToFetch) * 100 : 0"></div>
       </div>
+
+      <div class="error-logs" *ngIf="fetchErrors.length > 0">
+        <h4>Errors during fetch ({{ fetchErrors.length }}):</h4>
+        <ul>
+          <li *ngFor="let err of fetchErrors">{{ err }}</li>
+        </ul>
+      </div>
     </div>
 
     <!-- Review Section -->

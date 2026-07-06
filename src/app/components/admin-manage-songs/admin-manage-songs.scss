@@ -95,6 +95,55 @@
         color: var(--text-secondary);
       }
 
+    .progress-bar {
+      margin-top: 24px;
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid var(--border);
+
+      .progress-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .progress-fill {
+        height: 6px;
+        background: var(--primary);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+    }
+
+    .error-logs {
+      margin-top: 16px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+
+      h4 {
+        color: #ef4444;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      ul {
+        list-style-type: none;
+        max-height: 200px;
+        overflow-y: auto;
+        
+        li {
+          color: #fca5a5;
+          font-size: 13px;
+          margin-bottom: 4px;
+          font-family: monospace;
+        }
+      }
+    }
+
       select, textarea {
         width: 100%;
         padding: 14px;
