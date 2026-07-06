@@ -248,14 +248,18 @@ export class App implements OnInit {
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
-      } else if (url.startsWith('/advertise')) {
+      } else if (event.urlAfterRedirects.startsWith('/advertise')) {
         this.currentPage.set('advertise');
-      } else if (url.startsWith('/admin/manage-songs')) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      } else if (event.urlAfterRedirects.startsWith('/admin/manage-songs')) {
         this.currentPage.set('admin');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'advertise'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {
