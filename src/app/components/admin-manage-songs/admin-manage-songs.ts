@@ -96,6 +96,7 @@ export class AdminManageSongsComponent {
     }
     
     this.isFetching = false;
+    this.cdr.detectChanges();
   }
 
   async publish() {
@@ -137,6 +138,7 @@ export class AdminManageSongsComponent {
       this.publishMessage = '❌ Failed to publish: ' + (e.error?.message || e.message || 'Unknown error');
     } finally {
       this.isPublishing = false;
+      this.cdr.detectChanges();
     }
   }
 }
