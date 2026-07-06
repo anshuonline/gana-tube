@@ -43,7 +43,7 @@ export class AdBookingPageComponent implements OnInit {
 
   ngOnInit() {
     // Fetch dynamic prices from backend
-    const apiUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/api.php?action=prices' : '/manageads/api.php?action=prices';
+    const apiUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/api.php?action=prices' : 'https://manageads.ganatube.in/api.php?action=prices';
     this.http.get<any>(apiUrl).subscribe({
       next: (data) => {
         this.availablePlacements.forEach(p => {
@@ -174,7 +174,7 @@ export class AdBookingPageComponent implements OnInit {
       agreed_tos: this.agreedTos
     };
 
-    const submitUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/submit_booking.php' : '/manageads/submit_booking.php';
+    const submitUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/submit_booking.php' : 'https://manageads.ganatube.in/submit_booking.php';
     this.http.post<any>(submitUrl, payload).subscribe({
       next: (res) => {
         this.isSubmitting.set(false);

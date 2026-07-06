@@ -41,7 +41,7 @@ export class PlaylistPageComponent implements OnInit {
     const host = window.location.hostname;
     const adApiUrl = host === 'localhost' 
       ? 'http://localhost/manageads/api.php' 
-      : 'https://ganatube.in/manageads/api.php';
+      : 'https://manageads.ganatube.in/api.php';
 
     fetch(`${adApiUrl}?placeholder=playlist_in_feed_banner`)
       .then(res => res.json())
