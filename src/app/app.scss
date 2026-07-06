@@ -451,6 +451,7 @@
   @media (max-width: 992px) {
     padding-right: 0;
     align-items: center;
+    flex-direction: column-reverse;
   }
 }
 
@@ -463,7 +464,7 @@
   z-index: 10;
 
   @media (max-width: 992px) {
-    margin: 40px 0;
+    margin: 10px 0 20px;
     align-items: center;
   }
 }
