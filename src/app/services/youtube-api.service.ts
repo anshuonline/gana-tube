@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { CURATED_HINDI_SONGS } from '../data/curated-hindi-songs';
 
 export interface YouTubeSearchResult {
   videoId: string;
@@ -74,6 +75,7 @@ export class YoutubeApiService {
           catchError(() => of([]))
         );
       }),
+      map(results => this.injectCuratedSongs(query, results)),
       map(results => {
         if (results && results.length > 0) {
           try {
@@ -88,6 +90,29 @@ export class YoutubeApiService {
         return results;
       })
     );
+  }
+
+  private injectCuratedSongs(query: string, results: YouTubeSearchResult[]): YouTubeSearchResult[] {
+    if (!query.toLowerCase().includes('hindi') || !CURATED_HINDI_SONGS || CURATED_HINDI_SONGS.length === 0) {
+      return results;
+    }
+    
+    // Pick 3 to 7 random songs from CURATED_HINDI_SONGS
+    const mixCount = Math.floor(Math.random() * 5) + 3;
+    const shuffledCurated = [...CURATED_HINDI_SONGS].sort(() => 0.5 - Math.random()).slice(0, mixCount);
+    
+    // Inject at random positions in the first 20 items (or whatever length is available)
+    const mixed = [...(results || [])];
+    shuffledCurated.forEach(song => {
+      // Don't inject null/undefined results just in case
+      if (song) {
+        const insertPos = Math.floor(Math.random() * Math.min(20, mixed.length + 1));
+        mixed.splice(insertPos, 0, song);
+      }
+    });
+    
+    // Deduplicate by videoId
+    return Array.from(new Map(mixed.map(item => [item.videoId, item])).values());
   }
 
 

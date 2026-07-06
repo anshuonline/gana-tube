@@ -1,0 +1,1778 @@
+export const CURATED_HINDI_SONGS = [
+  {
+    "videoId": "4FYKJPe0dOE",
+    "title": "Tu Hi Disda (From \"Bhooth Bangla\")",
+    "channelTitle": "Tu Hi Disda (From \"Bhooth Bangla\")",
+    "thumbnail": "https://yt3.googleusercontent.com/SeCzomSMReWy0YAelrxrrJD2-n5wz4B35pMEkKBw_QhLUlzO4-RMFzr_s3ptFeeyjg3Mo_-irIezItlleg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/SeCzomSMReWy0YAelrxrrJD2-n5wz4B35pMEkKBw_QhLUlzO4-RMFzr_s3ptFeeyjg3Mo_-irIezItlleg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:18.508Z"
+  },
+  {
+    "videoId": "Gayw5AQvWcQ",
+    "title": "Shararat (From \"Dhurandhar\")",
+    "channelTitle": "Shashwat Sachdev",
+    "thumbnail": "https://yt3.googleusercontent.com/7Zsektrtwnf2UlL5CWGtSxi8JDfT8h4me73j31Mk-bDe5qbfUz7dtt1MUy-QlwkaGBWaIXucHF-r2KiCUQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/7Zsektrtwnf2UlL5CWGtSxi8JDfT8h4me73j31Mk-bDe5qbfUz7dtt1MUy-QlwkaGBWaIXucHF-r2KiCUQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:19.227Z"
+  },
+  {
+    "videoId": "i1o1p_DD6TU",
+    "title": "Gehra Hua (From \"Dhurandhar\")",
+    "channelTitle": "Gehra Hua (From \"Dhurandhar\")",
+    "thumbnail": "https://yt3.googleusercontent.com/B1p2-JcIuomNuey91o6bvshtrtw2gr0pH1bIviJxDqNZiT9et79lCgY4-pU-6FhVNWbi9FrnOtJ35t8=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/B1p2-JcIuomNuey91o6bvshtrtw2gr0pH1bIviJxDqNZiT9et79lCgY4-pU-6FhVNWbi9FrnOtJ35t8=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:19.983Z"
+  },
+  {
+    "videoId": "OeIyH6QIe5U",
+    "title": "Ram Ji Aake Bhala Karenge (From \"Bhooth Bangla\")",
+    "channelTitle": "Ram Ji Aake Bhala Karenge (From \"Bhooth Bangla\")",
+    "thumbnail": "https://yt3.googleusercontent.com/eN5_c_aSzHaNU6iDZwnHkfqqW6kD1zCdKu6j_GPgFz3K4hsFQtRgyovKAmsQQGC77YfB95YG7K9f3KYg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/eN5_c_aSzHaNU6iDZwnHkfqqW6kD1zCdKu6j_GPgFz3K4hsFQtRgyovKAmsQQGC77YfB95YG7K9f3KYg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:20.720Z"
+  },
+  {
+    "videoId": "GFDBRbKE8s0",
+    "title": "Ek Din Title Track",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/unLyiEgycdpJwWsQQkUrR_XKIwXUPM6Y4iMbmk0PMk2FM_s2_88k-hgSyZNXIysTrbHITJblqBe2L13_=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/unLyiEgycdpJwWsQQkUrR_XKIwXUPM6Y4iMbmk0PMk2FM_s2_88k-hgSyZNXIysTrbHITJblqBe2L13_=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:21.513Z"
+  },
+  {
+    "videoId": "58fJee2dQ1c",
+    "title": "Kya Bataun Tujhe",
+    "channelTitle": "Vishal Mishra",
+    "thumbnail": "https://yt3.googleusercontent.com/6E1D9WI5euEO6F8qeg753-Y7szvH3VjViDki2xUkacGzEBTOQF1Odbm9uMfDxkXjNLVF1mRC1x5BGeT9=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/6E1D9WI5euEO6F8qeg753-Y7szvH3VjViDki2xUkacGzEBTOQF1Odbm9uMfDxkXjNLVF1mRC1x5BGeT9=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:22.269Z"
+  },
+  {
+    "videoId": "AxN0RjNx6WM",
+    "title": "Jaiye Sajana (From \"Dhurandhar The Revenge\")",
+    "channelTitle": "Shashwat Sachdev",
+    "thumbnail": "https://yt3.googleusercontent.com/0pkwx8J4M_khsEmw8i-TJ4NvEmi-OD5pjbdIvAmFroWRPgBp5_P4tDCAcThJ4XnGh3k2DaKp_jeIGjx7=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/0pkwx8J4M_khsEmw8i-TJ4NvEmi-OD5pjbdIvAmFroWRPgBp5_P4tDCAcThJ4XnGh3k2DaKp_jeIGjx7=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:23.076Z"
+  },
+  {
+    "videoId": "eQoI2bPIkDY",
+    "title": "Bandhu 2.0 (From \"Cocktail 2\")",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/4MitFIR5yXe5SxYL5eeztSGmAxho-VqTdiIkl0Ml8fnonpG0Kr25AGJ_3aR9-J8HL9Hjnp_5zC0jjFhf=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/4MitFIR5yXe5SxYL5eeztSGmAxho-VqTdiIkl0Ml8fnonpG0Kr25AGJ_3aR9-J8HL9Hjnp_5zC0jjFhf=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:23.879Z"
+  },
+  {
+    "videoId": "-BJt4fCAtZE",
+    "title": "Arz Kiya Hai | Coke Studio Bharat",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/D8zrTH1RKP2TDB_Zg60FO9CLeb8WehGyT7wnSKjc0cXEwgt9AYcRuWWIg3UMkmIZJsO2SMOg6l1J8bV-=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/D8zrTH1RKP2TDB_Zg60FO9CLeb8WehGyT7wnSKjc0cXEwgt9AYcRuWWIg3UMkmIZJsO2SMOg6l1J8bV-=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:24.596Z"
+  },
+  {
+    "videoId": "_ofFkIYi00Q",
+    "title": "Tujhko (From “Cocktail 2”)",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/LgDmtOJ_Q0K_UqMJsa_vLCNxuRIAV6dJfkHPQ7NYM8TGltpjAz6FV9xM1dvv3oDu051LiTAx2FApYZ4=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/LgDmtOJ_Q0K_UqMJsa_vLCNxuRIAV6dJfkHPQ7NYM8TGltpjAz6FV9xM1dvv3oDu051LiTAx2FApYZ4=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:25.405Z"
+  },
+  {
+    "videoId": "ge4M2dVBgTw",
+    "title": "Saiyaara (Movie: Saiyaara)",
+    "channelTitle": "Faheem Abdullah",
+    "thumbnail": "https://yt3.googleusercontent.com/0lPp5SGRnGUn0NWQvBCIONNZVe7T4PTtgvFSg9Tqx3UHUjqu0-DpqC-kpSApkwa04gdi-7nhW5nSmj06cQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/0lPp5SGRnGUn0NWQvBCIONNZVe7T4PTtgvFSg9Tqx3UHUjqu0-DpqC-kpSApkwa04gdi-7nhW5nSmj06cQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:26.241Z"
+  },
+  {
+    "videoId": "_qUrZssLFpg",
+    "title": "Hum Dono (From \"Tu Meri Main Tera Main Tera Tu Meri\")",
+    "channelTitle": "Vishal-Shekhar",
+    "thumbnail": "https://yt3.googleusercontent.com/XUZLVNX-FEsbVfy874hx2RhDDFDhoJTqo-YnhVblgYL2XnGL2CfXGN_5fR-HrILYqxBDhtaHypPk_kz2=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/XUZLVNX-FEsbVfy874hx2RhDDFDhoJTqo-YnhVblgYL2XnGL2CfXGN_5fR-HrILYqxBDhtaHypPk_kz2=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:27.013Z"
+  },
+  {
+    "videoId": "uT_HXrrmHX8",
+    "title": "Sitaare (From \"Ikkis\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/XvvdvvJF54vqL_1FSspuGguIKMMz5OhyhXMRls0jrBra5OcVujKFCHdI-hKxtnwbO-v-lDKdPmSUD_h33w=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/XvvdvvJF54vqL_1FSspuGguIKMMz5OhyhXMRls0jrBra5OcVujKFCHdI-hKxtnwbO-v-lDKdPmSUD_h33w=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:27.784Z"
+  },
+  {
+    "videoId": "hJ3FQfQMbZw",
+    "title": "Ban Ke Dikha Ikkis (From \"Ikkis\")",
+    "channelTitle": "Jasmine Sandlas",
+    "thumbnail": "https://yt3.googleusercontent.com/UMjqZlz2JB49hCt93HWkqS9bJaKfuHBjrLsIxRJrEfienmsWlWZxJQ3lI9-liM7aHF5C3-pdV6PyWcw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/UMjqZlz2JB49hCt93HWkqS9bJaKfuHBjrLsIxRJrEfienmsWlWZxJQ3lI9-liM7aHF5C3-pdV6PyWcw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:28.560Z"
+  },
+  {
+    "videoId": "pRzS9QLvgZk",
+    "title": "Dhurandhar - Title Track (From \"Dhurandhar\")",
+    "channelTitle": "Shashwat Sachdev",
+    "thumbnail": "https://yt3.googleusercontent.com/1AZmL0CgxzbXWjT0fD0evW0O1NMAQKLgvUmrdB9xsIgpNIvuvGY80AUY9zxQdr1o-KCqvbYNus-k3YL7=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/1AZmL0CgxzbXWjT0fD0evW0O1NMAQKLgvUmrdB9xsIgpNIvuvGY80AUY9zxQdr1o-KCqvbYNus-k3YL7=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:29.544Z"
+  },
+  {
+    "videoId": "w0pbdkrRRJM",
+    "title": "Tere Ishk Mein",
+    "channelTitle": "A.R. Rahman",
+    "thumbnail": "https://yt3.googleusercontent.com/5AWXYskfu5i-fPpoUFIHgz3MLyPzWs7njVfig6KHVy1tdyiyeCiIkDBU00itkwriIhQmgXl6KNs9Jlvf=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/5AWXYskfu5i-fPpoUFIHgz3MLyPzWs7njVfig6KHVy1tdyiyeCiIkDBU00itkwriIhQmgXl6KNs9Jlvf=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:30.348Z"
+  },
+  {
+    "videoId": "BS8il9QTp6c",
+    "title": "Aakhri Ishq (From \"Dhurandhar The Revenge\")",
+    "channelTitle": "Shashwat Sachdev",
+    "thumbnail": "https://yt3.googleusercontent.com/o0VCkTQynMGGvlqcJiCpgRZx9RPR9AtdAA-U49rHh4gaTIO4hDo4N-t3dT_xvRVsKIlE_cHHs129GC4=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/o0VCkTQynMGGvlqcJiCpgRZx9RPR9AtdAA-U49rHh4gaTIO4hDo4N-t3dT_xvRVsKIlE_cHHs129GC4=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:32.146Z"
+  },
+  {
+    "videoId": "lbEtG0ZjyJA",
+    "title": "Aaya Sher (From \"The Paradise\") (Telugu)",
+    "channelTitle": "Anirudh Ravichander",
+    "thumbnail": "https://yt3.googleusercontent.com/nZevbUEupxBKmJ3VR6f4rdlYv5Tr53yVHws35zJg9JId6uuBAHgEeRDmf87DcEQkLCJFSHN31BLjYJE=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/nZevbUEupxBKmJ3VR6f4rdlYv5Tr53yVHws35zJg9JId6uuBAHgEeRDmf87DcEQkLCJFSHN31BLjYJE=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:32.916Z"
+  },
+  {
+    "videoId": "ci0zgkk0y7k",
+    "title": "Chillgum",
+    "channelTitle": "Yo Yo Honey Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/I4B_bu6OG7Au84dtMd6YbxNBXpFEKBkhWAtMR4ZorgCXkIgcBJXo1UKi5fMDTFBULM6gIzPH4a76rCYY5w=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/I4B_bu6OG7Au84dtMd6YbxNBXpFEKBkhWAtMR4ZorgCXkIgcBJXo1UKi5fMDTFBULM6gIzPH4a76rCYY5w=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:34.297Z"
+  },
+  {
+    "videoId": "hOSlu2N-ZJc",
+    "title": "Ishq Tera",
+    "channelTitle": "Guru Randhawa",
+    "thumbnail": "https://yt3.googleusercontent.com/Nya9UW1Gr05WMFkdodUzyIK6dHhGOCFCQyRsxlRUCXR6pqV92sfw9NtgFtaTQR10KtWUrNRGgzoatnOC=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Nya9UW1Gr05WMFkdodUzyIK6dHhGOCFCQyRsxlRUCXR6pqV92sfw9NtgFtaTQR10KtWUrNRGgzoatnOC=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:35.663Z"
+  },
+  {
+    "videoId": "Uju3zi_Q5eg",
+    "title": "Har Subha Har Shaam",
+    "channelTitle": "Ashwani Machal",
+    "thumbnail": "https://yt3.googleusercontent.com/HOEDcEkLtSLX1-erScDJ-96YLJeAzpa1nt9J0Sz3f_aW5Yy5jdAg9S8ueUd2Cn9wQNhBjq1gbocMI1fWNA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/HOEDcEkLtSLX1-erScDJ-96YLJeAzpa1nt9J0Sz3f_aW5Yy5jdAg9S8ueUd2Cn9wQNhBjq1gbocMI1fWNA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:36.460Z"
+  },
+  {
+    "videoId": "Q1GzQxP2iJo",
+    "title": "Tu Meri Main Tera Main Tera Tu Meri - Title Track (From \"Tu Meri Main Tera Main Tera Tu Meri\")",
+    "channelTitle": "Vishal-Shekhar",
+    "thumbnail": "https://yt3.googleusercontent.com/FHp4MZE5q8zj1TdaV26kW_7YbyVZsYx3uq4D0URwPb8C0XIyviXxuePNi_JlRy721HoY7Tghkh4rWKJh=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/FHp4MZE5q8zj1TdaV26kW_7YbyVZsYx3uq4D0URwPb8C0XIyviXxuePNi_JlRy721HoY7Tghkh4rWKJh=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:37.234Z"
+  },
+  {
+    "videoId": "mR2Ddymicow",
+    "title": "YA RABBA",
+    "channelTitle": "KAILASH KHER",
+    "thumbnail": "https://yt3.googleusercontent.com/fq0A0czoF-94F49S6X91T3O6dJhJAQZIroDqWtlsX8WSoK6L8r3Hk3xczfP34SogBikP9lhe4kLKQ5Pdsw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/fq0A0czoF-94F49S6X91T3O6dJhJAQZIroDqWtlsX8WSoK6L8r3Hk3xczfP34SogBikP9lhe4kLKQ5Pdsw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:37.921Z"
+  },
+  {
+    "videoId": "3R-q79a7n98",
+    "title": "Teri Deewani",
+    "channelTitle": "Kailash Kher",
+    "thumbnail": "https://yt3.googleusercontent.com/FBvgqfMNW3Z0sTHmoHy45Hit_1f8Qyx0WxmlhSdoP7baQ-KRfyexrQLOyHaP9bzrbc1DO0q5hvDrKbOH=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/FBvgqfMNW3Z0sTHmoHy45Hit_1f8Qyx0WxmlhSdoP7baQ-KRfyexrQLOyHaP9bzrbc1DO0q5hvDrKbOH=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:39.294Z"
+  },
+  {
+    "videoId": "7DEdxeJtuoc",
+    "title": "Mann Hawa",
+    "channelTitle": "Mohit Chauhan",
+    "thumbnail": "https://yt3.googleusercontent.com/J-mfoh6xPP5pjqArpmCRyzHJOm1nCEAfv308S4cNRUK3yIZz00lkJtvtV520MT7UaybXh9fFDk_Z3ee4jQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/J-mfoh6xPP5pjqArpmCRyzHJOm1nCEAfv308S4cNRUK3yIZz00lkJtvtV520MT7UaybXh9fFDk_Z3ee4jQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:40.049Z"
+  },
+  {
+    "videoId": "LO3Dta97Ds0",
+    "title": "Pinjara",
+    "channelTitle": "Bandar",
+    "thumbnail": "https://yt3.googleusercontent.com/8E2iCfeh4AqMtgbzktXcYieFAbE_xnXmioSgMmDIzMhg7lvYs6fscU4c20O447ifEdTnhUaAc2wRBSMKRQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/8E2iCfeh4AqMtgbzktXcYieFAbE_xnXmioSgMmDIzMhg7lvYs6fscU4c20O447ifEdTnhUaAc2wRBSMKRQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:40.759Z"
+  },
+  {
+    "videoId": "PEozagfBaOU",
+    "title": "C'mon Baby",
+    "channelTitle": "Payal Dev",
+    "thumbnail": "https://yt3.googleusercontent.com/yPZkxDnaMKZOtVdA2eL-_OZmLzeO1P-nu9YIeHcyIgf3_Edt0dbfcYt7WJeryjUCJfUpQx5Dzhv9VtPuVg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/yPZkxDnaMKZOtVdA2eL-_OZmLzeO1P-nu9YIeHcyIgf3_Edt0dbfcYt7WJeryjUCJfUpQx5Dzhv9VtPuVg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:41.732Z"
+  },
+  {
+    "videoId": "crjujVx0Irk",
+    "title": "Jab Talak (From “Cocktail 2”)",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/2GSAnm1J42B6eQLxVZbGxBl4EqRSnHcZ8S2lNttQ9o7Oqj_4a4gQrMuHpkjserYc_0SnFzXVKTn2v9Fw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/2GSAnm1J42B6eQLxVZbGxBl4EqRSnHcZ8S2lNttQ9o7Oqj_4a4gQrMuHpkjserYc_0SnFzXVKTn2v9Fw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:42.462Z"
+  },
+  {
+    "videoId": "KoGOONSG1_g",
+    "title": "Ghar Kab Aaoge",
+    "channelTitle": "Anu Malik",
+    "thumbnail": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:43.170Z"
+  },
+  {
+    "videoId": "E-0tXFH2JcY",
+    "title": "Ishq Da Chehra",
+    "channelTitle": "Diljit Dosanjh",
+    "thumbnail": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:43.921Z"
+  },
+  {
+    "videoId": "TR6u3vBESI0",
+    "title": "Jaate Hue Lamhon",
+    "channelTitle": "Anu Malik",
+    "thumbnail": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:44.650Z"
+  },
+  {
+    "videoId": "SS6uXkc20aU",
+    "title": "Hindustan Meri Jaan",
+    "channelTitle": "Anu Malik",
+    "thumbnail": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:45.371Z"
+  },
+  {
+    "videoId": "jtj25bfN5vA",
+    "title": "Mitti Ke Bete",
+    "channelTitle": "Mithoon",
+    "thumbnail": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_0qTfDGZ0HwNY1iFMm4CpIaCpotLRsjMirKLa0KYoJCTEsUrfFQQ5AlEgA-cJt5KD237alIE4iw1aB2Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:46.000Z"
+  },
+  {
+    "videoId": "10YcL88e7fY",
+    "title": "Jee Liya (From \"Tu Yaa Main\")",
+    "channelTitle": "Jee Liya (From \"Tu Yaa Main\")",
+    "thumbnail": "https://yt3.googleusercontent.com/wGByv5n5HeVTdN3ZL0y1vX8l9-601uWiiiN2rbarBtSJAjxMmzWGK1eL4VLaQYrN_jrNUtM_UxVhQ-M=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/wGByv5n5HeVTdN3ZL0y1vX8l9-601uWiiiN2rbarBtSJAjxMmzWGK1eL4VLaQYrN_jrNUtM_UxVhQ-M=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:46.829Z"
+  },
+  {
+    "videoId": "WmOGNNX6qoE",
+    "title": "Usey Kehna",
+    "channelTitle": "Tere Ishk Mein",
+    "thumbnail": "https://yt3.googleusercontent.com/5AWXYskfu5i-fPpoUFIHgz3MLyPzWs7njVfig6KHVy1tdyiyeCiIkDBU00itkwriIhQmgXl6KNs9Jlvf=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/5AWXYskfu5i-fPpoUFIHgz3MLyPzWs7njVfig6KHVy1tdyiyeCiIkDBU00itkwriIhQmgXl6KNs9Jlvf=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:47.570Z"
+  },
+  {
+    "videoId": "yhE2F3R8558",
+    "title": "Bekasi",
+    "channelTitle": "Kishore Kumar",
+    "thumbnail": "https://yt3.googleusercontent.com/Ik6rOrgE8mx-iyfxFZQSNJZr-aU9jjFE0-3AyMYY4yTVzUF2Rlc2jzf9fcFDTCAhxsFT0EVOlD3A7us=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Ik6rOrgE8mx-iyfxFZQSNJZr-aU9jjFE0-3AyMYY4yTVzUF2Rlc2jzf9fcFDTCAhxsFT0EVOlD3A7us=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:48.416Z"
+  },
+  {
+    "videoId": "N0CsVUst5Ug",
+    "title": "Wild Ride (From \"Dhurandhar The Revenge\") (feat. Ellisar)",
+    "channelTitle": "Shashwat Sachdev",
+    "thumbnail": "https://yt3.googleusercontent.com/o0VCkTQynMGGvlqcJiCpgRZx9RPR9AtdAA-U49rHh4gaTIO4hDo4N-t3dT_xvRVsKIlE_cHHs129GC4=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/o0VCkTQynMGGvlqcJiCpgRZx9RPR9AtdAA-U49rHh4gaTIO4hDo4N-t3dT_xvRVsKIlE_cHHs129GC4=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:49.158Z"
+  },
+  {
+    "videoId": "h1F5YAGdb9s",
+    "title": "Tamma Tamma",
+    "channelTitle": "Bappi Lahiri",
+    "thumbnail": "https://yt3.googleusercontent.com/mL5-IHqUZcQhVpbF2MCaCRdCeLXeqOpSX36Y2dcfel0k7UAG2QXB46gijMyWBgM3jwdLGPzdr8EYmSA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/mL5-IHqUZcQhVpbF2MCaCRdCeLXeqOpSX36Y2dcfel0k7UAG2QXB46gijMyWBgM3jwdLGPzdr8EYmSA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:49.839Z"
+  },
+  {
+    "videoId": "Bh-h9DPmiQg",
+    "title": "Chand Dekh Lena (From \"Maatrubhumi: May War Rest in Peace\")",
+    "channelTitle": "Himesh Reshammiya",
+    "thumbnail": "https://yt3.googleusercontent.com/D_Ql-QjdbtsX0CbCV9IR559esXN4QnjmutPGhP_4XIfSMtivRIMPGL0jgcU47_IZh9-n2k_uytj30ltr=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/D_Ql-QjdbtsX0CbCV9IR559esXN4QnjmutPGhP_4XIfSMtivRIMPGL0jgcU47_IZh9-n2k_uytj30ltr=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:50.612Z"
+  },
+  {
+    "videoId": "blyay-Fdqx4",
+    "title": "Humne Wahin Lagaya Dil",
+    "channelTitle": "Pati Patni Aur Woh Do",
+    "thumbnail": "https://yt3.googleusercontent.com/cg1meipF-cQ0sTxQJG-BmF8Bjdoh1KUxqG2xWlk7GnmSXYIPTG4G5y3P01c99styx7MnA15YbZAh-DcW=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/cg1meipF-cQ0sTxQJG-BmF8Bjdoh1KUxqG2xWlk7GnmSXYIPTG4G5y3P01c99styx7MnA15YbZAh-DcW=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:51.330Z"
+  },
+  {
+    "videoId": "hJa9BS_JBG0",
+    "title": "Akkad Bakkad",
+    "channelTitle": "Sonu Kakkar",
+    "thumbnail": "https://yt3.googleusercontent.com/ZU1M5zXSTEZ7cORLF9trGP-KWU2Cvjo4L8yPaNVHmA59EPAGv-hhPz5_pAy7WZCMEfDvcGGLDxwOjX_B=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/ZU1M5zXSTEZ7cORLF9trGP-KWU2Cvjo4L8yPaNVHmA59EPAGv-hhPz5_pAy7WZCMEfDvcGGLDxwOjX_B=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:52.114Z"
+  },
+  {
+    "videoId": "WKv07mnKVEE",
+    "title": "Kaise Hua (From \"Kabir Singh\")",
+    "channelTitle": "Vishal Mishra",
+    "thumbnail": "https://yt3.googleusercontent.com/_qw4wNEITr8WhH6Q6M575GPfNuXbpcl_Kfzhfsin63k_rSdu907M9LO4Eq2M2n_7uPEoptYuwEs3oT4O=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_qw4wNEITr8WhH6Q6M575GPfNuXbpcl_Kfzhfsin63k_rSdu907M9LO4Eq2M2n_7uPEoptYuwEs3oT4O=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:52.850Z"
+  },
+  {
+    "videoId": "4VwtfInG-LU",
+    "title": "Heeriye",
+    "channelTitle": "Jasleen Royal",
+    "thumbnail": "https://yt3.googleusercontent.com/IUaNm7SOpB6sip0Q_VCWbLLaQ_rnqgH4gy7_i_7GwWFsDFR3BK6CzAQJpg7IN2UUqGgE79lAeBEYTxh18A=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/IUaNm7SOpB6sip0Q_VCWbLLaQ_rnqgH4gy7_i_7GwWFsDFR3BK6CzAQJpg7IN2UUqGgE79lAeBEYTxh18A=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:53.539Z"
+  },
+  {
+    "videoId": "YCwP7X42wfw",
+    "title": "Satranga",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/02xLoCOZmap3ihA_v28cqFz1zBcE9cMzfwzJHzsgwxyGklT0rRWkfUqztPCgAx7CdBtVM5MahamnGuJw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/02xLoCOZmap3ihA_v28cqFz1zBcE9cMzfwzJHzsgwxyGklT0rRWkfUqztPCgAx7CdBtVM5MahamnGuJw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:54.239Z"
+  },
+  {
+    "videoId": "qnQCd_nZn_g",
+    "title": "O Maahi",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/olTad2rSFdiV02kmWaC_xYlKkZiB6nV7279LAf1r6uar7rcyojJ4WoCc9A6kY9Cf5ecp-yUk0-NGy1c=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/olTad2rSFdiV02kmWaC_xYlKkZiB6nV7279LAf1r6uar7rcyojJ4WoCc9A6kY9Cf5ecp-yUk0-NGy1c=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:54.885Z"
+  },
+  {
+    "videoId": "9cHq63r1vHQ",
+    "title": "Pehle Bhi Main",
+    "channelTitle": "Vishal Mishra",
+    "thumbnail": "https://yt3.googleusercontent.com/02xLoCOZmap3ihA_v28cqFz1zBcE9cMzfwzJHzsgwxyGklT0rRWkfUqztPCgAx7CdBtVM5MahamnGuJw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/02xLoCOZmap3ihA_v28cqFz1zBcE9cMzfwzJHzsgwxyGklT0rRWkfUqztPCgAx7CdBtVM5MahamnGuJw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:55.578Z"
+  },
+  {
+    "videoId": "V_jp5_VAzXk",
+    "title": "Chaleya",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/DuC8PRTm11127t5sQtQ-k8PRHO5JrB1XFyG4WK634cBSHJ-misa0-vkjJVfmpmp8_e5gN8dr5Tw3L0OlSQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/DuC8PRTm11127t5sQtQ-k8PRHO5JrB1XFyG4WK634cBSHJ-misa0-vkjJVfmpmp8_e5gN8dr5Tw3L0OlSQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:56.386Z"
+  },
+  {
+    "videoId": "GkJ_wZy0iB4",
+    "title": "Ve Kamleya (From \"Rocky Aur Rani Kii Prem Kahaani\")",
+    "channelTitle": "Ve Kamleya (From \"Rocky Aur Rani Kii Prem Kahaani\")",
+    "thumbnail": "https://yt3.googleusercontent.com/SkHH8FBBfUOnW1HWQgR1vbf4bMMKAA67kWV2CBywD38QBHa_I1kU7dJ51w43RhIldeflyRwY5c7u35A7=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/SkHH8FBBfUOnW1HWQgR1vbf4bMMKAA67kWV2CBywD38QBHa_I1kU7dJ51w43RhIldeflyRwY5c7u35A7=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:57.138Z"
+  },
+  {
+    "videoId": "YALvuUpY_b0",
+    "title": "Apna Bana Le (From \"Bhediya\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/EqN-4y9jQg91mt-94KKI8L1xu3olMS-Fh_WLL5tMlnqh1pSRzt-uWdnTVlY_GBnvLuA_WJmS6FYAXJlZtQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/EqN-4y9jQg91mt-94KKI8L1xu3olMS-Fh_WLL5tMlnqh1pSRzt-uWdnTVlY_GBnvLuA_WJmS6FYAXJlZtQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:58.029Z"
+  },
+  {
+    "videoId": "mVWekQAP7vQ",
+    "title": "Tere Vaaste (From \"Zara Hatke Zara Bachke\")",
+    "channelTitle": "Tere Vaaste (From \"Zara Hatke Zara Bachke\")",
+    "thumbnail": "https://yt3.googleusercontent.com/OC_FG417cB8VQuLPKI28K5xpamTf28ThvTTM6nET-oA2tNLbB-gHrUZtYhcNb4x_j_nlUiVHYlnR8wYOTg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/OC_FG417cB8VQuLPKI28K5xpamTf28ThvTTM6nET-oA2tNLbB-gHrUZtYhcNb4x_j_nlUiVHYlnR8wYOTg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:39:59.693Z"
+  },
+  {
+    "videoId": "NJAv_7lHUIU",
+    "title": "Kesariya (From \"Brahmastra\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/CH0SThQN0HOk2eV81GGA-Tiftn58G48iy8lEyKNXJjbDSI9ApKKnmt4ncwr5gO_mZoQvFF3HPfHtky1Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/CH0SThQN0HOk2eV81GGA-Tiftn58G48iy8lEyKNXJjbDSI9ApKKnmt4ncwr5gO_mZoQvFF3HPfHtky1Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:00.445Z"
+  },
+  {
+    "videoId": "LNegGbBmbLI",
+    "title": "What Jhumka ? (From \"Rocky Aur Rani Kii Prem Kahaani\")",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/EvcqUVIzGKBfd_8J7VIwEALl5aTWx5wrzncukPyGr6vTDMgf7XlBveS35dwu5PgqebfgbsbBuTTmjvA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/EvcqUVIzGKBfd_8J7VIwEALl5aTWx5wrzncukPyGr6vTDMgf7XlBveS35dwu5PgqebfgbsbBuTTmjvA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:01.166Z"
+  },
+  {
+    "videoId": "S15GwOj_1us",
+    "title": "Tum Kya Mile (From \"Rocky Aur Rani Kii Prem Kahaani\")",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/BvEU7FiPfMsSg7Y6JVAqkwbBxqmmLzqIBQelhqUgPVgLKR9IWGJT5XdoVvNcd0KlCqN9CKa_XFsUIObz=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/BvEU7FiPfMsSg7Y6JVAqkwbBxqmmLzqIBQelhqUgPVgLKR9IWGJT5XdoVvNcd0KlCqN9CKa_XFsUIObz=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:01.908Z"
+  },
+  {
+    "videoId": "9bDYGM9AcEw",
+    "title": "Phir Aur Kya Chahiye (From \"Zara Hatke Zara Bachke\")",
+    "channelTitle": "Sachin-Jigar",
+    "thumbnail": "https://yt3.googleusercontent.com/PKHC9ii0z7Uwh6n9DgHcoxfAnFFl4Knks9sqxIW7Wk8rf2FYioAwgDtxZg6ldxOURxm7CgN74a1JQcB5Qg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/PKHC9ii0z7Uwh6n9DgHcoxfAnFFl4Knks9sqxIW7Wk8rf2FYioAwgDtxZg6ldxOURxm7CgN74a1JQcB5Qg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:02.698Z"
+  },
+  {
+    "videoId": "vKITrWUNpjQ",
+    "title": "Naina",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/cRcsgV2Jn5FM2_o34p-b_Vo7RO1RcOJeNNQlfJjDJNP2FBqZR_BbUN5LPVY05X5AdWWpGfoY2Sju6Ekppg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/cRcsgV2Jn5FM2_o34p-b_Vo7RO1RcOJeNNQlfJjDJNP2FBqZR_BbUN5LPVY05X5AdWWpGfoY2Sju6Ekppg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:03.402Z"
+  },
+  {
+    "videoId": "XtZTpxnrHAc",
+    "title": "Aaj Ki Raat (From \"Stree 2\")",
+    "channelTitle": "Sachin-Jigar",
+    "thumbnail": "https://yt3.googleusercontent.com/UAA-RHT1goYnsJDghUnbVrkKOwLuMgXWryI7ezcqQD6XAEusG261rgYPdnYh698cfuw6-YTI_jk9t6TRnw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/UAA-RHT1goYnsJDghUnbVrkKOwLuMgXWryI7ezcqQD6XAEusG261rgYPdnYh698cfuw6-YTI_jk9t6TRnw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:04.158Z"
+  },
+  {
+    "videoId": "XtPK901WkQ0",
+    "title": "Taras (From \"Munjya\")",
+    "channelTitle": "Sachin-Jigar",
+    "thumbnail": "https://yt3.googleusercontent.com/46BPAi8SiAKVlkJJcpnjRVtRcBYBgW_2KQAY8icREjhkxGw3N1LzLJ8IdS2FXuwN4kXsc0hl-OOOWfo=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/46BPAi8SiAKVlkJJcpnjRVtRcBYBgW_2KQAY8icREjhkxGw3N1LzLJ8IdS2FXuwN4kXsc0hl-OOOWfo=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:04.883Z"
+  },
+  {
+    "videoId": "IDOghyqFA8s",
+    "title": "Sajni",
+    "channelTitle": "Jal -The Band",
+    "thumbnail": "https://yt3.googleusercontent.com/bUvZP55mpnikabTlhXMONOgWKLyXl2_wX84EyMxxY2dRYL9rukDJMSagd7hDZ8fBJW5APN4kbQNRfWQivQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/bUvZP55mpnikabTlhXMONOgWKLyXl2_wX84EyMxxY2dRYL9rukDJMSagd7hDZ8fBJW5APN4kbQNRfWQivQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:05.595Z"
+  },
+  {
+    "videoId": "PmRkeYVU1BE",
+    "title": "Dekhha Tenu (From \"Mr. And Mrs. Mahi\")",
+    "channelTitle": "Mohammad Faiz",
+    "thumbnail": "https://yt3.googleusercontent.com/UOY2VeiYo2WNdKr2JKYPHYFmWOrY3UQ6kr6haU4IleuP-6k9nWgpv-d7cZZ4plUTHiDQzWmnfm2PUPqY=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/UOY2VeiYo2WNdKr2JKYPHYFmWOrY3UQ6kr6haU4IleuP-6k9nWgpv-d7cZZ4plUTHiDQzWmnfm2PUPqY=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:06.297Z"
+  },
+  {
+    "videoId": "Gs08q9Gb19A",
+    "title": "Zaroor",
+    "channelTitle": "Aparshakti Khurana",
+    "thumbnail": "https://yt3.googleusercontent.com/QFG49_UqHcAAf0jzJ9XHlyRw2-5nu8N496wTrDpYfZrY9dirQ6P8Ntc6eUSVJLoKDMrH93UrBPR5JNT8zw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/QFG49_UqHcAAf0jzJ9XHlyRw2-5nu8N496wTrDpYfZrY9dirQ6P8Ntc6eUSVJLoKDMrH93UrBPR5JNT8zw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:07.009Z"
+  },
+  {
+    "videoId": "f419vqAt8PU",
+    "title": "Ishq (From \"Lost;Found\")",
+    "channelTitle": "Faheem Abdullah",
+    "thumbnail": "https://yt3.googleusercontent.com/mrfYb0F3sQqIGyVpf8wZ1zuY8AB9VtISZlY0nIOEZE_DfI6Dj29MEkvSjAkEalBZXOJXqn9nLQDVDK2-Og=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/mrfYb0F3sQqIGyVpf8wZ1zuY8AB9VtISZlY0nIOEZE_DfI6Dj29MEkvSjAkEalBZXOJXqn9nLQDVDK2-Og=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:07.826Z"
+  },
+  {
+    "videoId": "yleXPEPJIgI",
+    "title": "Millionaire",
+    "channelTitle": "Yo Yo Honey Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/0Xeyqa11v6fdHI-GkU1ReWrF21yDokQ8hRZ0utN6NAmLt6WMZMmayuCG6fvu_1-zIHb86RsDg3qctKun=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/0Xeyqa11v6fdHI-GkU1ReWrF21yDokQ8hRZ0utN6NAmLt6WMZMmayuCG6fvu_1-zIHb86RsDg3qctKun=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:08.612Z"
+  },
+  {
+    "videoId": "0DS5jYQeiw0",
+    "title": "Winning Speech",
+    "channelTitle": "Karan Aujla",
+    "thumbnail": "https://yt3.googleusercontent.com/mnu2kpE-hPCxQJ33mntkFMt5kmXuUqba4v1BuPvxdVaPB229swK_bujTrkHYrvJJtjGO86lqJ1G5jR0=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/mnu2kpE-hPCxQJ33mntkFMt5kmXuUqba4v1BuPvxdVaPB229swK_bujTrkHYrvJJtjGO86lqJ1G5jR0=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:09.289Z"
+  },
+  {
+    "videoId": "a1P55Z1Jugg",
+    "title": "Admirin' You (feat. Preston Pablo)",
+    "channelTitle": "Karan Aujla",
+    "thumbnail": "https://yt3.googleusercontent.com/CwS-QQuTf5ggHK9A9-5Pvn1CQyyALQfNHWP5hl40a6v33HS55zpUAbaT6R3nrnN2DuJTh1vlfTtN5DpO=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/CwS-QQuTf5ggHK9A9-5Pvn1CQyyALQfNHWP5hl40a6v33HS55zpUAbaT6R3nrnN2DuJTh1vlfTtN5DpO=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:10.911Z"
+  },
+  {
+    "videoId": "wScs3JNn8Lg",
+    "title": "With You",
+    "channelTitle": "AP Dhillon",
+    "thumbnail": "https://yt3.googleusercontent.com/M9INXhYwd81KszitvO9SsFJayopHXS_7ojWdQWrsAqiicW-KemjzlHdwFlRNNhp0iQ_LjQ108tAoIkU=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/M9INXhYwd81KszitvO9SsFJayopHXS_7ojWdQWrsAqiicW-KemjzlHdwFlRNNhp0iQ_LjQ108tAoIkU=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:11.706Z"
+  },
+  {
+    "videoId": "U4qD41gPQMU",
+    "title": "Softly",
+    "channelTitle": "Karan Aujla",
+    "thumbnail": "https://yt3.googleusercontent.com/CwS-QQuTf5ggHK9A9-5Pvn1CQyyALQfNHWP5hl40a6v33HS55zpUAbaT6R3nrnN2DuJTh1vlfTtN5DpO=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/CwS-QQuTf5ggHK9A9-5Pvn1CQyyALQfNHWP5hl40a6v33HS55zpUAbaT6R3nrnN2DuJTh1vlfTtN5DpO=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:12.446Z"
+  },
+  {
+    "videoId": "Lq0S1lqEjxo",
+    "title": "Born to Shine",
+    "channelTitle": "DILJIT DOSANJH",
+    "thumbnail": "https://yt3.googleusercontent.com/0qFbPaWYZjGP3eW8xeOx42S4nw38dU418iWaGc0W5F3a_It-7cXB880bOGH9me8N0T6pY07iD_3KHg5xJA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/0qFbPaWYZjGP3eW8xeOx42S4nw38dU418iWaGc0W5F3a_It-7cXB880bOGH9me8N0T6pY07iD_3KHg5xJA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:13.164Z"
+  },
+  {
+    "videoId": "uLL2xTK35Qc",
+    "title": "Lover",
+    "channelTitle": "Taylor Swift",
+    "thumbnail": "https://yt3.googleusercontent.com/OhxDTHQOQzSrcdgH9hzqzp1v22GYDE-QKnkryvCeq4ddx-3K3_c8oDXN0E6NvHlMn1q4XV59aHr0oL4f=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/OhxDTHQOQzSrcdgH9hzqzp1v22GYDE-QKnkryvCeq4ddx-3K3_c8oDXN0E6NvHlMn1q4XV59aHr0oL4f=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:13.929Z"
+  },
+  {
+    "videoId": "x18b0D8sTwo",
+    "title": "Excuses",
+    "channelTitle": "AP Dhillon",
+    "thumbnail": "https://yt3.googleusercontent.com/YodB8IMuc531lUrvJBl5gwh5yl242hTBKfVj-cpk4oFOqOm-wElw5Lcw3_DvagrR0arcXXs19l6xr6MN5Q=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/YodB8IMuc531lUrvJBl5gwh5yl242hTBKfVj-cpk4oFOqOm-wElw5Lcw3_DvagrR0arcXXs19l6xr6MN5Q=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:14.694Z"
+  },
+  {
+    "videoId": "FM2ykrYbzqg",
+    "title": "Brown Munde",
+    "channelTitle": "AP Dhillon",
+    "thumbnail": "https://yt3.googleusercontent.com/61uwz4Fic91-Ot8PmBTt-Ln5-N1sK4UnANdyVHqaQRsawpDwIXRxd6yEwqxvIxKUVcDnCutrAFQyG5q3=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/61uwz4Fic91-Ot8PmBTt-Ln5-N1sK4UnANdyVHqaQRsawpDwIXRxd6yEwqxvIxKUVcDnCutrAFQyG5q3=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:15.395Z"
+  },
+  {
+    "videoId": "5DlJJbkXQe0",
+    "title": "Insane",
+    "channelTitle": "AP Dhillon",
+    "thumbnail": "https://yt3.googleusercontent.com/KeEBJiN7-fZM1K8i9Kzvo3lvMCOik6rfSV-pQETMJZnJzEh760ICEeFnJQFCFzB5DbOYFc97UfaBuRpymQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/KeEBJiN7-fZM1K8i9Kzvo3lvMCOik6rfSV-pQETMJZnJzEh760ICEeFnJQFCFzB5DbOYFc97UfaBuRpymQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:16.474Z"
+  },
+  {
+    "videoId": "Km07GBS8myc",
+    "title": "True Stories",
+    "channelTitle": "AP Dhillon",
+    "thumbnail": "https://yt3.googleusercontent.com/1xmgk0vMZK61a8tPoHv5YAJo5Hf-tt0MHwMcJpPTZHW4AJwm7dnzwGi7fJOcSzqs8ju99P90fn1xkIk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/1xmgk0vMZK61a8tPoHv5YAJo5Hf-tt0MHwMcJpPTZHW4AJwm7dnzwGi7fJOcSzqs8ju99P90fn1xkIk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:17.278Z"
+  },
+  {
+    "videoId": "09EOWqaU-NI",
+    "title": "Kinni Kinni",
+    "channelTitle": "DILJIT DOSANJH",
+    "thumbnail": "https://yt3.googleusercontent.com/iH9ClXah1IOG5LLjVVK6NUmvdgbl92VsA9g0dyjFPW98r5gLY8HCLMC5_1Pm1-KNxTOAy2t-yOx-RdA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/iH9ClXah1IOG5LLjVVK6NUmvdgbl92VsA9g0dyjFPW98r5gLY8HCLMC5_1Pm1-KNxTOAy2t-yOx-RdA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:18.145Z"
+  },
+  {
+    "videoId": "C8nObVkgCEM",
+    "title": "Obsessed",
+    "channelTitle": "Mariah Carey",
+    "thumbnail": "https://yt3.googleusercontent.com/_Mh9I_ZQYB3F_lLZKpsQs3PfYbMUuwgijZzVSbSi8v02EVpcMOfi7uj6zsEFD6uzSiz8xzQ0Ik58caRNGg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_Mh9I_ZQYB3F_lLZKpsQs3PfYbMUuwgijZzVSbSi8v02EVpcMOfi7uj6zsEFD6uzSiz8xzQ0Ik58caRNGg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:18.928Z"
+  },
+  {
+    "videoId": "OEo9mz8pljQ",
+    "title": "Cheques",
+    "channelTitle": "Shubh",
+    "thumbnail": "https://yt3.googleusercontent.com/V_w7m2kuoVshpqcS1-RlEl-aONMQcGjP84WSo1tJS5IU8IDCr0v0s0NBMMGrLXtlL4CNjUKEdXcN3gAy=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/V_w7m2kuoVshpqcS1-RlEl-aONMQcGjP84WSo1tJS5IU8IDCr0v0s0NBMMGrLXtlL4CNjUKEdXcN3gAy=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:19.645Z"
+  },
+  {
+    "videoId": "qRBDz7tCCbk",
+    "title": "We Rollin",
+    "channelTitle": "Shubh",
+    "thumbnail": "https://yt3.googleusercontent.com/Z52VtxBQZEZ80bb_gWFoun-50H9BC_hdRkExyQUzp3Rdx8OOoPiz1tJGzWF5WHwyyb0k7IOT7fLMI7uF=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Z52VtxBQZEZ80bb_gWFoun-50H9BC_hdRkExyQUzp3Rdx8OOoPiz1tJGzWF5WHwyyb0k7IOT7fLMI7uF=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:20.459Z"
+  },
+  {
+    "videoId": "tMgEYaclnQ0",
+    "title": "On Top",
+    "channelTitle": "Karan Aujla",
+    "thumbnail": "https://yt3.googleusercontent.com/bwPCuvh1yjuA7cJnceKUUUsrblwKp64FYXKbchHXMc1ezfiM_FrgHDfYXgaCPUQMgw2EMlePQ2LvroU=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/bwPCuvh1yjuA7cJnceKUUUsrblwKp64FYXKbchHXMc1ezfiM_FrgHDfYXgaCPUQMgw2EMlePQ2LvroU=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:21.166Z"
+  },
+  {
+    "videoId": "nevOlXfYShI",
+    "title": "Daku",
+    "channelTitle": "Daku",
+    "thumbnail": "https://yt3.googleusercontent.com/i2SMT6PNiqxu_Z6kIrZaCnMKUskwR7CG3TQE9dpNh1-zDBW_A-2EQ0NEWRdkpbXtUbjzA924OldV11jZ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/i2SMT6PNiqxu_Z6kIrZaCnMKUskwR7CG3TQE9dpNh1-zDBW_A-2EQ0NEWRdkpbXtUbjzA924OldV11jZ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:21.894Z"
+  },
+  {
+    "videoId": "0K0sX6_wt_0",
+    "title": "Players (feat. Devika Badyal)",
+    "channelTitle": "Badshah",
+    "thumbnail": "https://yt3.googleusercontent.com/3EzY3OvKqaIKuRvvMk-DCYRX868LjNs1ToimTdWevPFaOY0OV6K1CBqtl0b8asfYlppKkseBWp6MMzY=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/3EzY3OvKqaIKuRvvMk-DCYRX868LjNs1ToimTdWevPFaOY0OV6K1CBqtl0b8asfYlppKkseBWp6MMzY=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:22.609Z"
+  },
+  {
+    "videoId": "qlOwSBYKD6g",
+    "title": "Wavy",
+    "channelTitle": "Wavy",
+    "thumbnail": "https://yt3.googleusercontent.com/PNoDnnbrVoQsy6hLGqp-FEp7OwkJmFoh6XRw-DpH1qgA8qoXkOoqH2U8AUsYReAEtjyOWgLCTWlrNmpp4w=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/PNoDnnbrVoQsy6hLGqp-FEp7OwkJmFoh6XRw-DpH1qgA8qoXkOoqH2U8AUsYReAEtjyOWgLCTWlrNmpp4w=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:23.514Z"
+  },
+  {
+    "videoId": "5wuEyC2YPtQ",
+    "title": "Old Money",
+    "channelTitle": "AP Dhillon",
+    "thumbnail": "https://yt3.googleusercontent.com/Rrf_YTGvEGNoK8XEJCzFlpBDLfRPUj0DO2jDjoOQcBDH8VJF5FB6cPBE_GZE4ztt8Se_LTKb1-oIQGbT=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Rrf_YTGvEGNoK8XEJCzFlpBDLfRPUj0DO2jDjoOQcBDH8VJF5FB6cPBE_GZE4ztt8Se_LTKb1-oIQGbT=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:24.337Z"
+  },
+  {
+    "videoId": "VIDdpvKFBLI",
+    "title": "8 ASLE (feat. Gurlez Akhtar)",
+    "channelTitle": "UNDISPUTED",
+    "thumbnail": "https://yt3.googleusercontent.com/Wv9NBg7iDqe3zshj5YOXvtk1bCpoep561aXtYzglBYpHmFc5dcEfsG-dV8hstDuUJNf-mUcTSxJUUFE8kQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Wv9NBg7iDqe3zshj5YOXvtk1bCpoep561aXtYzglBYpHmFc5dcEfsG-dV8hstDuUJNf-mUcTSxJUUFE8kQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:25.058Z"
+  },
+  {
+    "videoId": "eD8lmkBCma4",
+    "title": "California Love",
+    "channelTitle": "Cheema Y",
+    "thumbnail": "https://yt3.googleusercontent.com/guUWYbLZmnFni3hnbfDWJA4VgzxBE4o6Y9uSDNfaXuo-VITYNtRmLob-gbLhtoNGjAnhAQaC--18a2PI3A=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/guUWYbLZmnFni3hnbfDWJA4VgzxBE4o6Y9uSDNfaXuo-VITYNtRmLob-gbLhtoNGjAnhAQaC--18a2PI3A=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:25.802Z"
+  },
+  {
+    "videoId": "jNkylY5HycI",
+    "title": "No Love",
+    "channelTitle": "Shubh",
+    "thumbnail": "https://yt3.googleusercontent.com/G2ryS0OQ-BJ4g94A315NXGxX3jGU0rph_zeqjBbKGkvMYQ56uLDsWHYZpLwmJmdUPZPxCE56Dw5w1fdjkA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/G2ryS0OQ-BJ4g94A315NXGxX3jGU0rph_zeqjBbKGkvMYQ56uLDsWHYZpLwmJmdUPZPxCE56Dw5w1fdjkA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:26.707Z"
+  },
+  {
+    "videoId": "9fDjIFI7OlM",
+    "title": "DESIRES",
+    "channelTitle": "Gurinder Gill",
+    "thumbnail": "https://yt3.googleusercontent.com/ciA_XfgFe6uevhFb3AimcHHFbXZBD6sV9Vj3tTgjNcNwXsdozzE9ESOMUJD9LVke8DA9KWqEwQSEwvIk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/ciA_XfgFe6uevhFb3AimcHHFbXZBD6sV9Vj3tTgjNcNwXsdozzE9ESOMUJD9LVke8DA9KWqEwQSEwvIk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:27.523Z"
+  },
+  {
+    "videoId": "_deqdZmKzyg",
+    "title": "Husn",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/KyrCGnftqfj4eJ9FnumH8GlNsddPCa8y_LUtsS1dZqX-cQmILOMPKZQp3tEmPWMGN-Ee97I1USn3911GLg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/KyrCGnftqfj4eJ9FnumH8GlNsddPCa8y_LUtsS1dZqX-cQmILOMPKZQp3tEmPWMGN-Ee97I1USn3911GLg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:28.261Z"
+  },
+  {
+    "videoId": "usvVGXFIpTM",
+    "title": "Jo Tum Mere Ho",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/BU2wudOgpgn3sa2kO2MfEvfHeMTDZjZwPZlugNy89o_PtFbdCuXAJCZm8asRa9V9Y7cMZVw4FhqAQ_4=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/BU2wudOgpgn3sa2kO2MfEvfHeMTDZjZwPZlugNy89o_PtFbdCuXAJCZm8asRa9V9Y7cMZVw4FhqAQ_4=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:29.046Z"
+  },
+  {
+    "videoId": "-3KT1f7WZIo",
+    "title": "Afsos",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/RtrisEbMpw0qvN904DsYH4vOMyqHrwPoVlRM_tUcZL0OLqHs_IwPb-F6N_YlBqsqHGfCZdDL-o-99jsl=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/RtrisEbMpw0qvN904DsYH4vOMyqHrwPoVlRM_tUcZL0OLqHs_IwPb-F6N_YlBqsqHGfCZdDL-o-99jsl=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:29.860Z"
+  },
+  {
+    "videoId": "Kh49Zqa84IE",
+    "title": "Gul",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/XVFqLdB92wrjHxysLMRPP0L44wNPNC8g30Sk8VHNyqlAEWrtuihhxKV6sM4c8oCKOEM20SuV95MKuQXE=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/XVFqLdB92wrjHxysLMRPP0L44wNPNC8g30Sk8VHNyqlAEWrtuihhxKV6sM4c8oCKOEM20SuV95MKuQXE=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:30.600Z"
+  },
+  {
+    "videoId": "tYqZK7bq5Bs",
+    "title": "Baarishein",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/3-krcQ6FdG53f1ovjz5mc8b7DkDQ6tRAtXCrEQpdGM-dNECmriD7pX4i5CfLNXuaF1WP4ppPaa801Ns=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/3-krcQ6FdG53f1ovjz5mc8b7DkDQ6tRAtXCrEQpdGM-dNECmriD7pX4i5CfLNXuaF1WP4ppPaa801Ns=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:31.326Z"
+  },
+  {
+    "videoId": "i1IDh_ZoJgI",
+    "title": "Alag Aasmaan",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/XSFFKq9eWgpI4jKsD7luwyqpCgAYkIapEAV-92HNIoOrFj7KfTySAmr8n0s_LJMXfDQFS370iVxN7fXg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/XSFFKq9eWgpI4jKsD7luwyqpCgAYkIapEAV-92HNIoOrFj7KfTySAmr8n0s_LJMXfDQFS370iVxN7fXg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:32.082Z"
+  },
+  {
+    "videoId": "iAQcOfKO8CM",
+    "title": "Kasoor",
+    "channelTitle": "Prateek Kuhad",
+    "thumbnail": "https://yt3.googleusercontent.com/S4zqUztJkNfFfgRCwOVBbjkx4k2KkJmZB9bF3U9S3EfFy8bJuFc4YypjN5dQTRiiwpCgcQQ0qlf4MO-ZbQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/S4zqUztJkNfFfgRCwOVBbjkx4k2KkJmZB9bF3U9S3EfFy8bJuFc4YypjN5dQTRiiwpCgcQQ0qlf4MO-ZbQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:33.201Z"
+  },
+  {
+    "videoId": "5Y6x1UHCpJk",
+    "title": "Riha",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/ZsllsAFZHhmHIkz9KUXbbY54eG87-o-ySKWsTdbF5zNELXbI28MuHUlC1kqwojMprTSusiTP-7Ui4hjA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/ZsllsAFZHhmHIkz9KUXbbY54eG87-o-ySKWsTdbF5zNELXbI28MuHUlC1kqwojMprTSusiTP-7Ui4hjA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:33.946Z"
+  },
+  {
+    "videoId": "VK71Gp0uvdQ",
+    "title": "Mishri",
+    "channelTitle": "Anuv Jain",
+    "thumbnail": "https://yt3.googleusercontent.com/OBWCZGCV1j95mKivry6HVM3zUXwH_D-3-Is4ymc3C-piv-E4tax6D945V_u9KcVl95l5gQuAhZNOqSOcig=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/OBWCZGCV1j95mKivry6HVM3zUXwH_D-3-Is4ymc3C-piv-E4tax6D945V_u9KcVl95l5gQuAhZNOqSOcig=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:34.754Z"
+  },
+  {
+    "videoId": "O2_0u3ISZ_Q",
+    "title": "IRAADAY",
+    "channelTitle": "ZAYEM",
+    "thumbnail": "https://yt3.googleusercontent.com/ZNgr0cK5mK8AM3ABsNv3lpAHzuUNC1RFhuVjhzDKeI-Zl7br41TZrVq6BMdpEEP7WqosPtqDl0STtEGA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/ZNgr0cK5mK8AM3ABsNv3lpAHzuUNC1RFhuVjhzDKeI-Zl7br41TZrVq6BMdpEEP7WqosPtqDl0STtEGA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:35.495Z"
+  },
+  {
+    "videoId": "Y5m3FAxatX4",
+    "title": "Tu hai kahan",
+    "channelTitle": "AUR",
+    "thumbnail": "https://yt3.googleusercontent.com/VB6yl5tJbF-uycZQi57Vzuvf3w6inTzdCQeGVqsQlKaDZmD50UrhwP5wl6vg3QmOsO-gET7lx88Ceitw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/VB6yl5tJbF-uycZQi57Vzuvf3w6inTzdCQeGVqsQlKaDZmD50UrhwP5wl6vg3QmOsO-gET7lx88Ceitw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:36.265Z"
+  },
+  {
+    "videoId": "Ha4fSclVanI",
+    "title": "Jhol",
+    "channelTitle": "Maanu",
+    "thumbnail": "https://yt3.googleusercontent.com/GP9v2CnfMkE8wF3zy1An4FECREeFYy-6Y4iS2OwvISYnOTF09e6sSfD5XYuUjgaiczGvliqbycu3Yp27=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/GP9v2CnfMkE8wF3zy1An4FECREeFYy-6Y4iS2OwvISYnOTF09e6sSfD5XYuUjgaiczGvliqbycu3Yp27=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:36.966Z"
+  },
+  {
+    "videoId": "ZXtsN7G28Xw",
+    "title": "Faasle",
+    "channelTitle": "Kaavish",
+    "thumbnail": "https://yt3.googleusercontent.com/Bd1x8kbftPS1G4LyzEBOyxjIeI4T7sJd67JiHSCVFfzMKj3wgS344oKn8QRwWLmSAOBWnWTu8wbRx-4B=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Bd1x8kbftPS1G4LyzEBOyxjIeI4T7sJd67JiHSCVFfzMKj3wgS344oKn8QRwWLmSAOBWnWTu8wbRx-4B=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:37.753Z"
+  },
+  {
+    "videoId": "gmoucRvDfIk",
+    "title": "KABIRA",
+    "channelTitle": "TOCHI RAINA",
+    "thumbnail": "https://yt3.googleusercontent.com/8WRsPwoMoabdu5ISlf9f7tGGPzd2I7CTaWxc8qd6GYjaEBreC2Yw0KWMId6Y2vUTqSkt7GdlUi4NAXyf=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/8WRsPwoMoabdu5ISlf9f7tGGPzd2I7CTaWxc8qd6GYjaEBreC2Yw0KWMId6Y2vUTqSkt7GdlUi4NAXyf=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:38.422Z"
+  },
+  {
+    "videoId": "FOA9iyxsW_A",
+    "title": "AGAR TUM SAATH HO",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/AT2wfk1PvKjnHO7BzH2i2NkAvqRy_oZNEq48QGBlLJb51AuguCiR3mzp99X1uFdZezAkoSJ2WGjUU-HXZg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/AT2wfk1PvKjnHO7BzH2i2NkAvqRy_oZNEq48QGBlLJb51AuguCiR3mzp99X1uFdZezAkoSJ2WGjUU-HXZg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:39.170Z"
+  },
+  {
+    "videoId": "FO9rBogdRRQ",
+    "title": "Channa Mereya (From \"Ae Dil Hai Mushkil\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/X5T7RpQwMKML8zP8wv9_ESEONMdC3Tp4Jrdmx6rXl1lYeE7IxY3rAVTQ6AATqMRLdLybeJl8l8hDfBd5=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/X5T7RpQwMKML8zP8wv9_ESEONMdC3Tp4Jrdmx6rXl1lYeE7IxY3rAVTQ6AATqMRLdLybeJl8l8hDfBd5=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:39.936Z"
+  },
+  {
+    "videoId": "wx89ZdkwtS8",
+    "title": "Ae Dil Hai Mushkil Title Track (From \"Ae Dil Hai Mushkil\")",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/WP7l4p-2WhWzLM6lXJ0n2gXLK6u07eCejpybWzb-yhEyt9Y0aOkxMlLhpayO7PdXYOYy2NgkWu9hGBPy=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/WP7l4p-2WhWzLM6lXJ0n2gXLK6u07eCejpybWzb-yhEyt9Y0aOkxMlLhpayO7PdXYOYy2NgkWu9hGBPy=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:41.743Z"
+  },
+  {
+    "videoId": "Dm6YRJHy64c",
+    "title": "Raataan Lambiyan (From \"Shershaah\")",
+    "channelTitle": "Jubin Nautiyal",
+    "thumbnail": "https://yt3.googleusercontent.com/i6NqGdLD8nwC0cZJZNJZaZyPFt4SOLnBmOuQVqQYmfEE_jAWC0Ok5WK3ty5xhcFDlfidUjcZqmaOfbwb=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/i6NqGdLD8nwC0cZJZNJZaZyPFt4SOLnBmOuQVqQYmfEE_jAWC0Ok5WK3ty5xhcFDlfidUjcZqmaOfbwb=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:42.484Z"
+  },
+  {
+    "videoId": "w7Us7dFl4QE",
+    "title": "Ranjha",
+    "channelTitle": "Diljit Dosanjh",
+    "thumbnail": "https://yt3.googleusercontent.com/kGqJYCs_2WyoG13fKUaSimYnmbKysJ_LFCDlBH0j_R_Wqo5WJnReKmPIdKQKMoP0z6-TaxOPywMnGtqs=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/kGqJYCs_2WyoG13fKUaSimYnmbKysJ_LFCDlBH0j_R_Wqo5WJnReKmPIdKQKMoP0z6-TaxOPywMnGtqs=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:43.212Z"
+  },
+  {
+    "videoId": "EQxEms7gnqs",
+    "title": "Shayad (From \"Love Aaj Kal\")",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/Cr0zxxJ-n5CVF8zYultpi3FCef-BVXkFryW3rJGt6TCOLECklGKAFjLsmuAGdhuVvDUsPdpnnIbgV1RNPQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Cr0zxxJ-n5CVF8zYultpi3FCef-BVXkFryW3rJGt6TCOLECklGKAFjLsmuAGdhuVvDUsPdpnnIbgV1RNPQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:44.035Z"
+  },
+  {
+    "videoId": "1U9548B35WI",
+    "title": "Khairiyat",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/gyw6VH1uRAGq01PIpjnv5c-UFgJV08xE5x4Fd061iJ0CfOcuZacKO7Ap1uyoX9ID_MMBkeEVFKmpK1U=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/gyw6VH1uRAGq01PIpjnv5c-UFgJV08xE5x4Fd061iJ0CfOcuZacKO7Ap1uyoX9ID_MMBkeEVFKmpK1U=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:44.781Z"
+  },
+  {
+    "videoId": "R2wX-hifyHY",
+    "title": "Dil Diyan Gallan (From \"Carry On Jatta 4\")",
+    "channelTitle": "B Praak",
+    "thumbnail": "https://yt3.googleusercontent.com/WlEx9cHd3et8ibOKH1g6aDVcl0OF_pjEXK2-hm6vTDu-aX_9MRffwgNGSD8V8-ptZAXf_79kE7SCCg__=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/WlEx9cHd3et8ibOKH1g6aDVcl0OF_pjEXK2-hm6vTDu-aX_9MRffwgNGSD8V8-ptZAXf_79kE7SCCg__=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:45.493Z"
+  },
+  {
+    "videoId": "fsiPzT50ZiM",
+    "title": "Tum Hi Ho",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/3q33amH9hzn1dO8IeAX7TMb1QtEVfvVbqd2eSCaelOXNVmfMjbpDYdqD2HSiXtNP6i5Es7oynkWU2NfOXA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/3q33amH9hzn1dO8IeAX7TMb1QtEVfvVbqd2eSCaelOXNVmfMjbpDYdqD2HSiXtNP6i5Es7oynkWU2NfOXA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:46.282Z"
+  },
+  {
+    "videoId": "ZVyA_8rd1Ko",
+    "title": "KAUN TUJHE",
+    "channelTitle": "PALAK MUCHHAL",
+    "thumbnail": "https://yt3.googleusercontent.com/JFOH8kF-mXwFHZc-wPTqnX3aM2bRtpGMpOr2VByhQim4PrsIawLcHi-SYuBKjZy4a2Ef_nGTAlgDJw4T=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/JFOH8kF-mXwFHZc-wPTqnX3aM2bRtpGMpOr2VByhQim4PrsIawLcHi-SYuBKjZy4a2Ef_nGTAlgDJw4T=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:46.993Z"
+  },
+  {
+    "videoId": "5rHzi_5rSyw",
+    "title": "Janam Janam",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/7FxbxKIussM0Pu0YJa9eXy2eN9-f8g82NFoKpeepDQavqn_Auja9TzR_9b1wgMrfHQrGDLOtQymO-PfZ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/7FxbxKIussM0Pu0YJa9eXy2eN9-f8g82NFoKpeepDQavqn_Auja9TzR_9b1wgMrfHQrGDLOtQymO-PfZ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:47.723Z"
+  },
+  {
+    "videoId": "reBEkYrqMhA",
+    "title": "Gerua",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/7FxbxKIussM0Pu0YJa9eXy2eN9-f8g82NFoKpeepDQavqn_Auja9TzR_9b1wgMrfHQrGDLOtQymO-PfZ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/7FxbxKIussM0Pu0YJa9eXy2eN9-f8g82NFoKpeepDQavqn_Auja9TzR_9b1wgMrfHQrGDLOtQymO-PfZ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:48.692Z"
+  },
+  {
+    "videoId": "hp02FwlpQYU",
+    "title": "SOCH NA SAKE",
+    "channelTitle": "ARIJIT SINGH",
+    "thumbnail": "https://yt3.googleusercontent.com/OihMZS6JgOQCweJONbB_nKmVBB8rbZwehoLEQGMxRr1FlkfYX5KMb8vrGOEo5ATMZ62TTKhv46c0qk1F=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/OihMZS6JgOQCweJONbB_nKmVBB8rbZwehoLEQGMxRr1FlkfYX5KMb8vrGOEo5ATMZ62TTKhv46c0qk1F=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:49.408Z"
+  },
+  {
+    "videoId": "39BOqZO8xaM",
+    "title": "Tera Ban Jaunga",
+    "channelTitle": "Akhil Sachdeva",
+    "thumbnail": "https://yt3.googleusercontent.com/loAKTa9XpvZzV-TORspRPC978Kk_u2l6tYlHTHm-sYfwjmKsJdShoxbmLoPKoq9eZgq-uzpoRPtqEWX09w=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/loAKTa9XpvZzV-TORspRPC978Kk_u2l6tYlHTHm-sYfwjmKsJdShoxbmLoPKoq9eZgq-uzpoRPtqEWX09w=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:50.837Z"
+  },
+  {
+    "videoId": "PVDPkS4v8FQ",
+    "title": "Bekhayali (From \"Kabir Singh\")",
+    "channelTitle": "Sachet Tandon",
+    "thumbnail": "https://yt3.googleusercontent.com/rsBZ-GtkfOjImgHsnQ05X_9kwRvEBSmh-wVwr-LPgG9aPb60KXsFhd4_m2F6JceGszrypxiuHAfTjefs=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/rsBZ-GtkfOjImgHsnQ05X_9kwRvEBSmh-wVwr-LPgG9aPb60KXsFhd4_m2F6JceGszrypxiuHAfTjefs=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:51.598Z"
+  },
+  {
+    "videoId": "6NeVceQd6yI",
+    "title": "KAISE MUJHE",
+    "channelTitle": "GHAJINI",
+    "thumbnail": "https://yt3.googleusercontent.com/2rrBcBw8smJUdyTofOS7r9RZuOdhygYclvcP4HPS1JUVeK2j8DhCvMmbK45RTtoFKFux18GvUzYlPIg9=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/2rrBcBw8smJUdyTofOS7r9RZuOdhygYclvcP4HPS1JUVeK2j8DhCvMmbK45RTtoFKFux18GvUzYlPIg9=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:52.368Z"
+  },
+  {
+    "videoId": "UHOw6RBIrDs",
+    "title": "Agar Ho Tum (From \"Mr. And Mrs. Mahi\")",
+    "channelTitle": "Tanishk Bagchi",
+    "thumbnail": "https://yt3.googleusercontent.com/zqKtmbqitlfOXhC6DgL2sjKiTtq7VW4sjfM_pjy6nkPjpQmtfMiU95FHnZWakDS5DBHZLmmuw1fklcI=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/zqKtmbqitlfOXhC6DgL2sjKiTtq7VW4sjfM_pjy6nkPjpQmtfMiU95FHnZWakDS5DBHZLmmuw1fklcI=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:53.211Z"
+  },
+  {
+    "videoId": "CivcnZzvxJQ",
+    "title": "Dil Bechara",
+    "channelTitle": "A.R. Rahman",
+    "thumbnail": "https://yt3.googleusercontent.com/LL-arRXDABtgBDrxK5IXEt-5uDpf1ALSY_QDhxzUDMh1rAClHfOfCG4_RnXsHUfHteaLslwAsfPyxVVO=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/LL-arRXDABtgBDrxK5IXEt-5uDpf1ALSY_QDhxzUDMh1rAClHfOfCG4_RnXsHUfHteaLslwAsfPyxVVO=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:53.978Z"
+  },
+  {
+    "videoId": "UBhXquUhomY",
+    "title": "Apna Time Aayega",
+    "channelTitle": "Ranveer Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/qyE7JPPcxS4GTFh525HQ66ITr2hzqdwjX5NeMUJYjzslvKb4Rpf8sl18FA_DJWGbVTD4bxZ7Nxj9TaPY=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/qyE7JPPcxS4GTFh525HQ66ITr2hzqdwjX5NeMUJYjzslvKb4Rpf8sl18FA_DJWGbVTD4bxZ7Nxj9TaPY=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:55.551Z"
+  },
+  {
+    "videoId": "lSPNH_rYKIg",
+    "title": "ILAHI",
+    "channelTitle": "ARIJIT SINGH",
+    "thumbnail": "https://yt3.googleusercontent.com/8WRsPwoMoabdu5ISlf9f7tGGPzd2I7CTaWxc8qd6GYjaEBreC2Yw0KWMId6Y2vUTqSkt7GdlUi4NAXyf=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/8WRsPwoMoabdu5ISlf9f7tGGPzd2I7CTaWxc8qd6GYjaEBreC2Yw0KWMId6Y2vUTqSkt7GdlUi4NAXyf=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:56.370Z"
+  },
+  {
+    "videoId": "FCRUrHJW468",
+    "title": "SAFARNAMA",
+    "channelTitle": "Lucky Ali",
+    "thumbnail": "https://yt3.googleusercontent.com/AT2wfk1PvKjnHO7BzH2i2NkAvqRy_oZNEq48QGBlLJb51AuguCiR3mzp99X1uFdZezAkoSJ2WGjUU-HXZg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/AT2wfk1PvKjnHO7BzH2i2NkAvqRy_oZNEq48QGBlLJb51AuguCiR3mzp99X1uFdZezAkoSJ2WGjUU-HXZg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:57.126Z"
+  },
+  {
+    "videoId": "nBcKS3dhe5U",
+    "title": "Love You Zindagi (From \"Dear Zindagi\")",
+    "channelTitle": "Love You Zindagi (From \"Dear Zindagi\")",
+    "thumbnail": "https://yt3.googleusercontent.com/6VE0KG3tfQFrsPnmUABFT1EJstAZze1t6vo24W_AUsr5zMaGnh5f8uwAUTqEovo62Mv3iHzuV_mFIpQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/6VE0KG3tfQFrsPnmUABFT1EJstAZze1t6vo24W_AUsr5zMaGnh5f8uwAUTqEovo62Mv3iHzuV_mFIpQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:57.969Z"
+  },
+  {
+    "videoId": "N0ngg3KnFVs",
+    "title": "Aabaad Barbaad",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/z8xvKuuXGpl3t2DGRpQl5c3Y3iT0aP_wnhW6lVT0XiQ0DsZqzrFmEOIJD_hAHRiRrnZK659ieDEbtUbo=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/z8xvKuuXGpl3t2DGRpQl5c3Y3iT0aP_wnhW6lVT0XiQ0DsZqzrFmEOIJD_hAHRiRrnZK659ieDEbtUbo=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:58.704Z"
+  },
+  {
+    "videoId": "G2UbdF-AmCM",
+    "title": "Rait Zara Si",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/SptwamjhlZv04fzi3B-Crqyl7HZMXrNBIzexCgLjdxJ9SXxciHbpNc7ybSXmfJAxnGa_j0M0JtG635PZuw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/SptwamjhlZv04fzi3B-Crqyl7HZMXrNBIzexCgLjdxJ9SXxciHbpNc7ybSXmfJAxnGa_j0M0JtG635PZuw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:40:59.495Z"
+  },
+  {
+    "videoId": "SDQdGibJ9mE",
+    "title": "Mast Magan (From \"2 States)",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/Uf3FU8ElyrFboJFBiyva4RPgj7LBkm43iJ4srRMJ4Z2-PmYlxzB3uvsMWzXlXfrBYwYrVnqlAcurYVoUew=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Uf3FU8ElyrFboJFBiyva4RPgj7LBkm43iJ4srRMJ4Z2-PmYlxzB3uvsMWzXlXfrBYwYrVnqlAcurYVoUew=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:00.299Z"
+  },
+  {
+    "videoId": "i-EXgX279wU",
+    "title": "Galliyan",
+    "channelTitle": "Ankit Tiwari",
+    "thumbnail": "https://yt3.googleusercontent.com/_3Xhg_Tpnh4MSm2Xtp1RzNdNKk0rfpZCfoyJtuBm6R5J4ql93Dn5jInzmUJKH03nmpEQ4ehSBd5l71ly=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_3Xhg_Tpnh4MSm2Xtp1RzNdNKk0rfpZCfoyJtuBm6R5J4ql93Dn5jInzmUJKH03nmpEQ4ehSBd5l71ly=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:00.995Z"
+  },
+  {
+    "videoId": "EtSAs6GD0Yk",
+    "title": "Sun Saathiya",
+    "channelTitle": "Priya Saraiya",
+    "thumbnail": "https://yt3.googleusercontent.com/g_p5MY9TS-QR3Vq8ECAT5HFjajnLtlmmuJIvdnABkTQQa_bpOffRKaCKEh43ngoxpk2z9v8OxBLEFg4=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/g_p5MY9TS-QR3Vq8ECAT5HFjajnLtlmmuJIvdnABkTQQa_bpOffRKaCKEh43ngoxpk2z9v8OxBLEFg4=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:01.826Z"
+  },
+  {
+    "videoId": "pUwpLoLlzNQ",
+    "title": "Samjhawan",
+    "channelTitle": "Jawad Ahmed",
+    "thumbnail": "https://yt3.googleusercontent.com/DaNYaIF7k-oNb2Ndmw9sMeL4ZX6ycPeGJaUaiMOyMhitPujRa0sygmmy8ODHqzARaVE_rVaT4ZlHJu4=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/DaNYaIF7k-oNb2Ndmw9sMeL4ZX6ycPeGJaUaiMOyMhitPujRa0sygmmy8ODHqzARaVE_rVaT4ZlHJu4=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:02.665Z"
+  },
+  {
+    "videoId": "2Y3Wsdq-MN8",
+    "title": "Bol Do Na Zara",
+    "channelTitle": "Armaan Malik",
+    "thumbnail": "https://yt3.googleusercontent.com/AUfcWvb2FeOezTMAUvYUkpKsE2nkSrEJUqeRQ3KQ7_hcecStVHXyn_8--M5MvQXeYqSvwFkQWpKnEes=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/AUfcWvb2FeOezTMAUvYUkpKsE2nkSrEJUqeRQ3KQ7_hcecStVHXyn_8--M5MvQXeYqSvwFkQWpKnEes=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:03.405Z"
+  },
+  {
+    "videoId": "3tAmZlcZsHo",
+    "title": "Main Rang Sharbaton Ka (Reprise)",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/IKeuBtBBk6yuaXOBGifUZU-7oms4Upazta3lV0EpgKId5ernVZ7btTQ5P6kZX4BF7-roeeqRAhSwjt4K=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/IKeuBtBBk6yuaXOBGifUZU-7oms4Upazta3lV0EpgKId5ernVZ7btTQ5P6kZX4BF7-roeeqRAhSwjt4K=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:04.164Z"
+  },
+  {
+    "videoId": "I94fhjQ-U30",
+    "title": "TUM SE HI",
+    "channelTitle": "MOHIT CHAUHAN",
+    "thumbnail": "https://yt3.googleusercontent.com/RssJqEN-oB10xf7OunqlgijfxH0sDNiQXsnARif7RCYfXVjPqSPvihn_7Ggg8zGEsWALnDvBxIm1GreR=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/RssJqEN-oB10xf7OunqlgijfxH0sDNiQXsnARif7RCYfXVjPqSPvihn_7Ggg8zGEsWALnDvBxIm1GreR=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:05.018Z"
+  },
+  {
+    "videoId": "1q65CU2JoXg",
+    "title": "Iktara",
+    "channelTitle": "Amit Trivedi",
+    "thumbnail": "https://yt3.googleusercontent.com/PZdEJ5f26bbNwJnbeir--VznsQ332Hewj8SoAB9jgXRpC2ZJ5pEM-DQUulnXnx0vlcgurSIHNWgm9Pfv=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/PZdEJ5f26bbNwJnbeir--VznsQ332Hewj8SoAB9jgXRpC2ZJ5pEM-DQUulnXnx0vlcgurSIHNWgm9Pfv=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:06.272Z"
+  },
+  {
+    "videoId": "oeYgD5w3NQo",
+    "title": "Tera Hone Laga Hoon",
+    "channelTitle": "Pritam Chakraborty",
+    "thumbnail": "https://yt3.googleusercontent.com/2_0MIu6f5PUC3VO5R5vw_U1CTPBcRtDhbzOW1rgAd4QmiKMommcDYbL1CrV78AzP-6EkaR-MzF673WwJ0w=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/2_0MIu6f5PUC3VO5R5vw_U1CTPBcRtDhbzOW1rgAd4QmiKMommcDYbL1CrV78AzP-6EkaR-MzF673WwJ0w=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:06.967Z"
+  },
+  {
+    "videoId": "vyJTAnlRHVc",
+    "title": "Nazm Nazm",
+    "channelTitle": "Arko",
+    "thumbnail": "https://yt3.googleusercontent.com/g2AGjwYvDCbuW90ulLrFEJCQlR9XWPGVTeJA3YFWKOrEQ4b1lar35ST22tRvrZUBe11viZpRWP3vLWPk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/g2AGjwYvDCbuW90ulLrFEJCQlR9XWPGVTeJA3YFWKOrEQ4b1lar35ST22tRvrZUBe11viZpRWP3vLWPk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:07.650Z"
+  },
+  {
+    "videoId": "mThwDbcEqaI",
+    "title": "Binte Dil",
+    "channelTitle": "Padmaavat",
+    "thumbnail": "https://yt3.googleusercontent.com/XPpZw_lTRFuU1G1Cf1NtbBxFjkLIYjHOJ6YYqM3NKRvt-NIMxxhA0JspGEpmLf55GzZ6wFqliuvdD6J3=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/XPpZw_lTRFuU1G1Cf1NtbBxFjkLIYjHOJ6YYqM3NKRvt-NIMxxhA0JspGEpmLf55GzZ6wFqliuvdD6J3=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:08.322Z"
+  },
+  {
+    "videoId": "ii9KLQoV78I",
+    "title": "Hawayein (From \"Jab Harry Met Sejal\")",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/S-A1H940pKO854h157hHNY_Z_n1wRHJT-81NkgO6axWxaNPNcMxNx69r88oiJ_aT5_D-sZAqVS1_s2l5=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/S-A1H940pKO854h157hHNY_Z_n1wRHJT-81NkgO6axWxaNPNcMxNx69r88oiJ_aT5_D-sZAqVS1_s2l5=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:09.248Z"
+  },
+  {
+    "videoId": "8MUgi5liyMU",
+    "title": "Muskurane (Romantic)",
+    "channelTitle": "Jeet Gannguli",
+    "thumbnail": "https://yt3.googleusercontent.com/50R_-uUGlcVL0Nh2MMwAv9kqVBQRNdE8VSIrqCNyagwzn1KczQJnQW84ELmXxSPYd3zx7RARkSoeSSo=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/50R_-uUGlcVL0Nh2MMwAv9kqVBQRNdE8VSIrqCNyagwzn1KczQJnQW84ELmXxSPYd3zx7RARkSoeSSo=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:10.137Z"
+  },
+  {
+    "videoId": "SwzCJ_MV-AQ",
+    "title": "Title Track (From \"Hamari Adhuri Kahani\")",
+    "channelTitle": "Jeet Gannguli",
+    "thumbnail": "https://yt3.googleusercontent.com/OaBLNbjU_S8D8WrxmohNhbT2Kdwf0nDqBAH_g7McxygomJs2o67VlIFJaSz2izCbPvNMapSsRKYW0-n4=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/OaBLNbjU_S8D8WrxmohNhbT2Kdwf0nDqBAH_g7McxygomJs2o67VlIFJaSz2izCbPvNMapSsRKYW0-n4=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:11.789Z"
+  },
+  {
+    "videoId": "kbvceIA2Lz4",
+    "title": "SOORAJ DOOBA HAIN",
+    "channelTitle": "ADITI SINGH SHARMA",
+    "thumbnail": "https://yt3.googleusercontent.com/4_0KWSAlt5p6Lyu_u-HCwNMF2rtD7RyNh1h3XEj9imPcU6cWU5yVcixk7Db7kPKLCel7_gZjXO_rYjCU=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/4_0KWSAlt5p6Lyu_u-HCwNMF2rtD7RyNh1h3XEj9imPcU6cWU5yVcixk7Db7kPKLCel7_gZjXO_rYjCU=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:12.588Z"
+  },
+  {
+    "videoId": "TPq1BKSXUF0",
+    "title": "Dil Ko Karaar Aaya (From \"Sukoon\")",
+    "channelTitle": "Rajat Nagpal",
+    "thumbnail": "https://yt3.googleusercontent.com/_Ibky4Gk4JT0BUiULNSMOUqbYJevkoX4dc-ZlDkAiisxFrKHvMqxSNZVwGhOtnXaDlzQpjNgO3LEtEw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_Ibky4Gk4JT0BUiULNSMOUqbYJevkoX4dc-ZlDkAiisxFrKHvMqxSNZVwGhOtnXaDlzQpjNgO3LEtEw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:13.420Z"
+  },
+  {
+    "videoId": "_9FyH8PmRSU",
+    "title": "Maan Meri Jaan",
+    "channelTitle": "King",
+    "thumbnail": "https://yt3.googleusercontent.com/B8qfmAm8BOtXmSEwYMkcotK6nun-imczlC1r8OyeCxGMJqqfoxFkqCWL38MgFN3dcmYp63PLo4aQYbo=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/B8qfmAm8BOtXmSEwYMkcotK6nun-imczlC1r8OyeCxGMJqqfoxFkqCWL38MgFN3dcmYp63PLo4aQYbo=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:14.243Z"
+  },
+  {
+    "videoId": "E9zWVQypoSM",
+    "title": "Tu Aake Dekhle",
+    "channelTitle": "King",
+    "thumbnail": "https://yt3.googleusercontent.com/LHHH6TjcI6xIV4ngO0RLKcdUagGdaXDaX1Dt7emWSd7qYfy_gypNs7Y5uDJh5I_MQH6VEzi4yG0EfwK7=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/LHHH6TjcI6xIV4ngO0RLKcdUagGdaXDaX1Dt7emWSd7qYfy_gypNs7Y5uDJh5I_MQH6VEzi4yG0EfwK7=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:14.940Z"
+  },
+  {
+    "videoId": "2pBZQ927u40",
+    "title": "Noor E Khuda",
+    "channelTitle": "Shankar Ehsaan Loy",
+    "thumbnail": "https://yt3.googleusercontent.com/Q8IfqzFqS9SQe0JVJ-l6PDxGiLlNLk4RzEUiMUUT6SFFrQHfxq33dy6ODxMFXSA15oCCWSmWT0-JCok=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Q8IfqzFqS9SQe0JVJ-l6PDxGiLlNLk4RzEUiMUUT6SFFrQHfxq33dy6ODxMFXSA15oCCWSmWT0-JCok=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:15.980Z"
+  },
+  {
+    "videoId": "aG7MaqtWxT8",
+    "title": "Khuda Jaane (From \"Bachna Ae Haseeno\")",
+    "channelTitle": "Vishal and Sheykhar",
+    "thumbnail": "https://yt3.googleusercontent.com/nlWd_hDqIbAfP3G_alRifQ83MU3IgcTFA03QZIOjZKiTcdpGC0EqScRaoc4l27nMjB_V8ky7xo2JrTs=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/nlWd_hDqIbAfP3G_alRifQ83MU3IgcTFA03QZIOjZKiTcdpGC0EqScRaoc4l27nMjB_V8ky7xo2JrTs=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:16.682Z"
+  },
+  {
+    "videoId": "FYHKeHYlVA4",
+    "title": "PEE LOON",
+    "channelTitle": "MOHIT CHAUHAN",
+    "thumbnail": "https://yt3.googleusercontent.com/uV1_lkVf1rrdlgVLlqgrLNRygItbM6sfN_SjME5K7dUAU8_L7Qk2G4bt07pMLBHZFyesL2ASHs4ChFmkpg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/uV1_lkVf1rrdlgVLlqgrLNRygItbM6sfN_SjME5K7dUAU8_L7Qk2G4bt07pMLBHZFyesL2ASHs4ChFmkpg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:17.443Z"
+  },
+  {
+    "videoId": "C0S0PMpNybM",
+    "title": "Tum Mile",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/5bvgj-ptjXe6EBbU77Vaq6_c7iTQUSfjtj1o7U9kb-xckQ-jAlbpdudaKO9Zev9jPwpQB6Rmx8HtivtJ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/5bvgj-ptjXe6EBbU77Vaq6_c7iTQUSfjtj1o7U9kb-xckQ-jAlbpdudaKO9Zev9jPwpQB6Rmx8HtivtJ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:18.263Z"
+  },
+  {
+    "videoId": "FFtyFrei6ts",
+    "title": "Abhi Mujh Mein Kahin (From \"Agneepath\")",
+    "channelTitle": "Ajay-Atul",
+    "thumbnail": "https://yt3.googleusercontent.com/GRK5w5OkenWTrH4pvqxQSG0MOeJItct1mUl4IDJID1BFH4KnVQbItFphAp57bR0F9Oy_CM30jgBwQYnE=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/GRK5w5OkenWTrH4pvqxQSG0MOeJItct1mUl4IDJID1BFH4KnVQbItFphAp57bR0F9Oy_CM30jgBwQYnE=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:19.188Z"
+  },
+  {
+    "videoId": "JeiZTnRfrbM",
+    "title": "Saibo",
+    "channelTitle": "Sachin-Jigar",
+    "thumbnail": "https://yt3.googleusercontent.com/XE3qAfHTRLMel5ttmXnu3lq3MXtm8YGbvs64lQJiA9tX5CTAdFgrdUu6_VNWStU3VfYHLAgHxPMX0xE=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/XE3qAfHTRLMel5ttmXnu3lq3MXtm8YGbvs64lQJiA9tX5CTAdFgrdUu6_VNWStU3VfYHLAgHxPMX0xE=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:19.974Z"
+  },
+  {
+    "videoId": "XT_ANSoov00",
+    "title": "Phir Le Aya Dil (Reprise)",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/W3crfuGhM-7bR81I9dSXDfM99SGWeGLEqSS29DtIw23ITd7nlLzTC1dXHgMxsxLxlPTcvqFp2Hnq4D3V=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/W3crfuGhM-7bR81I9dSXDfM99SGWeGLEqSS29DtIw23ITd7nlLzTC1dXHgMxsxLxlPTcvqFp2Hnq4D3V=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:20.755Z"
+  },
+  {
+    "videoId": "Pm0Ga7R-vrM",
+    "title": "Tujhe Kitna Chahne Lage (From \"Kabir Singh\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/HDzoC7TKz9WrWyeQoSOgqooZkQspGJZvjrJ7-UIU49a6hJpjzExiQ-ApWDx-FCvjqooycKjbYitZyGee=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/HDzoC7TKz9WrWyeQoSOgqooZkQspGJZvjrJ7-UIU49a6hJpjzExiQ-ApWDx-FCvjqooycKjbYitZyGee=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:21.515Z"
+  },
+  {
+    "videoId": "Jkj8c3kvpBo",
+    "title": "Tera Yaar Hoon Main",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/uZw3aYXEykEwzGhXQu67qIJQE49Qd71k6jPlKsc4-SOlWwAjDsLsFQIVAJjP8Iwo-olV6QioCpaVCztSXg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/uZw3aYXEykEwzGhXQu67qIJQE49Qd71k6jPlKsc4-SOlWwAjDsLsFQIVAJjP8Iwo-olV6QioCpaVCztSXg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:22.388Z"
+  },
+  {
+    "videoId": "ovvUuC0nw2k",
+    "title": "Aayat",
+    "channelTitle": "Sanjay Leela Bhansali",
+    "thumbnail": "https://yt3.googleusercontent.com/FqYtmSf7b1BcDCeOfWq8dTXEMUM8V_v7I9H1iZaZG-ktbzYKdScB2i8K4045SznVNbCqV7FHKcnEJ3ll=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/FqYtmSf7b1BcDCeOfWq8dTXEMUM8V_v7I9H1iZaZG-ktbzYKdScB2i8K4045SznVNbCqV7FHKcnEJ3ll=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:23.105Z"
+  },
+  {
+    "videoId": "zYnpURpOZvw",
+    "title": "Deva Deva (From \"Brahmastra\")",
+    "channelTitle": "Pritam",
+    "thumbnail": "https://yt3.googleusercontent.com/pp29i2benRc6z6DjyYvPTL6thIUbX-MPCSL7Ax_ZoxDnKZ8VNRSEIPf-Fqqiw-hpRvQfQ7Xq-tKXbGM=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/pp29i2benRc6z6DjyYvPTL6thIUbX-MPCSL7Ax_ZoxDnKZ8VNRSEIPf-Fqqiw-hpRvQfQ7Xq-tKXbGM=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:23.786Z"
+  },
+  {
+    "videoId": "BOnxCtKA1VE",
+    "title": "Namo Namo",
+    "channelTitle": "Amit Trivedi",
+    "thumbnail": "https://yt3.googleusercontent.com/1CFGx2RBIDDhqxli7xazjUkr0B1IxH58cEYWE6VeVxeq7cIQ-HXZpYABghCsXa8sk_KysYYo7mJAOKt-=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/1CFGx2RBIDDhqxli7xazjUkr0B1IxH58cEYWE6VeVxeq7cIQ-HXZpYABghCsXa8sk_KysYYo7mJAOKt-=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:24.530Z"
+  },
+  {
+    "videoId": "BA37wV6e7IE",
+    "title": "Malang Sajna",
+    "channelTitle": "Sachet Tandon",
+    "thumbnail": "https://yt3.googleusercontent.com/NR71AAF80jtRtnwdFtzMmZDErAmPN4s2LghhLQezUHJCVy94893TSP6zU1A9IUBbB2kcPnQIXsk8-2M=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/NR71AAF80jtRtnwdFtzMmZDErAmPN4s2LghhLQezUHJCVy94893TSP6zU1A9IUBbB2kcPnQIXsk8-2M=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:25.285Z"
+  },
+  {
+    "videoId": "AByROu-A8Mg",
+    "title": "Rabba Janda (From \"Mission Majnu\")",
+    "channelTitle": "Jubin Nautiyal",
+    "thumbnail": "https://yt3.googleusercontent.com/3Tx0ZaUuOS6cNvQigzJAy9dcJio6wC5o46hAzGAUqbAs_k80wqnU5j4_khpz9obZ_6EVA7pBvElYJDw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/3Tx0ZaUuOS6cNvQigzJAy9dcJio6wC5o46hAzGAUqbAs_k80wqnU5j4_khpz9obZ_6EVA7pBvElYJDw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:26.171Z"
+  },
+  {
+    "videoId": "AU9AdGIdWZs",
+    "title": "Jhoome Jo Pathaan (From \"Pathaan\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/curP-MIYldECZ5T1muebA8KliLTdJc-Kq3Fhe_opP-4AUKVSVfYQMCsDanQ1OUZ4n2GAA8xeXUeh7cjm=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/curP-MIYldECZ5T1muebA8KliLTdJc-Kq3Fhe_opP-4AUKVSVfYQMCsDanQ1OUZ4n2GAA8xeXUeh7cjm=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:27.043Z"
+  },
+  {
+    "videoId": "Uo_OSlQZlgY",
+    "title": "Besharam Rang (From \"Pathaan\")",
+    "channelTitle": "Shilpa Rao",
+    "thumbnail": "https://yt3.googleusercontent.com/YOWUunCTTMZxoZUplYjp_MVnmxnBKM9nH_cDv386_joToQoc8X8IcNq_KCukRymYBT5aYl19Gqw0uYRaqw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/YOWUunCTTMZxoZUplYjp_MVnmxnBKM9nH_cDv386_joToQoc8X8IcNq_KCukRymYBT5aYl19Gqw0uYRaqw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:27.797Z"
+  },
+  {
+    "videoId": "vWBIHZLZQkc",
+    "title": "Zinda Banda (From \"Jawan\")",
+    "channelTitle": "Anirudh Ravichander",
+    "thumbnail": "https://yt3.googleusercontent.com/DuC8PRTm11127t5sQtQ-k8PRHO5JrB1XFyG4WK634cBSHJ-misa0-vkjJVfmpmp8_e5gN8dr5Tw3L0OlSQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/DuC8PRTm11127t5sQtQ-k8PRHO5JrB1XFyG4WK634cBSHJ-misa0-vkjJVfmpmp8_e5gN8dr5Tw3L0OlSQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:28.587Z"
+  },
+  {
+    "videoId": "4OXJvm4JBsU",
+    "title": "Not Ramaiya Vastavaiya",
+    "channelTitle": "Anirudh Ravichander",
+    "thumbnail": "https://yt3.googleusercontent.com/DuC8PRTm11127t5sQtQ-k8PRHO5JrB1XFyG4WK634cBSHJ-misa0-vkjJVfmpmp8_e5gN8dr5Tw3L0OlSQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/DuC8PRTm11127t5sQtQ-k8PRHO5JrB1XFyG4WK634cBSHJ-misa0-vkjJVfmpmp8_e5gN8dr5Tw3L0OlSQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:29.298Z"
+  },
+  {
+    "videoId": "Y943FiZ-Uqw",
+    "title": "Chammak Challo",
+    "channelTitle": "Vishal-Shekhar",
+    "thumbnail": "https://yt3.googleusercontent.com/ODhreTQufJgEezdnPVmP8OF5nefXi4Q9y5dm2CjpjFGks0f5SXKe5sYsd1oiRnB_1Bz1Ghj7Sat2guwp=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/ODhreTQufJgEezdnPVmP8OF5nefXi4Q9y5dm2CjpjFGks0f5SXKe5sYsd1oiRnB_1Bz1Ghj7Sat2guwp=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:30.064Z"
+  },
+  {
+    "videoId": "7SHohKbEKog",
+    "title": "Ghungroo (From \"WAR\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/AJ70mZ-EK1VqqsNWs9GwLrELy3aRfuWE4kfMGcAY8yZB-tCTGoFi6Q9rLExMQ14El94ao00-SW6b89c=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/AJ70mZ-EK1VqqsNWs9GwLrELy3aRfuWE4kfMGcAY8yZB-tCTGoFi6Q9rLExMQ14El94ao00-SW6b89c=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:30.735Z"
+  },
+  {
+    "videoId": "ZI3R0Gn5sa8",
+    "title": "Nashe Si Chadh Gayi (From \"Befikre\")",
+    "channelTitle": "Vishal and Sheykhar",
+    "thumbnail": "https://yt3.googleusercontent.com/viaCZKRr1hCygO8JQS6lLmhBqUVFXctO_9sOE7hwI-rS_JlYcCdqel9sAaGdQoFEFUR2R6ldsrr_c2L5=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/viaCZKRr1hCygO8JQS6lLmhBqUVFXctO_9sOE7hwI-rS_JlYcCdqel9sAaGdQoFEFUR2R6ldsrr_c2L5=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:31.415Z"
+  },
+  {
+    "videoId": "CK5dtbG19mo",
+    "title": "Kala Chashma",
+    "channelTitle": "Amar Arshi",
+    "thumbnail": "https://yt3.googleusercontent.com/EnAU_lisKXK2cCE9jI6k9dfPBnLIbOisqwGiAkczntFQ-zfhPFhIaIPOJ-paPM4hNvOz_C5wzGUvsfyK=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/EnAU_lisKXK2cCE9jI6k9dfPBnLIbOisqwGiAkczntFQ-zfhPFhIaIPOJ-paPM4hNvOz_C5wzGUvsfyK=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:32.146Z"
+  },
+  {
+    "videoId": "nqsBspRl5Ok",
+    "title": "Kar Gayi Chull (From \"Kapoor & Sons (Since 1921)\")",
+    "channelTitle": "Badshah",
+    "thumbnail": "https://yt3.googleusercontent.com/tDxSLBlhk1nl6cDTOVCg0SCvMkiqJ190BZdjYgYAsILVHL2GZ-vOICj1bJjOkeVDWhNZEx6xSK8bNryNZw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/tDxSLBlhk1nl6cDTOVCg0SCvMkiqJ190BZdjYgYAsILVHL2GZ-vOICj1bJjOkeVDWhNZEx6xSK8bNryNZw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:33.069Z"
+  },
+  {
+    "videoId": "cgDe9D4BQTk",
+    "title": "Bom Diggy Diggy (From \"Sonu Ke Titu Ki Sweety\")",
+    "channelTitle": "Zack Knight",
+    "thumbnail": "https://yt3.googleusercontent.com/KYsJ2usJH69ZY3--fgbKneSKFGBTty3WXWCrvqd3mBWI248oc0hndO0pL2LortJ5Fsx31dMsAKLwAAQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/KYsJ2usJH69ZY3--fgbKneSKFGBTty3WXWCrvqd3mBWI248oc0hndO0pL2LortJ5Fsx31dMsAKLwAAQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:33.891Z"
+  },
+  {
+    "videoId": "mDeToJRzm7o",
+    "title": "Morni Banke (From \"Badhaai Ho\")",
+    "channelTitle": "Guru Randhawa",
+    "thumbnail": "https://yt3.googleusercontent.com/0pvyl-J2SM9Vm19b5Lal-TIGh4aGBsGfaeupab7RSbwPfELtKdUK6ma_2AefXe8hIt0UU_g2dP4MVio=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/0pvyl-J2SM9Vm19b5Lal-TIGh4aGBsGfaeupab7RSbwPfELtKdUK6ma_2AefXe8hIt0UU_g2dP4MVio=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:34.593Z"
+  },
+  {
+    "videoId": "7Hhg6bXOZnQ",
+    "title": "Param Sundari",
+    "channelTitle": "A.R. Rahman",
+    "thumbnail": "https://yt3.googleusercontent.com/XzWmf0IPnCPxlXFWbhN50paL6rIRT3QYLHQU4oqogjiOJKX7kLu4WtYmVzF0Jh0Z0eBA_SAa9szweWEDSA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/XzWmf0IPnCPxlXFWbhN50paL6rIRT3QYLHQU4oqogjiOJKX7kLu4WtYmVzF0Jh0Z0eBA_SAa9szweWEDSA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:35.315Z"
+  },
+  {
+    "videoId": "BsrDrv4NV7M",
+    "title": "Tip Tip Barsa Paani",
+    "channelTitle": "Udit Narayan",
+    "thumbnail": "https://yt3.googleusercontent.com/8vqCt26yDbOYcDwKDe7tyEvh5csSOiIxUkmUgT_Kce8cPNQhG4Fd-8ZoCy4qxVUmhliGlVCdAT4TC-jh=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/8vqCt26yDbOYcDwKDe7tyEvh5csSOiIxUkmUgT_Kce8cPNQhG4Fd-8ZoCy4qxVUmhliGlVCdAT4TC-jh=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:36.056Z"
+  },
+  {
+    "videoId": "7uSj-x6EIUE",
+    "title": "Dilbar (From \"Satyameva Jayate\")",
+    "channelTitle": "Neha Kakkar",
+    "thumbnail": "https://yt3.googleusercontent.com/_ca2n9jCBvM2xFYc90GBO7tsaSjxr1N6qMMvsWUzlSXaQMtJAKD7X-87kp5NQdP-0OluyBprEokkV7b5=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_ca2n9jCBvM2xFYc90GBO7tsaSjxr1N6qMMvsWUzlSXaQMtJAKD7X-87kp5NQdP-0OluyBprEokkV7b5=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:36.847Z"
+  },
+  {
+    "videoId": "O1JRZxHM_qk",
+    "title": "Aankh Marey (From \"Simmba\")",
+    "channelTitle": "Neha Kakkar",
+    "thumbnail": "https://yt3.googleusercontent.com/BEVGPocI3RPFdXDYpAWSuYeFxGEINb-kwzacdBEfqNz0mRVEr7oPZA4nq6SbWnarjgUXV2Yc4FvnyTU=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/BEVGPocI3RPFdXDYpAWSuYeFxGEINb-kwzacdBEfqNz0mRVEr7oPZA4nq6SbWnarjgUXV2Yc4FvnyTU=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:37.601Z"
+  },
+  {
+    "videoId": "2wqXLa3vCk0",
+    "title": "GALLAN GOODIYAAN",
+    "channelTitle": "DIL DHADAKNE DO",
+    "thumbnail": "https://yt3.googleusercontent.com/EDCFWwTURug_VwDY2varfb4r9rOfSdv-m78QhTGWoon0S3et60ZtHVYBeqMf0PRGsSPWpZg6EEAUI_JQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/EDCFWwTURug_VwDY2varfb4r9rOfSdv-m78QhTGWoon0S3et60ZtHVYBeqMf0PRGsSPWpZg6EEAUI_JQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:38.388Z"
+  },
+  {
+    "videoId": "crrHSFnM3ic",
+    "title": "LONDON THUMAKDA",
+    "channelTitle": "QUEEN",
+    "thumbnail": "https://yt3.googleusercontent.com/u_CSD9QK1aLce-y2NCuX8g8wP_9pUmIGyz6Pzt3a7GUQckq-Zq5xqv365XEdGsx36Dn6ztadpZoTHO0=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/u_CSD9QK1aLce-y2NCuX8g8wP_9pUmIGyz6Pzt3a7GUQckq-Zq5xqv365XEdGsx36Dn6ztadpZoTHO0=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:39.106Z"
+  },
+  {
+    "videoId": "BuVYVzCsVzc",
+    "title": "Sweety Tera Drama",
+    "channelTitle": "Dev Negi",
+    "thumbnail": "https://yt3.googleusercontent.com/g2AGjwYvDCbuW90ulLrFEJCQlR9XWPGVTeJA3YFWKOrEQ4b1lar35ST22tRvrZUBe11viZpRWP3vLWPk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/g2AGjwYvDCbuW90ulLrFEJCQlR9XWPGVTeJA3YFWKOrEQ4b1lar35ST22tRvrZUBe11viZpRWP3vLWPk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:39.855Z"
+  },
+  {
+    "videoId": "eesw_fW7bt0",
+    "title": "Laal Peeli Akhiyaan",
+    "channelTitle": "Romy",
+    "thumbnail": "https://yt3.googleusercontent.com/FMv7FYqkppHAM9Sn43aneV3eql6nCHldW0OO4ZvoimckHHKwM4Io8NWCdLjarWnh-ecC_LrdpYs3PJ_v=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/FMv7FYqkppHAM9Sn43aneV3eql6nCHldW0OO4ZvoimckHHKwM4Io8NWCdLjarWnh-ecC_LrdpYs3PJ_v=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:40.586Z"
+  },
+  {
+    "videoId": "zjcFE4t8acY",
+    "title": "Angaaron",
+    "channelTitle": "Shreya Ghoshal",
+    "thumbnail": "https://yt3.googleusercontent.com/GvT0-xoON0AFOO5A6ymBOWQqxcEVPgeRczsMSGhEUPJI60zHk1n0MylGxbz510MFXyfunQTXN_UxEEE=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/GvT0-xoON0AFOO5A6ymBOWQqxcEVPgeRczsMSGhEUPJI60zHk1n0MylGxbz510MFXyfunQTXN_UxEEE=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:41.474Z"
+  },
+  {
+    "videoId": "b1wnrCREDj0",
+    "title": "Pushpa Pushpa",
+    "channelTitle": "Mika Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/GvT0-xoON0AFOO5A6ymBOWQqxcEVPgeRczsMSGhEUPJI60zHk1n0MylGxbz510MFXyfunQTXN_UxEEE=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/GvT0-xoON0AFOO5A6ymBOWQqxcEVPgeRczsMSGhEUPJI60zHk1n0MylGxbz510MFXyfunQTXN_UxEEE=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:42.151Z"
+  },
+  {
+    "videoId": "S2TJuB2j1Us",
+    "title": "Kissik",
+    "channelTitle": "Pushpa 2 The Rule - Hindi",
+    "thumbnail": "https://yt3.googleusercontent.com/GvT0-xoON0AFOO5A6ymBOWQqxcEVPgeRczsMSGhEUPJI60zHk1n0MylGxbz510MFXyfunQTXN_UxEEE=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/GvT0-xoON0AFOO5A6ymBOWQqxcEVPgeRczsMSGhEUPJI60zHk1n0MylGxbz510MFXyfunQTXN_UxEEE=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:42.870Z"
+  },
+  {
+    "videoId": "iks48tNYy6o",
+    "title": "Srivalli",
+    "channelTitle": "Javed Ali",
+    "thumbnail": "https://yt3.googleusercontent.com/w20kmKC4GQzTTZn76C2iyRSiLmvZNYJTqro5RIcDJ0X13NGplU5wFU9rXUUMJOLgWCb0QyuAFMtXYsQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/w20kmKC4GQzTTZn76C2iyRSiLmvZNYJTqro5RIcDJ0X13NGplU5wFU9rXUUMJOLgWCb0QyuAFMtXYsQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:43.597Z"
+  },
+  {
+    "videoId": "Zk4_H53LzZI",
+    "title": "Saami Saami",
+    "channelTitle": "Sunidhi Chauhan",
+    "thumbnail": "https://yt3.googleusercontent.com/w20kmKC4GQzTTZn76C2iyRSiLmvZNYJTqro5RIcDJ0X13NGplU5wFU9rXUUMJOLgWCb0QyuAFMtXYsQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/w20kmKC4GQzTTZn76C2iyRSiLmvZNYJTqro5RIcDJ0X13NGplU5wFU9rXUUMJOLgWCb0QyuAFMtXYsQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:44.325Z"
+  },
+  {
+    "videoId": "T7xmqisFI-Y",
+    "title": "Oo Bolega Ya Oo Oo Bolega",
+    "channelTitle": "Kanika Kapoor",
+    "thumbnail": "https://yt3.googleusercontent.com/w20kmKC4GQzTTZn76C2iyRSiLmvZNYJTqro5RIcDJ0X13NGplU5wFU9rXUUMJOLgWCb0QyuAFMtXYsQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/w20kmKC4GQzTTZn76C2iyRSiLmvZNYJTqro5RIcDJ0X13NGplU5wFU9rXUUMJOLgWCb0QyuAFMtXYsQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:45.739Z"
+  },
+  {
+    "videoId": "AbaAxgufFA8",
+    "title": "Naatu Naatu",
+    "channelTitle": "Rahul Sipligunj",
+    "thumbnail": "https://yt3.googleusercontent.com/BBkzOZptuJhomEubnwEAtqJbQzAiUFvdhbXVYChSdh9kmgT3H-dqnVxmtq0_jeNLoFWWmJEghVvFH-Nq1w=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/BBkzOZptuJhomEubnwEAtqJbQzAiUFvdhbXVYChSdh9kmgT3H-dqnVxmtq0_jeNLoFWWmJEghVvFH-Nq1w=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:46.383Z"
+  },
+  {
+    "videoId": "NJAv_7lHUIU",
+    "title": "Kesariya (From \"Brahmastra\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/CH0SThQN0HOk2eV81GGA-Tiftn58G48iy8lEyKNXJjbDSI9ApKKnmt4ncwr5gO_mZoQvFF3HPfHtky1Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/CH0SThQN0HOk2eV81GGA-Tiftn58G48iy8lEyKNXJjbDSI9ApKKnmt4ncwr5gO_mZoQvFF3HPfHtky1Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:47.100Z"
+  },
+  {
+    "videoId": "fpyBL6J0EuA",
+    "title": "Jee Ni Lagda",
+    "channelTitle": "Karan Aujla",
+    "thumbnail": "https://yt3.googleusercontent.com/CwS-QQuTf5ggHK9A9-5Pvn1CQyyALQfNHWP5hl40a6v33HS55zpUAbaT6R3nrnN2DuJTh1vlfTtN5DpO=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/CwS-QQuTf5ggHK9A9-5Pvn1CQyyALQfNHWP5hl40a6v33HS55zpUAbaT6R3nrnN2DuJTh1vlfTtN5DpO=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:47.938Z"
+  },
+  {
+    "videoId": "U13aOFC9Oic",
+    "title": "Makhna",
+    "channelTitle": "Tanishk Bagchi",
+    "thumbnail": "https://yt3.googleusercontent.com/PhPhKD8DdRGa_07w2-NqvVXvLoH-O8lmAaoNEwTjoEsJqAPjVJGK8-8jZYXyH7EodYwNXAe1BKcOOFfi=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/PhPhKD8DdRGa_07w2-NqvVXvLoH-O8lmAaoNEwTjoEsJqAPjVJGK8-8jZYXyH7EodYwNXAe1BKcOOFfi=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:48.689Z"
+  },
+  {
+    "videoId": "5-QuRbg2Vbw",
+    "title": "Chogada (From \"Loveyatri\")",
+    "channelTitle": "Darshan Raval",
+    "thumbnail": "https://yt3.googleusercontent.com/aE7Mfpciet7-4q8IjAnqHdnGGV93qr4Pjv2n2YTR0xKN1kAn1YunD4eF1_2Iz_fEU7Y-xuI2dQLvB-Y=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/aE7Mfpciet7-4q8IjAnqHdnGGV93qr4Pjv2n2YTR0xKN1kAn1YunD4eF1_2Iz_fEU7Y-xuI2dQLvB-Y=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:49.351Z"
+  },
+  {
+    "videoId": "-60Bl9h7u5g",
+    "title": "Kamariya (From \"Stree\")",
+    "channelTitle": "Aastha Gill",
+    "thumbnail": "https://yt3.googleusercontent.com/tlvHXmLpeJ3bMzOFdROMEuKtv4UyOyUGruZU4tsn1Yntm57Bb6WQpBlkR4NAfu55iFsCc7jEVMdgDBc=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/tlvHXmLpeJ3bMzOFdROMEuKtv4UyOyUGruZU4tsn1Yntm57Bb6WQpBlkR4NAfu55iFsCc7jEVMdgDBc=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:50.175Z"
+  },
+  {
+    "videoId": "PX8xRpqh5VA",
+    "title": "Akh Lad Jaave (From \"Loveyatri\")",
+    "channelTitle": "Badshah",
+    "thumbnail": "https://yt3.googleusercontent.com/FPZW2Yn3ySYWslG23tgvSdwe0FP-Kj35H5ctWgyxqPsp1gbO76tU8OLFubXGnE2QE75ivnNYLKkuarM=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/FPZW2Yn3ySYWslG23tgvSdwe0FP-Kj35H5ctWgyxqPsp1gbO76tU8OLFubXGnE2QE75ivnNYLKkuarM=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:50.916Z"
+  },
+  {
+    "videoId": "334Q6W7xhbQ",
+    "title": "Coca Cola (From \"Luka Chuppi\")",
+    "channelTitle": "Tony Kakkar",
+    "thumbnail": "https://yt3.googleusercontent.com/rF_5nO6t1qRK0PtglJU032YBtOtiuhjYPe-xJuVguXOT1533TWdeB3_tSna4TGWbm24aLj_aBflf0Jhn=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/rF_5nO6t1qRK0PtglJU032YBtOtiuhjYPe-xJuVguXOT1533TWdeB3_tSna4TGWbm24aLj_aBflf0Jhn=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:51.797Z"
+  },
+  {
+    "videoId": "51Oz0l-qR3M",
+    "title": "The Humma Song (From \"OK Jaanu\")",
+    "channelTitle": "A.R. Rahman",
+    "thumbnail": "https://yt3.googleusercontent.com/RAXaVrvChAxDzdAfwDQvAVeB9rLtuwAn7TwBGkkLgmIi4STe_xfxlSDs0QZ6yhOoG46tXgjxg2RKcm1d=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/RAXaVrvChAxDzdAfwDQvAVeB9rLtuwAn7TwBGkkLgmIi4STe_xfxlSDs0QZ6yhOoG46tXgjxg2RKcm1d=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:52.535Z"
+  },
+  {
+    "videoId": "vs8ATCTe-74",
+    "title": "Dil Chori (From \"Sonu Ke Titu Ki Sweety\")",
+    "channelTitle": "Yo Yo Honey Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/EAasQA_iiGZU0wxHcXvaXuT6rY0JoINvLYOw4qkIEALMrbt9fqPtVcIg-FE3F1SLm-Wxhyagm9S5yLWW=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/EAasQA_iiGZU0wxHcXvaXuT6rY0JoINvLYOw4qkIEALMrbt9fqPtVcIg-FE3F1SLm-Wxhyagm9S5yLWW=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:53.273Z"
+  },
+  {
+    "videoId": "yO7kCzBpMFA",
+    "title": "Naach Meri Rani",
+    "channelTitle": "Guru Randhawa",
+    "thumbnail": "https://yt3.googleusercontent.com/VE8rdUon8jzy1I00US7RWwHk51UfcbC1Nd8gp0LGOZF5kOhkNVQ31KFtsvmKZVFMbzoy7ni_RqqZ0CA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/VE8rdUon8jzy1I00US7RWwHk51UfcbC1Nd8gp0LGOZF5kOhkNVQ31KFtsvmKZVFMbzoy7ni_RqqZ0CA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:54.008Z"
+  },
+  {
+    "videoId": "rrTwP_N2BN4",
+    "title": "Genda Phool (feat. Payal Dev)",
+    "channelTitle": "Badshah",
+    "thumbnail": "https://yt3.googleusercontent.com/YzI6asLgX1jm-6QcvQ2ixgJDJm-pp9YsLkkoAqlhwOmPwjgcmSMCdLZFcPrGIjFpBXrJ8cqCl5hjJZbc8g=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/YzI6asLgX1jm-6QcvQ2ixgJDJm-pp9YsLkkoAqlhwOmPwjgcmSMCdLZFcPrGIjFpBXrJ8cqCl5hjJZbc8g=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:54.740Z"
+  },
+  {
+    "videoId": "_p-LyTrNWT8",
+    "title": "Pachtaoge (From \"Jaani Ve\")",
+    "channelTitle": "Arijit Singh",
+    "thumbnail": "https://yt3.googleusercontent.com/xNimgMxkg-ARB12_Cx0Ll7nuzAecyTSvJodYOuuNAqGYig-tfhJIuxD8FNaP71Nnws8B6vd-tQkMs1o8Lw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/xNimgMxkg-ARB12_Cx0Ll7nuzAecyTSvJodYOuuNAqGYig-tfhJIuxD8FNaP71Nnws8B6vd-tQkMs1o8Lw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:55.381Z"
+  },
+  {
+    "videoId": "_nJI4VcxF70",
+    "title": "Filhall (feat. Akshay Kumar & Nupur Sanon)",
+    "channelTitle": "B Praak",
+    "thumbnail": "https://yt3.googleusercontent.com/JXIxZJgdPUCcu2IS5UpN5YXPU5vPzJkZKCLiDZNEofqGgvIAD4n57uJckTjujC3nh2NbuP2zAo8xSGJh=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/JXIxZJgdPUCcu2IS5UpN5YXPU5vPzJkZKCLiDZNEofqGgvIAD4n57uJckTjujC3nh2NbuP2zAo8xSGJh=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:56.165Z"
+  },
+  {
+    "videoId": "UAc3iG7d16U",
+    "title": "Filhaal2 Mohabbat",
+    "channelTitle": "B Praak",
+    "thumbnail": "https://yt3.googleusercontent.com/qarwoC8OU5dHxqI6HOntPuzH_s69pzcBBftNFqSaPv_tBmEfBoVIsOIz_ziGkTmJktm1Re5itAZJENg-=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/qarwoC8OU5dHxqI6HOntPuzH_s69pzcBBftNFqSaPv_tBmEfBoVIsOIz_ziGkTmJktm1Re5itAZJENg-=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:57.308Z"
+  },
+  {
+    "videoId": "4z-oDk1utVo",
+    "title": "Lut Gaye (feat. Emraan Hashmi)",
+    "channelTitle": "Jubin Nautiyal",
+    "thumbnail": "https://yt3.googleusercontent.com/-WWDl9AxbK-RlE4546NR1sTIcY8YUoPfnMdNEHovMRBNXd5eqvmvCAN9RuxQqtRynYAtQhe0nFApmMzVUg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/-WWDl9AxbK-RlE4546NR1sTIcY8YUoPfnMdNEHovMRBNXd5eqvmvCAN9RuxQqtRynYAtQhe0nFApmMzVUg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:58.036Z"
+  },
+  {
+    "videoId": "izdeBydQFFA",
+    "title": "Meri Zindagi Hai Tu",
+    "channelTitle": "Asim Azhar",
+    "thumbnail": "https://yt3.googleusercontent.com/wFmKvCohFGD4H_3PUYKRvkLGFJwsZ6K3Y6ySmGuCNTcXhkVcGKZ24rqyoRA0c5vhW6wLtsURPPtYaDJk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/wFmKvCohFGD4H_3PUYKRvkLGFJwsZ6K3Y6ySmGuCNTcXhkVcGKZ24rqyoRA0c5vhW6wLtsURPPtYaDJk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:41:59.447Z"
+  },
+  {
+    "videoId": "sBXzGeDWL-E",
+    "title": "Barsaat Aa Gayi",
+    "channelTitle": "Javed-Mohsin",
+    "thumbnail": "https://yt3.googleusercontent.com/9wdmgyzB3BQaa611W1RqW0jwfPs6bFfOef5BZ-UZsRkWxCBdT6vwqdpOBVytJbInPxxB3OZvNwxcp-he=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/9wdmgyzB3BQaa611W1RqW0jwfPs6bFfOef5BZ-UZsRkWxCBdT6vwqdpOBVytJbInPxxB3OZvNwxcp-he=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:00.915Z"
+  },
+  {
+    "videoId": "uN_Ib8Uws5g",
+    "title": "Kya Loge Tum",
+    "channelTitle": "B Praak",
+    "thumbnail": "https://yt3.googleusercontent.com/k0UBB9sGH0AW6TZI4dajyC5XiWiw5VMLERppkFxHLlWNsAiNw4BnEuvXJAbwXRBXGZvhturh62OWmywt=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/k0UBB9sGH0AW6TZI4dajyC5XiWiw5VMLERppkFxHLlWNsAiNw4BnEuvXJAbwXRBXGZvhturh62OWmywt=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:01.773Z"
+  },
+  {
+    "videoId": "dY0b8Cj8BtM",
+    "title": "Zihaal e Miskin",
+    "channelTitle": "Javed-Mohsin",
+    "thumbnail": "https://yt3.googleusercontent.com/AmxRsie7kjBg4abeazpyCd4D-7AR2ul4ArwXp3ldhUhDrNovSx2PI1DudUmqMM5Osbv3v_3KOQtTcMk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/AmxRsie7kjBg4abeazpyCd4D-7AR2ul4ArwXp3ldhUhDrNovSx2PI1DudUmqMM5Osbv3v_3KOQtTcMk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:03.173Z"
+  },
+  {
+    "videoId": "nEy5srmsYYQ",
+    "title": "O’Sajna",
+    "channelTitle": "Badshah",
+    "thumbnail": "https://yt3.googleusercontent.com/X9z43RY-8TZE8Vtxq7vuvRIWhp57i02tcFvgEUOUPSALtLloNQNnfwAZLDYPCCebcl2PSf2a6AMxBsnD=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/X9z43RY-8TZE8Vtxq7vuvRIWhp57i02tcFvgEUOUPSALtLloNQNnfwAZLDYPCCebcl2PSf2a6AMxBsnD=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:03.977Z"
+  },
+  {
+    "videoId": "dRvFU3V68gM",
+    "title": "Mast Aankhein",
+    "channelTitle": "Tulsi Kumar",
+    "thumbnail": "https://yt3.googleusercontent.com/OIss0qhlqIjIgvpyNQoTQyfnaYOVK_PNYTufIlh5KABGFacI4dcRBQ8MVLST1i2zAMpYVyq6jyk5-oP5aw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/OIss0qhlqIjIgvpyNQoTQyfnaYOVK_PNYTufIlh5KABGFacI4dcRBQ8MVLST1i2zAMpYVyq6jyk5-oP5aw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:04.749Z"
+  },
+  {
+    "videoId": "EwLgGHAxTa8",
+    "title": "Raanjhanaa (From \"Raanjhanaa\")",
+    "channelTitle": "A.R. Rahman",
+    "thumbnail": "https://yt3.googleusercontent.com/yCq1SStzqgbmfRlNErtlbH2r1NspenFuKnV2I0t28cDZ1luTT2XJEUzaZyHoC5qozvX_HdeMaS-_-xbD=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/yCq1SStzqgbmfRlNErtlbH2r1NspenFuKnV2I0t28cDZ1luTT2XJEUzaZyHoC5qozvX_HdeMaS-_-xbD=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:05.497Z"
+  },
+  {
+    "videoId": "LNv8d4y4Cgk",
+    "title": "Chura Liya",
+    "channelTitle": "Sachet Tandon",
+    "thumbnail": "https://yt3.googleusercontent.com/IbJmE5L5CYZ12okU9uhlbSsVqvDthZX5G5pKOnpKKTwRgTI79ndxrjhk8KXOAMKJayPRrCFGoCH5rgvT=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/IbJmE5L5CYZ12okU9uhlbSsVqvDthZX5G5pKOnpKKTwRgTI79ndxrjhk8KXOAMKJayPRrCFGoCH5rgvT=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:06.196Z"
+  },
+  {
+    "videoId": "4jUkciRhqPc",
+    "title": "Baarish Ban Jaana",
+    "channelTitle": "Payal Dev",
+    "thumbnail": "https://yt3.googleusercontent.com/Sbgc26eHHXzcrv6cd_mXx8jrBq5Hd3D2XuLUX-G2O67T8qa8swNCgZ7OHxSf50RQZQYIouww4kTOk5Q=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/Sbgc26eHHXzcrv6cd_mXx8jrBq5Hd3D2XuLUX-G2O67T8qa8swNCgZ7OHxSf50RQZQYIouww4kTOk5Q=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:06.938Z"
+  },
+  {
+    "videoId": "99CFGKKvzRs",
+    "title": "Manike",
+    "channelTitle": "Yohani",
+    "thumbnail": "https://yt3.googleusercontent.com/mCkg-VoJ_K0CSZ6P-Sp2y8-9lJl_5nxejAJK5gSZCbSdw1tfCofTzYS6Vdjmt6rzFVDBzb47xeRq3Lgw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/mCkg-VoJ_K0CSZ6P-Sp2y8-9lJl_5nxejAJK5gSZCbSdw1tfCofTzYS6Vdjmt6rzFVDBzb47xeRq3Lgw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:07.597Z"
+  },
+  {
+    "videoId": "BLfmInnRaDg",
+    "title": "Tumhe Pyaar Karungga",
+    "channelTitle": "Laqshay Kapoor",
+    "thumbnail": "https://yt3.googleusercontent.com/gphABNjb7iYuCFPYj7vYJNxQD2Wqt6855syP09YsPrB2qhxJHecGCA6wIToUAa1GuwjiDWQnsDpUZfdQYA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/gphABNjb7iYuCFPYj7vYJNxQD2Wqt6855syP09YsPrB2qhxJHecGCA6wIToUAa1GuwjiDWQnsDpUZfdQYA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:08.269Z"
+  },
+  {
+    "videoId": "9vpr7vQE84w",
+    "title": "Dil Galti Kar Baitha Hai",
+    "channelTitle": "Jubin Nautiyal",
+    "thumbnail": "https://yt3.googleusercontent.com/_dGbTJ6iIUPWJZkOwN4e75WC5tQ3_ACC3FEVL77ZGt4cGLs33KgpS3m0H7gau-Xwc5JSCZS5iu7OTiWn4A=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_dGbTJ6iIUPWJZkOwN4e75WC5tQ3_ACC3FEVL77ZGt4cGLs33KgpS3m0H7gau-Xwc5JSCZS5iu7OTiWn4A=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:08.991Z"
+  },
+  {
+    "videoId": "n9qQiuwBywU",
+    "title": "Humnava Mere",
+    "channelTitle": "Jubin Nautiyal",
+    "thumbnail": "https://yt3.googleusercontent.com/LeeufAHJnL8kSCl_Uo8xTPWjgT-WPyyJaNXU96wxVtZrHQ5mFdfTHe-lN9EqgMsRglTnhBs4Qy6i1D16gQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/LeeufAHJnL8kSCl_Uo8xTPWjgT-WPyyJaNXU96wxVtZrHQ5mFdfTHe-lN9EqgMsRglTnhBs4Qy6i1D16gQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:09.694Z"
+  },
+  {
+    "videoId": "5U5Ru0nTiUM",
+    "title": "Tere Liye",
+    "channelTitle": "Atif Aslam",
+    "thumbnail": "https://yt3.googleusercontent.com/8rcPUY_axCJpmXE7z1tW3ipwgiVVJBmkH05BZTbzUkQ1zYooRjIb2Zfoqj9_hdQPIp0wuV3NJmMbLVA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/8rcPUY_axCJpmXE7z1tW3ipwgiVVJBmkH05BZTbzUkQ1zYooRjIb2Zfoqj9_hdQPIp0wuV3NJmMbLVA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:10.361Z"
+  },
+  {
+    "videoId": "xyAF7Mh95Ik",
+    "title": "Rim Jhim (feat. Pav Dharia)",
+    "channelTitle": "Khan Saab",
+    "thumbnail": "https://yt3.googleusercontent.com/D11cMia8iyo9bzH3ZtdnQFeK8YDfaZYi0IZ7p_PKsTIq0wCdZPvLl12B1dAU-bluzlYIppTSXwEKqxk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/D11cMia8iyo9bzH3ZtdnQFeK8YDfaZYi0IZ7p_PKsTIq0wCdZPvLl12B1dAU-bluzlYIppTSXwEKqxk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:11.013Z"
+  },
+  {
+    "videoId": "hlbTxlBuA-I",
+    "title": "Meri Banogi Kya",
+    "channelTitle": "Rito Riba",
+    "thumbnail": "https://yt3.googleusercontent.com/zfF96-nET9Lj_mrJqWJGsIDNFqSnYiT7yWyW83omBomYoO-h3Ja3VAeNLUbaobPMzT-3kOgc9rtoJ13I=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/zfF96-nET9Lj_mrJqWJGsIDNFqSnYiT7yWyW83omBomYoO-h3Ja3VAeNLUbaobPMzT-3kOgc9rtoJ13I=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:12.117Z"
+  },
+  {
+    "videoId": "yU34DVK41dY",
+    "title": "Tu Mil Gya",
+    "channelTitle": "Mahi Dhaka",
+    "thumbnail": "https://yt3.googleusercontent.com/lU3mzMdRfML3fmR8uejnJgd1DZKflxgK6TO2WFTjTkneWG8No0Uokn-LR_MQiB7X64WQAt0z1S3FfgxQKQ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/lU3mzMdRfML3fmR8uejnJgd1DZKflxgK6TO2WFTjTkneWG8No0Uokn-LR_MQiB7X64WQAt0z1S3FfgxQKQ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:12.885Z"
+  },
+  {
+    "videoId": "arVuYDmfSmQ",
+    "title": "Sajna Ve Sajna",
+    "channelTitle": "Sunidhi Chauhan",
+    "thumbnail": "https://yt3.googleusercontent.com/nalXtD97saMznyQzcxl8bHgOEzUvIO5-gYbFJ6OAgysX0M5tM-YjzOg0cYSGyupNv878ZJowbo3Wwwg=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/nalXtD97saMznyQzcxl8bHgOEzUvIO5-gYbFJ6OAgysX0M5tM-YjzOg0cYSGyupNv878ZJowbo3Wwwg=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:13.626Z"
+  },
+  {
+    "videoId": "9a26mBBK4jE",
+    "title": "Tere Sang Yaara",
+    "channelTitle": "Atif Aslam",
+    "thumbnail": "https://yt3.googleusercontent.com/cbjcRvrjwi20qFPhS3nIAfQrl1I0QqGDBzJ90KXcJkZstvH4e2R7RMMDdBSGTESJkFa7PsDBAlaZuzMA=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/cbjcRvrjwi20qFPhS3nIAfQrl1I0QqGDBzJ90KXcJkZstvH4e2R7RMMDdBSGTESJkFa7PsDBAlaZuzMA=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:14.375Z"
+  },
+  {
+    "videoId": "3M3o3Ak1qBY",
+    "title": "Jeene Laga Hoon",
+    "channelTitle": "Atif Aslam",
+    "thumbnail": "https://yt3.googleusercontent.com/_Ildec60a0FD1hWUNtyn6oYoEw9c6O5QmP2FIXwOMkEdl9Do-vLwTGl-TQTTS2LjN8PthPv3C7DaL18lRw=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/_Ildec60a0FD1hWUNtyn6oYoEw9c6O5QmP2FIXwOMkEdl9Do-vLwTGl-TQTTS2LjN8PthPv3C7DaL18lRw=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:15.089Z"
+  },
+  {
+    "videoId": "IgITZfS7L_8",
+    "title": "Dil Ibaadat",
+    "channelTitle": "Kk",
+    "thumbnail": "https://yt3.googleusercontent.com/5bvgj-ptjXe6EBbU77Vaq6_c7iTQUSfjtj1o7U9kb-xckQ-jAlbpdudaKO9Zev9jPwpQB6Rmx8HtivtJ=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/5bvgj-ptjXe6EBbU77Vaq6_c7iTQUSfjtj1o7U9kb-xckQ-jAlbpdudaKO9Zev9jPwpQB6Rmx8HtivtJ=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:15.865Z"
+  },
+  {
+    "videoId": "TLEPzT8jrUU",
+    "title": "Piya O Re Piya",
+    "channelTitle": "Atif Aslam",
+    "thumbnail": "https://yt3.googleusercontent.com/fRmijHFxzL5nfA4Pcz1hI_cWzCu0M1U7Bn4-wqbMCXUjjD4PxEsLobFsZCoQeehXSX1irD4hlNFKyMth=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/fRmijHFxzL5nfA4Pcz1hI_cWzCu0M1U7Bn4-wqbMCXUjjD4PxEsLobFsZCoQeehXSX1irD4hlNFKyMth=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:16.582Z"
+  },
+  {
+    "videoId": "Wq1zDZ81YhU",
+    "title": "Tum Tak (From \"Raanjhanaa\")",
+    "channelTitle": "Javed Ali",
+    "thumbnail": "https://yt3.googleusercontent.com/l4sYZWeiQjV2VPK83q2Qym0E-4gk8U3kLKCFHHeqO1aT23nupu9nojSXO5gRk7MIiICT0TiBep-YWaPO=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/l4sYZWeiQjV2VPK83q2Qym0E-4gk8U3kLKCFHHeqO1aT23nupu9nojSXO5gRk7MIiICT0TiBep-YWaPO=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:17.363Z"
+  },
+  {
+    "videoId": "_fmA1RoHbzA",
+    "title": "Kun Faya Kun",
+    "channelTitle": "A.R. Rahman",
+    "thumbnail": "https://yt3.googleusercontent.com/KYw74XSQwtKPbZTrHMNEBAnEMg1P1gNGwymnZwBSjstbqSE-MpigGlTIy6IZvC-ERlRkeP0c7VTiZObS=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/KYw74XSQwtKPbZTrHMNEBAnEMg1P1gNGwymnZwBSjstbqSE-MpigGlTIy6IZvC-ERlRkeP0c7VTiZObS=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:18.097Z"
+  },
+  {
+    "videoId": "Thda5BDSRHc",
+    "title": "ARZIYAN",
+    "channelTitle": "Kailash Kher",
+    "thumbnail": "https://yt3.googleusercontent.com/EUaymIrfyWRj0_-Q-My5ZnZhmDihHPC2SQ935X3jj6YirVIOd3B-gogG173wLegV8tny2CG-615Gt3dmig=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/EUaymIrfyWRj0_-Q-My5ZnZhmDihHPC2SQ935X3jj6YirVIOd3B-gogG173wLegV8tny2CG-615Gt3dmig=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:18.862Z"
+  },
+  {
+    "videoId": "Pqo8o_JcetA",
+    "title": "Jashn-E-Bahaaraa",
+    "channelTitle": "A.R. Rahman",
+    "thumbnail": "https://yt3.googleusercontent.com/gEeH3573jsHPgZNkhBBw7c8eeX94QIU14EvdXXit7PB2qpL7zIrza00-rryRsNEvPMQUr9eXKtRNrGk=w600-h600-l90-rj",
+    "thumbnailHigh": "https://yt3.googleusercontent.com/gEeH3573jsHPgZNkhBBw7c8eeX94QIU14EvdXXit7PB2qpL7zIrza00-rryRsNEvPMQUr9eXKtRNrGk=w600-h600-l90-rj",
+    "publishedAt": "2026-07-06T14:42:19.584Z"
+  }
+];
