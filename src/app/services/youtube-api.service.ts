@@ -25,6 +25,15 @@ export class YoutubeApiService {
     this.fetchLiveCuratedSongs();
   }
 
+  getCustomSections(): Observable<Record<string, any[]>> {
+    const fetchUrl = window.location.origin.includes('localhost') 
+      ? 'http://localhost/manageads/managegt-api.php?action=get_sections' 
+      : 'https://manageads.ganatube.in/managegt-api.php?action=get_sections';
+    return this.http.get<Record<string, any[]>>(fetchUrl).pipe(
+      catchError(() => of({}))
+    );
+  }
+
   private fetchLiveCuratedSongs() {
     const fetchUrl = window.location.origin.includes('localhost') 
       ? 'http://localhost/manageads/curated-songs.json' 

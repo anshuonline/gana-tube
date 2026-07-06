@@ -258,24 +258,6 @@ export class AlgorithmService {
       });
     }
 
-    // Append language-specific curated shelves for infinite scrolling depth
-    shelves.push(
-      { title: `🔥 Top 50 ${language}`, query: `top 50 ${language} songs playlist` },
-      { title: `☕ Lo-Fi Chill ${language}`, query: `lo-fi chill beats ${language}` },
-      { title: `🎸 ${language} Indie Pop`, query: `${language} Indie Pop` },
-      { title: `❤️ Romantic ${language} Melodies`, query: `romantic ${language} love songs` },
-      { title: `🕺 Party & Dance ${language}`, query: `${language} party dance dj hits` },
-      { title: `🎧 90s & 2000s ${language} Nostalgia`, query: `90s 2000s throwback ${language} hits` },
-      { title: `🌧️ Rainy Day ${language}`, query: `rainy day ${language} soft songs` },
-      { title: `💪 Workout & Gym ${language}`, query: `workout gym motivation ${language}` },
-      { title: `🛣️ Long Drive ${language}`, query: `road trip long drive ${language} songs` },
-      { title: `😔 Heartbreak & Sad ${language}`, query: `sad emotional heartbreak ${language} songs` },
-      { title: `🎵 Unplugged & Acoustic ${language}`, query: `unplugged acoustic cover ${language}` },
-      { title: `🎻 Classical & Sufi ${language}`, query: `classical sufi soulful ${language}` },
-      { title: `🚀 Viral ${language} Tracks`, query: `viral trending reels ${language} songs` },
-      { title: `🎙️ Best of ${language} Playback`, query: `best playback singers ${language} hits` }
-    );
-
     return of(shelves);
   }
 

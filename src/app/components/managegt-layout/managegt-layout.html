@@ -1,0 +1,24 @@
+<div class="managegt-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" *ngIf="isLoggedIn">
+    <div class="logo">
+      <img src="assets/images/ganatubenewlogo.png" alt="GanaTube Admin" />
+      <span>Admin</span>
+    </div>
+    <nav>
+      <ul>
+        <li>
+          <a routerLink="/managegt/sections" routerLinkActive="active">Manage Sections</a>
+        </li>
+        <li>
+          <a (click)="logout()" class="logout-btn">Logout</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="content-area" [class.full-width]="!isLoggedIn">
+    <router-outlet></router-outlet>
+  </main>
+</div>

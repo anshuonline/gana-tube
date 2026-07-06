@@ -1,0 +1,66 @@
+<div class="sections-manager">
+  <header>
+    <h2>Manage Custom Sections</h2>
+    <p>Create completely custom sections that will appear on the homepage for your users.</p>
+  </header>
+
+  <div class="controls-bar">
+    <div class="lang-selector">
+      <label>Language:</label>
+      <select [(ngModel)]="selectedLanguage" (change)="onLanguageChange()">
+        <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
+      </select>
+    </div>
+    
+    <button class="delete-all-btn" (click)="deleteAllSections()" *ngIf="currentSections.length > 0">
+      Delete All Sections
+    </button>
+  </div>
+
+  <div class="existing-sections">
+    <h3>Existing Sections ({{ currentSections.length }})</h3>
+    <div class="sections-list" *ngIf="currentSections.length > 0">
+      <div class="section-item" *ngFor="let section of currentSections; let i = index">
+        <div class="section-info">
+          <h4>{{ section.title }}</h4>
+          <span>{{ section.songs.length }} songs</span>
+        </div>
+        <button class="icon-btn delete" (click)="deleteSection(i)" title="Delete Section">
+          ✖
+        </button>
+      </div>
+    </div>
+    <div class="no-sections" *ngIf="currentSections.length === 0">
+      <p>No custom sections for {{ selectedLanguage }} yet. Create one below!</p>
+    </div>
+  </div>
+
+  <div class="create-section-card">
+    <h3>Create New Section</h3>
+    
+    <div class="form-group">
+      <label>Section Title (e.g. "Romantic Hits")</label>
+      <input type="text" [(ngModel)]="newSectionTitle" placeholder="Enter title..." />
+    </div>
+
+    <div class="form-group">
+      <label>Paste JSON Array of Song Names</label>
+      <textarea [(ngModel)]="jsonInput" rows="10" placeholder='[&#10;  "Song Name 1",&#10;  "Song Name 2"&#10;]'></textarea>
+    </div>
+
+    <div class="error-msg" *ngIf="fetchError">{{ fetchError }}</div>
+    
+    <div class="progress-bar" *ngIf="isFetching">
+      <div class="fill" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
+      <span>Fetching {{ fetchProgress }} / {{ totalToFetch }} songs...</span>
+    </div>
+
+    <button class="action-btn" (click)="addSection()" [disabled]="isFetching || isPublishing">
+      {{ isFetching ? 'Fetching Metadata...' : 'Fetch & Publish Section' }}
+    </button>
+
+    <div class="status-msg" [class.error]="publishMessage.includes('❌')" *ngIf="publishMessage">
+      {{ publishMessage }}
+    </div>
+  </div>
+</div>

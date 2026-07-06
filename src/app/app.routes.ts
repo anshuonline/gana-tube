@@ -11,5 +11,14 @@ export const routes: Routes = [
   { path: 'profile', children: [] },
   { path: 'playlist/:id', children: [] },
   { path: 'admin/manage-songs', loadComponent: () => import('./components/admin-manage-songs/admin-manage-songs').then(m => m.AdminManageSongsComponent) },
+  { 
+    path: 'managegt', 
+    loadComponent: () => import('./components/managegt-layout/managegt-layout').then(m => m.ManagegtLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'sections', pathMatch: 'full' },
+      { path: 'login', loadComponent: () => import('./components/managegt-login/managegt-login').then(m => m.ManagegtLoginComponent) },
+      { path: 'sections', loadComponent: () => import('./components/managegt-sections/managegt-sections').then(m => m.ManagegtSectionsComponent) }
+    ]
+  },
   { path: '**', children: [] } // Catch all for static pages like /terms, /privacy
 ];

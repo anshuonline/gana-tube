@@ -439,54 +439,88 @@ export class App implements OnInit {
   }
 
   loadInitialShelves(language?: string): void {
+    const lang = language || this.homeScreenLanguage();
     this.shelvesLoading.set(true);
     this.loadedShelves.set([]);
-    this.algorithmService.getVariableRewardShelves(language || this.homeScreenLanguage()).subscribe(shelves => {
-      this.allShelfDefinitions = shelves;
-      const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
-      let loadedCount = 0;
 
-      if (initialDefinitions.length === 0) {
-        this.shelvesLoading.set(false);
-        return;
-      }
+    // Fetch algorithmic dynamic shelves
+    this.algorithmService.getVariableRewardShelves(lang).subscribe(algorithmicShelves => {
+      
+      // Fetch custom sections created by Admin in ManageGT
+      this.youtubeApi.getCustomSections().subscribe((customData) => {
+        const langCustomSections: any[] = customData[lang] || [];
+        
+        // Convert Custom Sections to ShelfDefinition format for the UI
+        const customShelves: ShelfDefinition[] = langCustomSections.map(cs => ({
+          title: cs.title,
+          query: '', // We already have the songs, no need to query
+          songs: cs.songs
+        }));
+
+        // Combine them: Dynamic algorithmic shelves FIRST, then Custom Admin Sections
+        this.allShelfDefinitions = [...algorithmicShelves, ...customShelves];
+        
+        const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
+        let loadedCount = 0;
+
+        if (initialDefinitions.length === 0) {
+          this.shelvesLoading.set(false);
+          return;
+        }
 
       initialDefinitions.forEach((def) => {
-        this.youtubeApi.searchMusic(def.query, 50).subscribe({
-          next: (songs) => {
-            if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
-            
-            if (songs && songs.length > 0) {
-              this.loadedShelves.update(shelvesList => {
-                const updated = [...shelvesList];
-                updated.push({ title: def.title, query: def.query, songs });
-                // Sort by their original definition index to preserve order
-                return updated.sort((a, b) => {
-                  const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
-                  const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
-                  return idxA - idxB;
-                });
-              });
-            }
-            loadedCount++;
-            if (loadedCount >= initialDefinitions.length) {
-              this.shelvesLoading.set(false);
-              // Trigger background loading of remaining shelves
-              setTimeout(() => this.loadNextShelf(language), 500);
-            }
-          },
-          error: (err) => {
-            console.error(`Failed to load shelf: ${def.title}`, err);
-            if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
-            loadedCount++;
-            if (loadedCount >= initialDefinitions.length) {
-              this.shelvesLoading.set(false);
-              // Trigger background loading of remaining shelves
-              setTimeout(() => this.loadNextShelf(language), 500);
-            }
+        if (def.songs && def.songs.length > 0) {
+          // It's a custom section, already has songs!
+          this.loadedShelves.update(shelvesList => {
+            const updated = [...shelvesList];
+            updated.push({ title: def.title, query: def.query, songs: def.songs! });
+            return updated.sort((a, b) => {
+              const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
+              const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
+              return idxA - idxB;
+            });
+          });
+          loadedCount++;
+          if (loadedCount >= initialDefinitions.length) {
+            this.shelvesLoading.set(false);
+            setTimeout(() => this.loadNextShelf(lang), 500);
           }
-        });
+        } else {
+          // Algorithmic shelf, needs fetching
+          this.youtubeApi.searchMusic(def.query, 50).subscribe({
+            next: (songs) => {
+              if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
+              
+              if (songs && songs.length > 0) {
+                this.loadedShelves.update(shelvesList => {
+                  const updated = [...shelvesList];
+                  updated.push({ title: def.title, query: def.query, songs });
+                  return updated.sort((a, b) => {
+                    const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
+                    const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
+                    return idxA - idxB;
+                  });
+                });
+              }
+              loadedCount++;
+              if (loadedCount >= initialDefinitions.length) {
+                this.shelvesLoading.set(false);
+                setTimeout(() => this.loadNextShelf(language), 500);
+              }
+            },
+            error: (err) => {
+              console.error(`Failed to load shelf: ${def.title}`, err);
+              if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
+              loadedCount++;
+              if (loadedCount >= initialDefinitions.length) {
+                this.shelvesLoading.set(false);
+                setTimeout(() => this.loadNextShelf(language), 500);
+              }
+            }
+          });
+        }
       });
+    });
     });
   }
 
@@ -503,15 +537,19 @@ export class App implements OnInit {
     this.loadingShelfTitle.set(nextDefs[0].title + (nextDefs.length > 1 ? ' & more...' : ''));
     this.shelfLoading.set(true);
 
-    const observables = nextDefs.map(def => 
-      this.youtubeApi.searchMusic(def.query, 50).pipe(
-        // Catch errors for individual shelf loads so the whole batch doesn't fail
-        catchError((err: any) => {
-          console.error(`Failed to load shelf: ${def.title}`, err);
-          return of(null);
-        })
-      )
-    );
+    const observables = nextDefs.map(def => {
+      if (def.songs && def.songs.length > 0) {
+        return of(def.songs);
+      } else {
+        return this.youtubeApi.searchMusic(def.query, 50).pipe(
+          // Catch errors for individual shelf loads so the whole batch doesn't fail
+          catchError((err: any) => {
+            console.error(`Failed to load shelf: ${def.title}`, err);
+            return of(null);
+          })
+        );
+      }
+    });
 
     forkJoin(observables).subscribe({
       next: (results: any[]) => {
