@@ -525,7 +525,10 @@
   gap: 16px;
 
   @media (max-width: 992px) {
-    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 }
 
@@ -538,12 +541,16 @@
 }
 
 .hero-title {
-  font-size: clamp(4rem, 8vw, 7.5rem);
+  font-size: clamp(2.5rem, 8vw, 7.5rem);
   font-weight: 800;
   color: #fff;
   margin: 0;
   line-height: 1.1;
   letter-spacing: -0.02em;
+
+  @media (max-width: 768px) {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
 }
 
 .hero-subtitle {
@@ -553,6 +560,11 @@
   font-weight: 600;
   margin: 0 0 16px 0;
   text-transform: uppercase;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    margin: 0 0 12px 0;
+  }
 }
 
 .explore-btn {
@@ -592,6 +604,18 @@
 
   &:active {
     transform: translateY(0) scale(0.98);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    padding: 12px 28px;
+    border-radius: 12px;
+    gap: 8px;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 
