@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -45,7 +45,7 @@ export class ManagegtHeaderComponent implements OnInit {
     ? 'http://localhost/manageads/managegt-api.php'
     : 'https://manageads.ganatube.in/managegt-api.php';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.fetchHeaderData();
@@ -68,6 +68,7 @@ export class ManagegtHeaderComponent implements OnInit {
       this.loadDefaults(this.selectedLanguage);
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
