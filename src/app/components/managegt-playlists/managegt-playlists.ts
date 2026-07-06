@@ -70,6 +70,26 @@ export class ManagegtPlaylistsComponent implements OnInit {
     try {
       const cacheBuster = Date.now();
       this.allPlaylistsData = await firstValueFrom(this.http.get<Record<string, CustomPlaylist[]>>(`${this.apiUrl}?action=get_playlists&t=${cacheBuster}`)) || {};
+      
+      let needsSave = false;
+      const now = new Date();
+      Object.keys(this.allPlaylistsData).forEach(lang => {
+        this.allPlaylistsData[lang].forEach(p => {
+          if (p.status === 'schedule' && p.publishDate) {
+            if (new Date(p.publishDate) <= now) {
+              p.status = 'publish';
+              delete p.publishDate;
+              needsSave = true;
+            }
+          }
+        });
+      });
+      
+      if (needsSave) {
+        // Silently save the updated statuses
+        this.http.post(`${this.apiUrl}?action=save_playlists`, this.allPlaylistsData).subscribe();
+      }
+
       this.updateCurrentPlaylists();
       this.cdr.detectChanges();
     } catch (e) {

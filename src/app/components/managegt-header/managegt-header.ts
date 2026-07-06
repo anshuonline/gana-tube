@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
+import { timeout, catchError } from 'rxjs/operators';
 
 export interface HeroSlide {
   badge: string;       // e.g. "TRENDING PLAYLIST"
@@ -55,15 +56,19 @@ export class ManagegtHeaderComponent implements OnInit {
     try {
       const cacheBuster = Date.now();
       const data = await firstValueFrom(
-        this.http.get<Record<string, HeroSlide>>(`${this.apiUrl}?action=get_header&t=${cacheBuster}`)
+        this.http.get<Record<string, HeroSlide>>(`${this.apiUrl}?action=get_header&t=${cacheBuster}`).pipe(
+          timeout(6000),
+          catchError(() => of({} as Record<string, HeroSlide>))
+        )
       );
       this.allHeaderData = data || {};
       this.loadLanguage(this.selectedLanguage);
     } catch (e) {
-      console.error('Failed to load header data', e);
+      console.warn('Failed to load header data, using defaults', e);
       this.loadDefaults(this.selectedLanguage);
+    } finally {
+      this.isLoading = false;
     }
-    this.isLoading = false;
   }
 
   onLanguageChange() {

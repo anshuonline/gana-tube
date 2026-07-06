@@ -302,8 +302,14 @@ export class App implements OnInit {
       Object.keys(customData).forEach(lang => {
         const langPlaylists = customData[lang] || [];
         langPlaylists.forEach(p => {
-          // Only show published playlists to normal users
-          if (p.status === 'publish') {
+          let isPublished = p.status === 'publish';
+          if (p.status === 'schedule' && p.publishDate) {
+            if (new Date(p.publishDate) <= new Date()) {
+              isPublished = true;
+            }
+          }
+          
+          if (isPublished) {
             playlists.push({
               id: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
               slug: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
