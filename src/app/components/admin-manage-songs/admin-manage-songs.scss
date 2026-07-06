@@ -110,6 +110,17 @@
         }
       }
 
+      select {
+        color-scheme: dark;
+        cursor: pointer;
+
+        option {
+          background: #18181b; /* Dark background explicitly for options */
+          color: #ffffff;
+          padding: 10px;
+        }
+      }
+
       textarea {
         min-height: 150px;
         resize: vertical;
