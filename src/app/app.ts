@@ -99,7 +99,7 @@ export class App implements OnInit {
   selectedPlaylist = signal<PlaylistMeta | null>(null);
   
   homePlaylists = computed(() => {
-    return this.allPlaylists.filter(p => p.language === this.homeScreenLanguage());
+    return this.allPlaylists.filter(p => p.language === this.homeScreenLanguage()).slice(0, 2);
   });
 
   // Top Artists Data
