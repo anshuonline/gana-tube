@@ -1,0 +1,178 @@
+<div class="p-8 max-w-6xl mx-auto min-h-screen pb-32">
+  <!-- Header -->
+  <div class="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-white tracking-tight flex items-center">
+        <lucide-icon name="music" class="mr-3 text-purple-500"></lucide-icon>
+        Custom Playlists
+      </h1>
+      <p class="text-white/50 mt-2 text-sm">Create and manage your own custom playlists for the Home screen</p>
+    </div>
+    
+    <div class="flex items-center space-x-3 bg-black/40 p-1.5 rounded-xl border border-white/5">
+      <button *ngFor="let lang of languages" 
+              (click)="onLangChange(lang)"
+              [class.bg-purple-600]="selectedLang === lang"
+              [class.text-white]="selectedLang === lang"
+              [class.text-white-40]="selectedLang !== lang"
+              class="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-white/5">
+        {{ lang }}
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- LEFT COL: Add New Playlist Form -->
+    <div class="lg:col-span-1 space-y-6">
+      <div class="bg-[#0a0a12] p-6 rounded-2xl border border-white/10 shadow-xl">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+          <lucide-icon name="plus" class="mr-2 w-5 h-5 text-purple-400"></lucide-icon>
+          Create New Playlist
+        </h2>
+
+        <!-- Title -->
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Playlist Title</label>
+          <input type="text" [(ngModel)]="newPlaylistTitle" 
+                 placeholder="e.g. 90s Bollywood Nostalgia"
+                 class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-purple-500 transition-all">
+        </div>
+
+        <!-- Cover Image Upload -->
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Cover Photo</label>
+          
+          <div class="relative group cursor-pointer border-2 border-dashed border-white/20 rounded-xl bg-black/40 hover:border-purple-500/50 transition-all overflow-hidden"
+               style="height: 160px;">
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+            
+            <div *ngIf="!coverImagePreview" class="absolute inset-0 flex flex-col items-center justify-center text-white/40 group-hover:text-purple-400 transition-colors">
+              <lucide-icon name="upload" class="w-8 h-8 mb-2"></lucide-icon>
+              <span class="text-sm font-medium">Click to upload image</span>
+            </div>
+            
+            <img *ngIf="coverImagePreview" [src]="coverImagePreview" class="w-full h-full object-cover">
+            
+            <div *ngIf="coverImagePreview" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+              <span class="text-white text-sm font-medium flex items-center">
+                <lucide-icon name="upload" class="w-4 h-4 mr-2"></lucide-icon> Change Photo
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status & Schedule -->
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Visibility</label>
+          <div class="flex space-x-2">
+            <button (click)="newPlaylistStatus = 'publish'" 
+                    [class.bg-green-500_20]="newPlaylistStatus === 'publish'" [class.border-green-500]="newPlaylistStatus === 'publish'" [class.text-green-400]="newPlaylistStatus === 'publish'"
+                    [class.bg-black_40]="newPlaylistStatus !== 'publish'" [class.border-white_10]="newPlaylistStatus !== 'publish'" [class.text-white_40]="newPlaylistStatus !== 'publish'"
+                    class="flex-1 py-2 px-3 rounded-lg border flex items-center justify-center text-sm font-medium transition-all">
+              <lucide-icon name="eye" class="w-4 h-4 mr-1.5"></lucide-icon> Publish
+            </button>
+            <button (click)="newPlaylistStatus = 'schedule'" 
+                    [class.bg-blue-500_20]="newPlaylistStatus === 'schedule'" [class.border-blue-500]="newPlaylistStatus === 'schedule'" [class.text-blue-400]="newPlaylistStatus === 'schedule'"
+                    [class.bg-black_40]="newPlaylistStatus !== 'schedule'" [class.border-white_10]="newPlaylistStatus !== 'schedule'" [class.text-white_40]="newPlaylistStatus !== 'schedule'"
+                    class="flex-1 py-2 px-3 rounded-lg border flex items-center justify-center text-sm font-medium transition-all">
+              <lucide-icon name="clock" class="w-4 h-4 mr-1.5"></lucide-icon> Schedule
+            </button>
+            <button (click)="newPlaylistStatus = 'private'" 
+                    [class.bg-red-500_20]="newPlaylistStatus === 'private'" [class.border-red-500]="newPlaylistStatus === 'private'" [class.text-red-400]="newPlaylistStatus === 'private'"
+                    [class.bg-black_40]="newPlaylistStatus !== 'private'" [class.border-white_10]="newPlaylistStatus !== 'private'" [class.text-white_40]="newPlaylistStatus !== 'private'"
+                    class="flex-1 py-2 px-3 rounded-lg border flex items-center justify-center text-sm font-medium transition-all">
+              <lucide-icon name="eye-off" class="w-4 h-4 mr-1.5"></lucide-icon> Private
+            </button>
+          </div>
+          
+          <div *ngIf="newPlaylistStatus === 'schedule'" class="mt-3">
+            <input type="datetime-local" [(ngModel)]="newPlaylistDate" 
+                   class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:border-blue-500 transition-all">
+          </div>
+        </div>
+
+        <!-- Songs JSON -->
+        <div class="mb-6">
+          <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Songs Array (JSON format)</label>
+          <textarea [(ngModel)]="jsonInput" rows="5"
+                    placeholder='["Song 1", "Song 2", ...]'
+                    class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-purple-500 transition-all font-mono text-sm resize-none"></textarea>
+          <p class="text-[10px] text-white/40 mt-1.5">Paste a JSON array of song names to fetch from YouTube.</p>
+        </div>
+
+        <!-- Feedback Messages -->
+        <div *ngIf="fetchError" class="p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start">
+          <lucide-icon name="eye-off" class="mr-2 w-4 h-4 shrink-0 mt-0.5"></lucide-icon>
+          <span>{{ fetchError }}</span>
+        </div>
+        
+        <div *ngIf="isFetching || isUploading" class="p-4 mb-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="flex items-center text-purple-400 text-sm font-medium mb-3">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span *ngIf="isUploading">Uploading Image...</span>
+            <span *ngIf="isFetching && !isUploading">Fetching {{ fetchProgress }} / {{ totalToFetch }} songs...</span>
+          </div>
+          <div *ngIf="isFetching && !isUploading" class="w-full bg-black/50 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-indigo-500 h-1.5 rounded-full transition-all duration-300" 
+                 [style.width.%]="totalToFetch ? (fetchProgress / totalToFetch) * 100 : 0"></div>
+          </div>
+        </div>
+
+        <!-- Add Button -->
+        <button (click)="addPlaylist()" [disabled]="isFetching || isUploading"
+                class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/20 transition-all disabled:opacity-50 flex items-center justify-center">
+          <lucide-icon name="plus" class="w-5 h-5 mr-2"></lucide-icon> Create Playlist
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT COL: Existing Playlists -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <div *ngIf="currentPlaylists.length === 0" class="flex flex-col items-center justify-center py-20 bg-[#0a0a12]/50 border border-white/5 rounded-2xl border-dashed">
+        <lucide-icon name="music" class="w-12 h-12 text-white/10 mb-4"></lucide-icon>
+        <h3 class="text-white/60 font-medium">No custom playlists for {{ selectedLang }}</h3>
+        <p class="text-white/30 text-sm mt-1">Create one using the form on the left</p>
+      </div>
+
+      <div *ngIf="currentPlaylists.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div *ngFor="let pl of currentPlaylists; let i = index" 
+             class="bg-[#0a0a12] p-4 rounded-2xl border border-white/10 shadow-sm group hover:border-purple-500/30 transition-all flex space-x-4">
+          
+          <!-- Image -->
+          <div class="w-24 h-24 rounded-xl overflow-hidden shrink-0 relative shadow-md">
+            <img [src]="pl.coverImage" class="w-full h-full object-cover">
+            
+            <!-- Status Badge -->
+            <div class="absolute top-1 right-1 bg-black/80 backdrop-blur-sm rounded-md px-1.5 py-0.5 flex items-center">
+              <lucide-icon *ngIf="pl.status === 'publish'" name="eye" class="w-3 h-3 text-green-400"></lucide-icon>
+              <lucide-icon *ngIf="pl.status === 'schedule'" name="clock" class="w-3 h-3 text-blue-400"></lucide-icon>
+              <lucide-icon *ngIf="pl.status === 'private'" name="eye-off" class="w-3 h-3 text-red-400"></lucide-icon>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0 py-1">
+            <h3 class="text-white font-bold truncate text-lg">{{ pl.title }}</h3>
+            <p class="text-white/50 text-xs mt-1">{{ pl.songs.length }} songs</p>
+            
+            <p *ngIf="pl.status === 'schedule' && pl.publishDate" class="text-blue-400/80 text-[10px] mt-2 font-medium flex items-center">
+              <lucide-icon name="clock" class="w-3 h-3 mr-1"></lucide-icon>
+              {{ pl.publishDate | date:'medium' }}
+            </p>
+
+            <button (click)="deletePlaylist(i)" 
+                    class="mt-3 text-red-400/60 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors flex items-center text-xs font-medium">
+              <lucide-icon name="trash-2" class="w-3.5 h-3.5 mr-1.5"></lucide-icon> Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

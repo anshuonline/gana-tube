@@ -95,11 +95,19 @@ export class App implements OnInit {
   homeScreenLanguage = signal<string>('Hindi');
 
   // Playlists State
-  allPlaylists = PLAYLISTS;
+  customPlaylists = signal<PlaylistMeta[]>([]);
+  
+  allPlaylists = computed(() => {
+    return [...this.customPlaylists(), ...PLAYLISTS];
+  });
+  
   selectedPlaylist = signal<PlaylistMeta | null>(null);
   
   homePlaylists = computed(() => {
-    return this.allPlaylists.filter(p => p.language === this.homeScreenLanguage()).slice(0, 2);
+    // Show all custom playlists + up to 2 default playlists
+    const custom = this.customPlaylists().filter(p => p.language === this.homeScreenLanguage());
+    const defaults = PLAYLISTS.filter(p => p.language === this.homeScreenLanguage()).slice(0, 2);
+    return [...custom, ...defaults];
   });
 
   // Top Artists Data
