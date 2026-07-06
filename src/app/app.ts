@@ -256,10 +256,14 @@ export class App implements OnInit {
         this.currentPage.set('admin');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
+      } else if (event.urlAfterRedirects.startsWith('/managegt')) {
+        this.currentPage.set('admin');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {
