@@ -93,9 +93,8 @@ export class ManagegtSectionsComponent implements OnInit {
     if (event.previousIndex !== event.currentIndex) {
       moveItemInArray(this.currentSections, event.previousIndex, event.currentIndex);
       this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
-      // NOTE: Do NOT call updateCurrentSections() here — it creates a new array reference
-      // which breaks CDK drag-drop animation and resets the visual order.
-      this.publishSections();
+      // Defer publish so CDK drag animation completes fully before any state change triggers re-render
+      setTimeout(() => this.publishSections(), 0);
     }
   }
 
@@ -214,7 +213,7 @@ export class ManagegtSectionsComponent implements OnInit {
     this.publishMessage = 'Publishing...';
     
     try {
-      const response = await firstValueFrom(this.http.post<any>(`${this.apiUrl}?action=save_sections`, {
+      await firstValueFrom(this.http.post<any>(`${this.apiUrl}?action=save_sections`, {
         sectionsData: this.allSectionsData
       }, {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -228,14 +227,11 @@ export class ManagegtSectionsComponent implements OnInit {
         this.jsonInput = '';
         setTimeout(() => {
           this.publishMessage = '';
-          this.cdr.detectChanges();
         }, 3000);
       }
-      this.cdr.detectChanges(); // Force UI update
     } catch (e: any) {
       this.isPublishing = false;
       this.publishMessage = '❌ Failed to publish: ' + (e.error?.message || e.message || 'Unknown error');
-      this.cdr.detectChanges(); // Force UI update
     }
   }
 }

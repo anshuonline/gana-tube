@@ -37,13 +37,12 @@ export class ManagegtPlaylistsComponent implements OnInit {
   newPlaylistStatus: 'publish' | 'schedule' | 'private' = 'publish';
   newPlaylistDate = '';
   jsonInput = '';
-  coverImageFile: File | null = null;
-  coverImagePreview: string | ArrayBuffer | null = null;
-  isUploading = false;
+  newPlaylistCoverUrl = ''; // Replaced image upload with URL link
 
   // Fetching state
   isFetching = false;
   isPublishing = false;
+  isUploading = false; // kept for template compatibility (upload replaced by URL input)
   fetchProgress = 0;
   totalToFetch = 0;
   fetchError = '';
@@ -86,102 +85,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.updateCurrentPlaylists();
   }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        const compressedFile = await this.compressImage(file);
-        this.coverImageFile = compressedFile;
-        const reader = new FileReader();
-        reader.onload = e => this.coverImagePreview = reader.result;
-        reader.readAsDataURL(compressedFile);
-      } catch (e) {
-        console.error('Image compression failed', e);
-        this.fetchError = 'Failed to process image.';
-      }
-    }
-  }
 
-  private compressImage(file: File): Promise<File> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('Canvas not supported'));
-            return;
-          }
-
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // Compress to WebP (best for web) or JPEG
-          canvas.toBlob((blob) => {
-            if (blob) {
-              const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
-                type: 'image/webp',
-                lastModified: Date.now(),
-              });
-              resolve(newFile);
-            } else {
-              reject(new Error('Canvas to Blob failed'));
-            }
-          }, 'image/webp', 0.8);
-        };
-        img.onerror = (error) => reject(error);
-      };
-      reader.onerror = (error) => reject(error);
-    });
-  }
-
-  async uploadImage(): Promise<string | null> {
-    if (!this.coverImageFile) return null;
-    
-    this.isUploading = true;
-    this.cdr.detectChanges();
-
-    const formData = new FormData();
-    formData.append('image', this.coverImageFile);
-
-    try {
-      const res = await firstValueFrom(this.http.post<any>(`${this.apiUrl}?action=upload_image`, formData));
-      this.isUploading = false;
-      this.cdr.detectChanges();
-
-      if (res && res.status === 'success') {
-        return res.url;
-      }
-      throw new Error(res ? res.message : 'Empty response from server. Make sure API URL is correct.');
-    } catch (e: any) {
-      this.isUploading = false;
-      this.fetchError = 'Image upload failed: ' + (e.message || 'Unknown error');
-      this.cdr.detectChanges();
-      return null;
-    }
-  }
 
   async addPlaylist() {
     this.fetchError = '';
@@ -197,8 +101,8 @@ export class ManagegtPlaylistsComponent implements OnInit {
       return;
     }
 
-    if (!this.coverImageFile) {
-      this.fetchError = 'Please upload a cover photo';
+    if (!this.newPlaylistCoverUrl.trim()) {
+      this.fetchError = 'Please provide a cover photo link';
       return;
     }
 
@@ -255,12 +159,8 @@ export class ManagegtPlaylistsComponent implements OnInit {
         }
       }
       
-      // 2. Upload Image
-      const imageUrl = await this.uploadImage();
-      if (!imageUrl) {
-        this.isFetching = false;
-        return; // uploadImage already set the error
-      }
+      // 2. Upload Image (Replaced with Link)
+      const imageUrl = this.newPlaylistCoverUrl.trim();
 
       // 3. Create Playlist Object
       const newPlaylist: CustomPlaylist = {
@@ -284,8 +184,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
       // Reset form
       this.newPlaylistTitle = '';
       this.jsonInput = '';
-      this.coverImageFile = null;
-      this.coverImagePreview = null;
+      this.newPlaylistCoverUrl = '';
       this.newPlaylistStatus = 'publish';
       this.newPlaylistDate = '';
       this.fetchProgress = searchQueries.length;
