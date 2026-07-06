@@ -173,6 +173,7 @@ export class ManagegtSectionsComponent implements OnInit {
         newSection
       ];
       this.updateCurrentSections();
+      this.cdr.detectChanges(); // Force UI update
       
       this.publishSections(true); // Automatically publish after fetch
     } else {
@@ -197,11 +198,16 @@ export class ManagegtSectionsComponent implements OnInit {
       if (fromAdd) {
         this.newSectionTitle = '';
         this.jsonInput = '';
-        setTimeout(() => this.publishMessage = '', 3000);
+        setTimeout(() => {
+          this.publishMessage = '';
+          this.cdr.detectChanges();
+        }, 3000);
       }
+      this.cdr.detectChanges(); // Force UI update
     } catch (e: any) {
       this.isPublishing = false;
       this.publishMessage = '❌ Failed to publish: ' + (e.error?.message || e.message || 'Unknown error');
+      this.cdr.detectChanges(); // Force UI update
     }
   }
 }
