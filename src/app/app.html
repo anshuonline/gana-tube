@@ -1,6 +1,6 @@
 <div class="app-container" [class.player-active]="playerService.currentTrack() !== null">
   <!-- Hidden YouTube Player -->
-  <app-yt-player></app-yt-player>
+  <app-yt-player *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin'"></app-yt-player>
 
   <!-- Sidebar -->
   <nav class="app-sidebar" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
@@ -465,7 +465,7 @@
   </main>
 
   <!-- Global Sponsored Ad Banner (Only shown if active) -->
-  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive">
+  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive && currentPage() !== 'managegt' && currentPage() !== 'admin'">
     
     <!-- Show Image if no custom code -->
     <a *ngIf="!sponsoredAd()?.customCode" [href]="sponsoredAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">
@@ -485,6 +485,7 @@
 
   <!-- Fixed Music Player -->
   <app-music-player 
+    *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin'"
     (expand)="openFullScreenPlayer()">
   </app-music-player>
 

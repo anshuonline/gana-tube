@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
+import { timeout, catchError } from 'rxjs/operators';
 
 interface CustomSection {
   title: string;
@@ -114,7 +115,15 @@ export class ManagegtSectionsComponent implements OnInit {
       
       const promises = chunk.map(async (query) => {
         try {
-          const results = await firstValueFrom(this.youtubeApi.searchMusic(query, 1));
+          const results = await firstValueFrom(
+            this.youtubeApi.searchMusic(query, 1).pipe(
+              timeout(5000),
+              catchError((e) => {
+                console.warn('Search timed out or failed for:', query);
+                return of([]);
+              })
+            )
+          );
           if (results && results.length > 0) {
             fetchedSongs.push(results[0]);
           }
