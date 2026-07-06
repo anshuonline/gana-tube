@@ -58,6 +58,12 @@ export class PlaylistPageComponent implements OnInit {
   }
 
   loadSongs(): void {
+    if (this.playlist.preloadedSongs && this.playlist.preloadedSongs.length > 0) {
+      this.songs.set(this.playlist.preloadedSongs);
+      this.isLoading.set(false);
+      return;
+    }
+    
     this.isLoading.set(true);
     this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries, this.playlist.id).subscribe((results) => {
       this.songs.set(results);

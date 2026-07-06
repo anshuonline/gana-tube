@@ -305,7 +305,8 @@ export class App implements OnInit {
               title: p.title,
               coverImage: p.coverImage || '',
               language: lang,
-              searchQueries: p.searchQueries || []
+              searchQueries: p.searchQueries || [],
+              preloadedSongs: p.songs || []
             });
           }
         });

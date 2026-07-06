@@ -5,6 +5,7 @@ export interface PlaylistMeta {
   language: string;
   coverImage: string;
   searchQueries: string[];
+  preloadedSongs?: any[];
 }
 
 export const PLAYLISTS: PlaylistMeta[] = [
