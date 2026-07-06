@@ -203,6 +203,9 @@
                    [src]="getHeroImage(lang)" 
                    [alt]="lang + ' Singers'" 
                    class="hero-singers-img"
+                   [attr.fetchpriority]="homeScreenLanguage() === lang ? 'high' : 'low'"
+                   [attr.loading]="homeScreenLanguage() === lang ? 'eager' : 'lazy'"
+                   decoding="async"
                    [class.active]="homeScreenLanguage() === lang">
             </div>
           </div>
@@ -338,7 +341,7 @@
                 <div class="shelf-grid" #playlistsGrid>
                   <div class="song-card" *ngFor="let playlist of homePlaylists()" (click)="openPlaylist(playlist)">
                     <div class="card-thumbnail" style="aspect-ratio: 2/3;" [style.background]="!playlist.coverImage ? getGradient(playlist.title) : ''">
-                      <img *ngIf="playlist.coverImage" [src]="playlist.coverImage" [alt]="playlist.title" (error)="playlist.coverImage = ''" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;" />
+                      <img *ngIf="playlist.coverImage" [src]="playlist.coverImage" [alt]="playlist.title" loading="lazy" decoding="async" (error)="playlist.coverImage = ''" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;" />
                       <div *ngIf="!playlist.coverImage" style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; border-radius: 8px;">
                         <svg lucideMusic [attr.size]="48" style="opacity: 0.6; margin-bottom: 12px;"></svg>
                         <span style="font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;">{{ getInitials(playlist.title) }}</span>
