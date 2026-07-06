@@ -203,7 +203,7 @@ import { AlgorithmService } from '../../services/algorithm.service';
       <div class="fs-header">
         <div class="logo" style="display: flex; align-items: center; gap: 8px;">
           <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 32px; width: auto;" />
-          <span class="logo-text" style="font-size: 1.3rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube</span>
+          <span class="logo-text" style="font-size: 1.3rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube.in</span>
         </div>
         <div style="display: flex; gap: 16px;">
           <button class="fs-close-btn" [class.active]="showFSQueue()" (click)="toggleFSQueue()" title="Toggle Queue">
