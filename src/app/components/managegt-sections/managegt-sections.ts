@@ -99,78 +99,105 @@ export class ManagegtSectionsComponent implements OnInit {
   }
 
   async addSection() {
-    if (!this.newSectionTitle.trim()) {
-      this.fetchError = 'Please enter a section title.';
-      return;
-    }
-
-    let songQueries: string[] = [];
+    let inputData: any[] = [];
     try {
-      songQueries = JSON.parse(this.jsonInput);
-      if (!Array.isArray(songQueries)) throw new Error('Must be an array');
+      inputData = JSON.parse(this.jsonInput);
+      if (!Array.isArray(inputData)) throw new Error('Must be an array');
     } catch (e) {
       this.fetchError = 'Invalid JSON array format.';
       return;
     }
 
+    // Normalize input to an array of sections
+    let sectionsToProcess: { title: string, songQueries: string[] }[] = [];
+    
+    if (inputData.length > 0 && typeof inputData[0] === 'string') {
+      // Legacy single section format
+      if (!this.newSectionTitle.trim()) {
+        this.fetchError = 'Please enter a section title for string array input.';
+        return;
+      }
+      sectionsToProcess.push({ title: this.newSectionTitle.trim(), songQueries: inputData });
+    } else if (inputData.length > 0 && typeof inputData[0] === 'object' && inputData[0].section_name) {
+      // Multi-section format
+      for (const item of inputData) {
+        if (!item.section_name || !Array.isArray(item.songs)) {
+          this.fetchError = 'Invalid object format. Expected { section_name: string, songs: string[] }';
+          return;
+        }
+        sectionsToProcess.push({ title: item.section_name, songQueries: item.songs });
+      }
+    } else {
+       this.fetchError = 'Unknown JSON format. Provide either an array of strings or array of section objects.';
+       return;
+    }
+
     this.isFetching = true;
     this.fetchError = '';
     this.publishMessage = '';
-    this.fetchProgress = 0;
-    this.totalToFetch = songQueries.length;
     
-    const fetchedSongs: YouTubeSearchResult[] = [];
+    // Calculate total
+    this.totalToFetch = sectionsToProcess.reduce((sum, sec) => sum + sec.songQueries.length, 0);
+    this.fetchProgress = 0;
+    
+    const newSections: CustomSection[] = [];
 
-    // Chunk size
-    const chunkSize = 5;
-    for (let i = 0; i < songQueries.length; i += chunkSize) {
-      const chunk = songQueries.slice(i, i + chunkSize);
+    // Process each section
+    for (const sectionReq of sectionsToProcess) {
+      const fetchedSongs: YouTubeSearchResult[] = [];
+      const songQueries = sectionReq.songQueries;
       
-      const promises = chunk.map(async (query) => {
-        try {
-          const results = await firstValueFrom(
-            this.youtubeApi.searchMusic(query, 1).pipe(
-              timeout(5000),
-              catchError((e) => {
-                console.warn('Search timed out or failed for:', query);
-                return of([]);
-              })
-            )
-          );
-          if (results && results.length > 0) {
-            fetchedSongs.push(results[0]);
+      const chunkSize = 5;
+      for (let i = 0; i < songQueries.length; i += chunkSize) {
+        const chunk = songQueries.slice(i, i + chunkSize);
+        
+        const promises = chunk.map(async (query) => {
+          try {
+            const results = await firstValueFrom(
+              this.youtubeApi.searchMusic(query, 1).pipe(
+                timeout(5000),
+                catchError((e) => {
+                  console.warn('Search timed out or failed for:', query);
+                  return of([]);
+                })
+              )
+            );
+            if (results && results.length > 0) {
+              fetchedSongs.push(results[0]);
+            }
+          } catch (e) {
+            console.error('Error fetching song', query, e);
+          } finally {
+            this.fetchProgress++;
+            this.cdr.detectChanges();
           }
-        } catch (e) {
-          console.error('Error fetching song', query, e);
-        } finally {
-          this.fetchProgress++;
-          this.cdr.detectChanges();
+        });
+        
+        await Promise.all(promises);
+        
+        if (i + chunkSize < songQueries.length) {
+          await new Promise(res => setTimeout(res, 1000));
         }
-      });
+      }
       
-      await Promise.all(promises);
-      
-      // Delay to avoid rate limiting
-      if (i + chunkSize < songQueries.length) {
-        await new Promise(res => setTimeout(res, 1000));
+      if (fetchedSongs.length > 0) {
+        newSections.push({
+          title: sectionReq.title,
+          songs: fetchedSongs
+        });
       }
     }
 
     this.isFetching = false;
 
-    if (fetchedSongs.length > 0) {
-      const newSection: CustomSection = {
-        title: this.newSectionTitle.trim(),
-        songs: fetchedSongs
-      };
-      
+    if (newSections.length > 0) {
       if (!this.allSectionsData[this.selectedLanguage]) {
         this.allSectionsData[this.selectedLanguage] = [];
       }
       
       this.allSectionsData[this.selectedLanguage] = [
         ...this.allSectionsData[this.selectedLanguage], 
-        newSection
+        ...newSections
       ];
       this.updateCurrentSections();
       this.cdr.detectChanges(); // Force UI update
