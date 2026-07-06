@@ -303,10 +303,9 @@ export class App implements OnInit {
               id: p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
               slug: p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
               title: p.title,
-              description: `${p.songs.length} songs fetched`,
               coverImage: p.coverPhoto,
               language: lang,
-              tracks: p.songs.map((s: string) => ({ title: s, query: s }))
+              searchQueries: p.songs
             });
           }
         });
