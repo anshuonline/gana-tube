@@ -252,11 +252,11 @@ export class App implements OnInit {
         const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
         if (targetPlaylist) {
           this.selectedPlaylist.set(targetPlaylist);
-          this.currentPage.set('playlist');
-          this.isSearchMode.set(false);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          return;
         }
+        this.currentPage.set('playlist');
+        this.isSearchMode.set(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       } else if (event.urlAfterRedirects.startsWith('/advertise')) {
         this.currentPage.set('advertise');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -312,6 +312,15 @@ export class App implements OnInit {
         });
       });
       this.customPlaylists.set(playlists);
+      
+      // If user refreshed on a playlist page, set the selected playlist now that custom playlists are loaded
+      if (this.currentPage() === 'playlist') {
+        const playlistId = this.router.url.split('/')[2];
+        const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
+        if (targetPlaylist && !this.selectedPlaylist()) {
+          this.selectedPlaylist.set(targetPlaylist);
+        }
+      }
     });
   }
 
