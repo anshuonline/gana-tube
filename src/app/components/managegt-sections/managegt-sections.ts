@@ -52,7 +52,8 @@ export class ManagegtSectionsComponent implements OnInit {
 
   async fetchExistingSections() {
     try {
-      this.allSectionsData = await firstValueFrom(this.http.get<Record<string, CustomSection[]>>(`${this.apiUrl}?action=get_sections`)) || {};
+      const cacheBuster = Date.now();
+      this.allSectionsData = await firstValueFrom(this.http.get<Record<string, CustomSection[]>>(`${this.apiUrl}?action=get_sections&t=${cacheBuster}`)) || {};
       this.updateCurrentSections();
     } catch (e) {
       console.error('Failed to load sections', e);
