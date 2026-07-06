@@ -540,6 +540,10 @@
   letter-spacing: 0.05em;
   font-weight: 600;
   text-transform: uppercase;
+
+  @media (max-width: 992px) {
+    display: none;
+  }
 }
 
 .hero-title {
