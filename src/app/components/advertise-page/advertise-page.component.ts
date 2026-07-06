@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { LucideBarChart2, LucideUsers, LucideZap, LucideMail, LucideMegaphone, LucideCheckCircle, LucideSettings } from '@lucide/angular';
 import { App } from '../../app';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-advertise-page',
@@ -24,6 +25,7 @@ import { App } from '../../app';
 export class AdvertisePageComponent implements OnInit {
   
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   // Slider values (hours)
   bottomAdHours = signal<number>(24);
@@ -82,7 +84,7 @@ export class AdvertisePageComponent implements OnInit {
   }
 
   goHome() {
-    this.app.currentPage.set('home');
+    this.router.navigate(['/']);
   }
 
 }
