@@ -898,13 +898,11 @@
   padding: 40px 40px 0;
   letter-spacing: -0.05em;
   user-select: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 
   @media (max-width: 768px) {
     padding: 30px 20px 0;
-    font-size: clamp(2.5rem, 15vw, 4rem);
+    font-size: clamp(2rem, 11vw, 4rem);
   }
 }
 
