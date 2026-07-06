@@ -28,7 +28,8 @@
                 "glob": "**/*",
                 "input": "public"
               },
-              "src/.htaccess"
+              "src/.htaccess",
+              "managegt-api.php"
             ],
             "styles": ["src/styles.scss"]
           },

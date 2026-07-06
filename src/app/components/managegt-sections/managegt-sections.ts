@@ -93,7 +93,8 @@ export class ManagegtSectionsComponent implements OnInit {
     if (event.previousIndex !== event.currentIndex) {
       moveItemInArray(this.currentSections, event.previousIndex, event.currentIndex);
       this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
-      this.updateCurrentSections();
+      // NOTE: Do NOT call updateCurrentSections() here — it creates a new array reference
+      // which breaks CDK drag-drop animation and resets the visual order.
       this.publishSections();
     }
   }
