@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { CURATED_SONGS } from '../data/curated-songs';
 
 export interface YouTubeSearchResult {
   videoId: string;
@@ -20,8 +19,23 @@ export interface YouTubeSearchResult {
 export class YoutubeApiService {
   private apiUrl = environment.youtubeApiUrl;
   private apiKey = environment.youtubeApiKey;
+  private dynamicCuratedSongs: Record<string, any[]> | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.fetchLiveCuratedSongs();
+  }
+
+  private fetchLiveCuratedSongs() {
+    this.http.get<Record<string, any[]>>('https://manageads.ganatube.in/curated-songs.json')
+      .subscribe({
+        next: (data) => {
+          this.dynamicCuratedSongs = data;
+        },
+        error: (err) => {
+          console.warn('Failed to load remote curated songs. Using fallback if available.', err);
+        }
+      });
+  }
 
   searchMusic(query: string, maxResults = 20): Observable<YouTubeSearchResult[]> {
     const cacheKey = `search_${query}_${maxResults}`;
@@ -93,25 +107,25 @@ export class YoutubeApiService {
   }
 
   private injectCuratedSongs(query: string, results: YouTubeSearchResult[]): YouTubeSearchResult[] {
-    if (!CURATED_SONGS) return results;
+    if (!this.dynamicCuratedSongs) return results;
 
     const queryLower = query.toLowerCase();
     
-    // Detect which language this query is for (checking against keys in CURATED_SONGS)
+    // Detect which language this query is for (checking against keys in dynamicCuratedSongs)
     let detectedLang = null;
-    for (const lang of Object.keys(CURATED_SONGS)) {
+    for (const lang of Object.keys(this.dynamicCuratedSongs)) {
       if (queryLower.includes(lang.toLowerCase())) {
         detectedLang = lang;
         break;
       }
     }
 
-    if (!detectedLang || !CURATED_SONGS[detectedLang] || CURATED_SONGS[detectedLang].length === 0) {
+    if (!detectedLang || !this.dynamicCuratedSongs[detectedLang] || this.dynamicCuratedSongs[detectedLang].length === 0) {
       return results;
     }
     
     // Pick 3 to 7 random songs from the detected language's curated list
-    const curatedList = CURATED_SONGS[detectedLang];
+    const curatedList = this.dynamicCuratedSongs[detectedLang];
     const mixCount = Math.floor(Math.random() * 5) + 3;
     const shuffledCurated = [...curatedList].sort(() => 0.5 - Math.random()).slice(0, mixCount);
     

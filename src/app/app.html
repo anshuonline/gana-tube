@@ -411,6 +411,9 @@
       </div>
     </div>
     
+    <!-- Admin Manage Songs Section -->
+    <app-admin-manage-songs *ngIf="currentPage() === 'admin'"></app-admin-manage-songs>
+
     <!-- Static Pages Section -->
     <div class="static-page-container" *ngIf="pageContent[currentPage()]">
       <div class="static-page-content" [innerHTML]="pageContent[currentPage()]?.html"></div>

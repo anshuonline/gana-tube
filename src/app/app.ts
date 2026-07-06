@@ -21,6 +21,7 @@ import { AdvertisePageComponent } from './components/advertise-page/advertise-pa
 import { AdBookingPageComponent } from './components/ad-booking-page/ad-booking-page.component';
 import { AdTermsPageComponent } from './components/ad-terms-page/ad-terms-page.component';
 import { AdProhibitedPageComponent } from './components/ad-prohibited-page/ad-prohibited-page.component';
+import { AdminManageSongsComponent } from './components/admin-manage-songs/admin-manage-songs';
 import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 import { PwaService } from './services/pwa.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -60,7 +61,8 @@ export interface SponsoredAd {
     AdBookingPageComponent,
     AdTermsPageComponent,
     AdProhibitedPageComponent,
-    RouterModule
+    RouterModule,
+    AdminManageSongsComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -246,6 +248,10 @@ export class App implements OnInit {
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
+      } else if (url.startsWith('/advertise')) {
+        this.currentPage.set('advertise');
+      } else if (url.startsWith('/admin/manage-songs')) {
+        this.currentPage.set('admin');
       }
 
       // Check if it's a valid static page or one of our main pages

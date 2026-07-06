@@ -1,0 +1,65 @@
+<div class="admin-container">
+  
+  <!-- Login Screen -->
+  <div class="login-screen" *ngIf="!isAuthenticated">
+    <h2>Admin Access Only</h2>
+    <div class="input-group">
+      <input type="password" [(ngModel)]="password" placeholder="Enter Admin Password" (keyup.enter)="login()">
+      <button (click)="login()">Unlock</button>
+    </div>
+  </div>
+
+  <!-- Manage Songs Screen -->
+  <div class="manage-screen" *ngIf="isAuthenticated">
+    <h2>Manage Curated Songs</h2>
+    <p class="subtitle">Publish new songs for any language directly to the live website.</p>
+
+    <div class="control-panel">
+      <div class="form-group">
+        <label>Select Language</label>
+        <select [(ngModel)]="selectedLang">
+          <option *ngFor="let lang of languages" [value]="lang">{{lang}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Paste JSON Array of Song Names</label>
+        <textarea [(ngModel)]="jsonInput" placeholder='["Song 1", "Song 2", ...]'></textarea>
+      </div>
+
+      <button class="fetch-btn" (click)="fetchMetadata()" [disabled]="isFetching || !jsonInput.trim()">
+        {{ isFetching ? 'Fetching Metadata...' : 'Fetch Metadata' }}
+      </button>
+
+      <div class="progress-bar" *ngIf="isFetching || fetchProgress > 0">
+        <div class="progress-text">Fetched {{ fetchProgress }} of {{ totalToFetch }} songs</div>
+        <div class="progress-fill" [style.width.%]="totalToFetch ? (fetchProgress / totalToFetch) * 100 : 0"></div>
+      </div>
+    </div>
+
+    <!-- Review Section -->
+    <div class="review-section" *ngIf="fetchedSongs.length > 0">
+      <div class="review-header">
+        <h3>Successfully Fetched ({{ fetchedSongs.length }})</h3>
+        <button class="publish-btn" (click)="publish()" [disabled]="isPublishing || isFetching">
+          {{ isPublishing ? 'Publishing...' : 'Publish to Live Website' }}
+        </button>
+      </div>
+      
+      <div class="message" *ngIf="publishMessage" [ngClass]="{'error': publishError, 'success': !publishError}">
+        {{ publishMessage }}
+      </div>
+
+      <div class="songs-grid">
+        <div class="song-card" *ngFor="let song of fetchedSongs">
+          <img [src]="song.thumbnail" [alt]="song.title">
+          <div class="song-info">
+            <div class="song-title">{{ song.title }}</div>
+            <div class="song-artist">{{ song.artist }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
