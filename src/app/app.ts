@@ -240,6 +240,7 @@ export class App implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
+    this.fetchCustomPlaylists();
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
@@ -248,7 +249,7 @@ export class App implements OnInit {
       
       if (url === 'playlist') {
         const playlistId = event.urlAfterRedirects.split('/')[2];
-        const targetPlaylist = PLAYLISTS.find(p => p.id === playlistId);
+        const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
         if (targetPlaylist) {
           this.selectedPlaylist.set(targetPlaylist);
           this.currentPage.set('playlist');
@@ -286,6 +287,31 @@ export class App implements OnInit {
         this.isSearchMode.set(false);
         this.router.navigate(['/']);
       }
+    });
+  }
+
+  fetchCustomPlaylists(): void {
+    this.youtubeApi.getCustomPlaylists().subscribe((customData) => {
+      let playlists: PlaylistMeta[] = [];
+      // customData is { "Hindi": [ {title, coverPhoto, visibility, songs} ] }
+      Object.keys(customData).forEach(lang => {
+        const langPlaylists = customData[lang] || [];
+        langPlaylists.forEach(p => {
+          // Only show published playlists to normal users
+          if (p.status === 'publish') {
+            playlists.push({
+              id: p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              slug: p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              title: p.title,
+              description: `${p.songs.length} songs fetched`,
+              coverImage: p.coverPhoto,
+              language: lang,
+              tracks: p.songs.map((s: string) => ({ title: s, query: s }))
+            });
+          }
+        });
+      });
+      this.customPlaylists.set(playlists);
     });
   }
 
@@ -793,17 +819,10 @@ export class App implements OnInit {
       'Hindi': 'DIVE INTO THE MOST TRENDING HINDI MELODIES AND CLUB ANTHEMS',
       'Punjabi': 'HIGH-ENERGY BEATS AND VOCALS THAT RULE THE CHARTS WORLDWIDE',
       'Bhojpuri': 'FEEL THE PULSE WITH THE MOST VIRAL BHOJPURI DANCE NUMBERS',
-      'Bengali': 'IMMERSE YOURSELF IN THE RICH MUSICAL HERITAGE OF BENGAL',
-      'Haryanvi': 'UNSTOPPABLE GROOVES AND REGIONAL HITS TAKING OVER THE NATION',
-      'Tamil': 'DISCOVER TOP CHARTING TAMIL COMPOSITIONS AND BLOCKBUSTER HITS'
-    };
-    return subtitles[lang] || `DISCOVER THE LATEST AND GREATEST ${lang.toUpperCase()} HITS`;
-  }
-
   explorePlaylist(lang: string): void {
     const langLower = lang.toLowerCase();
     const playlistSlug = langLower === 'english' ? '76069476' : `hero-${langLower}`;
-    const targetPlaylist = PLAYLISTS.find(p => p.slug === playlistSlug || p.id === playlistSlug);
+    const targetPlaylist = this.allPlaylists().find(p => p.slug === playlistSlug || p.id === playlistSlug);
     
     if (targetPlaylist) {
       this.openPlaylist(targetPlaylist);
