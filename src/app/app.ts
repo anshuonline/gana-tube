@@ -293,19 +293,19 @@ export class App implements OnInit {
   fetchCustomPlaylists(): void {
     this.youtubeApi.getCustomPlaylists().subscribe((customData) => {
       let playlists: PlaylistMeta[] = [];
-      // customData is { "Hindi": [ {title, coverPhoto, visibility, songs} ] }
+      // customData is { "Hindi": [ {title, coverImage, status, searchQueries, songs, id} ] }
       Object.keys(customData).forEach(lang => {
         const langPlaylists = customData[lang] || [];
         langPlaylists.forEach(p => {
           // Only show published playlists to normal users
           if (p.status === 'publish') {
             playlists.push({
-              id: p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              slug: p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              id: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              slug: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
               title: p.title,
-              coverImage: p.coverPhoto,
+              coverImage: p.coverImage || '',
               language: lang,
-              searchQueries: p.songs
+              searchQueries: p.searchQueries || []
             });
           }
         });
