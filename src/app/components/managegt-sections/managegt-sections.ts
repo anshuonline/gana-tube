@@ -94,6 +94,7 @@ export class ManagegtSectionsComponent implements OnInit {
     this.draggedIndex = index;
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', index.toString()); // Critical for some browsers (like Firefox) to start dragging
     }
   }
 
