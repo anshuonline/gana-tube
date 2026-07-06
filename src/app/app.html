@@ -226,7 +226,7 @@
         </div>
 
         <!-- Recommendation Shelves (Home Screen) -->
-        <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !shelvesLoading() && !isSearchMode()">
+        <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !isSearchMode()">
 
           <!-- Dynamic Shelves Loop -->
           <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">
@@ -365,7 +365,7 @@
           </div>
 
           <!-- Shimmering Skeleton for Next Lazy Loaded Shelf -->
-          <div class="shelf-section loading-shelf" *ngIf="shelfLoading()">
+          <div class="shelf-section loading-shelf" *ngIf="shelfLoading() && loadedShelves().length > 0">
             <div class="shelf-header">
               <h2 class="shelf-title" style="opacity: 0.5;">Loading: {{ loadingShelfTitle() }}...</h2>
             </div>
@@ -377,7 +377,7 @@
         </div>
 
         <!-- Shelves Loading Skeletons -->
-        <div class="recommendations-wrap" *ngIf="!hasSearched() && shelvesLoading() && !isSearchMode()">
+        <div class="recommendations-wrap" *ngIf="!hasSearched() && !isSearchMode() && (shelvesLoading() || (shelfLoading() && loadedShelves().length === 0))">
           <div class="shelf-section" *ngFor="let s of [1,2]">
             <div class="skeleton-title" style="width: 200px; height: 28px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
             <div class="loading-grid">

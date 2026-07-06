@@ -567,9 +567,12 @@ export class App implements OnInit {
 
     // Fetch algorithmic dynamic shelves
     this.algorithmService.getVariableRewardShelves(lang).subscribe(algorithmicShelves => {
+      if (language && language !== this.homeScreenLanguage()) return;
       
       // Fetch custom sections created by Admin in ManageGT
       this.youtubeApi.getCustomSections().subscribe((customData) => {
+        if (language && language !== this.homeScreenLanguage()) return;
+        
         const langCustomSections: any[] = customData[lang] || [];
         
         // Convert Custom Sections to ShelfDefinition format for the UI
@@ -611,7 +614,11 @@ export class App implements OnInit {
           // Algorithmic shelf, needs fetching
           this.youtubeApi.searchMusic(def.query, 50).subscribe({
             next: (songs) => {
-              if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
+              if (language && language !== this.homeScreenLanguage()) {
+                // Stale callback, just increment count to prevent hanging if it was the current one somehow
+                loadedCount++;
+                return; 
+              }
               
               if (songs && songs.length > 0) {
                 this.loadedShelves.update(shelvesList => {
@@ -632,7 +639,10 @@ export class App implements OnInit {
             },
             error: (err) => {
               console.error(`Failed to load shelf: ${def.title}`, err);
-              if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
+              if (language && language !== this.homeScreenLanguage()) {
+                loadedCount++;
+                return;
+              }
               loadedCount++;
               if (loadedCount >= initialDefinitions.length) {
                 this.shelvesLoading.set(false);
