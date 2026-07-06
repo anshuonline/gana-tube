@@ -45,9 +45,7 @@ export class ManagegtHeaderComponent implements OnInit {
   saveMessage = '';
   saveError = '';
 
-  apiUrl = window.location.origin.includes('localhost')
-    ? 'http://localhost/manageads/managegt-api.php'
-    : 'https://manageads.ganatube.in/managegt-api.php';
+  apiUrl = 'https://manageads.ganatube.in/managegt-api.php';
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 

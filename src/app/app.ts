@@ -547,9 +547,7 @@ export class App implements OnInit {
   }
 
   fetchHeroData(): void {
-    const url = window.location.hostname === 'localhost'
-      ? 'http://localhost/manageads/managegt-api.php'
-      : 'https://manageads.ganatube.in/managegt-api.php';
+    const url = 'https://manageads.ganatube.in/managegt-api.php';
     fetch(`${url}?action=get_header&t=${Date.now()}`)
       .then(res => res.json())
       .then(data => {

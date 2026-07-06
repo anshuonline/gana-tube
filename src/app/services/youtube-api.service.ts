@@ -26,18 +26,14 @@ export class YoutubeApiService {
   }
 
   getCustomSections(): Observable<Record<string, any[]>> {
-    const fetchUrl = window.location.origin.includes('localhost') 
-      ? 'http://localhost/manageads/managegt-api.php?action=get_sections' 
-      : 'https://manageads.ganatube.in/managegt-api.php?action=get_sections';
+    const fetchUrl = 'https://manageads.ganatube.in/managegt-api.php?action=get_sections';
     return this.http.get<Record<string, any[]>>(fetchUrl).pipe(
       catchError(() => of({}))
     );
   }
 
   getCustomPlaylists(): Observable<Record<string, any[]>> {
-    const fetchUrl = window.location.origin.includes('localhost') 
-      ? 'http://localhost/manageads/managegt-api.php?action=get_playlists' 
-      : 'https://manageads.ganatube.in/managegt-api.php?action=get_playlists';
+    const fetchUrl = 'https://manageads.ganatube.in/managegt-api.php?action=get_playlists';
     // Use a timestamp to bypass browser caching, just like in the admin panel
     const cacheBuster = new Date().getTime();
     return this.http.get<Record<string, any[]>>(`${fetchUrl}&t=${cacheBuster}`).pipe(
@@ -46,9 +42,7 @@ export class YoutubeApiService {
   }
 
   private fetchLiveCuratedSongs() {
-    const fetchUrl = window.location.origin.includes('localhost') 
-      ? 'http://localhost/manageads/curated-songs.json' 
-      : 'https://manageads.ganatube.in/curated-songs.json';
+    const fetchUrl = 'https://manageads.ganatube.in/curated-songs.json';
       
     this.http.get<Record<string, any[]>>(fetchUrl)
       .subscribe({

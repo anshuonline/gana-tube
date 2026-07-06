@@ -37,9 +37,7 @@ export class ManagegtSectionsComponent implements OnInit {
   fetchError = '';
   publishMessage = '';
 
-  apiUrl = window.location.origin.includes('localhost') 
-    ? 'http://localhost/manageads/managegt-api.php'
-    : 'https://manageads.ganatube.in/managegt-api.php';
+  apiUrl = 'https://manageads.ganatube.in/managegt-api.php';
 
   constructor(
     private http: HttpClient, 

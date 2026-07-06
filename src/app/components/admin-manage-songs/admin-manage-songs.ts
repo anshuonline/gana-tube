@@ -111,9 +111,7 @@ export class AdminManageSongsComponent {
     try {
       // 1. Fetch current curated-songs.json from server
       let currentData: Record<string, any[]> = {};
-      const fetchUrl = window.location.origin.includes('localhost') 
-        ? 'http://localhost/manageads/curated-songs.json' 
-        : 'https://manageads.ganatube.in/curated-songs.json';
+      const fetchUrl = 'https://manageads.ganatube.in/curated-songs.json';
         
       try {
         currentData = await this.http.get<Record<string, any[]>>(fetchUrl).toPromise() || {};
@@ -130,9 +128,7 @@ export class AdminManageSongsComponent {
         songsData: currentData
       };
 
-      const submitUrl = window.location.origin.includes('localhost') 
-        ? 'http://localhost/manageads/save-songs.php' 
-        : 'https://manageads.ganatube.in/save-songs.php';
+      const submitUrl = 'https://manageads.ganatube.in/save-songs.php';
 
       const response = await this.http.post<any>(submitUrl, payload, {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })

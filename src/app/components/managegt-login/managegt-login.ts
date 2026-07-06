@@ -28,9 +28,7 @@ export class ManagegtLoginComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const loginUrl = window.location.origin.includes('localhost') 
-      ? 'http://localhost/manageads/managegt-api.php?action=login'
-      : 'https://manageads.ganatube.in/managegt-api.php?action=login';
+    const loginUrl = 'https://manageads.ganatube.in/managegt-api.php?action=login';
 
     this.http.post<any>(loginUrl, { username: this.username, password: this.password })
       .subscribe({
