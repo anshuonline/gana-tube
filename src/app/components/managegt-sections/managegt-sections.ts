@@ -97,6 +97,10 @@ export class ManagegtSectionsComponent implements OnInit {
     }
   }
 
+  onDragEnter(event: DragEvent) {
+    event.preventDefault(); // Necessary for some browsers to allow dropping
+  }
+
   onDragOver(event: DragEvent) {
     event.preventDefault(); // Necessary to allow dropping
     if (event.dataTransfer) {
