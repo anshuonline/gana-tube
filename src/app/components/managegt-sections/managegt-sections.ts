@@ -67,13 +67,14 @@ export class ManagegtSectionsComponent implements OnInit {
   }
 
   updateCurrentSections() {
-    this.currentSections = this.allSectionsData[this.selectedLanguage] || [];
+    this.currentSections = [...(this.allSectionsData[this.selectedLanguage] || [])];
   }
 
   deleteSection(index: number) {
     if (confirm('Are you sure you want to delete this section?')) {
       this.currentSections.splice(index, 1);
-      this.allSectionsData[this.selectedLanguage] = this.currentSections;
+      this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+      this.updateCurrentSections();
       this.publishSections();
     }
   }
@@ -84,6 +85,38 @@ export class ManagegtSectionsComponent implements OnInit {
       this.allSectionsData[this.selectedLanguage] = [];
       this.publishSections();
     }
+  }
+
+  // Drag and Drop Logic
+  draggedIndex: number | null = null;
+
+  onDragStart(index: number, event: DragEvent) {
+    this.draggedIndex = index;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault(); // Necessary to allow dropping
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  onDrop(dropIndex: number, event: DragEvent) {
+    event.preventDefault();
+    if (this.draggedIndex !== null && this.draggedIndex !== dropIndex) {
+      // Reorder array
+      const item = this.currentSections.splice(this.draggedIndex, 1)[0];
+      this.currentSections.splice(dropIndex, 0, item);
+      
+      // Update data and save
+      this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+      this.updateCurrentSections();
+      this.publishSections();
+    }
+    this.draggedIndex = null;
   }
 
   async addSection() {
@@ -156,7 +189,10 @@ export class ManagegtSectionsComponent implements OnInit {
         this.allSectionsData[this.selectedLanguage] = [];
       }
       
-      this.allSectionsData[this.selectedLanguage].push(newSection);
+      this.allSectionsData[this.selectedLanguage] = [
+        ...this.allSectionsData[this.selectedLanguage], 
+        newSection
+      ];
       this.updateCurrentSections();
       
       this.publishSections(true); // Automatically publish after fetch
