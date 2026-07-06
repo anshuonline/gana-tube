@@ -3,7 +3,7 @@
   <div class="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
     <div>
       <h1 class="text-3xl font-bold text-white tracking-tight flex items-center">
-        <lucide-icon name="music" class="mr-3 text-purple-500"></lucide-icon>
+        <svg lucideMusic class="mr-3 text-purple-500 w-8 h-8"></svg>
         Custom Playlists
       </h1>
       <p class="text-white/50 mt-2 text-sm">Create and manage your own custom playlists for the Home screen</p>
@@ -27,7 +27,7 @@
     <div class="lg:col-span-1 space-y-6">
       <div class="bg-[#0a0a12] p-6 rounded-2xl border border-white/10 shadow-xl">
         <h2 class="text-xl font-bold text-white mb-6 flex items-center">
-          <lucide-icon name="plus" class="mr-2 w-5 h-5 text-purple-400"></lucide-icon>
+          <svg lucidePlus class="mr-2 w-5 h-5 text-purple-400"></svg>
           Create New Playlist
         </h2>
 
@@ -48,7 +48,7 @@
             <input type="file" (change)="onFileSelected($event)" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
             
             <div *ngIf="!coverImagePreview" class="absolute inset-0 flex flex-col items-center justify-center text-white/40 group-hover:text-purple-400 transition-colors">
-              <lucide-icon name="upload" class="w-8 h-8 mb-2"></lucide-icon>
+              <svg lucideUpload class="w-8 h-8 mb-2"></svg>
               <span class="text-sm font-medium">Click to upload image</span>
             </div>
             
@@ -56,7 +56,7 @@
             
             <div *ngIf="coverImagePreview" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
               <span class="text-white text-sm font-medium flex items-center">
-                <lucide-icon name="upload" class="w-4 h-4 mr-2"></lucide-icon> Change Photo
+                <svg lucideUpload class="w-4 h-4 mr-2"></svg> Change Photo
               </span>
             </div>
           </div>
@@ -70,19 +70,19 @@
                     [class.bg-green-500_20]="newPlaylistStatus === 'publish'" [class.border-green-500]="newPlaylistStatus === 'publish'" [class.text-green-400]="newPlaylistStatus === 'publish'"
                     [class.bg-black_40]="newPlaylistStatus !== 'publish'" [class.border-white_10]="newPlaylistStatus !== 'publish'" [class.text-white_40]="newPlaylistStatus !== 'publish'"
                     class="flex-1 py-2 px-3 rounded-lg border flex items-center justify-center text-sm font-medium transition-all">
-              <lucide-icon name="eye" class="w-4 h-4 mr-1.5"></lucide-icon> Publish
+              <svg lucideEye class="w-4 h-4 mr-1.5"></svg> Publish
             </button>
             <button (click)="newPlaylistStatus = 'schedule'" 
                     [class.bg-blue-500_20]="newPlaylistStatus === 'schedule'" [class.border-blue-500]="newPlaylistStatus === 'schedule'" [class.text-blue-400]="newPlaylistStatus === 'schedule'"
                     [class.bg-black_40]="newPlaylistStatus !== 'schedule'" [class.border-white_10]="newPlaylistStatus !== 'schedule'" [class.text-white_40]="newPlaylistStatus !== 'schedule'"
                     class="flex-1 py-2 px-3 rounded-lg border flex items-center justify-center text-sm font-medium transition-all">
-              <lucide-icon name="clock" class="w-4 h-4 mr-1.5"></lucide-icon> Schedule
+              <svg lucideClock class="w-4 h-4 mr-1.5"></svg> Schedule
             </button>
             <button (click)="newPlaylistStatus = 'private'" 
                     [class.bg-red-500_20]="newPlaylistStatus === 'private'" [class.border-red-500]="newPlaylistStatus === 'private'" [class.text-red-400]="newPlaylistStatus === 'private'"
                     [class.bg-black_40]="newPlaylistStatus !== 'private'" [class.border-white_10]="newPlaylistStatus !== 'private'" [class.text-white_40]="newPlaylistStatus !== 'private'"
                     class="flex-1 py-2 px-3 rounded-lg border flex items-center justify-center text-sm font-medium transition-all">
-              <lucide-icon name="eye-off" class="w-4 h-4 mr-1.5"></lucide-icon> Private
+              <svg lucideEyeOff class="w-4 h-4 mr-1.5"></svg> Private
             </button>
           </div>
           
@@ -103,7 +103,7 @@
 
         <!-- Feedback Messages -->
         <div *ngIf="fetchError" class="p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start">
-          <lucide-icon name="eye-off" class="mr-2 w-4 h-4 shrink-0 mt-0.5"></lucide-icon>
+          <svg lucideEyeOff class="mr-2 w-4 h-4 shrink-0 mt-0.5"></svg>
           <span>{{ fetchError }}</span>
         </div>
         
@@ -125,7 +125,7 @@
         <!-- Add Button -->
         <button (click)="addPlaylist()" [disabled]="isFetching || isUploading"
                 class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/20 transition-all disabled:opacity-50 flex items-center justify-center">
-          <lucide-icon name="plus" class="w-5 h-5 mr-2"></lucide-icon> Create Playlist
+          <svg lucidePlus class="w-5 h-5 mr-2"></svg> Create Playlist
         </button>
       </div>
     </div>
@@ -134,7 +134,7 @@
     <div class="lg:col-span-2 space-y-6">
       
       <div *ngIf="currentPlaylists.length === 0" class="flex flex-col items-center justify-center py-20 bg-[#0a0a12]/50 border border-white/5 rounded-2xl border-dashed">
-        <lucide-icon name="music" class="w-12 h-12 text-white/10 mb-4"></lucide-icon>
+        <svg lucideMusic class="w-12 h-12 text-white/10 mb-4"></svg>
         <h3 class="text-white/60 font-medium">No custom playlists for {{ selectedLang }}</h3>
         <p class="text-white/30 text-sm mt-1">Create one using the form on the left</p>
       </div>
@@ -149,9 +149,9 @@
             
             <!-- Status Badge -->
             <div class="absolute top-1 right-1 bg-black/80 backdrop-blur-sm rounded-md px-1.5 py-0.5 flex items-center">
-              <lucide-icon *ngIf="pl.status === 'publish'" name="eye" class="w-3 h-3 text-green-400"></lucide-icon>
-              <lucide-icon *ngIf="pl.status === 'schedule'" name="clock" class="w-3 h-3 text-blue-400"></lucide-icon>
-              <lucide-icon *ngIf="pl.status === 'private'" name="eye-off" class="w-3 h-3 text-red-400"></lucide-icon>
+              <svg lucideEye *ngIf="pl.status === 'publish'" class="w-3 h-3 text-green-400"></svg>
+              <svg lucideClock *ngIf="pl.status === 'schedule'" class="w-3 h-3 text-blue-400"></svg>
+              <svg lucideEyeOff *ngIf="pl.status === 'private'" class="w-3 h-3 text-red-400"></svg>
             </div>
           </div>
 
@@ -161,13 +161,13 @@
             <p class="text-white/50 text-xs mt-1">{{ pl.songs.length }} songs</p>
             
             <p *ngIf="pl.status === 'schedule' && pl.publishDate" class="text-blue-400/80 text-[10px] mt-2 font-medium flex items-center">
-              <lucide-icon name="clock" class="w-3 h-3 mr-1"></lucide-icon>
+              <svg lucideClock class="w-3 h-3 mr-1"></svg>
               {{ pl.publishDate | date:'medium' }}
             </p>
 
             <button (click)="deletePlaylist(i)" 
                     class="mt-3 text-red-400/60 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors flex items-center text-xs font-medium">
-              <lucide-icon name="trash-2" class="w-3.5 h-3.5 mr-1.5"></lucide-icon> Remove
+              <svg lucideTrash2 class="w-3.5 h-3.5 mr-1.5"></svg> Remove
             </button>
           </div>
         </div>

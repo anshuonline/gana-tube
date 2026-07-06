@@ -2,13 +2,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
+import { timeout, catchError } from 'rxjs/operators';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
-import { 
-  LucideMusic, LucideUpload, LucideSave, 
-  LucideClock, LucideEye, LucideEyeOff, 
-  LucidePlus, LucideTrash2, LucideCheckCircle
-} from '@lucide/angular';
 
 export interface CustomPlaylist {
   id: string;
@@ -24,7 +20,7 @@ export interface CustomPlaylist {
 @Component({
   selector: 'app-managegt-playlists',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideMusic, LucideUpload, LucideSave, LucideClock, LucideEye, LucideEyeOff, LucidePlus, LucideTrash2, LucideCheckCircle],
+  imports: [CommonModule, FormsModule],
   templateUrl: './managegt-playlists.html',
   styleUrls: ['./managegt-playlists.scss']
 })
@@ -159,8 +155,36 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.cdr.detectChanges();
 
     try {
-      // 1. Fetch Songs
-      const allResults: YouTubeSearchResult[] = await firstValueFrom(this.youtubeApi.getBatchSongs(searchQueries));
+      // 1. Fetch Songs chunk by chunk
+      const allResults: YouTubeSearchResult[] = [];
+      const chunkSize = 5;
+      
+      for (let i = 0; i < searchQueries.length; i += chunkSize) {
+        const chunk = searchQueries.slice(i, i + chunkSize);
+        const promises = chunk.map(async (query) => {
+          try {
+            const results = await firstValueFrom(
+              this.youtubeApi.searchMusic(query, 1).pipe(
+                timeout(5000),
+                catchError(() => of([]))
+              )
+            );
+            if (results && results.length > 0) {
+              allResults.push(results[0]);
+            }
+          } catch (e) {
+            console.error('Error fetching song', query, e);
+          } finally {
+            this.fetchProgress++;
+            this.cdr.detectChanges();
+          }
+        });
+        
+        await Promise.all(promises);
+        if (i + chunkSize < searchQueries.length) {
+          await new Promise(res => setTimeout(res, 1000));
+        }
+      }
       
       // 2. Upload Image
       const imageUrl = await this.uploadImage();
