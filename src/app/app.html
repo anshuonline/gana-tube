@@ -293,8 +293,8 @@
               <span class="ad-label">Sponsored</span>
             </div>
 
-            <!-- Inject Artists and Playlists after 3rd shelf (index 2) -->
-            <ng-container *ngIf="shelfIdx === 2">
+            <!-- Inject Artists and Playlists after 3rd shelf (index 2) OR at the very end if less than 3 shelves -->
+            <ng-container *ngIf="shelfIdx === 2 || (loadedShelves().length <= 2 && shelfIdx === loadedShelves().length - 1)">
               
               <!-- Dynamic Artists Section -->
               <div class="artists-section" *ngIf="currentTopArtists().length > 0" style="margin: 60px 0 40px;">
