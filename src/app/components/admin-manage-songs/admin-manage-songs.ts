@@ -111,8 +111,12 @@ export class AdminManageSongsComponent {
     try {
       // 1. Fetch current curated-songs.json from server
       let currentData: Record<string, any[]> = {};
+      const fetchUrl = window.location.origin.includes('localhost') 
+        ? 'http://localhost/manageads/curated-songs.json' 
+        : 'https://manageads.ganatube.in/curated-songs.json';
+        
       try {
-        currentData = await this.http.get<Record<string, any[]>>('https://manageads.ganatube.in/curated-songs.json').toPromise() || {};
+        currentData = await this.http.get<Record<string, any[]>>(fetchUrl).toPromise() || {};
       } catch (e) {
         console.warn('Could not fetch existing curated-songs.json, starting fresh.', e);
       }
@@ -126,7 +130,11 @@ export class AdminManageSongsComponent {
         songsData: currentData
       };
 
-      const response = await this.http.post<any>('https://manageads.ganatube.in/save-songs.php', payload, {
+      const submitUrl = window.location.origin.includes('localhost') 
+        ? 'http://localhost/manageads/save-songs.php' 
+        : 'https://manageads.ganatube.in/save-songs.php';
+
+      const response = await this.http.post<any>(submitUrl, payload, {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       }).toPromise();
 

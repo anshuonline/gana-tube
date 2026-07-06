@@ -26,7 +26,11 @@ export class YoutubeApiService {
   }
 
   private fetchLiveCuratedSongs() {
-    this.http.get<Record<string, any[]>>('https://manageads.ganatube.in/curated-songs.json')
+    const fetchUrl = window.location.origin.includes('localhost') 
+      ? 'http://localhost/manageads/curated-songs.json' 
+      : 'https://manageads.ganatube.in/curated-songs.json';
+      
+    this.http.get<Record<string, any[]>>(fetchUrl)
       .subscribe({
         next: (data) => {
           this.dynamicCuratedSongs = data;
