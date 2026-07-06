@@ -202,7 +202,7 @@ import { AlgorithmService } from '../../services/algorithm.service';
       <!-- Header Controls -->
       <div class="fs-header">
         <div class="logo" style="display: flex; align-items: center; gap: 8px;">
-          <img src="ganatube.png" alt="GanaTube Logo" class="logo-img" style="height: 32px; width: auto;" />
+          <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 32px; width: auto;" />
           <span class="logo-text" style="font-size: 1.3rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube</span>
         </div>
         <div style="display: flex; gap: 16px;">
