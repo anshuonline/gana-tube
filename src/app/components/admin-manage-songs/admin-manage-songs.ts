@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -34,10 +34,10 @@ export class AdminManageSongsComponent {
   fetchedSongs: FetchedSong[] = [];
   
   isPublishing = false;
-  publishMessage = '';
-  publishError = false;
+  publishMessage: string = '';
+  publishError: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   login() {
     // Basic frontend check. Real check happens on the PHP server during publish.
@@ -85,6 +85,7 @@ export class AdminManageSongsComponent {
           console.error('Failed to fetch:', query, e);
         }
         this.fetchProgress++;
+        this.cdr.detectChanges();
       });
       
       await Promise.all(promises);
