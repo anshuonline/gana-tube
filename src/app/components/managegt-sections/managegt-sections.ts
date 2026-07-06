@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { firstValueFrom, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 interface CustomSection {
   title: string;
@@ -14,7 +15,7 @@ interface CustomSection {
 @Component({
   selector: 'app-managegt-sections',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './managegt-sections.html',
   styleUrls: ['./managegt-sections.scss']
 })
@@ -88,40 +89,13 @@ export class ManagegtSectionsComponent implements OnInit {
   }
 
   // Drag and Drop Logic
-  draggedIndex: number | null = null;
-
-  onDragStart(index: number, event: DragEvent) {
-    this.draggedIndex = index;
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/plain', index.toString()); // Critical for some browsers (like Firefox) to start dragging
-    }
-  }
-
-  onDragEnter(event: DragEvent) {
-    event.preventDefault(); // Necessary for some browsers to allow dropping
-  }
-
-  onDragOver(event: DragEvent) {
-    event.preventDefault(); // Necessary to allow dropping
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
-    }
-  }
-
-  onDrop(dropIndex: number, event: DragEvent) {
-    event.preventDefault();
-    if (this.draggedIndex !== null && this.draggedIndex !== dropIndex) {
-      // Reorder array
-      const item = this.currentSections.splice(this.draggedIndex, 1)[0];
-      this.currentSections.splice(dropIndex, 0, item);
-      
-      // Update data and save
+  drop(event: CdkDragDrop<CustomSection[]>) {
+    if (event.previousIndex !== event.currentIndex) {
+      moveItemInArray(this.currentSections, event.previousIndex, event.currentIndex);
       this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
       this.updateCurrentSections();
       this.publishSections();
     }
-    this.draggedIndex = null;
   }
 
   async addSection() {
