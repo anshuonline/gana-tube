@@ -178,7 +178,7 @@ export class App implements OnInit {
   showAd = signal<boolean>(true);
 
   // Dynamic Hero Header Data (from ManageGT admin)
-  heroData = signal<Record<string, { badge: string; title: string; subtitle: string; imageUrl: string; buttonText: string }>>({});
+  heroData = signal<Record<string, { badge: string; title: string; subtitle: string; imageUrl: string; buttonText: string; buttonLink?: string }>>({});
 
   private manageApiUrl = 'https://manageads.ganatube.in/managegt-api.php';
 
@@ -868,6 +868,17 @@ export class App implements OnInit {
   }
 
   explorePlaylist(lang: string): void {
+    const dynamic = this.heroData()[lang];
+    if (dynamic?.buttonLink) {
+      const link = dynamic.buttonLink;
+      if (link.startsWith('http')) {
+        window.open(link, '_blank');
+      } else {
+        this.router.navigateByUrl(link);
+      }
+      return;
+    }
+
     const langLower = lang.toLowerCase();
     const playlistSlug = langLower === 'english' ? '76069476' : `hero-${langLower}`;
     const targetPlaylist = this.allPlaylists().find(p => p.slug === playlistSlug || p.id === playlistSlug);

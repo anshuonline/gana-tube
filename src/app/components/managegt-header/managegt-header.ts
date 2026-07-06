@@ -11,6 +11,7 @@ export interface HeroSlide {
   subtitle: string;    // e.g. "DIVE INTO THE MOST TRENDING..."
   imageUrl: string;    // URL of the right-side hero image
   buttonText: string;  // e.g. "EXPLORE PLAYLIST"
+  buttonLink: string;  // e.g. "/playlist/latest"
 }
 
 @Component({
@@ -33,8 +34,11 @@ export class ManagegtHeaderComponent implements OnInit {
     title: '',
     subtitle: '',
     imageUrl: '',
-    buttonText: 'EXPLORE PLAYLIST'
+    buttonText: 'EXPLORE PLAYLIST',
+    buttonLink: ''
   };
+
+  isUploadingImage = false;
 
   isSaving = false;
   isLoading = false;
@@ -97,22 +101,51 @@ export class ManagegtHeaderComponent implements OnInit {
 
   loadDefaults(lang: string) {
     const defaults: Record<string, Partial<HeroSlide>> = {
-      'Hindi':    { title: 'Bollywood Blockbusters', subtitle: 'DIVE INTO THE MOST TRENDING HINDI MELODIES AND CLUB ANTHEMS', imageUrl: 'images/hindi-singers.png' },
-      'English':  { title: 'Global Essentials', subtitle: 'EXPERIENCE THE BIGGEST INTERNATIONAL TRACKS STREAMING RIGHT NOW', imageUrl: 'images/english-singers.png' },
-      'Punjabi':  { title: 'Punjabi Powerhouse', subtitle: 'HIGH-ENERGY BEATS AND VOCALS THAT RULE THE CHARTS WORLDWIDE', imageUrl: 'images/punjabi-singers.png' },
-      'Tamil':    { title: 'Kollywood Supreme', subtitle: 'DISCOVER TOP CHARTING TAMIL COMPOSITIONS AND BLOCKBUSTER HITS', imageUrl: 'images/tamil-singers.png' },
-      'Telugu':   { title: 'Tollywood Hits', subtitle: 'THE BIGGEST AND BEST TELUGU SONGS TRENDING ACROSS THE NATION', imageUrl: 'images/hindi-singers.png' },
-      'Bengali':  { title: 'Soulful Bengali', subtitle: 'IMMERSE YOURSELF IN THE RICH MUSICAL HERITAGE OF BENGAL', imageUrl: 'images/bengali-singers.png' },
-      'Bhojpuri': { title: 'Bhojpuri Chartbusters', subtitle: 'FEEL THE PULSE WITH THE MOST VIRAL BHOJPURI DANCE NUMBERS', imageUrl: 'images/bhojpuri-singers.png' },
-      'Haryanvi': { title: 'Haryanvi Dominance', subtitle: 'UNSTOPPABLE GROOVES AND REGIONAL HITS TAKING OVER THE NATION', imageUrl: 'images/haryanvi-singers.png' },
+      'Hindi':    { title: 'Bollywood Blockbusters', subtitle: 'DIVE INTO THE MOST TRENDING HINDI MELODIES AND CLUB ANTHEMS', imageUrl: 'images/hindi-singers.png', buttonLink: '' },
+      'English':  { title: 'Global Essentials', subtitle: 'EXPERIENCE THE BIGGEST INTERNATIONAL TRACKS STREAMING RIGHT NOW', imageUrl: 'images/english-singers.png', buttonLink: '' },
+      'Punjabi':  { title: 'Punjabi Powerhouse', subtitle: 'HIGH-ENERGY BEATS AND VOCALS THAT RULE THE CHARTS WORLDWIDE', imageUrl: 'images/punjabi-singers.png', buttonLink: '' },
+      'Tamil':    { title: 'Kollywood Supreme', subtitle: 'DISCOVER TOP CHARTING TAMIL COMPOSITIONS AND BLOCKBUSTER HITS', imageUrl: 'images/tamil-singers.png', buttonLink: '' },
+      'Telugu':   { title: 'Tollywood Hits', subtitle: 'THE BIGGEST AND BEST TELUGU SONGS TRENDING ACROSS THE NATION', imageUrl: 'images/hindi-singers.png', buttonLink: '' },
+      'Bengali':  { title: 'Soulful Bengali', subtitle: 'IMMERSE YOURSELF IN THE RICH MUSICAL HERITAGE OF BENGAL', imageUrl: 'images/bengali-singers.png', buttonLink: '' },
+      'Bhojpuri': { title: 'Bhojpuri Chartbusters', subtitle: 'FEEL THE PULSE WITH THE MOST VIRAL BHOJPURI DANCE NUMBERS', imageUrl: 'images/bhojpuri-singers.png', buttonLink: '' },
+      'Haryanvi': { title: 'Haryanvi Dominance', subtitle: 'UNSTOPPABLE GROOVES AND REGIONAL HITS TAKING OVER THE NATION', imageUrl: 'images/haryanvi-singers.png', buttonLink: '' },
     };
     this.form = {
       badge: 'TRENDING PLAYLIST',
       buttonText: 'EXPLORE PLAYLIST',
+      buttonLink: defaults[lang]?.buttonLink || '',
       title: defaults[lang]?.title || `${lang} Essentials`,
       subtitle: defaults[lang]?.subtitle || `DISCOVER THE LATEST AND GREATEST ${lang.toUpperCase()} HITS`,
       imageUrl: defaults[lang]?.imageUrl || 'images/hindi-singers.png',
     };
+  }
+
+  async uploadImage(event: any) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    this.isUploadingImage = true;
+    this.saveError = '';
+    
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await firstValueFrom(
+        this.http.post<any>(`${this.apiUrl}?action=upload_image`, formData)
+      );
+      if (res?.status === 'success' && res.imageUrl) {
+        this.form.imageUrl = res.imageUrl;
+      } else {
+        throw new Error(res?.message || 'Unknown error during upload');
+      }
+    } catch (e: any) {
+      this.saveError = '❌ Failed to upload image: ' + (e.message || 'Unknown error');
+    } finally {
+      this.isUploadingImage = false;
+      // Reset file input so same file can be selected again if needed
+      event.target.value = '';
+    }
   }
 
   async save() {
