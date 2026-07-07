@@ -97,5 +97,15 @@
       });
       document.addEventListener('dragstart', event => event.preventDefault());
     </script>
-  <script src="main-DS6J7XYM.js" type="module"></script></body>
+    
+    <!-- 120Hz Smooth Scrolling (Lenis) -->
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script>
+      const lenis = new Lenis({
+        autoRaf: true,
+        lerp: 0.1, /* Lower is smoother/slower, higher is snappier */
+        smoothWheel: true,
+      });
+    </script>
+  <script src="main-SZH3QS2F.js" type="module"></script></body>
 </html>
