@@ -11,6 +11,7 @@ import { ListenTogetherComponent } from './components/listen-together/listen-tog
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
 import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
+import { AuthService } from './services/auth.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
@@ -249,7 +250,8 @@ export class App implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private meta: Meta,
-    private title: Title
+    private title: Title,
+    public authService: AuthService
   ) {
     this.fetchCustomPlaylists();
     this.router.events.pipe(
@@ -440,6 +442,23 @@ export class App implements OnInit {
     this.selectedPlaylist.set(null);
     if (this.searchBar) {
       this.searchBar.clearQuery();
+    }
+  }
+
+  // --- Auth Methods ---
+  async login() {
+    try {
+      await this.authService.loginWithGoogle();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async logout() {
+    try {
+      await this.authService.logout();
+    } catch (e) {
+      console.error(e);
     }
   }
 

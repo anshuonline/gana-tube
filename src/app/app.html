@@ -24,9 +24,17 @@
     </div>
     
     <div class="sidebar-footer">
-      <div class="sidebar-item profile" (click)="openProfilePage()" [class.active]="currentPage() === 'profile'">
+      <div *ngIf="!authService.currentUser()" class="sidebar-item" (click)="login()">
         <svg lucideUser [attr.size]="24"></svg>
-        <span class="sidebar-label">Profile</span>
+        <span class="sidebar-label">Login</span>
+      </div>
+
+      <div *ngIf="authService.currentUser()" class="sidebar-user-profile" style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;" />
+        <div style="display: flex; flex-direction: column; overflow: hidden; flex: 1;">
+          <span style="font-size: 0.9rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ authService.currentUser()?.displayName }}</span>
+          <span (click)="logout()" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); cursor: pointer; text-decoration: underline;">Logout</span>
+        </div>
       </div>
     </div>
   </nav>
