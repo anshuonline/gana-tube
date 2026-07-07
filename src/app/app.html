@@ -34,9 +34,15 @@
   <!-- Header -->
   <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
     <div class="header-inner">
-      <div class="logo" routerLink="/" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
-        <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
-        <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube.in</span>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="logo" routerLink="/" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
+          <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
+          <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif; display: flex; align-items: center;">GanaTube.in</span>
+        </div>
+        <button (click)="copyWebsiteLink()" title="Share Website" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';">
+          <svg lucideShare2 [attr.size]="18" *ngIf="!linkCopied"></svg>
+          <svg lucideCheck [attr.size]="18" *ngIf="linkCopied" style="color: #4ade80; transform: scale(1.1); transition: transform 0.2s ease;"></svg>
+        </button>
       </div>
 
       <!-- Compact Fake Search Button in Header -->

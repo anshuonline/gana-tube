@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -50,6 +50,8 @@ export interface SponsoredAd {
     LucideUser,
     LucideMessageSquare,
     LucideMegaphone,
+    LucideShare2,
+    LucideCheck,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -170,6 +172,8 @@ export class App implements OnInit {
   loadingShelfTitle = signal<string>('');
 
   currentPage = signal<string>('home');
+  activeSocialTab = signal<'chat' | 'rooms'>('chat');
+  linkCopied = false;
   pageContent = PAGE_CONTENT;
 
   // Sponsored Ad State
@@ -1052,5 +1056,14 @@ export class App implements OnInit {
     }
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  copyWebsiteLink() {
+    navigator.clipboard.writeText('https://ganatube.in').then(() => {
+      this.linkCopied = true;
+      setTimeout(() => {
+        this.linkCopied = false;
+      }, 2000);
+    });
   }
 }
