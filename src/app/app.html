@@ -152,18 +152,43 @@
       </div>
     </div>
 
-    <div *ngIf="currentPage() === 'socials'" class="static-page-container">
-      <div class="static-page-content" style="text-align: center; margin-top: 80px; max-width: 800px; margin-left: auto; margin-right: auto; padding: 0 20px;">
-        <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 16px; letter-spacing: -1px;">Follow GanaTube</h1>
-        <p style="color: rgba(255,255,255,0.7); margin-bottom: 50px; font-size: 1.2rem;">Connect with us on our official social handles for the latest music updates and community features.</p>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px;">
-          <!-- Instagram Box -->
-          <a href="https://www.instagram.com/ganatube.in/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 16px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 24px; border-radius: 16px; text-decoration: none; color: white; font-weight: 700; font-size: 1.4rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.3);" onmouseover="this.style.transform='translateY(-5px) scale(1.02)'; this.style.boxShadow='0 15px 30px rgba(220, 39, 67, 0.4)';" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)';">
-            <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-            Instagram
-          </a>
-          <!-- You can add more social boxes here in the future -->
+    <div *ngIf="currentPage() === 'socials'" class="socials-page">
+      <h1 class="socials-title">Follow GanaTube</h1>
+      <p class="socials-subtitle">Join our community across the web. Stay updated with the latest features, trending music, and behind-the-scenes content.</p>
+      
+      <div class="socials-grid">
+        <!-- Instagram Card -->
+        <a href="https://www.instagram.com/ganatube.in/" target="_blank" rel="noopener noreferrer" class="social-card instagram">
+          <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" width="40" height="40" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </div>
+          <span class="social-name">Instagram</span>
+          <span class="social-handle">@ganatube.in</span>
+        </a>
+
+        <!-- Placeholder Cards (Coming Soon) -->
+        <div class="social-card placeholder" style="opacity: 0.5; pointer-events: none;">
+          <div class="icon-wrapper" style="background: rgba(255,255,255,0.1);">
+            <svg viewBox="0 0 24 24" width="40" height="40" stroke="rgba(255,255,255,0.5)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            </svg>
+          </div>
+          <span class="social-name">Facebook</span>
+          <span class="social-handle">Coming Soon</span>
+        </div>
+
+        <div class="social-card placeholder" style="opacity: 0.5; pointer-events: none;">
+          <div class="icon-wrapper" style="background: rgba(255,255,255,0.1);">
+            <svg viewBox="0 0 24 24" width="40" height="40" stroke="rgba(255,255,255,0.5)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+            </svg>
+          </div>
+          <span class="social-name">Twitter (X)</span>
+          <span class="social-handle">Coming Soon</span>
         </div>
       </div>
     </div>
