@@ -24,17 +24,9 @@
     </div>
     
     <div class="sidebar-footer">
-      <div *ngIf="!authService.currentUser()" class="sidebar-item" (click)="login()">
+      <div class="sidebar-item profile" (click)="openProfilePage()" [class.active]="currentPage() === 'profile'">
         <svg lucideUser [attr.size]="24"></svg>
-        <span class="sidebar-label">Login</span>
-      </div>
-
-      <div *ngIf="authService.currentUser()" class="sidebar-item profile" (click)="openProfilePage()" [class.active]="currentPage() === 'profile'" style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1); height: auto;">
-        <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
-        <div style="display: flex; flex-direction: column; overflow: hidden; flex: 1;">
-          <span style="font-size: 0.9rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; line-height: 1.2;">{{ authService.currentUser()?.displayName || 'User' }}</span>
-          <span (click)="$event.stopPropagation(); logout()" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); cursor: pointer; text-decoration: underline; margin-top: 2px;">Logout</span>
-        </div>
+        <span class="sidebar-label">Profile</span>
       </div>
     </div>
   </nav>
@@ -112,14 +104,27 @@
       
       <div class="profile-page-grid">
         <div class="profile-card user-card">
-          <div class="avatar-large">
-            <svg lucideUser [attr.size]="48"></svg>
-          </div>
-          <div class="user-details">
-            <h2>Guest User</h2>
-            <span class="account-type">Free Account</span>
-          </div>
-          <button class="login-action-btn disabled" disabled>Login (Coming Soon)</button>
+          <!-- Logged Out State -->
+          <ng-container *ngIf="!authService.currentUser()">
+            <div class="avatar-large">
+              <svg lucideUser [attr.size]="48"></svg>
+            </div>
+            <div class="user-details">
+              <h2>Guest User</h2>
+              <span class="account-type">Free Account</span>
+            </div>
+            <button class="login-action-btn" (click)="login()" style="opacity: 1; pointer-events: auto; cursor: pointer; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);">Login with Google</button>
+          </ng-container>
+
+          <!-- Logged In State -->
+          <ng-container *ngIf="authService.currentUser()">
+            <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" class="avatar-large" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: none; padding: 0;" />
+            <div class="user-details">
+              <h2>{{ authService.currentUser()?.displayName || 'User' }}</h2>
+              <span class="account-type">{{ authService.currentUser()?.email }}</span>
+            </div>
+            <button class="login-action-btn" (click)="logout()" style="opacity: 1; pointer-events: auto; cursor: pointer; background: rgba(255,255,255,0.1); color: white;">Logout</button>
+          </ng-container>
         </div>
 
         <div class="profile-card settings-card">
