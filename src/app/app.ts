@@ -449,8 +449,12 @@ export class App implements OnInit {
   async login() {
     try {
       await this.authService.loginWithGoogle();
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      if (e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
+        console.log('Login popup closed by user.');
+      } else {
+        console.error('Login error:', e);
+      }
     }
   }
 
