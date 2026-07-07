@@ -55,7 +55,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
   publishMessage = '';
   copiedPlaylistId = signal<string | null>(null);
 
-  apiUrl = 'https://manageads.ganatube.in/managegt-api.php';
+  apiUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
 
   constructor(
     private http: HttpClient, 

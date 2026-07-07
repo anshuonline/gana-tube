@@ -186,7 +186,7 @@ export class App implements OnInit {
   // Dynamic Hero Header Data (from ManageGT admin)
   heroData = signal<Record<string, { badge: string; title: string; subtitle: string; imageUrl: string; buttonText: string; buttonLink?: string }>>({});
 
-  private manageApiUrl = 'https://manageads.ganatube.in/managegt-api.php';
+  private manageApiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
 
   carouselIndex = 0;
   private carouselInterval: any;
@@ -608,7 +608,7 @@ export class App implements OnInit {
   }
 
   fetchHeroData(): void {
-    const url = 'https://manageads.ganatube.in/managegt-api.php';
+    const url = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
     fetch(`${url}?action=get_header&t=${Date.now()}`)
       .then(res => res.json())
       .then(data => {

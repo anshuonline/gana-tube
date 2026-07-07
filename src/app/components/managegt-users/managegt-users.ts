@@ -26,7 +26,7 @@ export class ManagegtUsersComponent implements OnInit {
   error = signal<string>('');
   expandedUser = signal<string | null>(null);
 
-  private apiUrl = 'https://manageads.ganatube.in/user-api.php';
+  private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/user-api.php' : 'https://manageads.ganatube.in/user-api.php';
 
   constructor(private http: HttpClient) {
     if (!environment.production) {
