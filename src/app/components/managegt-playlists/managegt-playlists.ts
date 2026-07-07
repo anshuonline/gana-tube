@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -18,10 +18,12 @@ export interface CustomPlaylist {
   publishDate?: string; // ISO date string
 }
 
+import { LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck } from '@lucide/angular';
+
 @Component({
   selector: 'app-managegt-playlists',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule],
+  imports: [CommonModule, FormsModule, DragDropModule, LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck],
   templateUrl: './managegt-playlists.html',
   styleUrls: ['./managegt-playlists.scss']
 })
@@ -51,6 +53,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
   totalToFetch = 0;
   fetchError = '';
   publishMessage = '';
+  copiedPlaylistId = signal<string | null>(null);
 
   apiUrl = 'https://manageads.ganatube.in/managegt-api.php';
 
@@ -242,6 +245,15 @@ export class ManagegtPlaylistsComponent implements OnInit {
       this.allPlaylistsData[this.selectedLang] = this.currentPlaylists;
       this.publishPlaylists();
     }
+  }
+
+  copyLink(playlistId: string) {
+    const url = `https://ganatube.in/playlist/${playlistId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.copiedPlaylistId.set(playlistId);
+      setTimeout(() => this.copiedPlaylistId.set(null), 2000);
+      this.cdr.detectChanges();
+    });
   }
 
   async publishPlaylists() {
