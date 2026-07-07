@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck } from '@lucide/angular';
 
@@ -12,6 +12,7 @@ import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.s
 import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
@@ -230,16 +231,30 @@ export class App implements OnInit {
 
   togglePreferredLanguage(lang: string): void {
     const current = this.preferredLanguages();
+    let nextLangs = [...current];
+
     if (current.includes(lang)) {
       if (current.length > 1) {
-        const next = current.filter(l => l !== lang);
-        this.preferredLanguages.set(next);
+        nextLangs = current.filter(l => l !== lang);
+        this.preferredLanguages.set(nextLangs);
         if (this.homeScreenLanguage() === lang) {
-          this.setLanguage(next[0]);
+          this.setLanguage(nextLangs[0]);
         }
       }
     } else {
-      this.preferredLanguages.set([...current, lang]);
+      nextLangs = [...current, lang];
+      this.preferredLanguages.set(nextLangs);
+    }
+
+    // Sync to DB if logged in
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      this.userService.syncProfile({
+        email: user.email,
+        preferred_languages: nextLangs,
+        liked_songs: this.userService.likedSongs(),
+        listening_preferences: this.userService.listeningPreferences()
+      });
     }
   }
 
@@ -251,8 +266,27 @@ export class App implements OnInit {
     private route: ActivatedRoute,
     private meta: Meta,
     private title: Title,
-    public authService: AuthService
+    public authService: AuthService,
+    public userService: UserService
   ) {
+    effect(() => {
+      const user = this.authService.currentUser();
+      if (user && user.email) {
+        this.userService.loadProfile(user.email).then(profile => {
+          if (profile) {
+            if (profile.preferred_languages && profile.preferred_languages.length > 0) {
+              this.preferredLanguages.set(profile.preferred_languages);
+            }
+            this.algorithmService.syncFromBackend(profile.liked_songs, profile.listening_preferences);
+          }
+        });
+      } else if (user === null) {
+        this.userService.likedSongs.set([]);
+        this.userService.listeningPreferences.set([]);
+        this.algorithmService.syncFromBackend([], []);
+      }
+    }, { allowSignalWrites: true });
+
     this.fetchCustomPlaylists();
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -750,10 +784,17 @@ export class App implements OnInit {
   }
 
   onSuggestSearch(query: string): void {
-    if (this.searchBar) {
-      this.searchBar.query = query;
-    }
+    if (!query) return;
+    this.closeSearchPage();
+    this.hasSearched.set(true);
+    this.currentQuery = query;
     this.performSearch(query);
+    
+    // Sync listening preference to backend if logged in
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      this.userService.trackListeningPreference(user.email, query, this.preferredLanguages());
+    }
   }
 
   onPlayTrack(track: YouTubeSearchResult, list: YouTubeSearchResult[]): void {

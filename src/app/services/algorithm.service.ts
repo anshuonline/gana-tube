@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { YoutubeApiService, YouTubeSearchResult } from './youtube-api.service';
+import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 import { Observable, of, forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -38,8 +40,32 @@ export class AlgorithmService {
   private profileKey = 'gt_user_profile';
   private profile: UserProfile;
 
-  constructor(private youtubeApi: YoutubeApiService) {
+  constructor(
+    private youtubeApi: YoutubeApiService,
+    private authService: AuthService,
+    private userService: UserService
+  ) {
     this.profile = this.loadProfile();
+  }
+
+  public syncFromBackend(likedSongs: string[], searchHistory: string[]) {
+    this.profile.liked_songs = likedSongs || [];
+    if (searchHistory && searchHistory.length > 0) {
+      this.profile.search_history = searchHistory;
+    }
+    this.saveProfile();
+  }
+
+  private triggerBackendSync(): void {
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      this.userService.syncProfile({
+        email: user.email,
+        preferred_languages: this.userService.preferredLanguages ? this.userService.preferredLanguages() : [],
+        liked_songs: this.profile.liked_songs,
+        listening_preferences: this.profile.search_history // We map search_history to listening_preferences
+      });
+    }
   }
 
   private loadProfile(): UserProfile {
@@ -147,6 +173,7 @@ export class AlgorithmService {
 
     this.updateTasteProfile(song, score);
     this.saveProfile();
+    this.triggerBackendSync();
   }
 
   private updateTasteProfile(song: YouTubeSearchResult, score: number): void {
@@ -182,7 +209,9 @@ export class AlgorithmService {
       isLiked = true;
       this.updateTasteProfile(song, 2.0);
     }
+    
     this.saveProfile();
+    this.triggerBackendSync();
     return isLiked;
   }
 
