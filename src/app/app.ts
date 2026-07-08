@@ -226,6 +226,10 @@ export class App implements OnInit {
     return `linear-gradient(135deg, ${colorPair[0]} 0%, ${colorPair[1]} 100%)`;
   }
 
+  // Random backgrounds for library boxes
+  randomLikedThumbnail = signal<string | null>(null);
+  randomRecentThumbnail = signal<string | null>(null);
+
   // Profile & Settings State
   musicQuality = signal<'High' | 'Standard' | 'Data Saver'>('High');
   preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
@@ -286,9 +290,18 @@ export class App implements OnInit {
               this.openLikedSongs();
             }
 
-            // Dynamically inject 'Recently Played' if we just loaded it from backend
-            // and it wasn't present during the initial shelf load.
+            // Set random thumbnails for library boxes
+            const liked = this.userService.likedSongs();
+            if (liked && liked.length > 0) {
+              const randSong = liked[Math.floor(Math.random() * liked.length)];
+              this.randomLikedThumbnail.set(randSong.thumbnailHigh || randSong.thumbnail);
+            }
+            
             const recentPlays = this.userService.recentPlays();
+            if (recentPlays && recentPlays.length > 0) {
+              const randSong = recentPlays[Math.floor(Math.random() * recentPlays.length)];
+              this.randomRecentThumbnail.set(randSong.thumbnailHigh || randSong.thumbnail);
+            }
             if (recentPlays && recentPlays.length > 0) {
               const hasRecentShelf = this.allShelfDefinitions.some(s => s.title === 'Recently Played');
               if (!hasRecentShelf) {

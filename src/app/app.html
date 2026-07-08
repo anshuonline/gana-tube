@@ -177,14 +177,29 @@
           </button>
         </div>
 
-        <div *ngIf="authService.currentUser()" class="profile-card settings-card" style="background: linear-gradient(180deg, rgba(88, 28, 135, 0.35) 0%, rgba(15, 15, 20, 0.95) 100%); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 40px rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; max-width: 480px; transition: transform 0.3s ease;">
-          <h3 style="font-size: 1.6rem; margin-bottom: 8px; color: #fff;">Liked Music</h3>
-          <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Access your favorite tracks and curated playlists.</p>
-          <div class="quality-selector" style="display: flex;">
-            <button class="q-btn active" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 12px; transition: all 0.2s ease; cursor: pointer;" (click)="openLikedSongs()" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-              <svg lucideHeart [attr.size]="20" style="fill: #c084fc; color: #c084fc;"></svg>
-              <span style="font-weight: 500; font-size: 0.95rem; color: #fff;">Liked Songs ({{ userService.likedSongs().length }})</span>
-            </button>
+        <div *ngIf="authService.currentUser()" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 900px;">
+          <!-- Liked Music Box -->
+          <div class="profile-card settings-card" [style.background]="randomLikedThumbnail() ? 'linear-gradient(180deg, rgba(88, 28, 135, 0.7) 0%, rgba(15, 15, 20, 0.98) 100%), url(' + randomLikedThumbnail() + ') center/cover no-repeat' : 'linear-gradient(180deg, rgba(88, 28, 135, 0.35) 0%, rgba(15, 15, 20, 0.95) 100%)'" style="backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 40px rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; transition: transform 0.3s ease;">
+            <h3 style="font-size: 1.6rem; margin-bottom: 8px; color: #fff;">Liked Music</h3>
+            <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Access your favorite tracks and curated playlists.</p>
+            <div class="quality-selector" style="display: flex;">
+              <button class="q-btn active" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 12px; transition: all 0.2s ease; cursor: pointer;" (click)="openLikedSongs()" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                <svg lucideHeart [attr.size]="20" style="fill: #c084fc; color: #c084fc;"></svg>
+                <span style="font-weight: 500; font-size: 0.95rem; color: #fff;">Liked Songs ({{ userService.likedSongs().length }})</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recently Played Box -->
+          <div class="profile-card settings-card" [style.background]="randomRecentThumbnail() ? 'linear-gradient(180deg, rgba(20, 60, 120, 0.7) 0%, rgba(15, 15, 20, 0.98) 100%), url(' + randomRecentThumbnail() + ') center/cover no-repeat' : 'linear-gradient(180deg, rgba(20, 60, 120, 0.35) 0%, rgba(15, 15, 20, 0.95) 100%)'" style="backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 40px rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; transition: transform 0.3s ease;">
+            <h3 style="font-size: 1.6rem; margin-bottom: 8px; color: #fff;">Recently Played</h3>
+            <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Jump back into the music you were just listening to.</p>
+            <div class="quality-selector" style="display: flex;">
+              <button class="q-btn active" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 12px; transition: all 0.2s ease; cursor: pointer;" (click)="closePlaylist()" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span style="font-weight: 500; font-size: 0.95rem; color: #fff;">History ({{ userService.recentPlays().length }})</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
