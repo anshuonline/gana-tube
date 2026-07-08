@@ -654,8 +654,17 @@ export class App implements OnInit {
           });
         }
 
-        // Combine them: Recently Played FIRST, then Custom Admin Sections (instant), then Dynamic algorithmic shelves (slow API)
-        this.allShelfDefinitions = [...recentShelves, ...customShelves, ...algorithmicShelves];
+        // Extract 'Suggested for You' (the first algorithmic shelf)
+        const suggestedShelf = algorithmicShelves.length > 0 ? [algorithmicShelves[0]] : [];
+        const otherAlgorithmicShelves = algorithmicShelves.length > 1 ? algorithmicShelves.slice(1) : [];
+
+        // Combine them: Recently Played FIRST, then Suggested for You, then Custom Admin Sections (instant), then Dynamic algorithmic shelves (slow API)
+        this.allShelfDefinitions = [
+          ...recentShelves, 
+          ...suggestedShelf,
+          ...customShelves, 
+          ...otherAlgorithmicShelves
+        ];
         
         const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
         let loadedCount = 0;
