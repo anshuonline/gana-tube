@@ -97,34 +97,37 @@
 
   <!-- Main Content -->
   <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()">
-    <div *ngIf="currentPage() === 'profile'" class="profile-page-container">
+    <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
       <div class="profile-page-header">
         <h1>Profile & Settings</h1>
       </div>
       
       <div class="profile-page-grid">
-        <div class="profile-card user-card">
-          <!-- Logged Out State -->
-          <ng-container *ngIf="!authService.currentUser()">
-            <div class="avatar-large">
-              <svg lucideUser [attr.size]="48"></svg>
-            </div>
-            <div class="user-details">
+        <div class="profile-card user-card modern-user-card">
+          <div class="banner-bg"></div>
+          <div class="user-content">
+            <!-- Logged Out State -->
+            <ng-container *ngIf="!authService.currentUser()">
+              <div class="avatar-wrapper">
+                <div class="avatar-placeholder">
+                  <svg lucideUser [attr.size]="48"></svg>
+                </div>
+              </div>
               <h2>Guest User</h2>
               <span class="account-type">Free Account</span>
-            </div>
-            <button class="login-action-btn" (click)="login()" style="opacity: 1; pointer-events: auto; cursor: pointer; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);">Login with Google</button>
-          </ng-container>
+              <button class="login-action-btn" (click)="login()" style="opacity: 1; pointer-events: auto; cursor: pointer;">Login with Google</button>
+            </ng-container>
 
-          <!-- Logged In State -->
-          <ng-container *ngIf="authService.currentUser()">
-            <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" class="avatar-large" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: none; padding: 0;" />
-            <div class="user-details">
+            <!-- Logged In State -->
+            <ng-container *ngIf="authService.currentUser()">
+              <div class="avatar-wrapper">
+                <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" />
+              </div>
               <h2>{{ authService.currentUser()?.displayName || 'User' }}</h2>
               <span class="account-type">{{ authService.currentUser()?.email }}</span>
-            </div>
-            <button class="login-action-btn" (click)="logout()" style="opacity: 1; pointer-events: auto; cursor: pointer; background: rgba(255,255,255,0.1); color: white;">Logout</button>
-          </ng-container>
+              <button class="login-action-btn logout-btn" (click)="logout()" style="opacity: 1; pointer-events: auto; cursor: pointer;">Logout</button>
+            </ng-container>
+          </div>
         </div>
 
 
