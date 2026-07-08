@@ -185,14 +185,91 @@
           <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </div>
 
-        <div *ngIf="authService.currentUser()" class="desktop-library-view" style="display: flex; gap: 20px; max-width: 900px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px 4px 40px; margin: -10px -4px -20px; scrollbar-width: none;">
+        <div *ngIf="authService.currentUser()" class="desktop-library-view">
           <style>
-            .profile-card::-webkit-scrollbar { display: none; }
+            .desktop-library-view {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+              gap: 20px;
+              width: 100%;
+              padding: 10px 0 40px;
+            }
             @media (max-width: 768px) {
               .desktop-library-view { display: none !important; }
               .mobile-library-view { display: flex !important; }
               .swipe-hint { display: none !important; }
             }
+            .desktop-lib-item {
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+              cursor: pointer;
+            }
+            .desktop-lib-thumb {
+              width: 100%;
+              aspect-ratio: 16 / 9;
+              border-radius: 12px;
+              position: relative;
+              background: #222;
+              overflow: hidden;
+            }
+            .desktop-lib-thumb img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              transition: transform 0.3s ease;
+            }
+            .desktop-lib-item:hover .desktop-lib-thumb img {
+              transform: scale(1.05);
+            }
+            .desktop-lib-count {
+              position: absolute;
+              bottom: 8px;
+              right: 8px;
+              background: rgba(0,0,0,0.8);
+              color: white;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 0.85rem;
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              font-weight: 500;
+            }
+            .desktop-lib-info-row {
+              display: flex;
+              align-items: flex-start;
+              justify-content: space-between;
+              gap: 12px;
+            }
+            .desktop-lib-info {
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+              overflow: hidden;
+            }
+            .desktop-lib-title {
+              color: #fff;
+              font-size: 1.1rem;
+              font-weight: 600;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .desktop-lib-sub {
+              color: rgba(255,255,255,0.6);
+              font-size: 0.9rem;
+              display: flex;
+              flex-direction: column;
+              gap: 2px;
+            }
+            .desktop-lib-more {
+              color: rgba(255,255,255,0.8);
+              padding: 4px;
+              flex-shrink: 0;
+            }
+            
+            /* Mobile styles */
             .mobile-library-view {
               display: none;
               flex-direction: column;
@@ -259,25 +336,49 @@
           </style>
 
           <!-- DESKTOP Liked Music Box -->
-          <div class="profile-card settings-card" (click)="openLikedSongs()" [style.background]="randomLikedThumbnail() ? 'linear-gradient(180deg, rgba(88, 28, 135, 0.7) 0%, rgba(15, 15, 20, 0.98) 100%), url(' + randomLikedThumbnail() + ') center/cover no-repeat' : 'linear-gradient(180deg, rgba(88, 28, 135, 0.35) 0%, rgba(15, 15, 20, 0.95) 100%)'" style="flex: 0 0 340px; scroll-snap-align: start; backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 40px rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; transition: transform 0.3s ease, border-color 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='rgba(255,255,255,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.06)';">
-            <h3 style="font-size: 1.6rem; margin-bottom: 8px; color: #fff;">Liked Music</h3>
-            <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Access your favorite tracks and curated playlists.</p>
-            <div class="quality-selector" style="display: flex;">
-              <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 12px;">
-                <svg lucideHeart [attr.size]="20" style="fill: #c084fc; color: #c084fc;"></svg>
-                <span style="font-weight: 500; font-size: 0.95rem; color: #fff;">Liked Songs ({{ userService.likedSongs().length }})</span>
+          <div class="desktop-lib-item" (click)="openLikedSongs()">
+            <div class="desktop-lib-thumb">
+              <img [src]="randomLikedThumbnail() || 'assets/default-playlist.jpg'" alt="Liked Music">
+              <div class="desktop-lib-count">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                {{ userService.likedSongs().length | number }} videos
+              </div>
+            </div>
+            <div class="desktop-lib-info-row">
+              <div class="desktop-lib-info">
+                <div class="desktop-lib-title">Liked videos</div>
+                <div class="desktop-lib-sub">
+                  <span>Private • Playlist</span>
+                  <span>Updated today</span>
+                  <span>View full playlist</span>
+                </div>
+              </div>
+              <div class="desktop-lib-more">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
               </div>
             </div>
           </div>
 
           <!-- DESKTOP Recently Played Box -->
-          <div class="profile-card settings-card" (click)="openRecentlyPlayed()" [style.background]="randomRecentThumbnail() ? 'linear-gradient(180deg, rgba(20, 60, 120, 0.7) 0%, rgba(15, 15, 20, 0.98) 100%), url(' + randomRecentThumbnail() + ') center/cover no-repeat' : 'linear-gradient(180deg, rgba(20, 60, 120, 0.35) 0%, rgba(15, 15, 20, 0.95) 100%)'" style="flex: 0 0 340px; scroll-snap-align: start; backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 40px rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; transition: transform 0.3s ease, border-color 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='rgba(255,255,255,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.06)';">
-            <h3 style="font-size: 1.6rem; margin-bottom: 8px; color: #fff;">Recently Played</h3>
-            <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Jump back into the music you were just listening to.</p>
-            <div class="quality-selector" style="display: flex;">
-              <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 12px;">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <span style="font-weight: 500; font-size: 0.95rem; color: #fff;">History ({{ userService.recentPlays().length }})</span>
+          <div class="desktop-lib-item" (click)="openRecentlyPlayed()">
+            <div class="desktop-lib-thumb">
+              <img [src]="randomRecentThumbnail() || 'assets/default-playlist.jpg'" alt="Recently Played">
+              <div class="desktop-lib-count">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                {{ userService.recentPlays().length | number }} videos
+              </div>
+            </div>
+            <div class="desktop-lib-info-row">
+              <div class="desktop-lib-info">
+                <div class="desktop-lib-title">History</div>
+                <div class="desktop-lib-sub">
+                  <span>Private • History</span>
+                  <span>Updated today</span>
+                  <span>View full history</span>
+                </div>
+              </div>
+              <div class="desktop-lib-more">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
               </div>
             </div>
           </div>
