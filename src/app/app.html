@@ -177,13 +177,13 @@
           </button>
         </div>
 
-        <div *ngIf="authService.currentUser()" class="profile-card settings-card" style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 16px;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Liked Music</h3>
-          <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">Access your favorite tracks and curated playlists.</p>
-          <div class="quality-selector" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-            <button class="q-btn active" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px;" (click)="openLikedSongs()">
-              <svg lucideHeart [attr.size]="20" style="fill: var(--color-primary); color: var(--color-primary);"></svg>
-              <span>Liked Songs ({{ userService.likedSongs().length }})</span>
+        <div *ngIf="authService.currentUser()" class="profile-card settings-card" style="background: linear-gradient(135deg, rgba(88, 28, 135, 0.4) 0%, rgba(30, 10, 48, 0.8) 100%); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; max-width: 480px; transition: transform 0.3s ease;">
+          <h3 style="font-size: 1.6rem; margin-bottom: 8px; color: #fff;">Liked Music</h3>
+          <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Access your favorite tracks and curated playlists.</p>
+          <div class="quality-selector" style="display: flex;">
+            <button class="q-btn active" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 12px; transition: all 0.2s ease; cursor: pointer;" (click)="openLikedSongs()" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+              <svg lucideHeart [attr.size]="20" style="fill: #c084fc; color: #c084fc;"></svg>
+              <span style="font-weight: 500; font-size: 0.95rem; color: #fff;">Liked Songs ({{ userService.likedSongs().length }})</span>
             </button>
           </div>
         </div>
