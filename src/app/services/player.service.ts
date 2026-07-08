@@ -172,6 +172,14 @@ export class PlayerService {
     this.currentIndex.set(startIndex);
     this.playerState.set('loading');
     
+    // Add to recent plays
+    if (tracks[startIndex]) {
+      const user = this.authService.currentUser();
+      if (user && user.email) {
+        this.userService.addRecentPlay(user.email, tracks[startIndex], this.userService.preferredLanguages());
+      }
+    }
+    
     if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
       this.roomService.getSocket().emit('sync_queue', {
         roomId: this.roomService.currentRoom(),
