@@ -226,10 +226,14 @@ export class AlgorithmService {
       .slice(0, 3)
       .map(e => e[0]);
 
+    const randomYear = [2022, 2023, 2024, 2025, 2026][Math.floor(Math.random() * 5)];
+    const randomVibe = ['hits', 'trending', 'viral', 'best of', 'new releases', 'top'][Math.floor(Math.random() * 6)];
+    const randomModifier = topArtists.length > 0 ? ` ${topArtists[Math.floor(Math.random() * topArtists.length)]}` : '';
+
     const shelves: ShelfDefinition[] = [
       {
         title: "Suggested for You",
-        query: `top hit ${language} songs playlist`
+        query: `${randomVibe} ${language} songs ${randomYear}${randomModifier}`
       }
     ];
 
@@ -240,16 +244,20 @@ export class AlgorithmService {
     
     if (hour >= 6 && hour < 12) {
       timeGreeting = "Morning Boost ☀️";
-      timeQuery = `morning motivation ${language} songs`;
+      const mornings = ['morning motivation', 'morning chill', 'waking up', 'fresh morning'];
+      timeQuery = `${mornings[Math.floor(Math.random() * mornings.length)]} ${language} songs`;
     } else if (hour >= 12 && hour < 17) {
       timeGreeting = "Afternoon Vibes 🎵";
-      timeQuery = `latest pop ${language} songs`;
+      const afternoons = ['afternoon drive', 'pop', 'upbeat', 'feel good'];
+      timeQuery = `${afternoons[Math.floor(Math.random() * afternoons.length)]} ${language} songs`;
     } else if (hour >= 17 && hour < 21) {
       timeGreeting = "Evening Melodies 🌆";
-      timeQuery = `romantic evening ${language} songs`;
+      const evenings = ['evening romantic', 'unplugged', 'sunset chill', 'acoustic'];
+      timeQuery = `${evenings[Math.floor(Math.random() * evenings.length)]} ${language} songs ${randomYear}`;
     } else {
       timeGreeting = "Late Night Feels 🌙";
-      timeQuery = `lofi chill sad ${language} songs`;
+      const nights = ['late night lofi', 'midnight chill', 'night drive', 'sleep relaxing'];
+      timeQuery = `${nights[Math.floor(Math.random() * nights.length)]} ${language} songs`;
     }
 
     shelves.push({
@@ -259,25 +267,31 @@ export class AlgorithmService {
 
     if (this.profile.history.length < 3) {
       // New user - keep exactly 2 default playlists
-      shelves.push({ title: `Trending ${language} Hits 🔥`, query: `trending ${language} songs today` });
-      shelves.push({ title: "All-Time Blockbusters 🎵", query: `all time best ${language} songs` });
+      const newUsers1 = ['trending', 'viral', 'top charts'];
+      shelves.push({ title: `Trending ${language} Hits 🔥`, query: `${newUsers1[Math.floor(Math.random() * newUsers1.length)]} ${language} songs today` });
+      
+      const newUsers2 = ['all time best', 'classic hits', 'golden era'];
+      shelves.push({ title: "All-Time Blockbusters 🎵", query: `${newUsers2[Math.floor(Math.random() * newUsers2.length)]} ${language} songs` });
     } else {
       // Personalized shelves
       if (topArtists.length > 0) {
+        const topModifiers = ['hits', 'live', 'best songs', 'audio'];
         shelves.push({
           title: "Because you like " + topArtists[0],
-          query: topArtists[0] + " songs"
+          query: topArtists[0] + " " + topModifiers[Math.floor(Math.random() * topModifiers.length)]
         });
       }
 
+      const madeForYouModifiers = ['hits', 'mashup', 'remix', 'jukebox'];
       shelves.push({
         title: "Made For You 💜",
-        query: topArtists.length > 1 ? (topArtists[1] + " hits") : `trending ${language} songs`
+        query: topArtists.length > 1 ? (topArtists[1] + " " + madeForYouModifiers[Math.floor(Math.random() * madeForYouModifiers.length)]) : `trending ${language} songs ${randomYear}`
       });
 
+      const freshModifiers = ['new release', 'latest', 'brand new'];
       shelves.push({
         title: "Fresh Finds For You ✨",
-        query: `new release ${language} pop songs`
+        query: `${freshModifiers[Math.floor(Math.random() * freshModifiers.length)]} ${language} pop songs`
       });
     }
 
