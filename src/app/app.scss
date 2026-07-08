@@ -803,6 +803,7 @@
   gap: 12px;
   padding: 4px 0 16px;
   scrollbar-width: none;
+  scroll-snap-type: x mandatory;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -810,6 +811,7 @@
   .song-card {
     flex: 0 0 240px !important;
     width: 240px !important;
+    scroll-snap-align: start;
   }
 }
 
@@ -821,6 +823,7 @@
   scroll-behavior: smooth;
   scrollbar-width: none;
   padding: 20px 20px 40px;
+  scroll-snap-type: x mandatory;
 
   &::-webkit-scrollbar {
     display: none;
@@ -835,6 +838,7 @@
   gap: 16px;
   cursor: pointer;
   position: relative;
+  scroll-snap-align: start;
   
   .artist-img-wrapper {
     position: relative;

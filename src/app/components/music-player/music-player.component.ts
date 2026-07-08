@@ -196,7 +196,12 @@ import { AuthService } from '../../services/auth.service';
     </div>
 
     <!-- FULL SCREEN CAR/MEDIA VIEW -->
-    <div class="fullscreen-overlay" [class.active]="isFullScreen()">
+    <div class="fullscreen-overlay" [class.active]="isFullScreen()"
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd($event)"
+         [style.transform]="getSwipeTransform()"
+         [style.transition]="isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)'">
       <!-- Ambient Dynamic Glow Background -->
       <div class="ambient-glow-bg" *ngIf="playerService.currentTrack() as track" [style.background-image]="'url(' + track.thumbnailHigh + ')'"></div>
       <div class="vignette-overlay"></div>
@@ -439,13 +444,82 @@ export class MusicPlayerComponent {
   }
 
   onPlayerBarClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    // Intercept clicks to expand player, ignoring clicks on interactive slider, buttons or queue triggers
-    const isInteractive = target.closest('button, input, .progress-section, .control-buttons, a, .volume-slider');
-    if (!isInteractive) {
-      this.toggleFullScreen();
+    if ((event.target as HTMLElement).closest('.player-center, .player-right, .q-btn, .ctrl-btn, .play-pause-btn')) {
+      return; // Do not open FS if clicking controls
     }
+    this.toggleFullScreen();
   }
 
-  // Keyboard shortcuts are now handled globally in app.ts
+  // Swipe Gestures
+  touchStartY = 0;
+  touchCurrentY = 0;
+  touchStartX = 0;
+  touchCurrentX = 0;
+  isDragging = false;
+
+  onTouchStart(e: TouchEvent) {
+    if ((e.target as HTMLElement).closest('.fs-queue-section, .volume-slider, .track-progress')) return;
+    this.touchStartY = e.touches[0].clientY;
+    this.touchStartX = e.touches[0].clientX;
+    this.isDragging = true;
+  }
+  
+  onTouchMove(e: TouchEvent) {
+    if (!this.isDragging) return;
+    this.touchCurrentY = e.touches[0].clientY;
+    this.touchCurrentX = e.touches[0].clientX;
+  }
+
+  onTouchEnd(e: TouchEvent) {
+    if (!this.isDragging) return;
+    this.isDragging = false;
+    
+    if (!this.touchStartY || !this.touchCurrentY) {
+      this.resetTouch();
+      return;
+    }
+    
+    const diffY = this.touchCurrentY - this.touchStartY;
+    const diffX = this.touchCurrentX - this.touchStartX;
+    
+    // Swipe down to dismiss
+    if (diffY > 120 && Math.abs(diffY) > Math.abs(diffX)) {
+      this.toggleFullScreen();
+    } 
+    // Swipe left/right for next/prev
+    else if (Math.abs(diffX) > 100 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        this.playerService.previous();
+      } else {
+        this.playerService.next();
+      }
+    }
+    
+    this.resetTouch();
+  }
+
+  resetTouch() {
+    this.touchStartY = 0;
+    this.touchCurrentY = 0;
+    this.touchStartX = 0;
+    this.touchCurrentX = 0;
+  }
+  
+  getSwipeTransform(): string {
+    if (!this.isDragging || !this.touchStartY || !this.touchCurrentY) {
+      return '';
+    }
+    const diffY = this.touchCurrentY - this.touchStartY;
+    const diffX = this.touchCurrentX - this.touchStartX;
+    
+    // Only animate swipe down if primarily swiping down
+    if (diffY > 0 && Math.abs(diffY) > Math.abs(diffX)) {
+      return `translateY(${diffY}px)`;
+    }
+    // Only animate left/right if horizontal swipe
+    if (Math.abs(diffX) > 20 && Math.abs(diffX) > Math.abs(diffY)) {
+      return `translateX(${diffX}px)`;
+    }
+    return '';
+  }
 }
