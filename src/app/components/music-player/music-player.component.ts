@@ -22,6 +22,8 @@ import {
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-music-player',
@@ -355,7 +357,12 @@ export class MusicPlayerComponent {
   showFSQueue = signal<boolean>(false);
   showToast = signal<boolean>(false);
 
-  constructor(public playerService: PlayerService, public algorithmService: AlgorithmService) {}
+  constructor(
+    public playerService: PlayerService,
+    public algorithmService: AlgorithmService,
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
 
   get progressPercent(): number {
     const duration = this.playerService.duration();
@@ -392,6 +399,10 @@ export class MusicPlayerComponent {
     event.stopPropagation();
     const track = this.playerService.currentTrack();
     if (track) {
+      const user = this.authService.currentUser();
+      if (user && user.email) {
+        this.userService.toggleLike(user.email, track, this.userService.preferredLanguages());
+      }
       this.algorithmService.toggleLike(track);
     }
   }

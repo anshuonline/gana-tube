@@ -48,8 +48,15 @@ export class AlgorithmService {
     this.profile = this.loadProfile();
   }
 
-  public syncFromBackend(likedSongs: string[], searchHistory: string[]) {
-    this.profile.liked_songs = likedSongs || [];
+  public syncFromBackend(likedSongs: any[], searchHistory: string[]) {
+    if (likedSongs && Array.isArray(likedSongs)) {
+      this.profile.liked_songs = likedSongs.map(song => {
+        return typeof song === 'string' ? song : (song.videoId || song.id);
+      }).filter(Boolean);
+    } else {
+      this.profile.liked_songs = [];
+    }
+    
     if (searchHistory && searchHistory.length > 0) {
       this.profile.search_history = searchHistory;
     }
@@ -212,7 +219,6 @@ export class AlgorithmService {
     }
     
     this.saveProfile();
-    this.triggerBackendSync();
     return isLiked;
   }
 
