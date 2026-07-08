@@ -171,7 +171,7 @@
   }
 
   .profile-card {
-    background: rgba(20, 20, 28, 0.6);
+    background: #08080a;
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -191,6 +191,9 @@
   .modern-user-card {
     padding: 0;
     grid-column: 1 / -1;
+    max-width: 650px;
+    margin: 0 auto;
+    width: 100%;
     .banner-bg {
       height: 140px;
       background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);

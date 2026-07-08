@@ -234,6 +234,28 @@ export class App implements OnInit {
   // Profile & Settings State
   musicQuality = signal<'High' | 'Standard' | 'Data Saver'>('High');
   preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
+  
+  isEditingUsername = signal<boolean>(false);
+  newUsername = signal<string>('');
+
+  async saveUsername() {
+    if (this.newUsername().trim()) {
+      const success = await this.authService.updateUsername(this.newUsername().trim());
+      if (success) {
+        this.isEditingUsername.set(false);
+      } else {
+        alert('Failed to update username. Please try again.');
+      }
+    }
+  }
+
+  toggleEditUsername() {
+    this.isEditingUsername.set(!this.isEditingUsername());
+    if (this.isEditingUsername()) {
+      this.newUsername.set(this.authService.currentUser()?.displayName || '');
+    }
+  }
+
 
   togglePreferredLanguage(lang: string): void {
     const current = this.preferredLanguages();
