@@ -124,6 +124,36 @@ export class YoutubeApiService {
     );
   }
 
+  getVideoDetails(videoIds: string[]): Observable<YouTubeSearchResult[]> {
+    if (!videoIds || videoIds.length === 0) return of([]);
+    
+    // We can only query up to 50 ids at a time with YouTube API
+    const idsToFetch = videoIds.slice(0, 50).join(',');
+
+    if (!this.apiKey || this.apiKey === 'YOUR_YOUTUBE_API_KEY_HERE') {
+      return of([]);
+    }
+
+    const params = new HttpParams()
+      .set('part', 'snippet')
+      .set('id', idsToFetch)
+      .set('key', this.apiKey);
+
+    return this.http.get<any>(`${this.apiUrl}/videos`, { params }).pipe(
+      map(response => 
+        response.items.map((item: any) => ({
+          videoId: item.id,
+          title: this.decodeHtml(item.snippet.title),
+          channelTitle: item.snippet.channelTitle,
+          thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
+          thumbnailHigh: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+          publishedAt: item.snippet.publishedAt,
+        }))
+      ),
+      catchError(() => of([]))
+    );
+  }
+
   private injectCuratedSongs(query: string, results: YouTubeSearchResult[]): YouTubeSearchResult[] {
     if (!this.dynamicCuratedSongs) return results;
 

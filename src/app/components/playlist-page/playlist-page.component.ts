@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
+import { UserService } from '../../services/user.service';
 import { PlaylistMeta } from '../../data/playlists.data';
 import { SponsoredAd } from '../../app';
 import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart } from '@lucide/angular';
@@ -23,12 +24,12 @@ export class PlaylistPageComponent implements OnInit {
   isCopied = signal<boolean>(false);
   playlistAd = signal<SponsoredAd | null>(null);
 
-  sanitizer = inject(DomSanitizer);
+  private sanitizer = inject(DomSanitizer);
+  private youtubeApi = inject(YoutubeApiService);
+  public playerService = inject(PlayerService);
+  private userService = inject(UserService);
 
-  constructor(
-    private youtubeApi: YoutubeApiService,
-    public playerService: PlayerService
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
     if (this.playlist) {
@@ -59,8 +60,34 @@ export class PlaylistPageComponent implements OnInit {
 
   loadSongs(): void {
     if (this.playlist.preloadedSongs && this.playlist.preloadedSongs.length > 0) {
-      this.songs.set(this.playlist.preloadedSongs);
-      this.isLoading.set(false);
+      // Check if they are legacy dummy songs (Unknown Title)
+      const hasDummies = this.playlist.preloadedSongs.some(s => s.title === 'Unknown Title');
+      
+      if (hasDummies) {
+        this.isLoading.set(true);
+        const dummyIds = this.playlist.preloadedSongs.filter(s => s.title === 'Unknown Title').map(s => s.videoId);
+        
+        this.youtubeApi.getVideoDetails(dummyIds).subscribe(details => {
+          // Merge details with any non-dummy preloaded songs
+          const updatedSongs = this.playlist.preloadedSongs!.map(s => {
+            if (s.title === 'Unknown Title') {
+              const detail = details.find(d => d.videoId === s.videoId);
+              return detail || s; // fallback to dummy if not found
+            }
+            return s;
+          });
+          
+          this.songs.set(updatedSongs);
+          this.isLoading.set(false);
+          
+          if (this.playlist.id === 'liked-songs') {
+            this.userService.likedSongs.set(updatedSongs);
+          }
+        });
+      } else {
+        this.songs.set(this.playlist.preloadedSongs);
+        this.isLoading.set(false);
+      }
       return;
     }
     
