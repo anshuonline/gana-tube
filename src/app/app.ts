@@ -298,6 +298,10 @@ export class App implements OnInit {
       
       if (url === 'playlist') {
         const playlistId = event.urlAfterRedirects.split('/')[2];
+        if (playlistId === 'liked-songs') {
+          this.openLikedSongs();
+          return;
+        }
         const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
         if (targetPlaylist) {
           this.selectedPlaylist.set(targetPlaylist);
@@ -418,9 +422,15 @@ export class App implements OnInit {
       // If user refreshed on a playlist page, set the selected playlist now that custom playlists are loaded
       if (this.currentPage() === 'playlist') {
         const playlistId = this.router.url.split('/')[2];
-        const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
-        if (targetPlaylist && !this.selectedPlaylist()) {
-          this.selectedPlaylist.set(targetPlaylist);
+        if (playlistId === 'liked-songs') {
+          if (!this.selectedPlaylist()) {
+            this.openLikedSongs();
+          }
+        } else {
+          const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
+          if (targetPlaylist && !this.selectedPlaylist()) {
+            this.selectedPlaylist.set(targetPlaylist);
+          }
         }
       }
     });
