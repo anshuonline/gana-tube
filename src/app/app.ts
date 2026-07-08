@@ -641,8 +641,8 @@ export class App implements OnInit {
           songs: cs.songs
         }));
 
-        // Combine them: Dynamic algorithmic shelves FIRST, then Custom Admin Sections
-        this.allShelfDefinitions = [...algorithmicShelves, ...customShelves];
+        // Combine them: Custom Admin Sections FIRST (instant), then Dynamic algorithmic shelves (slow API)
+        this.allShelfDefinitions = [...customShelves, ...algorithmicShelves];
         
         const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
         let loadedCount = 0;
