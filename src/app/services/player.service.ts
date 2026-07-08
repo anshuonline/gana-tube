@@ -3,6 +3,8 @@ import { YouTubeSearchResult } from './youtube-api.service';
 import { AlgorithmService } from './algorithm.service';
 import { YoutubeApiService } from './youtube-api.service';
 import { RoomService } from './room.service';
+import { UserService } from './user.service';
+import { AuthService } from './auth.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -15,6 +17,8 @@ export class PlayerService {
   private algorithmService = inject(AlgorithmService);
   private youtubeApi = inject(YoutubeApiService);
   private roomService = inject(RoomService);
+  private userService = inject(UserService);
+  private authService = inject(AuthService);
   private trackStartTime: number = 0;
   private isFetchingMore = false;
   private isRemoteUpdate = false;
@@ -139,6 +143,13 @@ export class PlayerService {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
+    
+    // Add to recent plays
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      this.userService.addRecentPlay(user.email, track, this.userService.preferredLanguages());
+    }
+    
     const q = this.queue();
     const existingIdx = q.findIndex((t) => t.videoId === track.videoId);
     if (existingIdx >= 0) {

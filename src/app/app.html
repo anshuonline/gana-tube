@@ -127,6 +127,16 @@
           </ng-container>
         </div>
 
+        <div class="profile-card settings-card" *ngIf="authService.currentUser()">
+          <h3>Your Library</h3>
+          <p>Access your favorite tracks and recent plays.</p>
+          <div class="quality-selector" style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="q-btn active" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;" (click)="openLikedSongs()">
+              <svg lucideHeart [attr.size]="18"></svg> Liked Songs ({{ userService.likedSongs().length }})
+            </button>
+          </div>
+        </div>
+
         <div class="profile-card settings-card">
           <h3>Music Quality</h3>
           <p>Choose the audio quality for playback.</p>

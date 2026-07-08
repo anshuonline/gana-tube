@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck, LucideHeart } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -54,6 +54,7 @@ export interface SponsoredAd {
     LucideMegaphone,
     LucideShare2,
     LucideCheck,
+    LucideHeart,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -253,6 +254,7 @@ export class App implements OnInit {
         email: user.email,
         preferred_languages: nextLangs,
         liked_songs: this.userService.likedSongs(),
+        recent_plays: this.userService.recentPlays(),
         listening_preferences: this.userService.listeningPreferences()
       });
     }
@@ -641,8 +643,19 @@ export class App implements OnInit {
           songs: cs.songs
         }));
 
-        // Combine them: Custom Admin Sections FIRST (instant), then Dynamic algorithmic shelves (slow API)
-        this.allShelfDefinitions = [...customShelves, ...algorithmicShelves];
+        // Add Recently Played if available
+        const recentPlays = this.userService.recentPlays();
+        const recentShelves: ShelfDefinition[] = [];
+        if (recentPlays && recentPlays.length > 0) {
+          recentShelves.push({
+            title: 'Recently Played',
+            query: '',
+            songs: recentPlays
+          });
+        }
+
+        // Combine them: Recently Played FIRST, then Custom Admin Sections (instant), then Dynamic algorithmic shelves (slow API)
+        this.allShelfDefinitions = [...recentShelves, ...customShelves, ...algorithmicShelves];
         
         const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
         let loadedCount = 0;
@@ -1021,6 +1034,24 @@ export class App implements OnInit {
     this.isSearchMode.set(false);
     this.router.navigate(['/playlist', playlist.id]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  openLikedSongs(): void {
+    const likedSongs = this.userService.likedSongs().filter(song => typeof song !== 'string');
+    if (likedSongs.length > 0) {
+      const playlistMeta: PlaylistMeta = {
+        id: 'liked-songs',
+        title: 'Liked Songs',
+        language: this.homeScreenLanguage(),
+        coverImage: likedSongs[0].thumbnail || 'assets/default-playlist.jpg',
+        preloadedSongs: likedSongs,
+        searchQueries: []
+      };
+      this.selectedPlaylist.set(playlistMeta);
+      this.currentPage.set('playlist');
+      this.isSearchMode.set(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   closePlaylist(): void {
