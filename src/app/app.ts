@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck, LucideHeart } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
@@ -194,7 +194,8 @@ export class App implements OnInit {
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
-  sanitizer = inject(DomSanitizer);
+  private location = inject(Location);
+  private sanitizer = inject(DomSanitizer);
 
   getSafeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -1177,9 +1178,12 @@ export class App implements OnInit {
 
   closePlaylist(): void {
     this.selectedPlaylist.set(null);
-    this.currentPage.set('home');
-    this.router.navigate(['/home']);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.currentPage.set('home');
+      this.router.navigate(['/home']);
+    }
   }
 
 

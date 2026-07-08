@@ -1332,12 +1332,26 @@
   min-height: 80vh;
   display: flex;
   justify-content: center;
+  @media (max-width: 768px) {
+    padding-top: 60px;
+  }
+}
+
+.library-page-wrapper {
+  justify-content: flex-start;
+  padding-left: 40px;
+  padding-right: 40px;
+  @media (max-width: 768px) {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 .library-page-content {
   text-align: left;
-  max-width: 800px;
-  margin: 0 auto 40px;
+  max-width: 100%;
+  width: 100%;
+  margin: 0 0 40px;
   padding: 0;
   @media (max-width: 768px) {
     margin-top: 0;
