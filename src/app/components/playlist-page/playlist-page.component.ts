@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter, signal, inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
@@ -15,7 +15,7 @@ import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart } f
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
-export class PlaylistPageComponent implements OnInit {
+export class PlaylistPageComponent implements OnInit, OnChanges {
   @Input() playlist!: PlaylistMeta;
   @Output() back = new EventEmitter<void>();
 
@@ -36,6 +36,12 @@ export class PlaylistPageComponent implements OnInit {
       this.loadSongs();
     }
     this.loadAd();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['playlist'] && !changes['playlist'].firstChange) {
+      this.loadSongs();
+    }
   }
 
   loadAd(): void {
