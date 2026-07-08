@@ -259,6 +259,26 @@ export class PlayerService {
     }
   }
 
+  addToQueue(track: Track): void {
+    const q = this.queue();
+    this.queue.set([...q, track]);
+    if (q.length === 0) {
+      this.playTrack(track);
+    }
+  }
+
+  addNext(track: Track): void {
+    const q = this.queue();
+    const curr = this.currentIndex();
+    if (q.length === 0) {
+      this.playTrack(track);
+    } else {
+      const newQueue = [...q];
+      newQueue.splice(curr + 1, 0, track);
+      this.queue.set(newQueue);
+    }
+  }
+
   removeFromQueue(index: number): void {
     const q = this.queue();
     const currIdx = this.currentIndex();

@@ -22,12 +22,25 @@ export class UserService {
   likedSongs = signal<any[]>([]);
   recentPlays = signal<any[]>([]);
   listeningPreferences = signal<string[]>([]);
+  customPlaylists = signal<{name: string, tracks: any[]}[]>([]);
   
   constructor(private http: HttpClient) {
     if (!environment.production) {
       // In local dev, use the local XAMPP backend if preferred, 
       // otherwise it will just hit the production backend url from environment.
       // this.apiUrl = 'http://localhost/manageads/user-api.php';
+    }
+    
+    // Load custom playlists from localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('ganatube_playlists');
+      if (stored) {
+        try {
+          this.customPlaylists.set(JSON.parse(stored));
+        } catch (e) {
+          console.error('Failed to parse local playlists', e);
+        }
+      }
     }
   }
 
@@ -140,5 +153,32 @@ export class UserService {
       recent_plays: this.recentPlays(),
       listening_preferences: currentPrefs
     });
+  }
+
+  // Custom Playlists (Local Storage)
+  createPlaylist(name: string) {
+    const current = this.customPlaylists();
+    if (current.find(p => p.name === name)) return false;
+    const newPlaylists = [...current, { name, tracks: [] }];
+    this.customPlaylists.set(newPlaylists);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ganatube_playlists', JSON.stringify(newPlaylists));
+    }
+    return true;
+  }
+
+  addToPlaylist(playlistName: string, track: any) {
+    const current = [...this.customPlaylists()];
+    const pIdx = current.findIndex(p => p.name === playlistName);
+    if (pIdx >= 0) {
+      // Prevent duplicates
+      if (!current[pIdx].tracks.find((t: any) => t.videoId === track.videoId)) {
+        current[pIdx].tracks.unshift(track);
+        this.customPlaylists.set(current);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ganatube_playlists', JSON.stringify(current));
+        }
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck, LucideHeart } from '@lucide/angular';
+import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck, LucideHeart, LucideListPlus, LucideListStart, LucideFolderPlus, LucideListMusic, LucidePlus } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -55,6 +55,11 @@ export interface SponsoredAd {
     LucideShare2,
     LucideCheck,
     LucideHeart,
+    LucideListPlus,
+    LucideListStart,
+    LucideFolderPlus,
+    LucideListMusic,
+    LucidePlus,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -237,6 +242,85 @@ export class App implements OnInit {
   
   isEditingUsername = signal<boolean>(false);
   newUsername = signal<string>('');
+
+  // Track Menu State
+  activeMenuTrackId = signal<string | null>(null);
+  showPlaylistModal = signal<boolean>(false);
+  playlistModalTrack = signal<any | null>(null);
+  newPlaylistName = signal<string>('');
+
+  toggleMenu(track: any, event: Event) {
+    event.stopPropagation();
+    if (this.activeMenuTrackId() === track.videoId) {
+      this.activeMenuTrackId.set(null);
+    } else {
+      this.activeMenuTrackId.set(track.videoId);
+    }
+  }
+
+  addToQueue(track: any) {
+    this.playerService.addToQueue(track);
+    this.activeMenuTrackId.set(null);
+  }
+
+  playNext(track: any) {
+    this.playerService.addNext(track);
+    this.activeMenuTrackId.set(null);
+  }
+
+  shareTrack(track: any) {
+    const url = `https://ganatube.in/watch?v=${track.videoId}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      alert('Link copied to clipboard!');
+    }
+    this.activeMenuTrackId.set(null);
+  }
+
+  async toggleLikeTrack(track: any) {
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      await this.userService.toggleLike(user.email, track, this.preferredLanguages());
+    } else {
+      alert('Please login to like songs');
+    }
+    this.activeMenuTrackId.set(null);
+  }
+
+  openSaveToPlaylist(track: any) {
+    this.playlistModalTrack.set(track);
+    this.showPlaylistModal.set(true);
+    this.activeMenuTrackId.set(null);
+  }
+
+  closePlaylistModal() {
+    this.showPlaylistModal.set(false);
+    this.playlistModalTrack.set(null);
+    this.newPlaylistName.set('');
+  }
+
+  createAndAddToPlaylist() {
+    const name = this.newPlaylistName().trim();
+    if (!name) return;
+    const track = this.playlistModalTrack();
+    if (!track) return;
+    
+    this.userService.createPlaylist(name);
+    this.userService.addToPlaylist(name, track);
+    this.newPlaylistName.set('');
+  }
+
+  isLiked(track: any): boolean {
+    if (!track) return false;
+    return !!this.userService.likedSongs().find(s => 
+      (typeof s === 'string' ? s === track.videoId : s.videoId === track.videoId)
+    );
+  }
+
+  isInPlaylist(playlist: any, track: any): boolean {
+    if (!track || !playlist) return false;
+    return !!playlist.tracks.find((t: any) => t.videoId === track.videoId);
+  }
 
   async saveUsername() {
     if (this.newUsername().trim()) {
@@ -513,6 +597,13 @@ export class App implements OnInit {
     if (this.isSearchFocused() && this.results().length > 0) {
       if (!target.closest('.search-box-container') && !target.closest('.search-results-dropdown')) {
         this.isSearchFocused.set(false);
+      }
+    }
+    
+    // Close track menu
+    if (this.activeMenuTrackId()) {
+      if (!target.closest('.track-menu-dropdown') && !target.closest('.track-options-btn')) {
+        this.activeMenuTrackId.set(null);
       }
     }
   }
