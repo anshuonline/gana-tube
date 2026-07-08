@@ -299,6 +299,14 @@ export class App implements OnInit {
     this.newPlaylistName.set('');
   }
 
+  playCustomPlaylist(playlist: any) {
+    if (playlist && playlist.tracks && playlist.tracks.length > 0) {
+      this.playerService.setQueue(playlist.tracks, 0);
+    } else {
+      alert('This playlist is empty.');
+    }
+  }
+
   createAndAddToPlaylist() {
     const name = this.newPlaylistName().trim();
     if (!name) return;
