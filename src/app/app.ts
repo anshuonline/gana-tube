@@ -285,9 +285,11 @@ export class App implements OnInit {
             }
             this.algorithmService.syncFromBackend(profile.liked_songs, profile.listening_preferences);
             
-            // If user refreshed on liked-songs page, re-open now that profile is loaded
+            // If user refreshed on liked-songs or recently-played page, re-open now that profile is loaded
             if (this.router.url.includes('/playlist/liked-songs')) {
               this.openLikedSongs();
+            } else if (this.router.url.includes('/playlist/recently-played')) {
+              this.openRecentlyPlayed();
             }
 
             // Set random thumbnails for library boxes
@@ -1137,6 +1139,39 @@ export class App implements OnInit {
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
     this.router.navigate(['/playlist', 'liked-songs']);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  openRecentlyPlayed(): void {
+    const recentPlays = this.userService.recentPlays().map(song => {
+      if (typeof song === 'string') {
+        return {
+          videoId: song,
+          title: 'Unknown Title',
+          channelTitle: 'GanaTube',
+          thumbnail: `https://i.ytimg.com/vi/${song}/mqdefault.jpg`,
+          thumbnailHigh: `https://i.ytimg.com/vi/${song}/maxresdefault.jpg`,
+          publishedAt: ''
+        };
+      }
+      const s = {...song};
+      if (s.videoId) {
+        s.thumbnailHigh = `https://i.ytimg.com/vi/${s.videoId}/maxresdefault.jpg`;
+      }
+      return s;
+    });
+    const playlistMeta: PlaylistMeta = {
+      id: 'recently-played',
+      title: 'Recently Played',
+      language: this.homeScreenLanguage(),
+      coverImage: recentPlays.length > 0 && recentPlays[0].thumbnail ? recentPlays[0].thumbnail : 'assets/default-playlist.jpg',
+      preloadedSongs: recentPlays,
+      searchQueries: []
+    };
+    this.selectedPlaylist.set(playlistMeta);
+    this.currentPage.set('playlist');
+    this.isSearchMode.set(false);
+    this.router.navigate(['/playlist', 'recently-played']);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
