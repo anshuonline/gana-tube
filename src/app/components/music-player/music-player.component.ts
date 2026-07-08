@@ -200,8 +200,8 @@ import { AuthService } from '../../services/auth.service';
          (touchstart)="onTouchStart($event)"
          (touchmove)="onTouchMove($event)"
          (touchend)="onTouchEnd($event)"
-         [style.transform]="getSwipeTransform()"
-         [style.transition]="isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)'">
+         [style.transform]="swipeTransform()"
+         [style.transition]="isDragging() ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)'">
       <!-- Ambient Dynamic Glow Background -->
       <div class="ambient-glow-bg" *ngIf="playerService.currentTrack() as track" [style.background-image]="'url(' + track.thumbnailHigh + ')'"></div>
       <div class="vignette-overlay"></div>
@@ -451,36 +451,47 @@ export class MusicPlayerComponent {
   }
 
   // Swipe Gestures
-  touchStartY = 0;
-  touchCurrentY = 0;
-  touchStartX = 0;
-  touchCurrentX = 0;
-  isDragging = false;
+  touchStartY = signal(0);
+  touchCurrentY = signal(0);
+  touchStartX = signal(0);
+  touchCurrentX = signal(0);
+  isDragging = signal(false);
+  swipeTransform = signal('');
 
   onTouchStart(e: TouchEvent) {
     if ((e.target as HTMLElement).closest('.fs-queue-section, .volume-slider, .track-progress')) return;
-    this.touchStartY = e.touches[0].clientY;
-    this.touchStartX = e.touches[0].clientX;
-    this.isDragging = true;
+    this.touchStartY.set(e.touches[0].clientY);
+    this.touchStartX.set(e.touches[0].clientX);
+    this.isDragging.set(true);
   }
   
   onTouchMove(e: TouchEvent) {
-    if (!this.isDragging) return;
-    this.touchCurrentY = e.touches[0].clientY;
-    this.touchCurrentX = e.touches[0].clientX;
+    if (!this.isDragging()) return;
+    this.touchCurrentY.set(e.touches[0].clientY);
+    this.touchCurrentX.set(e.touches[0].clientX);
+    
+    const diffY = this.touchCurrentY() - this.touchStartY();
+    const diffX = this.touchCurrentX() - this.touchStartX();
+    
+    // Prevent default scroll if swiping down in fullscreen player
+    if (Math.abs(diffY) > Math.abs(diffX) && e.cancelable) {
+      e.preventDefault();
+    }
+    
+    this.updateSwipeTransform();
   }
 
   onTouchEnd(e: TouchEvent) {
-    if (!this.isDragging) return;
-    this.isDragging = false;
+    if (!this.isDragging()) return;
+    this.isDragging.set(false);
     
-    if (!this.touchStartY || !this.touchCurrentY) {
+    if (!this.touchStartY() || !this.touchCurrentY()) {
       this.resetTouch();
       return;
     }
     
-    const diffY = this.touchCurrentY - this.touchStartY;
-    const diffX = this.touchCurrentX - this.touchStartX;
+    const diffY = this.touchCurrentY() - this.touchStartY();
+    const diffX = this.touchCurrentX() - this.touchStartX();
     
     // Swipe down to dismiss
     if (diffY > 120 && Math.abs(diffY) > Math.abs(diffX)) {
@@ -499,27 +510,31 @@ export class MusicPlayerComponent {
   }
 
   resetTouch() {
-    this.touchStartY = 0;
-    this.touchCurrentY = 0;
-    this.touchStartX = 0;
-    this.touchCurrentX = 0;
+    this.touchStartY.set(0);
+    this.touchCurrentY.set(0);
+    this.touchStartX.set(0);
+    this.touchCurrentX.set(0);
+    this.swipeTransform.set('');
   }
   
-  getSwipeTransform(): string {
-    if (!this.isDragging || !this.touchStartY || !this.touchCurrentY) {
-      return '';
+  updateSwipeTransform() {
+    if (!this.isDragging() || !this.touchStartY() || !this.touchCurrentY()) {
+      this.swipeTransform.set('');
+      return;
     }
-    const diffY = this.touchCurrentY - this.touchStartY;
-    const diffX = this.touchCurrentX - this.touchStartX;
+    const diffY = this.touchCurrentY() - this.touchStartY();
+    const diffX = this.touchCurrentX() - this.touchStartX();
     
     // Only animate swipe down if primarily swiping down
     if (diffY > 0 && Math.abs(diffY) > Math.abs(diffX)) {
-      return `translateY(${diffY}px)`;
+      this.swipeTransform.set(`translateY(${diffY}px)`);
+      return;
     }
     // Only animate left/right if horizontal swipe
     if (Math.abs(diffX) > 20 && Math.abs(diffX) > Math.abs(diffY)) {
-      return `translateX(${diffX}px)`;
+      this.swipeTransform.set(`translateX(${diffX}px)`);
+      return;
     }
-    return '';
+    this.swipeTransform.set('');
   }
 }
