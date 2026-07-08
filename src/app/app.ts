@@ -379,6 +379,15 @@ export class App implements OnInit {
     }
   }
 
+  // --- Performance Optimization ---
+  trackByVideoId(index: number, track: any): string {
+    return track.videoId;
+  }
+
+  shelfTrackBy(index: number, shelf: any): string {
+    return shelf.title;
+  }
+
   constructor(
     private youtubeApi: YoutubeApiService,
     public playerService: PlayerService,

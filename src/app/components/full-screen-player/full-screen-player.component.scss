@@ -133,6 +133,7 @@
 
   .queue-list {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding-right: 16px;
 
@@ -208,6 +209,7 @@
 
   .lyrics-container {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding-right: 16px;
 

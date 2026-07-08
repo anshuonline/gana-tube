@@ -585,7 +585,7 @@
         <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !isSearchMode()">
 
           <!-- Dynamic Shelves Loop -->
-          <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index">
+          <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index; trackBy: shelfTrackBy">
             <!-- Standard Shelf Layout -->
             <ng-container *ngIf="shelf.title !== 'Suggested for You'">
               <div class="shelf-header">
@@ -600,7 +600,7 @@
                 </div>
               </div>
               <div class="shelf-grid" #shelfGrid>
-                <div class="song-card" *ngFor="let track of shelf.songs" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <div class="song-card" *ngFor="let track of shelf.songs; trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
                   <div class="card-thumbnail">
                     <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                     <div class="thumbnail-overlay">
@@ -647,7 +647,7 @@
                 <h2 class="shelf-title">{{ shelf.title }}</h2>
               </div>
               <div class="suggested-list-grid">
-                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8)" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8); trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
                   <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                   <div class="suggested-info">
                     <div class="suggested-artist">{{ track.channelTitle | uppercase }}</div>
