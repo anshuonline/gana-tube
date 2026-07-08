@@ -600,7 +600,7 @@
                 </div>
               </div>
               <div class="shelf-grid" #shelfGrid>
-                <div class="song-card" *ngFor="let track of shelf.songs" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <div class="song-card" *ngFor="let track of shelf.songs" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
                   <div class="card-thumbnail">
                     <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                     <div class="thumbnail-overlay">
@@ -611,11 +611,11 @@
                         <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
                       </button>
                     </div>
+                    <button class="track-options-btn" (click)="toggleMenu(track, $event)">
+                      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                    </button>
                   </div>
-                  <button class="track-options-btn" (click)="toggleMenu(track, $event)">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                  </button>
-                  <!-- Dropdown Menu -->
+                  <!-- Dropdown Menu (outside thumbnail to avoid overflow:hidden clip) -->
                   <div class="track-menu-dropdown" *ngIf="activeMenuTrackId() === track.videoId">
                     <div class="menu-item" (click)="$event.stopPropagation(); addToQueue(track)">
                       <svg lucideListPlus [attr.size]="18"></svg> Add to queue
@@ -647,37 +647,34 @@
                 <h2 class="shelf-title">{{ shelf.title }}</h2>
               </div>
               <div class="suggested-list-grid">
-                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8)" [class.active]="playerService.currentTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
-                  <div style="position: relative;">
-                    <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
-                    <button class="track-options-btn" (click)="toggleMenu(track, $event)">
-                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-                    </button>
-                    <!-- Dropdown Menu -->
-                    <div class="track-menu-dropdown" *ngIf="activeMenuTrackId() === track.videoId" style="top: 100%; right: auto; left: 0;">
-                      <div class="menu-item" (click)="$event.stopPropagation(); addToQueue(track)">
-                        <svg lucideListPlus [attr.size]="18"></svg> Add to queue
-                      </div>
-                      <div class="menu-item" (click)="$event.stopPropagation(); playNext(track)">
-                        <svg lucideListStart [attr.size]="18"></svg> Play next
-                      </div>
-                      <div class="menu-item" (click)="$event.stopPropagation(); openSaveToPlaylist(track)">
-                        <svg lucideFolderPlus [attr.size]="18"></svg> Save to playlist
-                      </div>
-                      <div class="menu-item" (click)="$event.stopPropagation(); toggleLikeTrack(track)">
-                        <svg lucideHeart [attr.size]="18"></svg> {{ isLiked(track) ? 'Remove from liked songs' : 'Add to liked songs' }}
-                      </div>
-                      <div class="menu-item" (click)="$event.stopPropagation(); shareTrack(track)">
-                        <svg lucideShare2 [attr.size]="18"></svg> Share
-                      </div>
-                    </div>
-                  </div>
+                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8)" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                  <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                   <div class="suggested-info">
                     <div class="suggested-artist">{{ track.channelTitle | uppercase }}</div>
                     <div class="suggested-title" [title]="track.title">{{ track.title }}</div>
                   </div>
                   <div class="suggested-actions">
-                    <!-- Actions replaced by hover menu -->
+                    <button class="track-options-btn suggested-menu-btn" (click)="toggleMenu(track, $event)">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                    </button>
+                  </div>
+                  <!-- Dropdown Menu -->
+                  <div class="track-menu-dropdown" *ngIf="activeMenuTrackId() === track.videoId">
+                    <div class="menu-item" (click)="$event.stopPropagation(); addToQueue(track)">
+                      <svg lucideListPlus [attr.size]="18"></svg> Add to queue
+                    </div>
+                    <div class="menu-item" (click)="$event.stopPropagation(); playNext(track)">
+                      <svg lucideListStart [attr.size]="18"></svg> Play next
+                    </div>
+                    <div class="menu-item" (click)="$event.stopPropagation(); openSaveToPlaylist(track)">
+                      <svg lucideFolderPlus [attr.size]="18"></svg> Save to playlist
+                    </div>
+                    <div class="menu-item" (click)="$event.stopPropagation(); toggleLikeTrack(track)">
+                      <svg lucideHeart [attr.size]="18"></svg> {{ isLiked(track) ? 'Remove from liked songs' : 'Add to liked songs' }}
+                    </div>
+                    <div class="menu-item" (click)="$event.stopPropagation(); shareTrack(track)">
+                      <svg lucideShare2 [attr.size]="18"></svg> Share
+                    </div>
                   </div>
                 </div>
               </div>

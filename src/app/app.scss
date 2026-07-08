@@ -801,8 +801,7 @@
   overflow-x: auto;
   scroll-behavior: smooth;
   gap: 12px;
-  padding: 4px 0 250px;
-  margin-bottom: -234px;
+  padding: 4px 0 16px;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
   &::-webkit-scrollbar {
@@ -1704,10 +1703,28 @@
 }
 
 /* --- TRACK OPTIONS MENU --- */
+
+/* Song cards need position:relative for dropdown positioning */
+.song-card {
+  position: relative;
+}
+.song-card.menu-open {
+  z-index: 100;
+}
+
+/* Suggested list items also need relative + z-index */
+.suggested-list-item {
+  position: relative;
+}
+.suggested-list-item.menu-open {
+  z-index: 100;
+}
+
+/* The 3-dot button (inside .card-thumbnail for poster cards) */
 .track-options-btn {
   position: absolute;
-  right: 12px;
-  top: 12px;
+  right: 8px;
+  top: 8px;
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -1723,23 +1740,58 @@
 .track-options-btn:hover {
   background: rgba(0,0,0,0.9);
 }
-.song-card:hover .track-options-btn,
-.suggested-list-item:hover .track-options-btn {
+
+/* For suggested section: button is static, not absolute */
+.suggested-menu-btn {
+  position: static;
+  opacity: 0.5;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  color: rgba(255,255,255,0.8);
+}
+.suggested-menu-btn:hover {
+  background: rgba(255,255,255,0.1);
   opacity: 1;
 }
 
+/* Show button on hover */
+.song-card:hover .track-options-btn {
+  opacity: 1;
+}
+.suggested-list-item:hover .suggested-menu-btn {
+  opacity: 1;
+}
+
+/* The dropdown menu */
 .track-menu-dropdown {
   position: absolute;
   right: 0;
   top: 100%;
   background: #000000;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  z-index: 1000;
-  min-width: 200px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+  z-index: 9990;
+  min-width: 220px;
   padding: 8px 0;
 }
+
+/* For song-cards, position dropdown below the thumbnail area */
+.song-card > .track-menu-dropdown {
+  top: auto;
+  right: 0;
+  margin-top: -4px;
+}
+
+/* For suggested items, dropdown from the right side */
+.suggested-list-item > .track-menu-dropdown {
+  right: 0;
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 4px;
+}
+
 .track-menu-dropdown .menu-item {
   display: flex;
   align-items: center;
@@ -1749,6 +1801,7 @@
   font-size: 0.95rem;
   cursor: pointer;
   transition: background 0.2s;
+  white-space: nowrap;
 }
 .track-menu-dropdown .menu-item:hover {
   background: rgba(255,255,255,0.1);
