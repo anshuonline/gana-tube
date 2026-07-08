@@ -1056,7 +1056,19 @@ export class App implements OnInit {
   }
 
   openLikedSongs(): void {
-    const likedSongs = this.userService.likedSongs().filter(song => typeof song !== 'string');
+    const likedSongs = this.userService.likedSongs().map(song => {
+      if (typeof song === 'string') {
+        return {
+          videoId: song,
+          title: 'Unknown Title',
+          channelTitle: 'GanaTube',
+          thumbnail: `https://i.ytimg.com/vi/${song}/mqdefault.jpg`,
+          thumbnailHigh: `https://i.ytimg.com/vi/${song}/hqdefault.jpg`,
+          publishedAt: ''
+        };
+      }
+      return song;
+    });
     const playlistMeta: PlaylistMeta = {
       id: 'liked-songs',
       title: 'Liked Songs',
