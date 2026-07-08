@@ -1070,7 +1070,7 @@ export class App implements OnInit {
           title: 'Unknown Title',
           channelTitle: 'GanaTube',
           thumbnail: `https://i.ytimg.com/vi/${song}/mqdefault.jpg`,
-          thumbnailHigh: `https://i.ytimg.com/vi/${song}/hqdefault.jpg`,
+          thumbnailHigh: `https://i.ytimg.com/vi/${song}/maxresdefault.jpg`,
           publishedAt: ''
         };
       }

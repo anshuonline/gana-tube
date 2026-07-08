@@ -100,7 +100,7 @@ export class YoutubeApiService {
               title: this.decodeHtml(item.snippet.title),
               channelTitle: item.snippet.channelTitle,
               thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
-              thumbnailHigh: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+              thumbnailHigh: item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.standard?.url || item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
               publishedAt: item.snippet.publishedAt,
             }))
           ),
@@ -146,7 +146,7 @@ export class YoutubeApiService {
           title: this.decodeHtml(item.snippet.title),
           channelTitle: item.snippet.channelTitle,
           thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
-          thumbnailHigh: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+          thumbnailHigh: item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.standard?.url || item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
           publishedAt: item.snippet.publishedAt,
         }))
       ),
