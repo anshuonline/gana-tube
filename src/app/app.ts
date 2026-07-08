@@ -666,12 +666,19 @@ export class App implements OnInit {
 
         // Extract 'Suggested for You' (the first algorithmic shelf)
         const suggestedShelf = algorithmicShelves.length > 0 ? [algorithmicShelves[0]] : [];
-        const otherAlgorithmicShelves = algorithmicShelves.length > 1 ? algorithmicShelves.slice(1) : [];
+        const timeShelf = algorithmicShelves.length > 1 ? [algorithmicShelves[1]] : [];
+        const otherAlgorithmicShelves = algorithmicShelves.length > 2 ? algorithmicShelves.slice(2) : [];
 
-        // Combine them: Recently Played FIRST, then Suggested for You, then Custom Admin Sections (instant), then Dynamic algorithmic shelves (slow API)
+        // Combine them in the requested order:
+        // 1. Suggested for You
+        // 2. Time-based shelf (Afternoon/Night)
+        // 3. Recently Played
+        // 4. Custom Admin Sections
+        // 5. Other algorithmic shelves
         this.allShelfDefinitions = [
-          ...recentShelves, 
           ...suggestedShelf,
+          ...timeShelf,
+          ...recentShelves, 
           ...customShelves, 
           ...otherAlgorithmicShelves
         ];
