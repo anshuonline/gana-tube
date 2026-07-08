@@ -285,6 +285,30 @@ export class App implements OnInit {
             if (this.router.url.includes('/playlist/liked-songs')) {
               this.openLikedSongs();
             }
+
+            // Dynamically inject 'Recently Played' if we just loaded it from backend
+            // and it wasn't present during the initial shelf load.
+            const recentPlays = this.userService.recentPlays();
+            if (recentPlays && recentPlays.length > 0) {
+              const hasRecentShelf = this.allShelfDefinitions.some(s => s.title === 'Recently Played');
+              if (!hasRecentShelf) {
+                const recentShelf = {
+                  title: 'Recently Played',
+                  query: '',
+                  songs: recentPlays
+                };
+                
+                // Inject at index 2 (after Suggested and Time-based) or at end
+                this.allShelfDefinitions.splice(2, 0, recentShelf);
+                
+                this.loadedShelves.update(shelves => {
+                  const updated = [...shelves];
+                  const insertIndex = Math.min(2, updated.length);
+                  updated.splice(insertIndex, 0, recentShelf);
+                  return updated;
+                });
+              }
+            }
           }
         });
       } else if (user === null) {
