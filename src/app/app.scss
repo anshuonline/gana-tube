@@ -801,7 +801,8 @@
   overflow-x: auto;
   scroll-behavior: smooth;
   gap: 12px;
-  padding: 4px 0 16px;
+  padding: 4px 0 250px;
+  margin-bottom: -234px;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
   &::-webkit-scrollbar {
@@ -1705,21 +1706,22 @@
 /* --- TRACK OPTIONS MENU --- */
 .track-options-btn {
   position: absolute;
-  right: -5px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
+  right: 12px;
+  top: 12px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: none;
-  color: rgba(255,255,255,0.5);
+  color: #fff;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s, color 0.2s;
-  padding: 5px;
+  transition: opacity 0.2s, background 0.2s;
+  padding: 6px;
   border-radius: 50%;
+  z-index: 10;
 }
 .track-options-btn:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.9);
 }
 .song-card:hover .track-options-btn,
 .suggested-list-item:hover .track-options-btn {
