@@ -5,12 +5,16 @@
 
   <div class="playlist-header">
     <div class="playlist-cover-container">
-      <img [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'">
+      <img *ngIf="playlist.id !== 'liked-songs'" [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'">
+      
+      <div *ngIf="playlist.id === 'liked-songs'" class="liked-songs-cover">
+        <svg lucideHeart [attr.size]="64" fill="white" stroke="none" class="glowing-heart"></svg>
+      </div>
     </div>
     <div class="playlist-info">
-      <span class="badge">{{ playlist.language }}</span>
+      <span class="badge" *ngIf="playlist.id !== 'liked-songs'">{{ playlist.language }}</span>
       <h1 class="playlist-title">{{ playlist.title }}</h1>
-      <p class="playlist-meta">GanaTube Curated • {{ songs().length > 0 ? songs().length + ' songs' : 'Loading...' }}</p>
+      <p class="playlist-meta">GanaTube Curated • {{ isLoading() ? 'Loading...' : songs().length + ' songs' }}</p>
       <div class="playlist-actions">
         <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
           <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All

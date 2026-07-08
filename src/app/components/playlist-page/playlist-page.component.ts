@@ -5,12 +5,12 @@ import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-a
 import { PlayerService } from '../../services/player.service';
 import { PlaylistMeta } from '../../data/playlists.data';
 import { SponsoredAd } from '../../app';
-import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck } from '@lucide/angular';
+import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart } from '@lucide/angular';
 
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck],
+  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
