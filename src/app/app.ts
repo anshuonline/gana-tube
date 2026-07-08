@@ -280,6 +280,11 @@ export class App implements OnInit {
               this.preferredLanguages.set(profile.preferred_languages);
             }
             this.algorithmService.syncFromBackend(profile.liked_songs, profile.listening_preferences);
+            
+            // If user refreshed on liked-songs page, re-open now that profile is loaded
+            if (this.router.url.includes('/playlist/liked-songs')) {
+              this.openLikedSongs();
+            }
           }
         });
       } else if (user === null) {
@@ -1074,7 +1079,12 @@ export class App implements OnInit {
           publishedAt: ''
         };
       }
-      return song;
+      // Always upgrade thumbnailHigh to maxresdefault for best quality
+      const s = {...song};
+      if (s.videoId) {
+        s.thumbnailHigh = `https://i.ytimg.com/vi/${s.videoId}/maxresdefault.jpg`;
+      }
+      return s;
     });
     const playlistMeta: PlaylistMeta = {
       id: 'liked-songs',
