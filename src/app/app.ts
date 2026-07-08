@@ -1038,20 +1038,19 @@ export class App implements OnInit {
 
   openLikedSongs(): void {
     const likedSongs = this.userService.likedSongs().filter(song => typeof song !== 'string');
-    if (likedSongs.length > 0) {
-      const playlistMeta: PlaylistMeta = {
-        id: 'liked-songs',
-        title: 'Liked Songs',
-        language: this.homeScreenLanguage(),
-        coverImage: likedSongs[0].thumbnail || 'assets/default-playlist.jpg',
-        preloadedSongs: likedSongs,
-        searchQueries: []
-      };
-      this.selectedPlaylist.set(playlistMeta);
-      this.currentPage.set('playlist');
-      this.isSearchMode.set(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    const playlistMeta: PlaylistMeta = {
+      id: 'liked-songs',
+      title: 'Liked Songs',
+      language: this.homeScreenLanguage(),
+      coverImage: likedSongs.length > 0 && likedSongs[0].thumbnail ? likedSongs[0].thumbnail : 'assets/default-playlist.jpg',
+      preloadedSongs: likedSongs,
+      searchQueries: []
+    };
+    this.selectedPlaylist.set(playlistMeta);
+    this.currentPage.set('playlist');
+    this.isSearchMode.set(false);
+    this.router.navigate(['/playlist', 'liked-songs']);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   closePlaylist(): void {
