@@ -294,13 +294,15 @@ export class App implements OnInit {
             const liked = this.userService.likedSongs();
             if (liked && liked.length > 0) {
               const randSong = liked[Math.floor(Math.random() * liked.length)];
-              this.randomLikedThumbnail.set(randSong.thumbnailHigh || randSong.thumbnail);
+              const thumbUrl = typeof randSong === 'string' ? `https://i.ytimg.com/vi/${randSong}/maxresdefault.jpg` : (randSong.thumbnailHigh || randSong.thumbnail);
+              this.randomLikedThumbnail.set(thumbUrl);
             }
             
             const recentPlays = this.userService.recentPlays();
             if (recentPlays && recentPlays.length > 0) {
               const randSong = recentPlays[Math.floor(Math.random() * recentPlays.length)];
-              this.randomRecentThumbnail.set(randSong.thumbnailHigh || randSong.thumbnail);
+              const thumbUrl = typeof randSong === 'string' ? `https://i.ytimg.com/vi/${randSong}/maxresdefault.jpg` : (randSong.thumbnailHigh || randSong.thumbnail);
+              this.randomRecentThumbnail.set(thumbUrl);
             }
             if (recentPlays && recentPlays.length > 0) {
               const hasRecentShelf = this.allShelfDefinitions.some(s => s.title === 'Recently Played');
