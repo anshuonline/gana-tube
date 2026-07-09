@@ -586,6 +586,15 @@ export class App implements OnInit {
         this.isSearchMode.set(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
+      } else if (url === 'user') {
+        const parts = event.urlAfterRedirects.split('/');
+        const username = parts[2];
+        const playlistId = parts[3];
+        
+        if (playlistId) {
+          this.fetchPublicPlaylist(playlistId, username);
+        }
+        return;
       }
 
       // Check if it's a valid static page or one of our main pages
@@ -1299,6 +1308,61 @@ export class App implements OnInit {
     this.isSearchMode.set(false);
     this.router.navigate(['/playlist', playlist.id]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  openCustomPlaylist(pl: any): void {
+    const email = this.authService.currentUser()?.email || 'user';
+    const username = email.split('@')[0];
+    
+    // Create temporary PlaylistMeta
+    const playlistMeta: PlaylistMeta = {
+      id: pl.playlist_id,
+      title: pl.name,
+      language: this.homeScreenLanguage(),
+      coverImage: pl.tracks.length > 0 && pl.tracks[0].thumbnailHigh ? pl.tracks[0].thumbnailHigh : 
+                 (pl.tracks.length > 0 && pl.tracks[0].thumbnail ? pl.tracks[0].thumbnail : 'assets/default-playlist.jpg'),
+      preloadedSongs: pl.tracks,
+      searchQueries: []
+    };
+    
+    this.selectedPlaylist.set(playlistMeta);
+    this.currentPage.set('playlist');
+    this.isSearchMode.set(false);
+    this.router.navigate(['/user', username, pl.playlist_id]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async fetchPublicPlaylist(playlistId: string, username: string) {
+    const email = this.authService.currentUser()?.email || '';
+    try {
+      const url = this.userService['apiUrl'].replace('user-api.php', 'playlist-api.php');
+      const response = await fetch(`${url}?action=getPublicPlaylist&playlist_id=${playlistId}&email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      
+      if (data.status === 'success' && data.data) {
+        const pl = data.data;
+        const playlistMeta: PlaylistMeta = {
+          id: pl.playlist_id,
+          title: pl.playlist_name,
+          language: this.homeScreenLanguage(),
+          coverImage: pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh ? pl.songs[0].thumbnailHigh : 
+                     (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg'),
+          preloadedSongs: pl.songs || [],
+          searchQueries: []
+        };
+        
+        this.selectedPlaylist.set(playlistMeta);
+        this.currentPage.set('playlist');
+        this.isSearchMode.set(false);
+      } else {
+        // Fallback if not found or private
+        this.router.navigate(['/home']);
+        this.toastService.error("Playlist not found or is private");
+      }
+    } catch(e) {
+      this.router.navigate(['/home']);
+      this.toastService.error("Error loading playlist");
+    }
   }
 
   openLikedSongs(): void {

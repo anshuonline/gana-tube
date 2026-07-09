@@ -394,7 +394,7 @@
           </div>
 
           <!-- DESKTOP Custom Playlists -->
-          <div class="desktop-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="playCustomPlaylist(pl)">
+          <div class="desktop-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="openCustomPlaylist(pl)">
             <div class="desktop-lib-thumb">
               <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
               <div class="desktop-lib-count">
@@ -456,7 +456,7 @@
           </div>
 
           <!-- MOBILE Custom Playlists -->
-          <div class="mobile-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="playCustomPlaylist(pl)">
+          <div class="mobile-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="openCustomPlaylist(pl)">
             <div class="mobile-lib-thumb">
               <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
               <div class="mobile-lib-count">

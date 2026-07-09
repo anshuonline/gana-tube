@@ -41,13 +41,26 @@
         <span>Add to queue</span>
       </li>
 
-      <li (click)="saveToPlaylist($event)">
+      <li class="menu-item" (click)="saveToPlaylist($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history'">
         <svg lucideFolderPlus [attr.size]="20"></svg>
         <span>Save to playlist</span>
       </li>
 
-      <!-- Delete option only for Custom Playlists -->
-      <li *ngIf="playlist?.playlist_id" (click)="deletePlaylist($event)">
+      <!-- Visibility Toggle -->
+      <li class="menu-item" (click)="toggleVisibility($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history'">
+        <svg *ngIf="playlist?.is_public" lucideGlobe [attr.size]="20"></svg>
+        <svg *ngIf="!playlist?.is_public" lucideLock [attr.size]="20"></svg>
+        <span>Make {{ playlist?.is_public ? 'Private' : 'Public' }}</span>
+      </li>
+
+      <!-- Share Option -->
+      <li class="menu-item" (click)="sharePlaylist($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history'">
+        <svg lucideShare2 [attr.size]="20"></svg>
+        <span>Share</span>
+      </li>
+
+      <!-- Delete option -->
+      <li class="menu-item" (click)="deletePlaylist($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history'" style="color: #f44336;">
         <svg lucideTrash2 [attr.size]="20"></svg>
         <span>Delete playlist</span>
       </li>

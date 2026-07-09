@@ -11,7 +11,10 @@ import {
   LucideListStart,
   LucideListPlus,
   LucideFolderPlus,
-  LucideTrash2
+  LucideTrash2,
+  LucideGlobe,
+  LucideLock,
+  LucideShare2
 } from '@lucide/angular';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 
@@ -29,6 +32,9 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
     LucideListPlus,
     LucideFolderPlus,
     LucideTrash2,
+    LucideGlobe,
+    LucideLock,
+    LucideShare2,
     ConfirmModalComponent
   ],
   templateUrl: './playlist-menu.html',
@@ -164,8 +170,45 @@ export class PlaylistMenuComponent implements OnChanges {
 
   saveToPlaylist(event: Event) {
     event.stopPropagation();
-    // Complex to add all tracks to another playlist, leaving as alert for now
     alert('Select tracks individually to add them to other playlists.');
+    this.close();
+  }
+
+  async toggleVisibility(event: Event) {
+    event.stopPropagation();
+    if (this.playlist?.playlist_id) {
+      const email = this.authService.currentUser()?.email;
+      if (email) {
+        const newVisibility = !this.playlist.is_public;
+        try {
+          const url = this.userService['apiUrl'].replace('user-api.php', 'playlist-api.php');
+          await fetch(`${url}?action=updatePlaylist`, {
+            method: 'POST',
+            body: JSON.stringify({ email, playlist_id: this.playlist.playlist_id, is_public: newVisibility ? 1 : 0 })
+          });
+          this.playlist.is_public = newVisibility;
+          this.userService.loadPlaylists(email);
+          this.toastService.success(`Playlist is now ${newVisibility ? 'Public' : 'Private'}`);
+        } catch(e) {
+          this.toastService.error("Failed to update visibility");
+        }
+      }
+    }
+  }
+
+  sharePlaylist(event: Event) {
+    event.stopPropagation();
+    if (this.playlist?.playlist_id) {
+      const email = this.authService.currentUser()?.email || 'user';
+      const username = email.split('@')[0];
+      const url = `${window.location.origin}/user/${username}/${this.playlist.playlist_id}`;
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+          this.toastService.success("Link copied to clipboard!");
+        });
+      }
+    }
     this.close();
   }
 
