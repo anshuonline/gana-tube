@@ -14,7 +14,11 @@
     <div class="playlist-info">
       <span class="badge" *ngIf="playlist.id !== 'liked-songs'">{{ playlist.language }}</span>
       <h1 class="playlist-title">{{ playlist.title }}</h1>
-      <p class="playlist-meta">GanaTube Curated • {{ isLoading() ? 'Loading...' : songs().length + ' songs' }}</p>
+      <p class="playlist-meta">
+        {{ playlist.creator ? playlist.creator : 'GanaTube Curated' }}
+        <span *ngIf="playlist.is_public !== undefined"> • {{ playlist.is_public ? 'Public' : 'Private' }}</span>
+        • {{ isLoading() ? 'Loading...' : songs().length + ' songs' }}
+      </p>
       <div class="playlist-actions">
         <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
           <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All

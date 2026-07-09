@@ -1333,7 +1333,9 @@ export class App implements OnInit {
       coverImage: pl.tracks.length > 0 && pl.tracks[0].thumbnailHigh ? pl.tracks[0].thumbnailHigh : 
                  (pl.tracks.length > 0 && pl.tracks[0].thumbnail ? pl.tracks[0].thumbnail : 'assets/default-playlist.jpg'),
       preloadedSongs: pl.tracks,
-      searchQueries: []
+      searchQueries: [],
+      creator: this.authService.currentUser()?.displayName || username,
+      is_public: pl.is_public
     };
     
     this.selectedPlaylist.set(playlistMeta);

@@ -17,6 +17,7 @@ import {
   LucideShare2
 } from '@lucide/angular';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
+import { EditPlaylistModalComponent } from '../edit-playlist-modal/edit-playlist-modal';
 
 @Component({
   selector: 'app-playlist-menu',
@@ -35,7 +36,8 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
     LucideGlobe,
     LucideLock,
     LucideShare2,
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    EditPlaylistModalComponent
   ],
   templateUrl: './playlist-menu.html',
   styleUrls: ['./playlist-menu.scss']
@@ -58,9 +60,8 @@ export class PlaylistMenuComponent implements OnChanges {
   public toastService = inject(ToastService);
 
   isMobile = false;
-  isEditing = false;
-  editName = '';
   showDeleteConfirm = false;
+  showEditModal = false;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -120,30 +121,55 @@ export class PlaylistMenuComponent implements OnChanges {
   editPlaylist(event: Event) {
     event.stopPropagation();
     if (this.playlist?.playlist_id) {
-      this.isEditing = true;
-      this.editName = this.playlist.name;
+      this.showEditModal = true;
     } else {
       this.toastService.info("Cannot edit this playlist");
     }
   }
 
-  async saveEdit(event: Event) {
-    event.stopPropagation();
-    const newName = this.editName.trim();
-    if (newName && newName !== this.playlist.name) {
-      const email = this.authService.currentUser()?.email;
-      if (email && this.playlist.playlist_id) {
-        // Assume updatePlaylist is added in UserService later, for now just show toast
-        this.toastService.info("Playlist rename will be available soon!");
+  async saveEditDetails(details: {name: string, isPublic: boolean}) {
+    if (!this.playlist?.playlist_id) return;
+    
+    // Check if the name changed or visibility changed
+    if (details.name !== this.playlist.name || details.isPublic !== this.playlist.is_public) {
+      try {
+        const url = this.userService['apiUrl'].replace('user-api.php', 'playlist-api.php');
+        const user = this.authService.currentUser();
+        const response: any = await fetch(`${url}?action=editPlaylist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: user?.email,
+            playlist_id: this.playlist.playlist_id,
+            playlist_name: details.name,
+            is_public: details.isPublic ? 1 : 0
+          })
+        }).then(r => r.json());
+
+        if (response.status === 'success') {
+          // Update local state
+          this.playlist.name = details.name;
+          this.playlist.is_public = details.isPublic;
+          
+          // Update custom playlists array in user service
+          const currentPlaylists = this.userService.customPlaylists();
+          const pIndex = currentPlaylists.findIndex(p => p.playlist_id === this.playlist.playlist_id);
+          if (pIndex >= 0) {
+            currentPlaylists[pIndex].name = details.name;
+            currentPlaylists[pIndex].is_public = details.isPublic;
+            this.userService.customPlaylists.set([...currentPlaylists]);
+          }
+          this.toastService.success('Playlist updated successfully');
+        } else {
+          this.toastService.error('Failed to update playlist');
+        }
+      } catch (e) {
+        console.error(e);
+        this.toastService.error('Error updating playlist');
       }
     }
-    this.isEditing = false;
+    this.showEditModal = false;
     this.close();
-  }
-
-  cancelEdit(event: Event) {
-    event.stopPropagation();
-    this.isEditing = false;
   }
 
   playNext(event: Event) {

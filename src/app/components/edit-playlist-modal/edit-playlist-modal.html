@@ -1,0 +1,32 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Playlist</h2>
+      <button class="close-btn" (click)="onClose()">
+        <svg lucideX [attr.size]="24"></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" [(ngModel)]="playlistName" placeholder="Add a name" class="form-input" />
+      </div>
+
+      <div class="form-group toggle-group" (click)="isPublic = !isPublic">
+        <div class="toggle-info">
+          <label>Visibility</label>
+          <span class="desc">{{ isPublic ? 'Anyone can view this playlist' : 'Only you can view this playlist' }}</span>
+        </div>
+        <div class="toggle-switch" [class.active]="isPublic">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onClose()">Cancel</button>
+      <button class="btn-save" (click)="onSave()" [disabled]="!playlistName.trim()">Save</button>
+    </div>
+  </div>
+</div>

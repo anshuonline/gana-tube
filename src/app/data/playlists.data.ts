@@ -6,6 +6,8 @@ export interface PlaylistMeta {
   coverImage: string;
   searchQueries: string[];
   preloadedSongs?: any[];
+  creator?: string;
+  is_public?: boolean;
 }
 
 export const PLAYLISTS: PlaylistMeta[] = [
