@@ -444,7 +444,9 @@ export class MusicPlayerComponent {
   }
 
   onPlayerBarClick(event: MouseEvent): void {
-    if ((event.target as HTMLElement).closest('.player-center, .player-right, .q-btn, .ctrl-btn, .play-pause-btn')) {
+    // Only block fullscreen toggle if the user explicitly clicked a button, slider, or the queue drawer
+    const interactiveSelectors = '.ctrl-btn, .fs-ctrl-btn, .play-pause-btn, .progress-track, .volume-slider, .queue-drawer, .q-btn';
+    if ((event.target as HTMLElement).closest(interactiveSelectors)) {
       return; // Do not open FS if clicking controls
     }
     this.toggleFullScreen();
