@@ -2,7 +2,11 @@
 <div class="track-menu-overlay" *ngIf="isOpen && isMobile" (click)="close($event)"></div>
 
 <!-- Main Container -->
-<div class="track-menu-container" *ngIf="isOpen" [class.mobile]="isMobile" (click)="$event.stopPropagation()">
+<div class="track-menu-container" *ngIf="isOpen" 
+     [class.mobile]="isMobile" 
+     [style.left.px]="!isMobile ? calculatedX : null" 
+     [style.top.px]="!isMobile ? calculatedY : null"
+     (click)="$event.stopPropagation()">
   
   <!-- Mobile Header (Drag handle + Track Info) -->
   <div class="mobile-header" *ngIf="isMobile">
@@ -37,12 +41,13 @@
 
     <hr class="menu-divider">
     
-    <div class="menu-item" (click)="goToArtist($event)">
-      <svg lucideUser [attr.size]="20"></svg> Go to artist
-    </div>
-    
-    <div class="menu-item" (click)="goToAlbum($event)">
-      <svg lucideDisc [attr.size]="20"></svg> Go to album
+    <!-- Go to Artist (Card Style) -->
+    <div class="menu-item artist-card-item" (click)="goToArtist($event)">
+      <img [src]="getArtistImage()" (error)="onImageError($event)" class="artist-avatar" alt="Artist">
+      <div class="artist-info">
+        <span class="artist-name">{{ track?.channelTitle }}</span>
+        <span class="artist-label">View Artist</span>
+      </div>
     </div>
     
     <hr class="menu-divider">

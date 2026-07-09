@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { AuthService } from '../../services/auth.service';
@@ -12,7 +12,6 @@ import {
   LucideHeart,
   LucideShare2,
   LucideUser,
-  LucideDisc,
   LucideDownload,
   LucideRadio
 } from '@lucide/angular';
@@ -28,16 +27,21 @@ import {
     LucideHeart,
     LucideShare2,
     LucideUser,
-    LucideDisc,
     LucideDownload,
     LucideRadio
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
 })
-export class TrackMenuComponent {
+export class TrackMenuComponent implements OnChanges {
   @Input() track: any;
   @Input() isOpen = false;
+  
+  @Input() xPos = 0;
+  @Input() yPos = 0;
+  
+  calculatedX = 0;
+  calculatedY = 0;
   
   @Output() closeMenu = new EventEmitter<void>();
   @Output() openPlaylist = new EventEmitter<any>();
@@ -57,6 +61,39 @@ export class TrackMenuComponent {
   @HostListener('window:resize')
   checkScreenSize() {
     this.isMobile = window.innerWidth <= 768;
+    this.calculatePosition();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['isOpen'] || changes['xPos'] || changes['yPos']) {
+      this.calculatePosition();
+    }
+  }
+
+  calculatePosition() {
+    if (this.isMobile || !this.isOpen) return;
+    
+    // Assuming menu width is around 260px
+    const menuWidth = 260;
+    // Assuming menu height might be around 400px at most
+    const menuHeight = 400;
+
+    let finalX = this.xPos;
+    let finalY = this.yPos;
+
+    // Prevent going off screen to the right
+    if (finalX + menuWidth > window.innerWidth) {
+      finalX = window.innerWidth - menuWidth - 16;
+    }
+    
+    // Prevent going off screen to the bottom (open upwards instead)
+    if (finalY + menuHeight > window.innerHeight) {
+      // open upwards (subtract button height roughly 24px and menu height)
+      finalY = Math.max(16, this.yPos - menuHeight - 24);
+    }
+
+    this.calculatedX = finalX;
+    this.calculatedY = finalY;
   }
 
   close(event?: Event) {
@@ -126,12 +163,12 @@ export class TrackMenuComponent {
     this.close();
   }
 
-  goToAlbum(event: Event) {
-    event.stopPropagation();
-    if (this.track) {
-      this.router.navigate(['/search'], { queryParams: { q: `${this.track.title} ${this.track.channelTitle}` } });
-    }
-    this.close();
+  getArtistImage(): string {
+    return this.track?.channelThumbnail || 'ganatubenewlogo.png';
+  }
+
+  onImageError(event: any) {
+    event.target.src = 'ganatubenewlogo.png';
   }
 
   download(event: Event) {

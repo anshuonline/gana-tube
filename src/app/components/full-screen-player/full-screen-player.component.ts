@@ -58,6 +58,8 @@ export class FullScreenPlayerComponent implements OnInit {
 
   activeView: 'artwork' | 'queue' | 'lyrics' | 'related' = 'artwork';
   showMenu = false;
+  menuX = 0;
+  menuY = 0;
   lyrics: string | null = null; // Plain text fallback
   parsedLyrics: { time: number, text: string }[] = [];
   activeLineIndex: number = -1;
@@ -100,7 +102,13 @@ export class FullScreenPlayerComponent implements OnInit {
     this.showMenu = false;
   }
 
-  toggleMenu(): void {
+  toggleMenu(event: MouseEvent): void {
+    if (!this.showMenu) {
+      const target = event.currentTarget as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      this.menuX = rect.right;
+      this.menuY = rect.bottom;
+    }
     this.showMenu = !this.showMenu;
   }
 

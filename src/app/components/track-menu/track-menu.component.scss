@@ -1,9 +1,6 @@
 /* Desktop styling (default) */
 .track-menu-container {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
+  position: fixed; /* Escape all overflow containers */
   background: #000000; /* AMOLED Black as requested */
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
@@ -46,6 +43,38 @@
 
     &.disabled-item {
       opacity: 0.5;
+    }
+  }
+
+  /* Artist Card Style */
+  .artist-card-item {
+    padding: 10px 20px;
+    gap: 12px;
+    
+    .artist-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .artist-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      
+      .artist-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 2px;
+      }
+      
+      .artist-label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
     }
   }
 

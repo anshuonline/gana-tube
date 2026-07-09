@@ -619,7 +619,9 @@
                   <app-track-menu 
                     [track]="track" 
                     [isOpen]="activeMenuTrackId() === track.videoId"
-                    (closeMenu)="activeMenuTrackId.set(null)"
+                    [xPos]="activeMenuPosition()?.x || 0"
+                    [yPos]="activeMenuPosition()?.y || 0"
+                    (closeMenu)="closeMenu()"
                     (openPlaylist)="openSaveToPlaylist($event)">
                   </app-track-menu>
                   <div class="card-info">
@@ -651,7 +653,9 @@
                   <app-track-menu 
                     [track]="track" 
                     [isOpen]="activeMenuTrackId() === track.videoId"
-                    (closeMenu)="activeMenuTrackId.set(null)"
+                    [xPos]="activeMenuPosition()?.x || 0"
+                    [yPos]="activeMenuPosition()?.y || 0"
+                    (closeMenu)="closeMenu()"
                     (openPlaylist)="openSaveToPlaylist($event)">
                   </app-track-menu>
                 </div>

@@ -244,20 +244,30 @@ export class App implements OnInit {
   
   isEditingUsername = signal<boolean>(false);
   newUsername = signal<string>('');
-
-  // Track Menu State
+  currentAmbientBg = signal<string>('');
+  
   activeMenuTrackId = signal<string | null>(null);
+  activeMenuPosition = signal<{x: number, y: number} | null>(null);
   showPlaylistModal = signal<boolean>(false);
   playlistModalTrack = signal<any | null>(null);
   newPlaylistName = signal<string>('');
 
-  toggleMenu(track: any, event: Event) {
+  toggleMenu(track: any, event: MouseEvent) {
     event.stopPropagation();
     if (this.activeMenuTrackId() === track.videoId) {
       this.activeMenuTrackId.set(null);
+      this.activeMenuPosition.set(null);
     } else {
+      const target = event.currentTarget as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      this.activeMenuPosition.set({ x: rect.right, y: rect.bottom });
       this.activeMenuTrackId.set(track.videoId);
     }
+  }
+
+  closeMenu() {
+    this.activeMenuTrackId.set(null);
+    this.activeMenuPosition.set(null);
   }
 
   addToQueue(track: any) {
@@ -267,7 +277,7 @@ export class App implements OnInit {
 
   playNext(track: any) {
     this.playerService.addNext(track);
-    this.activeMenuTrackId.set(null);
+    this.closeMenu();
   }
 
   shareTrack(track: any) {
@@ -276,7 +286,7 @@ export class App implements OnInit {
       navigator.clipboard.writeText(url);
       alert('Link copied to clipboard!');
     }
-    this.activeMenuTrackId.set(null);
+    this.closeMenu();
   }
 
   async toggleLikeTrack(track: any) {
