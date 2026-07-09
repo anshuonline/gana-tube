@@ -140,7 +140,7 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     this.showSearchResults = true;
     this.searchResults = [];
 
-    this.youtubeApi.searchMusic(query, 25).subscribe({
+    this.youtubeApi.searchMusic(query, 50).subscribe({
       next: (results) => {
         // Filter out multiple versions of the same song
         const unique = [];
@@ -153,7 +153,7 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
             unique.push(r);
           }
         }
-        this.searchResults = unique.slice(0, 10);
+        this.searchResults = unique;
         this.isSearching = false;
         this.cdr.detectChanges();
       },
@@ -172,12 +172,15 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   }
 
   playSearchResult(track: YouTubeSearchResult) {
-    // In Car Mode, if they tap a search result, play it immediately and clear search.
-    // Replace the current queue with just this track, or play it next.
-    // For simplicity, let's play it right away.
-    this.playerService.queue.set([track]);
-    this.playerService.currentIndex.set(0);
+    // In Car Mode, play the clicked search result and queue the rest of the search results
+    const index = this.searchResults.indexOf(track);
+    this.playerService.queue.set([...this.searchResults]);
+    this.playerService.currentIndex.set(index !== -1 ? index : 0);
     this.playerService.playTrack(track);
+    
+    // Clear search will hide the search results and show the "Up Next" queue,
+    // which now contains the full search results. This fulfills the user's need 
+    // to keep playing search results while displaying the active song.
     this.clearSearch();
   }
 
