@@ -139,18 +139,21 @@
 .desktop-lib-play-btn {
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #a855f7, #6366f1);
-  color: #fff;
+  background: #fff;
+  color: #000;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transform: translateY(15px);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 25px rgba(168, 85, 247, 0.5);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 .desktop-lib-item:hover .desktop-lib-play-btn {
   transform: translateY(0);
+}
+.desktop-lib-play-btn:hover {
+  transform: scale(1.1) !important;
 }
 
 .desktop-lib-info-row {

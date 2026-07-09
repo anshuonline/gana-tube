@@ -1,8 +1,8 @@
 <!-- Overlay to catch outside clicks and apply dimming -->
-<div class="playlist-menu-overlay" *ngIf="isOpen" (click)="close($event)"></div>
+<div class="playlist-menu-overlay" *ngIf="isOpen && !showEditModal && !showDeleteConfirm" (click)="close($event)"></div>
 
 <!-- Main Container -->
-<div class="track-menu-container" *ngIf="isOpen" 
+<div class="track-menu-container" *ngIf="isOpen && !showEditModal && !showDeleteConfirm" 
      [class.mobile]="isMobile" 
      [style.left.px]="!isMobile ? calculatedX : null" 
      [style.top.px]="!isMobile ? calculatedY : null"
