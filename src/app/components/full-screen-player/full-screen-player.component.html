@@ -1,7 +1,7 @@
 <div class="fs-player-overlay" [class.visible]="isVisible">
   
-  <!-- Dynamic blurred background -->
-  <div class="fs-bg-blur" [style.background-image]="'url(' + playerService.currentTrack()?.thumbnailHigh + ')'"></div>
+  <!-- Ambient blurred background -->
+  <div class="fs-bg-ambient" [style.background-image]="'url(' + playerService.currentTrack()?.thumbnailHigh + ')'"></div>
   <div class="fs-bg-overlay"></div>
 
   <div class="fs-container">
@@ -11,10 +11,20 @@
       <button class="icon-btn" (click)="close()" title="Minimize">
         <svg lucideChevronDown [attr.size]="32"></svg>
       </button>
-      <div class="fs-header-text">
+      
+      <!-- Center Tabs for List Views -->
+      <div class="fs-top-tabs" *ngIf="activeView !== 'artwork'">
+        <button class="tab-btn" [class.active]="activeView === 'queue'" (click)="toggleView('queue')">UP NEXT</button>
+        <button class="tab-btn" [class.active]="activeView === 'lyrics'" (click)="toggleView('lyrics')">LYRICS</button>
+        <button class="tab-btn" [class.active]="activeView === 'related'" (click)="toggleView('related')">RELATED</button>
+      </div>
+
+      <!-- Playing From text for Artwork View -->
+      <div class="fs-header-text" *ngIf="activeView === 'artwork'">
         <span class="fs-now-playing">NOW PLAYING</span>
         <span class="fs-source">{{ playerService.currentTrack()?.channelTitle }}</span>
       </div>
+
       <div class="fs-header-right" style="position: relative;">
         <button class="icon-btn" style="margin-right: 8px; opacity: 0.7;" title="Car Mode (Coming Soon)">
           <svg lucideCar [attr.size]="24"></svg>
@@ -35,94 +45,103 @@
       </div>
     </div>
 
-    <!-- Main Content Area (Artwork / Queue / Lyrics) -->
+    <!-- Main Content Area -->
     <div class="fs-main">
       
       <!-- Artwork View -->
-      <div class="fs-artwork-view" *ngIf="activeView === 'artwork'">
-        <img 
-          [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
-          [alt]="playerService.currentTrack()?.title"
-          class="fs-album-art"
-        />
+      <div class="fs-player-view" *ngIf="activeView === 'artwork'">
+        <div class="fs-artwork-container">
+          <img 
+            [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
+            [alt]="playerService.currentTrack()?.title"
+            class="fs-album-art"
+          />
+        </div>
       </div>
 
-      <!-- Queue View (Up Next) -->
-      <div class="fs-queue-view" *ngIf="activeView === 'queue'">
-        <h3 class="view-title">Up Next</h3>
-        <div class="queue-list">
-          <div 
-            class="queue-item" 
-            *ngFor="let track of playerService.queue(); let i = index"
-            [class.active]="playerService.currentIndex() === i"
-            (click)="playQueueTrack(i)"
-          >
-            <div class="queue-item-thumb">
-              <img [src]="track.thumbnail" [alt]="track.title" />
-              <div class="play-overlay" *ngIf="playerService.currentIndex() === i">
-                <div class="play-ripple">
-                  <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <!-- Lists View Container -->
+      <div class="fs-list-view" *ngIf="activeView !== 'artwork'">
+        
+        <!-- Queue View (Up Next) -->
+        <div class="fs-queue-view" *ngIf="activeView === 'queue'">
+          <div class="queue-list">
+            <div 
+              class="queue-item" 
+              *ngFor="let track of playerService.queue(); let i = index"
+              [class.active]="playerService.currentIndex() === i"
+              (click)="playQueueTrack(i)"
+            >
+              <div class="queue-item-thumb">
+                <img [src]="track.thumbnail" [alt]="track.title" />
+                <div class="play-overlay" *ngIf="playerService.currentIndex() === i">
+                  <div class="play-ripple">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                  </div>
                 </div>
               </div>
+              <div class="queue-item-info">
+                <div class="queue-title">{{ track.title }}</div>
+                <div class="queue-artist">{{ track.channelTitle }}</div>
+              </div>
             </div>
-            <div class="queue-item-info">
-              <div class="queue-title">{{ track.title }}</div>
-              <div class="queue-artist">{{ track.channelTitle }}</div>
+          </div>
+        </div>
+
+        <!-- Lyrics View -->
+        <div class="fs-lyrics-view" *ngIf="activeView === 'lyrics'">
+          <div class="lyrics-container" #lyricsContainer>
+            <div *ngIf="lyricsLoading" class="lyrics-loading">
+              <div class="spinner"></div>
+              <span>Fetching lyrics...</span>
+            </div>
+
+            <!-- Synced Lyrics Mode -->
+            <div *ngIf="!lyricsLoading && parsedLyrics.length > 0" class="synced-lyrics-text">
+              <p 
+                *ngFor="let line of parsedLyrics; let i = index"
+                class="lyric-line"
+                [class.active]="i === activeLineIndex"
+                [class.passed]="i < activeLineIndex"
+                (click)="playerService.seekTo(line.time)"
+              >
+                {{ line.text }}
+              </p>
+            </div>
+
+            <!-- Plain Lyrics Fallback Mode -->
+            <div *ngIf="!lyricsLoading && parsedLyrics.length === 0 && lyrics" class="lyrics-text" [innerHTML]="lyrics"></div>
+
+            <!-- Not Found -->
+            <div *ngIf="!lyricsLoading && parsedLyrics.length === 0 && !lyrics" class="lyrics-not-found">
+              <svg lucideMic2 [attr.size]="48" style="opacity: 0.5; margin-bottom: 16px;"></svg>
+              <p>Looks like we don't have lyrics for this song yet.</p>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Lyrics View -->
-      <div class="fs-lyrics-view" *ngIf="activeView === 'lyrics'">
-        <h3 class="view-title">Lyrics</h3>
-        <div class="lyrics-container" #lyricsContainer>
-          <div *ngIf="lyricsLoading" class="lyrics-loading">
-            <div class="spinner"></div>
-            <span>Fetching lyrics...</span>
-          </div>
-
-          <!-- Synced Lyrics Mode -->
-          <div *ngIf="!lyricsLoading && parsedLyrics.length > 0" class="synced-lyrics-text">
-            <p 
-              *ngFor="let line of parsedLyrics; let i = index"
-              class="lyric-line"
-              [class.active]="i === activeLineIndex"
-              [class.passed]="i < activeLineIndex"
-              (click)="playerService.seekTo(line.time)"
-            >
-              {{ line.text }}
-            </p>
-          </div>
-
-          <!-- Plain Lyrics Fallback Mode -->
-          <div *ngIf="!lyricsLoading && parsedLyrics.length === 0 && lyrics" class="lyrics-text" [innerHTML]="lyrics"></div>
-
-          <!-- Not Found -->
-          <div *ngIf="!lyricsLoading && parsedLyrics.length === 0 && !lyrics" class="lyrics-not-found">
-            <svg lucideMic2 [attr.size]="48" style="opacity: 0.5; margin-bottom: 16px;"></svg>
-            <p>Looks like we don't have lyrics for this song yet.</p>
+        <!-- Related View -->
+        <div class="fs-related-view" *ngIf="activeView === 'related'">
+          <div class="related-placeholder" style="text-align: center; color: rgba(255,255,255,0.5); padding: 80px 20px;">
+            <p>More like this coming soon...</p>
           </div>
         </div>
-      </div>
 
-      <!-- Related View (Placeholder) -->
-      <div class="fs-related-view" *ngIf="activeView === 'related'">
-        <h3 class="view-title">Related</h3>
-        <div class="related-placeholder" style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px 20px;">
-          <p>More like this coming soon...</p>
-        </div>
       </div>
 
     </div>
 
-    <!-- Bottom Controls Area -->
-    <div class="fs-bottom">
+    <!-- Bottom Controls Area (Visible only when Artwork is active) -->
+    <div class="fs-bottom" *ngIf="activeView === 'artwork'">
       
-      <!-- Track Info -->
-      <div class="fs-track-info">
-        <h2 class="fs-title" [title]="playerService.currentTrack()?.title">{{ playerService.currentTrack()?.title }}</h2>
-        <p class="fs-artist">{{ playerService.currentTrack()?.channelTitle }}</p>
+      <!-- Track Info Row -->
+      <div class="fs-track-info-row">
+        <div class="fs-track-text">
+          <h2 class="fs-title" [title]="playerService.currentTrack()?.title">{{ playerService.currentTrack()?.title }}</h2>
+          <p class="fs-artist">{{ playerService.currentTrack()?.channelTitle }}</p>
+        </div>
+        <button class="fs-toggle-btn like-btn" [class.active]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
+          <svg lucideHeart [attr.size]="28" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+        </button>
       </div>
 
       <!-- Progress Bar -->
@@ -140,44 +159,37 @@
       </div>
 
       <!-- Playback Controls -->
-      <div class="fs-controls">
-        
-        <!-- Like button (replaces old Lyrics toggle) -->
-        <div class="fs-side-controls">
-          <button class="fs-toggle-btn" [class.active]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
-            <svg lucideHeart [attr.size]="24" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
-          </button>
-        </div>
+      <div class="fs-controls-row">
+        <button class="fs-control-btn secondary" [class.active]="playerService.isShuffled()" title="Shuffle" (click)="playerService.toggleShuffle()">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+        </button>
 
-        <!-- Main Center Controls -->
-        <div class="fs-center-controls">
+        <div class="fs-main-controls">
           <button class="fs-control-btn skip" (click)="playerService.previous()" [disabled]="playerService.currentIndex() <= 0">
-            <svg lucideSkipBack [attr.size]="32" fill="currentColor"></svg>
+            <svg lucideSkipBack [attr.size]="36" fill="currentColor"></svg>
           </button>
           
           <button class="fs-control-btn play-pause" (click)="playerService.togglePlayPause()">
-            <svg lucidePause [attr.size]="40" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
-            <svg lucidePlay [attr.size]="40" fill="currentColor" style="margin-left: 4px;" *ngIf="!playerService.isPlaying()"></svg>
+            <svg lucidePause [attr.size]="48" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
+            <svg lucidePlay [attr.size]="48" fill="currentColor" style="margin-left: 4px;" *ngIf="!playerService.isPlaying()"></svg>
           </button>
           
           <button class="fs-control-btn skip" (click)="playerService.next()" [disabled]="playerService.currentIndex() >= playerService.queue().length - 1">
-            <svg lucideSkipForward [attr.size]="32" fill="currentColor"></svg>
+            <svg lucideSkipForward [attr.size]="36" fill="currentColor"></svg>
           </button>
         </div>
 
-        <!-- Queue toggle -->
-        <div class="fs-side-controls" style="justify-content: flex-end;">
-          <button class="fs-toggle-btn" [class.active]="activeView === 'queue'" (click)="toggleView('queue')" title="Up Next">
-            <svg lucideListMusic [attr.size]="24"></svg>
-          </button>
-        </div>
-
+        <button class="fs-control-btn secondary" (click)="toggleView('queue')" title="Up Next">
+          <svg lucideListMusic [attr.size]="24"></svg>
+        </button>
       </div>
 
-      <div class="fs-bottom-tabs">
-        <button class="tab-btn" [class.active]="activeView === 'lyrics'" (click)="toggleView('lyrics')">Lyrics</button>
-        <button class="tab-btn" [class.active]="activeView === 'related'" (click)="toggleView('related')">Related</button>
+      <!-- Bottom Nav (Lyrics & Related toggles) -->
+      <div class="fs-bottom-nav">
+        <span class="nav-item" (click)="toggleView('lyrics')">Lyrics</span>
+        <span class="nav-item" (click)="toggleView('related')">Related</span>
       </div>
+      
     </div>
     
   </div>
