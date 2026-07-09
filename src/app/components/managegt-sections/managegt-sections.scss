@@ -1,24 +1,504 @@
-/* Tailwind CSS classes handle the styling now. */
-
-/* Angular CDK Drag & Drop Styles for Smoothness */
-.cdk-drag-preview {
-  box-sizing: border-box;
-  border-radius: 1rem; /* rounded-2xl */
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
-  z-index: 1000 !important;
-  opacity: 0.95;
+.page-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Inter', sans-serif;
+  color: #fff;
 }
 
-.cdk-drag-placeholder {
-  opacity: 0.2;
-  border: 1px dashed rgba(139, 92, 246, 0.5); /* dashed purple border */
-  background: rgba(139, 92, 246, 0.05);
+.page-header {
+  margin-bottom: 40px;
+  
+  h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    letter-spacing: -1px;
+  }
+  
+  p {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    font-size: 1rem;
+  }
 }
 
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+.controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+
+  .lang-selector {
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px;
+    border-radius: 16px;
+    overflow-x: auto;
+    
+    &::-webkit-scrollbar { display: none; }
+    
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+
+      &:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      &.active {
+        background: #fff;
+        color: #000;
+      }
+    }
+  }
+
+  .delete-all-btn {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    padding: 10px 20px;
+    border-radius: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(255, 59, 48, 0.2);
+    }
+  }
 }
 
-.cdk-drop-list-dragging .cdk-drag {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+.sections-list-container {
+  margin-bottom: 40px;
+
+  .section-count {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 16px;
+
+    .count-badge {
+      background: #fff;
+      color: #000;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+  }
+}
+
+.sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-card {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &.expanded {
+    background: #111;
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  cursor: pointer;
+  user-select: none;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .drag-handle {
+      color: rgba(255, 255, 255, 0.3);
+      cursor: grab;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      transition: all 0.2s;
+
+      &:active {
+        cursor: grabbing;
+      }
+      &:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    .title-group {
+      h4 {
+        margin: 0 0 4px 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+
+      .song-count {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2px 8px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    gap: 8px;
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.danger {
+        &:hover {
+          color: #ff3b30;
+          background: rgba(255, 59, 48, 0.1);
+        }
+      }
+
+      &.toggle {
+        &:hover {
+          color: #fff;
+          background: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+  }
+}
+
+.section-content {
+  padding: 0 20px 20px 20px;
+  animation: slideDown 0.3s ease-out;
+  
+  .songs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #000;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .song-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(4px);
+    }
+
+    .song-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .song-info {
+      flex: 1;
+      overflow: hidden;
+
+      .song-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .song-artist {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .danger-subtle {
+      color: rgba(255, 255, 255, 0.3);
+      &:hover {
+        color: #ff3b30;
+      }
+    }
+  }
+
+  .add-song-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #fff;
+      color: #000;
+      border-style: solid;
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #0a0a0a;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+
+  .empty-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+  }
+}
+
+.create-section-container {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+
+  .create-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .create-icon {
+      width: 48px;
+      height: 48px;
+      background: #fff;
+      color: #000;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 8px;
+
+      &.flex-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+
+      .hint {
+        font-size: 0.75rem;
+        text-transform: none;
+        letter-spacing: normal;
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      outline: none;
+
+      &:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    .form-textarea {
+      font-family: monospace;
+      resize: vertical;
+    }
+  }
+
+  .error-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+
+    .progress-fill {
+      height: 100%;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+  }
+
+  .progress-text {
+    text-align: right;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 20px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 20px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .loading-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .controls-bar {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+
+    .delete-all-btn {
+      justify-content: center;
+    }
+  }
 }

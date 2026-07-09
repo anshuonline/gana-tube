@@ -18,12 +18,13 @@ export interface CustomPlaylist {
   publishDate?: string; // ISO date string
 }
 
-import { LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck } from '@lucide/angular';
+import { LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck, LucideChevronDown, LucideChevronUp, LucidePlus, LucideX, LucideTrash2 } from '@lucide/angular';
+import { SearchSongModalComponent } from '../search-song-modal/search-song-modal.component';
 
 @Component({
   selector: 'app-managegt-playlists',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck],
+  imports: [CommonModule, FormsModule, DragDropModule, SearchSongModalComponent, LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck, LucideChevronDown, LucideChevronUp, LucidePlus, LucideX, LucideTrash2],
   templateUrl: './managegt-playlists.html',
   styleUrls: ['./managegt-playlists.scss']
 })
@@ -44,6 +45,9 @@ export class ManagegtPlaylistsComponent implements OnInit {
   
   // Edit State
   editingPlaylistId: string | null = null;
+
+  expandedPlaylistIndex: number | null = null;
+  showSearchModalForPlaylist: number | null = null;
 
   // Fetching state
   isFetching = false;
@@ -110,7 +114,44 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.updateCurrentPlaylists();
   }
 
+  // Expand / Collapse Playlist
+  togglePlaylist(index: number) {
+    if (this.expandedPlaylistIndex === index) {
+      this.expandedPlaylistIndex = null;
+    } else {
+      this.expandedPlaylistIndex = index;
+    }
+  }
 
+  // Delete Individual Song
+  deleteSongFromPlaylist(playlistIndex: number, songIndex: number) {
+    if (confirm('Are you sure you want to remove this song from the playlist?')) {
+      this.currentPlaylists[playlistIndex].songs.splice(songIndex, 1);
+      this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
+      this.updateCurrentPlaylists();
+      this.publishPlaylists();
+    }
+  }
+
+  // Add Song Modal
+  openSearchModal(playlistIndex: number) {
+    this.showSearchModalForPlaylist = playlistIndex;
+  }
+
+  closeSearchModal() {
+    this.showSearchModalForPlaylist = null;
+  }
+
+  addSongToPlaylist(song: YouTubeSearchResult) {
+    if (this.showSearchModalForPlaylist !== null) {
+      this.currentPlaylists[this.showSearchModalForPlaylist].songs.push(song);
+      this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
+      this.updateCurrentPlaylists();
+      this.publishPlaylists();
+      this.showSearchModalForPlaylist = null;
+      this.expandedPlaylistIndex = this.showSearchModalForPlaylist;
+    }
+  }
 
   async addPlaylist() {
     this.fetchError = '';
@@ -239,15 +280,24 @@ export class ManagegtPlaylistsComponent implements OnInit {
     }
   }
 
-  deletePlaylist(index: number) {
+  deletePlaylist(id: string) {
     if (confirm('Are you sure you want to delete this playlist?')) {
-      this.currentPlaylists.splice(index, 1);
+      this.currentPlaylists = this.currentPlaylists.filter(p => p.id !== id);
       this.allPlaylistsData[this.selectedLang] = this.currentPlaylists;
       this.publishPlaylists();
     }
   }
 
-  copyLink(playlistId: string) {
+  deleteAllPlaylists() {
+    if (confirm('Are you sure you want to delete ALL playlists for this language?')) {
+      this.currentPlaylists = [];
+      this.allPlaylistsData[this.selectedLang] = [];
+      this.publishPlaylists();
+    }
+  }
+
+  copyShareLink(playlistId: string, event: Event) {
+    event.stopPropagation();
     const url = `https://ganatube.in/playlist/${playlistId}`;
     navigator.clipboard.writeText(url).then(() => {
       this.copiedPlaylistId.set(playlistId);
@@ -278,8 +328,9 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  editPlaylist(playlist: CustomPlaylist): void {
+  startEdit(playlist: CustomPlaylist): void {
     this.editingPlaylistId = playlist.id;
+
     this.newPlaylistTitle = playlist.title;
     this.newPlaylistCoverUrl = playlist.coverImage;
     this.newPlaylistStatus = playlist.status;
@@ -294,8 +345,17 @@ export class ManagegtPlaylistsComponent implements OnInit {
     
     this.jsonInput = JSON.stringify(playlist.searchQueries, null, 2);
     
-    // Scroll to top to see form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to top to see form (only if editing from main form, but we are editing inline now)
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  saveEdit(playlist: CustomPlaylist) {
+    this.publishPlaylists();
+    this.cancelEdit();
+  }
+
+  saveOrder() {
+    this.publishPlaylists();
   }
 
   cancelEdit(): void {
@@ -308,11 +368,12 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.fetchError = '';
   }
 
-  drop(event: CdkDragDrop<CustomPlaylist[]>): void {
+  drop(event: CdkDragDrop<CustomPlaylist[]>) {
     if (event.previousIndex !== event.currentIndex) {
       moveItemInArray(this.currentPlaylists, event.previousIndex, event.currentIndex);
       this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
-      this.publishPlaylists();
+      this.expandedPlaylistIndex = null; // Close to avoid UI glitches
+      setTimeout(() => this.publishPlaylists(), 0);
     }
   }
 }

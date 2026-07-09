@@ -1,227 +1,230 @@
-<div class="p-8 max-w-6xl mx-auto min-h-screen pb-32">
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
-    <div>
-      <h1 class="text-4xl font-extrabold text-white tracking-tighter flex items-center">
-        <svg lucideMusic class="mr-3 text-purple-400 w-8 h-8"></svg>
-        Custom Playlists
-      </h1>
-      <p class="text-white/40 mt-2 text-sm font-medium">Create and manage your own custom playlists for the Home screen</p>
+<div class="page-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h2>Manage Custom Playlists</h2>
+      <p>Curate custom playlists with your own cover arts and release schedules.</p>
+    </div>
+  </header>
+
+  <div class="controls-bar">
+    <div class="lang-selector">
+      <button 
+        *ngFor="let lang of languages" 
+        (click)="onLangChange(lang)"
+        [class.active]="selectedLang === lang"
+        class="lang-btn">
+        {{ lang }}
+      </button>
     </div>
     
-    <div class="flex items-center space-x-3 bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-white/5">
-      <button *ngFor="let lang of languages" 
-              (click)="onLangChange(lang)"
-              [ngClass]="selectedLang === lang ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/60 hover:bg-white/5'"
-              class="px-5 py-2 rounded-xl text-sm font-semibold transition-all hover:text-white duration-300">
-        {{ lang }}
+    <div class="header-actions">
+      <button class="action-btn outline" (click)="saveOrder()" *ngIf="currentPlaylists.length > 0">
+        <svg lucideSave [attr.size]="18"></svg>
+        Save Order
+      </button>
+      <button class="action-btn danger outline" (click)="deleteAllPlaylists()">
+        <svg lucideTrash [attr.size]="18"></svg>
+        Delete All
       </button>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-    
-    <!-- LEFT COL: Add New Playlist Form -->
-    <div class="lg:col-span-5 space-y-6">
-      <div class="bg-[#0c0c14]/80 backdrop-blur-2xl p-6 rounded-3xl border border-white/5 shadow-2xl">
-        <h2 class="text-xl font-bold text-white mb-6 flex items-center tracking-tight">
-          <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center mr-3 text-purple-400">
-            <svg *ngIf="!editingPlaylistId" lucidePlus class="w-4 h-4"></svg>
-            <svg *ngIf="editingPlaylistId" lucideEdit2 class="w-4 h-4"></svg>
-          </div>
-          {{ editingPlaylistId ? 'Edit Playlist' : 'Create Playlist' }}
-        </h2>
-
-        <!-- Title -->
-        <div class="mb-5">
-          <label class="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 px-1">Playlist Title</label>
-          <input type="text" [(ngModel)]="newPlaylistTitle" 
-                 placeholder="e.g. 90s Bollywood Nostalgia"
-                 class="w-full px-5 py-3.5 bg-white/5 border border-white/5 rounded-2xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium">
-        </div>
-
-        <!-- Cover Image Link -->
-        <div class="mb-5">
-          <label class="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 px-1">Cover Photo Link</label>
-          <input type="text" [(ngModel)]="newPlaylistCoverUrl" 
-                 placeholder="e.g. https://example.com/image.jpg"
-                 class="w-full px-5 py-3.5 bg-white/5 border border-white/5 rounded-2xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium mb-3">
-          
-          <div *ngIf="newPlaylistCoverUrl" class="relative rounded-2xl border border-white/5 overflow-hidden bg-black/40 shadow-inner" style="height: 160px;">
-            <img [src]="newPlaylistCoverUrl" class="w-full h-full object-cover">
-          </div>
-        </div>
-
-        <!-- Status & Schedule -->
-        <div class="mb-5">
-          <label class="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 px-1">Visibility</label>
-          <div class="flex space-x-2 bg-white/5 p-1.5 rounded-2xl border border-white/5">
-            <button (click)="newPlaylistStatus = 'publish'" 
-                    [ngClass]="newPlaylistStatus === 'publish' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/40 hover:bg-white/5'"
-                    class="flex-1 flex items-center justify-center py-2 rounded-xl text-sm font-semibold transition-all">
-              <svg lucideEye class="w-4 h-4 mr-1.5"></svg> Publish
-            </button>
-            <button (click)="newPlaylistStatus = 'schedule'" 
-                    [ngClass]="newPlaylistStatus === 'schedule' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/40 hover:bg-white/5'"
-                    class="flex-1 flex items-center justify-center py-2 rounded-xl text-sm font-semibold transition-all">
-              <svg lucideClock class="w-4 h-4 mr-1.5"></svg> Schedule
-            </button>
-            <button (click)="newPlaylistStatus = 'private'" 
-                    [ngClass]="newPlaylistStatus === 'private' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-white/40 hover:bg-white/5'"
-                    class="flex-1 flex items-center justify-center py-2 rounded-xl text-sm font-semibold transition-all">
-              <svg lucideEyeOff class="w-4 h-4 mr-1.5"></svg> Private
-            </button>
-          </div>
-        </div>
-
-        <div *ngIf="newPlaylistStatus === 'schedule'" class="mb-5 animate-in fade-in slide-in-from-top-2">
-          <label class="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 px-1">Schedule Date & Time</label>
-          <input type="datetime-local" [(ngModel)]="newPlaylistDate"
-                 class="w-full px-5 py-3.5 bg-white/5 border border-white/5 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium [color-scheme:dark]">
-        </div>
-
-        <!-- Songs JSON Input -->
-        <div class="mb-6">
-          <label class="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 px-1">Songs JSON Array</label>
-          <textarea [(ngModel)]="jsonInput" 
-                    rows="6"
-                    placeholder='[&#10;  "Song Name 1",&#10;  "Song Name 2"&#10;]'
-                    class="w-full px-5 py-4 bg-white/5 border border-white/5 rounded-2xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-mono text-sm resize-none"></textarea>
-          <p class="text-[11px] text-white/30 mt-2 px-1">Paste a JSON array of song names to fetch from YouTube.</p>
-        </div>
-
-        <!-- Feedback Messages -->
-        <div *ngIf="fetchError" class="p-4 mb-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium flex items-start">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          <span>{{ fetchError }}</span>
-        </div>
-        
-        <div *ngIf="isFetching" class="p-5 mb-5 rounded-2xl bg-white/5 border border-white/10">
-          <div class="flex items-center justify-between mb-3 text-sm">
-            <div class="flex items-center text-white/70 font-medium">
-              <svg lucideClock class="w-4 h-4 mr-2 animate-spin text-purple-400"></svg>
-              <span>Fetching {{ fetchProgress }} / {{ totalToFetch }} songs...</span>
-            </div>
-          </div>
-          <div class="w-full bg-black/40 rounded-full h-2 overflow-hidden shadow-inner">
-            <div class="bg-gradient-to-r from-purple-500 to-indigo-500 h-2 rounded-full transition-all duration-300" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
-          </div>
-        </div>
-
-        <!-- Create / Update Button -->
-        <div class="flex gap-3">
-          <button (click)="addPlaylist()"
-                  [disabled]="!newPlaylistTitle.trim() || (!jsonInput.trim() && !editingPlaylistId) || isFetching"
-                  class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-4 px-6 rounded-2xl font-bold transition-all shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
-            
-            <ng-container *ngIf="!isFetching">
-              {{ editingPlaylistId ? 'Update Playlist' : 'Create Playlist' }}
-            </ng-container>
-            
-            <ng-container *ngIf="isFetching">
-              <div class="flex items-center justify-center space-x-2">
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Fetching {{ fetchProgress }}/{{ totalToFetch }}...</span>
-              </div>
-            </ng-container>
-          </button>
-          
-          <button *ngIf="editingPlaylistId" (click)="cancelEdit()" class="px-6 bg-transparent hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/10">
-            Cancel
-          </button>
-        </div>
+  <div class="playlists-list-container">
+    <div class="list-header">
+      <div class="header-left">
+        <span class="count-badge">{{ currentPlaylists.length }}</span>
+        <h3>Active Playlists</h3>
+      </div>
+      <div class="header-right" *ngIf="publishMessage">
+        <span class="success-msg">
+          <svg lucideCheck [attr.size]="16"></svg>
+          {{ publishMessage }}
+        </span>
       </div>
     </div>
 
-    <!-- RIGHT COL: Existing Playlists -->
-    <div class="lg:col-span-7 space-y-6">
+    <div class="playlists-list" cdkDropList (cdkDropListDropped)="drop($event)">
       
-      <div class="flex items-center justify-between bg-[#0c0c14]/80 backdrop-blur-2xl p-6 rounded-3xl border border-white/5 shadow-lg">
-        <div>
-          <h2 class="text-xl font-bold text-white tracking-tight">Existing Playlists</h2>
-          <p class="text-white/40 text-sm mt-1 font-medium">{{ currentPlaylists.length }} playlist(s) for {{ selectedLang }}</p>
-        </div>
-        <button (click)="publishPlaylists()" [disabled]="isPublishing"
-                class="px-6 py-3 bg-white/10 hover:bg-white text-white hover:text-black font-bold rounded-2xl transition-all disabled:opacity-50 flex items-center border border-white/10">
-          <svg *ngIf="isPublishing" class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          <svg *ngIf="!isPublishing" lucideSave class="w-4 h-4 mr-2"></svg>
-          {{ isPublishing ? 'Saving...' : 'Save Changes' }}
-        </button>
-      </div>
-
-      <div *ngIf="publishMessage" class="p-4 rounded-2xl bg-white/10 border border-white/10 text-white text-sm font-medium flex items-center backdrop-blur-md">
-        <svg lucideSave class="w-4 h-4 mr-2 text-green-400"></svg> {{ publishMessage }}
-      </div>
-
-      <div *ngIf="currentPlaylists.length === 0" class="text-center p-16 bg-white/5 border border-dashed border-white/10 rounded-3xl backdrop-blur-sm">
-        <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-white/20">
-          <svg lucideMusic class="w-8 h-8"></svg>
-        </div>
-        <p class="text-white/40 font-medium">No custom playlists created for {{ selectedLang }} yet.</p>
-      </div>
-
-      <div *ngIf="currentPlaylists.length > 0" 
-           class="space-y-4"
-           cdkDropList
-           (cdkDropListDropped)="drop($event)">
-        
-        <div *ngFor="let playlist of currentPlaylists; let i = index" 
-             cdkDrag
-             class="group relative overflow-hidden bg-[#0c0c14]/80 backdrop-blur-2xl border border-white/5 rounded-3xl transition-all duration-300 hover:border-white/10 flex flex-col sm:flex-row">
-          
-          <!-- Drag Handle -->
-          <div class="absolute left-2 top-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white/50 z-10 cursor-move" cdkDragHandle>
-            <svg lucideGripVertical class="w-5 h-5"></svg>
-          </div>
-          
-          <div class="w-full sm:w-48 h-48 sm:h-auto shrink-0 relative bg-black">
-            <img [src]="playlist.coverImage" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105">
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent to-[#0c0c14]/80 hidden sm:block"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0c0c14] to-transparent sm:hidden"></div>
-            
-            <div class="absolute top-3 left-3 flex space-x-1.5">
-              <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg backdrop-blur-md"
-                    [ngClass]="{
-                      'bg-green-500/80 text-green-50': playlist.status === 'publish',
-                      'bg-yellow-500/80 text-yellow-50': playlist.status === 'schedule',
-                      'bg-red-500/80 text-red-50': playlist.status === 'private'
-                    }">
-                {{ playlist.status }}
-              </span>
+      <div *ngFor="let playlist of currentPlaylists; let pIndex = index" 
+           cdkDrag
+           class="playlist-card" 
+           [class.expanded]="expandedPlaylistIndex === pIndex"
+           [class.editing]="editingPlaylistId === playlist.id">
+           
+        <!-- Playlist Header -->
+        <div class="playlist-header" (click)="togglePlaylist(pIndex)">
+          <div class="header-left">
+            <div cdkDragHandle class="drag-handle" (click)="$event.stopPropagation()">
+              <svg lucideGripVertical [attr.size]="20"></svg>
             </div>
-          </div>
-          
-          <div class="p-6 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="text-2xl font-bold text-white tracking-tight mb-2 group-hover:text-purple-400 transition-colors">{{ playlist.title }}</h3>
-              <p class="text-white/40 text-sm mb-4 font-medium">{{ playlist.songs.length }} videos fetched</p>
-              
-              <div *ngIf="playlist.status === 'schedule'" class="inline-flex items-center text-xs font-medium bg-white/10 text-white/70 px-3 py-1.5 rounded-xl mb-4 border border-white/5">
-                <svg lucideClock class="w-3.5 h-3.5 mr-1.5 opacity-70"></svg>
-                Scheduled for: {{ playlist.publishDate | date:'medium' }}
+            <img [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover">
+            <div class="title-group">
+              <h4>{{ playlist.title }}</h4>
+              <div class="meta-tags">
+                <span class="tag songs-tag">
+                  <svg lucideMusic [attr.size]="12"></svg>
+                  {{ playlist.songs.length }} songs
+                </span>
+                <span class="tag status-tag" [ngClass]="playlist.status">
+                  <svg *ngIf="playlist.status === 'schedule'" lucideClock [attr.size]="12"></svg>
+                  {{ playlist.status | titlecase }}
+                  <span *ngIf="playlist.status === 'schedule' && playlist.publishDate">
+                    - {{ playlist.publishDate | date:'medium' }}
+                  </span>
+                </span>
+                <span class="tag copy-tag" (click)="copyShareLink(playlist.id, $event)">
+                  <svg *ngIf="copiedPlaylistId() !== playlist.id" lucideCopy [attr.size]="12"></svg>
+                  <svg *ngIf="copiedPlaylistId() === playlist.id" lucideCheck [attr.size]="12"></svg>
+                  {{ copiedPlaylistId() === playlist.id ? 'Copied!' : 'Copy Link' }}
+                </span>
               </div>
             </div>
+          </div>
+          
+          <div class="header-right" (click)="$event.stopPropagation()">
+            <button class="icon-btn" (click)="startEdit(playlist)" title="Edit Settings">
+              <svg lucideEdit2 [attr.size]="20"></svg>
+            </button>
+            <button class="icon-btn danger" (click)="deletePlaylist(playlist.id)" title="Delete Playlist">
+              <svg lucideTrash2 [attr.size]="20"></svg>
+            </button>
+            <button class="icon-btn toggle" (click)="togglePlaylist(pIndex)">
+              <svg *ngIf="expandedPlaylistIndex !== pIndex" lucideChevronDown [attr.size]="24"></svg>
+              <svg *ngIf="expandedPlaylistIndex === pIndex" lucideChevronUp [attr.size]="24"></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Playlist Content (Songs) -->
+        <div class="playlist-content" *ngIf="expandedPlaylistIndex === pIndex && editingPlaylistId !== playlist.id">
+          <div class="songs-list">
             
-            <div class="flex justify-end pt-4 border-t border-white/5 mt-4">
-              <button (click)="copyLink(playlist.id)" class="px-5 py-2.5 bg-transparent hover:bg-white/10 text-white rounded-xl text-sm font-semibold transition-all border border-white/10 whitespace-nowrap mr-2">
-                <svg *ngIf="copiedPlaylistId() !== playlist.id" lucideCopy class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></svg>
-                <svg *ngIf="copiedPlaylistId() === playlist.id" lucideCheck class="w-4 h-4 inline-block mr-1.5 -mt-0.5 text-green-400"></svg>
-                {{ copiedPlaylistId() === playlist.id ? 'Copied!' : 'Copy Link' }}
-              </button>
-              <button (click)="editPlaylist(playlist)" class="px-5 py-2.5 bg-transparent hover:bg-white/10 text-white rounded-xl text-sm font-semibold transition-all border border-white/10 whitespace-nowrap mr-2">
-                <svg lucideEdit2 class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></svg> Edit
-              </button>
-              <button (click)="deletePlaylist(i)" class="flex items-center text-red-400 bg-transparent hover:bg-red-500/10 px-4 py-2 rounded-xl transition-all font-medium text-sm border border-transparent hover:border-red-500/20">
-                <svg lucideTrash class="w-4 h-4 mr-2"></svg> Remove
+            <div class="song-item" *ngFor="let song of playlist.songs; let songIndex = index">
+              <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
+              <div class="song-info">
+                <div class="song-title">{{ song.title }}</div>
+                <div class="song-artist">{{ song.channelTitle }}</div>
+              </div>
+              <button class="icon-btn danger-subtle" (click)="deleteSongFromPlaylist(pIndex, songIndex)" title="Remove Song">
+                <svg lucideX [attr.size]="18"></svg>
               </button>
             </div>
+            
+            <button class="add-song-btn" (click)="openSearchModal(pIndex)">
+              <svg lucidePlus [attr.size]="20"></svg>
+              Add Song to {{ playlist.title }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="edit-form" *ngIf="editingPlaylistId === playlist.id" (click)="$event.stopPropagation()">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Playlist Title</label>
+              <input type="text" [(ngModel)]="playlist.title" class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Cover Photo URL</label>
+              <input type="text" [(ngModel)]="playlist.coverImage" class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Visibility Status</label>
+              <select [(ngModel)]="playlist.status" class="form-input">
+                <option value="publish">Public (Publish)</option>
+                <option value="schedule">Schedule</option>
+                <option value="private">Private</option>
+              </select>
+            </div>
+            <div class="form-group" *ngIf="playlist.status === 'schedule'">
+              <label>Publish Date</label>
+              <input type="datetime-local" [(ngModel)]="playlist.publishDate" class="form-input">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="action-btn cancel" (click)="cancelEdit()">Cancel</button>
+            <button class="action-btn primary" (click)="saveEdit(playlist)">Save Changes</button>
           </div>
         </div>
       </div>
       
+    </div>
+
+    <div *ngIf="currentPlaylists.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <svg lucideMusic [attr.size]="32"></svg>
+      </div>
+      <p>No custom playlists for {{ selectedLang }}. Create one below!</p>
     </div>
   </div>
+
+  <div class="create-playlist-container">
+    <div class="create-header">
+      <div class="create-icon">
+        <svg lucidePlus [attr.size]="20"></svg>
+      </div>
+      <h3>Create New Playlist</h3>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Playlist Title</label>
+        <input type="text" [(ngModel)]="newPlaylistTitle" placeholder="e.g. My Favorite Tracks" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label>Cover Photo URL</label>
+        <input type="text" [(ngModel)]="newPlaylistCoverUrl" placeholder="https://..." class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label>Visibility Status</label>
+        <select [(ngModel)]="newPlaylistStatus" class="form-input">
+          <option value="publish">Public (Publish Immediately)</option>
+          <option value="schedule">Schedule Publish</option>
+          <option value="private">Private (Only Admin)</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="newPlaylistStatus === 'schedule'">
+        <label>Select Date & Time</label>
+        <input type="datetime-local" [(ngModel)]="newPlaylistDate" class="form-input" />
+      </div>
+    </div>
+
+    <div class="form-group full-width mt-4">
+      <label class="flex-label">
+        <span>JSON Array of Songs</span>
+        <span class="hint">e.g. ["Song 1", "Song 2"]</span>
+      </label>
+      <textarea [(ngModel)]="jsonInput" rows="4" placeholder='["Song 1", "Song 2"]' class="form-textarea"></textarea>
+    </div>
+
+    <div *ngIf="fetchError" class="error-box">
+      <svg lucideX [attr.size]="18"></svg>
+      {{ fetchError }}
+    </div>
+
+    <div *ngIf="isFetching || isUploading" class="progress-bar">
+      <div class="progress-fill" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
+    </div>
+    <div *ngIf="isFetching || isUploading" class="progress-text">
+      {{ isUploading ? 'Uploading Image...' : 'Fetching ' + fetchProgress + ' / ' + totalToFetch }}
+    </div>
+
+    <button class="submit-btn" [disabled]="isFetching || isUploading || isPublishing" (click)="addPlaylist()">
+      <span *ngIf="!isFetching && !isUploading && !isPublishing">Create Playlist</span>
+      <span *ngIf="isFetching || isUploading || isPublishing" class="loading-text">
+        <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
+        Processing...
+      </span>
+    </button>
+  </div>
 </div>
+
+<!-- Add Song Modal -->
+<app-search-song-modal 
+  *ngIf="showSearchModalForPlaylist !== null"
+  (close)="closeSearchModal()"
+  (songSelected)="addSongToPlaylist($event)">
+</app-search-song-modal>

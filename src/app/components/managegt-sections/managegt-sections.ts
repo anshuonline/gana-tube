@@ -6,6 +6,8 @@ import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-a
 import { firstValueFrom, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { LucideChevronDown, LucideChevronUp, LucideTrash2, LucidePlus, LucideX, LucideGripVertical, LucideTrash } from '@lucide/angular';
+import { SearchSongModalComponent } from '../search-song-modal/search-song-modal.component';
 
 interface CustomSection {
   title: string;
@@ -15,7 +17,7 @@ interface CustomSection {
 @Component({
   selector: 'app-managegt-sections',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule],
+  imports: [CommonModule, FormsModule, DragDropModule, SearchSongModalComponent, LucideChevronDown, LucideChevronUp, LucideTrash2, LucidePlus, LucideX, LucideGripVertical, LucideTrash],
   templateUrl: './managegt-sections.html',
   styleUrls: ['./managegt-sections.scss']
 })
@@ -36,6 +38,9 @@ export class ManagegtSectionsComponent implements OnInit {
   totalToFetch = 0;
   fetchError = '';
   publishMessage = '';
+
+  expandedSectionIndex: number | null = null;
+  showSearchModalForSection: number | null = null;
 
   apiUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
 
@@ -86,11 +91,52 @@ export class ManagegtSectionsComponent implements OnInit {
     }
   }
 
+  // Expand / Collapse Section
+  toggleSection(index: number) {
+    if (this.expandedSectionIndex === index) {
+      this.expandedSectionIndex = null;
+    } else {
+      this.expandedSectionIndex = index;
+    }
+  }
+
+  // Delete Individual Song
+  deleteSongFromSection(sectionIndex: number, songIndex: number) {
+    if (confirm('Are you sure you want to remove this song from the section?')) {
+      this.currentSections[sectionIndex].songs.splice(songIndex, 1);
+      this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+      this.updateCurrentSections();
+      this.publishSections();
+    }
+  }
+
+  // Add Song Modal
+  openSearchModal(sectionIndex: number) {
+    this.showSearchModalForSection = sectionIndex;
+  }
+
+  closeSearchModal() {
+    this.showSearchModalForSection = null;
+  }
+
+  addSongToSection(song: YouTubeSearchResult) {
+    if (this.showSearchModalForSection !== null) {
+      this.currentSections[this.showSearchModalForSection].songs.push(song);
+      this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+      this.updateCurrentSections();
+      this.publishSections();
+      this.showSearchModalForSection = null;
+      this.expandedSectionIndex = this.showSearchModalForSection;
+    }
+  }
+
   // Drag and Drop Logic
   drop(event: CdkDragDrop<CustomSection[]>) {
     if (event.previousIndex !== event.currentIndex) {
       moveItemInArray(this.currentSections, event.previousIndex, event.currentIndex);
       this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+      // Close expanded section if it's dragged to avoid UI glitches
+      this.expandedSectionIndex = null;
       // Defer publish so CDK drag animation completes fully before any state change triggers re-render
       setTimeout(() => this.publishSections(), 0);
     }
