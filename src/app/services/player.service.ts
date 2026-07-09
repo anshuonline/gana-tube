@@ -146,13 +146,7 @@ export class PlayerService {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-    
-    // Add to recent plays
-    const user = this.authService.currentUser();
-    if (user && user.email) {
-      this.userService.addRecentPlay(user.email, track, this.userService.preferredLanguages());
-    }
-    
+
     const q = this.queue();
     const existingIdx = q.findIndex((t) => t.videoId === track.videoId);
     if (existingIdx >= 0) {
@@ -176,15 +170,7 @@ export class PlayerService {
     this.queue.set(tracks);
     this.currentIndex.set(startIndex);
     this.playerState.set('loading');
-    
-    // Add to recent plays
-    if (tracks[startIndex]) {
-      const user = this.authService.currentUser();
-      if (user && user.email) {
-        this.userService.addRecentPlay(user.email, tracks[startIndex], this.userService.preferredLanguages());
-      }
-    }
-    
+
     if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
       this.roomService.getSocket().emit('sync_queue', {
         roomId: this.roomService.currentRoom(),
@@ -387,6 +373,15 @@ export class PlayerService {
       this.ytPlayer.loadVideoById(videoId);
       
       const current = this.currentTrack();
+      
+      // Add to recent plays (History) whenever a new track loads
+      if (current) {
+        const user = this.authService.currentUser();
+        if (user && user.email) {
+          this.userService.addRecentPlay(user.email, current, this.userService.preferredLanguages());
+        }
+      }
+
       if (!this.isRemoteUpdate && current && this.roomService.currentRoom()) {
         this.roomService.getSocket().emit('play_track', { 
           roomId: this.roomService.currentRoom(), 
