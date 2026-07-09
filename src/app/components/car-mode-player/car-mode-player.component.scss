@@ -410,15 +410,18 @@
   }
   
   .cm-artwork {
+    width: 220px;
+    height: 220px;
     max-width: 100%;
-    aspect-ratio: 1 / 1;
-    margin-bottom: 24px;
+    margin: 0 auto 24px auto;
   }
 
   .cm-track-info {
     margin-bottom: 24px;
     .cm-track-title {
-      font-size: 2rem;
+      font-size: 1.8rem;
+      line-height: 1.2;
+      margin-bottom: 8px;
       white-space: normal;
       overflow: visible;
       text-overflow: clip;
@@ -426,28 +429,60 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
     }
+    .cm-track-artist {
+      font-size: 1.2rem;
+    }
   }
 
   .cm-main-controls {
-    gap: 16px;
+    gap: 20px;
     
-    .cm-ctrl-btn.play-pause {
-      width: 88px;
-      height: 88px;
-      
-      svg {
+    .cm-ctrl-btn {
+      &.skip svg {
         width: 48px;
         height: 48px;
+      }
+      &.secondary svg {
+        width: 32px;
+        height: 32px;
+      }
+      &.play-pause {
+        width: 96px;
+        height: 96px;
+        
+        svg {
+          width: 52px;
+          height: 52px;
+        }
       }
     }
   }
 
   .cm-list-col {
-    padding: 16px;
+    padding: 16px 8px;
     border-radius: 24px;
+    background: transparent;
   }
 
-  .cm-search-bar .cm-search-input {
-    font-size: 1.2rem;
+  .cm-search-bar {
+    padding: 6px 6px 6px 20px;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    
+    .cm-search-input {
+      font-size: 1.1rem;
+      padding: 10px 8px;
+    }
+    
+    .cm-voice-btn {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      
+      svg {
+        width: 28px;
+        height: 28px;
+      }
+    }
   }
 }
