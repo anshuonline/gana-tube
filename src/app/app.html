@@ -887,3 +887,15 @@
   [isOpen]="showPlaylistModal()"
   (closeMenu)="closePlaylistModal()">
 </app-save-playlist-modal>
+<!-- Global Reusable Playlist Menu (For Library 3-dots) -->
+<app-playlist-menu
+  *ngIf="activePlaylistMenu()"
+  [playlist]="activePlaylistMenu()"
+  [isOpen]="!!activePlaylistMenu()"
+  [xPos]="activePlaylistMenuPosition()?.x || 0"
+  [yPos]="activePlaylistMenuPosition()?.y || 0"
+  (closeMenu)="closePlaylistMenu()">
+</app-playlist-menu>
+
+<!-- Global Toast Notifications -->
+<app-toast></app-toast>

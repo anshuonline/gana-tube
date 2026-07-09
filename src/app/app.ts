@@ -11,6 +11,8 @@ import { ListenTogetherComponent } from './components/listen-together/listen-tog
 import { TrackMenuComponent } from './components/track-menu/track-menu.component';
 import { PlaylistMenuComponent } from './components/playlist-menu/playlist-menu';
 import { SavePlaylistModalComponent } from './components/save-playlist-modal/save-playlist-modal';
+import { ToastComponent } from './components/toast/toast.component';
+import { ToastService } from './services/toast.service';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
 import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
@@ -78,7 +80,8 @@ export interface SponsoredAd {
     RouterModule,
     AdminManageSongsComponent,
     PlaylistMenuComponent,
-    SavePlaylistModalComponent
+    SavePlaylistModalComponent,
+    ToastComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -207,6 +210,10 @@ export class App implements OnInit {
   private destroy$ = new Subject<void>();
   private location = inject(Location);
   private sanitizer = inject(DomSanitizer);
+  private titleService = inject(Title);
+  public toastService = inject(ToastService);
+
+  private readonly SEARCH_HISTORY_KEY = 'ganatube_search_history';
 
   getSafeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -309,7 +316,7 @@ export class App implements OnInit {
     const url = `https://ganatube.in/watch?v=${track.videoId}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
-      alert('Link copied to clipboard!');
+      this.toastService.success('Link copied to clipboard!');
     }
     this.closeMenu();
   }
@@ -317,9 +324,14 @@ export class App implements OnInit {
   async toggleLikeTrack(track: any) {
     const user = this.authService.currentUser();
     if (user && user.email) {
-      await this.userService.toggleLike(user.email, track, this.preferredLanguages());
+      const added = await this.userService.toggleLike(user.email, track, this.userService.preferredLanguages());
+      if (added) {
+        this.toastService.success('Added to liked songs');
+      } else {
+        this.toastService.success('Removed from liked songs');
+      }
     } else {
-      alert('Please login to like songs');
+      this.toastService.info('Please login to like songs');
     }
     this.closeMenu();
   }
@@ -340,7 +352,7 @@ export class App implements OnInit {
     if (playlist && playlist.tracks && playlist.tracks.length > 0) {
       this.playerService.setQueue(playlist.tracks, 0);
     } else {
-      alert('This playlist is empty.');
+      this.toastService.info('This playlist is empty.');
     }
   }
 
@@ -353,15 +365,17 @@ export class App implements OnInit {
     if (!track) return;
     const user = this.authService.currentUser();
     if (!user || !user.email) {
-      alert("Please log in to create playlists.");
+      this.toastService.error("Please log in to create playlists.");
       return;
     }
     
     const created = await this.userService.createPlaylist(user.email as string, name, this.newPlaylistIsPublic());
     if (created) {
       await this.userService.addToPlaylist(user.email as string, name, track);
-      this.newPlaylistName.set('');
-      this.newPlaylistIsPublic.set(false);
+      this.closePlaylistModal();
+      this.toastService.success(`Playlist "${name}" created successfully`);
+    } else {
+      this.toastService.error("Failed to create playlist.");
     }
   }
 

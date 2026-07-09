@@ -112,6 +112,8 @@ export class UserService {
       recent_plays: this.recentPlays(),
       listening_preferences: this.listeningPreferences()
     });
+    
+    return !exists;
   }
 
   // Helper to add to recent plays

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX } from '@lucide/angular';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-save-playlist-modal',
@@ -18,6 +19,7 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
 
   userService = inject(UserService);
   authService = inject(AuthService);
+  toastService = inject(ToastService);
 
   newPlaylistName = signal<string>('');
   newPlaylistIsPublic = signal<boolean>(false);
@@ -74,7 +76,7 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
     if (!this.track) return;
     const user = this.authService.currentUser();
     if (!user || !user.email) {
-      alert("Please log in to create playlists.");
+      this.toastService.error("Please log in to create playlists.");
       return;
     }
     
@@ -85,14 +87,13 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
         await this.userService.addToPlaylist(user.email as string, name, this.track);
         this.newPlaylistName.set('');
         this.newPlaylistIsPublic.set(false);
-        // Optionally close here, but user might want to see it was added
-        // this.close();
+        this.toastService.success(`Playlist "${name}" created successfully`);
       } else {
-        alert("Failed to create playlist.");
+        this.toastService.error("Failed to create playlist.");
       }
     } catch (e) {
       console.error(e);
-      alert("An error occurred while creating the playlist.");
+      this.toastService.error("An error occurred while creating the playlist.");
     } finally {
       this.isCreating.set(false);
     }

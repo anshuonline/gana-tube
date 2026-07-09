@@ -1,0 +1,18 @@
+<div class="toast-container">
+  <div class="toast-message" 
+       *ngFor="let toast of toastService.toasts()"
+       [ngClass]="'toast-' + toast.type">
+    
+    <div class="toast-icon">
+      <svg *ngIf="toast.type === 'success'" lucideCheckCircle [attr.size]="20" style="color: #4caf50;"></svg>
+      <svg *ngIf="toast.type === 'error'" lucideXCircle [attr.size]="20" style="color: #f44336;"></svg>
+      <svg *ngIf="toast.type === 'info'" lucideInfo [attr.size]="20" style="color: #2196f3;"></svg>
+    </div>
+    
+    <div class="toast-text">{{ toast.message }}</div>
+    
+    <button class="toast-close" (click)="toastService.remove(toast.id)">
+      <svg lucideX [attr.size]="16"></svg>
+    </button>
+  </div>
+</div>
