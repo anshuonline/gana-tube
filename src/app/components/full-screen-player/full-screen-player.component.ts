@@ -160,15 +160,17 @@ export class FullScreenPlayerComponent implements OnInit {
     this.youtubeApi.getSyncedLyrics(query).subscribe(res => {
       if (res && res.syncedLyrics) {
         this.parseLrc(res.syncedLyrics);
+        this.lyricsLoading = false;
       } else if (res && res.plainLyrics) {
         this.lyrics = res.plainLyrics.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+        this.lyricsLoading = false;
       } else {
         // Fallback to ytmusic-api static lyrics
         this.youtubeApi.getLyrics(track.videoId).subscribe(ly => {
           this.lyrics = ly;
+          this.lyricsLoading = false;
         });
       }
-      this.lyricsLoading = false;
     });
   }
 

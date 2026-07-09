@@ -262,32 +262,26 @@ export class YoutubeApiService {
   }
 
   getLyrics(videoId: string): Observable<string | null> {
-    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
-    const params = new HttpParams().set('videoId', videoId);
-    return this.http.get<{ lyrics: any }>(`${backendUrl}/lyrics`, { params }).pipe(
-      map(res => {
-        if (!res.lyrics) return null;
-        if (Array.isArray(res.lyrics)) {
-          return res.lyrics.join('<br>');
-        }
-        if (typeof res.lyrics === 'object' && res.lyrics.content) {
-            return res.lyrics.content.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-        }
-        return String(res.lyrics).replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-      }),
-      catchError(err => {
-        console.warn('Failed to fetch lyrics:', err);
-        return of(null);
-      })
-    );
+    // Deprecated for direct videoId, handled by getSyncedLyrics fallback
+    return of(null);
   }
 
   getSyncedLyrics(query: string): Observable<any | null> {
-    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
-    const params = new HttpParams().set('q', query);
-    return this.http.get<any>(`${backendUrl}/synced-lyrics`, { params }).pipe(
+    // Clean query to remove "Topic" or "Official Video" which might confuse lrclib
+    const cleanQuery = query.replace(/ - Topic/g, '').replace(/Official Video/gi, '').trim();
+    const params = new HttpParams().set('q', cleanQuery);
+    return this.http.get<any[]>('https://lrclib.net/api/search', { params }).pipe(
+      map(results => {
+        if (results && results.length > 0) {
+          // Prefer result with syncedLyrics
+          const withSync = results.find(r => r.syncedLyrics);
+          if (withSync) return withSync;
+          return results[0]; // Fallback to plainLyrics
+        }
+        return null;
+      }),
       catchError(err => {
-        console.warn('Failed to fetch synced lyrics:', err);
+        console.warn('Failed to fetch synced lyrics from lrclib:', err);
         return of(null);
       })
     );
