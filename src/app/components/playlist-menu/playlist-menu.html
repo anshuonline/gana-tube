@@ -5,7 +5,7 @@
      [style.top.px]="!isMobile ? calculatedY : null"
      (click)="close($event)">
   
-  <div class="track-menu-dropdown" (click)="$event.stopPropagation()">
+  <div class="menu-content-wrapper" (click)="$event.stopPropagation()">
     <!-- Mobile header with drag handle -->
     <div class="mobile-drag-handle" *ngIf="isMobile" (click)="close($event)">
       <div class="handle-bar"></div>

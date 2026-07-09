@@ -1767,50 +1767,7 @@
   opacity: 1;
 }
 
-/* The dropdown menu */
-.track-menu-dropdown {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  background: #000000;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.8);
-  z-index: 9990;
-  min-width: 220px;
-  padding: 8px 0;
-}
-
-/* For song-cards, position dropdown below the thumbnail area */
-.song-card > .track-menu-dropdown {
-  top: auto;
-  right: 0;
-  margin-top: -4px;
-}
-
-/* For suggested items, dropdown from the right side */
-.suggested-list-item > .track-menu-dropdown {
-  right: 0;
-  top: 100%;
-  bottom: auto;
-  margin-top: 4px;
-  z-index: 99999;
-}
-
-.track-menu-dropdown .menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  color: #fff;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  white-space: nowrap;
-}
-.track-menu-dropdown .menu-item:hover {
-  background: rgba(255,255,255,0.1);
-}
+/* Old track-menu-dropdown removed */
 
 /* --- PLAYLIST MODAL --- */
 .modal-overlay {
