@@ -1,0 +1,156 @@
+<div class="static-page-container library-page-wrapper">
+  <div class="static-page-content library-page-content">
+    <h1 class="library-page-title">
+      <svg lucideLibrary [attr.size]="40" class="lib-icon"></svg>
+      Your Library
+    </h1>
+    
+    <div *ngIf="!authService.currentUser()" style="text-align: center; padding: 60px 0; background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+      <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 1.1rem;">Please log in to view your personalized library.</p>
+      <button class="action-btn" (click)="login()" style="display: inline-flex; background: linear-gradient(135deg, #a855f7, #6366f1); color: white; padding: 14px 32px; border-radius: 30px; font-weight: 700; font-size: 1.1rem; cursor: pointer; border: none; box-shadow: 0 10px 20px rgba(168, 85, 247, 0.4); transition: transform 0.2s;">
+        Log In
+      </button>
+    </div>
+
+    <!-- Swipe hint for mobile -->
+    <div class="swipe-hint" *ngIf="authService.currentUser()">
+      <span>Swipe for more</span>
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </div>
+
+    <!-- Desktop Grid View -->
+    <div *ngIf="authService.currentUser()" class="desktop-library-view">
+      <!-- Liked Music -->
+      <div class="desktop-lib-item" (click)="openLikedSongs()">
+        <div class="desktop-lib-thumb">
+          <img [src]="randomLikedThumbnail() || 'assets/default-playlist.jpg'" alt="Liked Music">
+          <div class="desktop-lib-play-overlay">
+            <div class="desktop-lib-play-btn">
+              <svg lucidePlay [attr.size]="28" style="margin-left: 4px;"></svg>
+            </div>
+          </div>
+          <div class="desktop-lib-count">
+            <svg lucideHeart [attr.size]="14"></svg>
+            {{ userService.likedSongs().length | number }}
+          </div>
+        </div>
+        <div class="desktop-lib-info-row">
+          <div class="desktop-lib-info">
+            <div class="desktop-lib-title">Liked Music</div>
+            <div class="desktop-lib-sub">Private • Auto</div>
+          </div>
+          <div class="desktop-lib-more" (click)="togglePlaylistMenu({name: 'Liked videos', tracks: userService.likedSongs()}, $event)">
+            <svg lucideMoreVertical [attr.size]="20"></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="desktop-lib-item" (click)="openRecentlyPlayed()">
+        <div class="desktop-lib-thumb">
+          <img [src]="randomRecentThumbnail() || 'assets/default-playlist.jpg'" alt="Recently Played">
+          <div class="desktop-lib-play-overlay">
+            <div class="desktop-lib-play-btn">
+              <svg lucidePlay [attr.size]="28" style="margin-left: 4px;"></svg>
+            </div>
+          </div>
+          <div class="desktop-lib-count">
+            <svg lucideListMusic [attr.size]="14"></svg>
+            {{ userService.recentPlays().length | number }}
+          </div>
+        </div>
+        <div class="desktop-lib-info-row">
+          <div class="desktop-lib-info">
+            <div class="desktop-lib-title">History</div>
+            <div class="desktop-lib-sub">Private • Auto</div>
+          </div>
+          <div class="desktop-lib-more" (click)="togglePlaylistMenu({name: 'History', tracks: userService.recentPlays()}, $event)">
+            <svg lucideMoreVertical [attr.size]="20"></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Playlists -->
+      <div class="desktop-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="openCustomPlaylist(pl)">
+        <div class="desktop-lib-thumb">
+          <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
+          <div class="desktop-lib-play-overlay">
+            <div class="desktop-lib-play-btn">
+              <svg lucidePlay [attr.size]="28" style="margin-left: 4px;"></svg>
+            </div>
+          </div>
+          <div class="desktop-lib-count">
+            <svg lucideListMusic [attr.size]="14"></svg>
+            {{ pl.tracks.length | number }}
+          </div>
+        </div>
+        <div class="desktop-lib-info-row">
+          <div class="desktop-lib-info">
+            <div class="desktop-lib-title">{{ pl.name }}</div>
+            <div class="desktop-lib-sub">{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</div>
+          </div>
+          <div class="desktop-lib-more" (click)="togglePlaylistMenu(pl, $event)">
+            <svg lucideMoreVertical [attr.size]="20"></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Vertical View -->
+    <div *ngIf="authService.currentUser()" class="mobile-library-view">
+      <!-- Liked Music -->
+      <div class="mobile-lib-item" (click)="openLikedSongs()">
+        <div class="mobile-lib-thumb">
+          <img [src]="randomLikedThumbnail() || 'assets/default-playlist.jpg'" alt="Liked Music">
+          <div class="mobile-lib-count">
+            <svg lucideHeart [attr.size]="12"></svg>
+            {{ userService.likedSongs().length | number }}
+          </div>
+        </div>
+        <div class="mobile-lib-info">
+          <div class="mobile-lib-title">Liked Music</div>
+          <div class="mobile-lib-sub">Private • Auto</div>
+        </div>
+        <div class="mobile-lib-more" (click)="togglePlaylistMenu({name: 'Liked videos', tracks: userService.likedSongs()}, $event)">
+          <svg lucideMoreVertical [attr.size]="20"></svg>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="mobile-lib-item" (click)="openRecentlyPlayed()">
+        <div class="mobile-lib-thumb">
+          <img [src]="randomRecentThumbnail() || 'assets/default-playlist.jpg'" alt="Recently Played">
+          <div class="mobile-lib-count">
+            <svg lucideListMusic [attr.size]="12"></svg>
+            {{ userService.recentPlays().length | number }}
+          </div>
+        </div>
+        <div class="mobile-lib-info">
+          <div class="mobile-lib-title">History</div>
+          <div class="mobile-lib-sub">Private • Auto</div>
+        </div>
+        <div class="mobile-lib-more" (click)="togglePlaylistMenu({name: 'History', tracks: userService.recentPlays()}, $event)">
+          <svg lucideMoreVertical [attr.size]="20"></svg>
+        </div>
+      </div>
+
+      <!-- Custom Playlists -->
+      <div class="mobile-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="openCustomPlaylist(pl)">
+        <div class="mobile-lib-thumb">
+          <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
+          <div class="mobile-lib-count">
+            <svg lucideListMusic [attr.size]="12"></svg>
+            {{ pl.tracks.length | number }}
+          </div>
+        </div>
+        <div class="mobile-lib-info">
+          <div class="mobile-lib-title">{{ pl.name }}</div>
+          <div class="mobile-lib-sub">{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</div>
+        </div>
+        <div class="mobile-lib-more" (click)="togglePlaylistMenu(pl, $event)">
+          <svg lucideMoreVertical [attr.size]="20"></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

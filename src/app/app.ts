@@ -33,6 +33,7 @@ import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 import { PwaService } from './services/pwa.service';
 import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-browser';
 import { CarModePlayerComponent } from './components/car-mode-player/car-mode-player.component';
+import { LibraryPageComponent } from './components/library-page/library-page';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -83,7 +84,8 @@ export interface SponsoredAd {
     AdminManageSongsComponent,
     PlaylistMenuComponent,
     SavePlaylistModalComponent,
-    ToastComponent
+    ToastComponent,
+    LibraryPageComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
