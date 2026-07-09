@@ -1538,7 +1538,7 @@ export class App implements OnInit {
       queryVariation = `${this.currentQuery} audio`;
     }
 
-    this.youtubeApi.searchMusic(queryVariation).pipe(takeUntil(this.destroy$)).subscribe({
+    this.youtubeApi.searchMusic(queryVariation, 50).pipe(takeUntil(this.destroy$)).subscribe({
       next: (newItems) => {
         const currentItems = this.results();
         const existingIds = new Set(currentItems.map(item => item.videoId));

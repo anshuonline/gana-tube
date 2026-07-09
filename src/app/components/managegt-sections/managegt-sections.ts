@@ -151,7 +151,7 @@ export class ManagegtSectionsComponent implements OnInit {
     if (this.lazyLoadPage === 2) queryVariation = `${this.searchQuery} hits`;
     if (this.lazyLoadPage === 3) queryVariation = `${this.searchQuery} audio`;
 
-    this.youtubeApi.searchMusic(queryVariation, 15).subscribe({
+    this.youtubeApi.searchMusic(queryVariation, 50).subscribe({
       next: (results) => {
         const unique = [];
         const existingIds = new Set(this.searchResults.map(r => r.videoId));
@@ -163,7 +163,7 @@ export class ManagegtSectionsComponent implements OnInit {
           }
         }
         
-        this.searchResults = [...this.searchResults, ...unique.slice(0, 10)];
+        this.searchResults = [...this.searchResults, ...unique];
         this.isSearchingSongs = false;
         this.cdr.detectChanges();
       },
