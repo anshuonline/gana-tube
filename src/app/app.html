@@ -893,7 +893,8 @@
   <!-- Full Screen Player Overlay -->
   <app-full-screen-player 
     [isVisible]="isFullScreenPlayerVisible()"
-    (closePlayer)="closeFullScreenPlayer()">
+    (closePlayer)="closeFullScreenPlayer()"
+    (openPlaylist)="openSaveToPlaylist($event)">
   </app-full-screen-player>
 
   <!-- Listen Together Modal -->

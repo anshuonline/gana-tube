@@ -12,8 +12,15 @@ import {
   LucideVolumeX,
   LucideListMusic,
   LucideMic2,
-  LucideShare2
+  LucideShare2,
+  LucideMoreVertical,
+  LucideHeart,
+  LucideFolderPlus,
+  LucideListPlus
 } from '@lucide/angular';
+import { AlgorithmService } from '../../services/algorithm.service';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -31,7 +38,11 @@ import { FormsModule } from '@angular/forms';
     LucideVolumeX,
     LucideListMusic,
     LucideMic2,
-    LucideShare2
+    LucideShare2,
+    LucideMoreVertical,
+    LucideHeart,
+    LucideFolderPlus,
+    LucideListPlus
   ],
   templateUrl: './full-screen-player.component.html',
   styleUrls: ['./full-screen-player.component.scss']
@@ -39,12 +50,17 @@ import { FormsModule } from '@angular/forms';
 export class FullScreenPlayerComponent implements OnInit {
   @Input() isVisible = false;
   @Output() closePlayer = new EventEmitter<void>();
+  @Output() openPlaylist = new EventEmitter<any>();
   @ViewChild('lyricsContainer') lyricsContainer!: ElementRef;
 
   public playerService = inject(PlayerService);
   private youtubeApi = inject(YoutubeApiService);
+  public algorithmService = inject(AlgorithmService);
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
 
-  activeView: 'artwork' | 'queue' | 'lyrics' = 'artwork';
+  activeView: 'artwork' | 'queue' | 'lyrics' | 'related' = 'artwork';
+  showMenu = false;
   lyrics: string | null = null; // Plain text fallback
   parsedLyrics: { time: number, text: string }[] = [];
   activeLineIndex: number = -1;
@@ -84,9 +100,50 @@ export class FullScreenPlayerComponent implements OnInit {
 
   close(): void {
     this.closePlayer.emit();
+    this.showMenu = false;
   }
 
-  toggleView(view: 'artwork' | 'queue' | 'lyrics'): void {
+  toggleMenu(): void {
+    this.showMenu = !this.showMenu;
+  }
+
+  emitSaveToPlaylist(): void {
+    const track = this.playerService.currentTrack();
+    if (track) {
+      this.openPlaylist.emit(track);
+    }
+    this.showMenu = false;
+  }
+
+  isCurrentTrackLiked(): boolean {
+    const track = this.playerService.currentTrack();
+    if (!track) return false;
+    return this.algorithmService.isLiked(track.videoId);
+  }
+
+  toggleLike(): void {
+    const track = this.playerService.currentTrack();
+    if (track) {
+      const user = this.authService.currentUser();
+      if (user && user.email) {
+        this.userService.toggleLike(user.email, track, this.userService.preferredLanguages());
+      }
+      this.algorithmService.toggleLike(track);
+    }
+    this.showMenu = false;
+  }
+
+  addQueueTrack(): void {
+    const track = this.playerService.currentTrack();
+    if (track) {
+      this.playerService.addToQueue(track);
+      this.showToast = true;
+      setTimeout(() => this.showToast = false, 3000);
+    }
+    this.showMenu = false;
+  }
+
+  toggleView(view: 'artwork' | 'queue' | 'lyrics' | 'related'): void {
     if (this.activeView === view) {
       this.activeView = 'artwork';
     } else {
@@ -185,5 +242,6 @@ export class FullScreenPlayerComponent implements OnInit {
       this.showToast = true;
       setTimeout(() => this.showToast = false, 3000);
     });
+    this.showMenu = false;
   }
 }

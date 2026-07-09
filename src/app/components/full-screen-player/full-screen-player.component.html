@@ -15,9 +15,28 @@
         <span class="fs-now-playing">NOW PLAYING</span>
         <span class="fs-source">{{ playerService.currentTrack()?.channelTitle }}</span>
       </div>
-      <button class="icon-btn" (click)="copyShareLink()" title="Share Link">
-        <svg lucideShare2 [attr.size]="24"></svg>
-      </button>
+      <div class="fs-header-right" style="position: relative;">
+        <button class="icon-btn" (click)="toggleMenu()" title="More Options">
+          <svg lucideMoreVertical [attr.size]="24"></svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="track-menu-dropdown fs-menu" *ngIf="showMenu">
+          <div class="menu-item" (click)="addQueueTrack()">
+            <svg lucideListPlus [attr.size]="18"></svg> Add to queue
+          </div>
+          <div class="menu-item" (click)="emitSaveToPlaylist()">
+            <svg lucideFolderPlus [attr.size]="18"></svg> Save to playlist
+          </div>
+          <div class="menu-item" (click)="toggleLike()">
+            <svg lucideHeart [attr.size]="18" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg> 
+            {{ isCurrentTrackLiked() ? 'Remove from liked' : 'Add to liked songs' }}
+          </div>
+          <div class="menu-item" (click)="copyShareLink()">
+            <svg lucideShare2 [attr.size]="18"></svg> Share
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Main Content Area (Artwork / Queue / Lyrics) -->
@@ -91,6 +110,14 @@
         </div>
       </div>
 
+      <!-- Related View (Placeholder) -->
+      <div class="fs-related-view" *ngIf="activeView === 'related'">
+        <h3 class="view-title">Related</h3>
+        <div class="related-placeholder" style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px 20px;">
+          <p>More like this coming soon...</p>
+        </div>
+      </div>
+
     </div>
 
     <!-- Bottom Controls Area -->
@@ -119,10 +146,10 @@
       <!-- Playback Controls -->
       <div class="fs-controls">
         
-        <!-- Additional controls toggles (Lyrics / Queue) -->
+        <!-- Like button (replaces old Lyrics toggle) -->
         <div class="fs-side-controls">
-          <button class="fs-toggle-btn" [class.active]="activeView === 'lyrics'" (click)="toggleView('lyrics')" title="Lyrics">
-            <svg lucideMic2 [attr.size]="24"></svg>
+          <button class="fs-toggle-btn" [class.active]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
+            <svg lucideHeart [attr.size]="24" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
           </button>
         </div>
 
@@ -142,13 +169,20 @@
           </button>
         </div>
 
-        <!-- Additional controls toggles (Lyrics / Queue) -->
+        <!-- Queue toggle -->
         <div class="fs-side-controls" style="justify-content: flex-end;">
           <button class="fs-toggle-btn" [class.active]="activeView === 'queue'" (click)="toggleView('queue')" title="Up Next">
             <svg lucideListMusic [attr.size]="24"></svg>
           </button>
         </div>
 
+      </div>
+
+      <!-- Bottom Tabs for Mobile Views -->
+      <div class="fs-bottom-tabs">
+        <button class="tab-btn" [class.active]="activeView === 'queue'" (click)="toggleView('queue')">Up next</button>
+        <button class="tab-btn" [class.active]="activeView === 'lyrics'" (click)="toggleView('lyrics')">Lyrics</button>
+        <button class="tab-btn" [class.active]="activeView === 'related'" (click)="toggleView('related')">Related</button>
       </div>
     </div>
     
