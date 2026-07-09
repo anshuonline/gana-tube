@@ -890,7 +890,7 @@
             <svg *ngIf="isLiked(playlistModalTrack())" lucideCheck [attr.size]="20" style="margin-left: auto; color: var(--color-primary);"></svg>
           </div>
           <!-- Custom Playlists -->
-          <div class="playlist-item" *ngFor="let pl of userService.customPlaylists()" (click)="userService.addToPlaylist(pl.name, playlistModalTrack())">
+          <div class="playlist-item" *ngFor="let pl of userService.customPlaylists()" (click)="userService.addToPlaylist(authService.currentUser()?.email || '', pl.playlist_id || pl.name, playlistModalTrack())">
             <div class="playlist-icon">
               <svg lucideListMusic [attr.size]="20" stroke="white"></svg>
             </div>
@@ -903,6 +903,10 @@
         </div>
         <div class="new-playlist-input">
           <input type="text" placeholder="New playlist name..." [value]="newPlaylistName()" (input)="newPlaylistName.set($any($event.target).value)">
+          <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; margin-bottom: 10px; cursor: pointer;">
+            <input type="checkbox" [checked]="newPlaylistIsPublic()" (change)="newPlaylistIsPublic.set(!newPlaylistIsPublic())">
+            <span style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">Make playlist public</span>
+          </label>
           <button (click)="createAndAddToPlaylist()">
             <svg lucidePlus [attr.size]="18"></svg> Create
           </button>

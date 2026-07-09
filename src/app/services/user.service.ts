@@ -22,25 +22,32 @@ export class UserService {
   likedSongs = signal<any[]>([]);
   recentPlays = signal<any[]>([]);
   listeningPreferences = signal<string[]>([]);
-  customPlaylists = signal<{name: string, tracks: any[]}[]>([]);
+  customPlaylists = signal<any[]>([]);
   
   constructor(private http: HttpClient) {
     if (!environment.production) {
-      // In local dev, use the local XAMPP backend if preferred, 
-      // otherwise it will just hit the production backend url from environment.
-      // this.apiUrl = 'http://localhost/manageads/user-api.php';
+      // In local dev, use the local XAMPP backend if preferred
     }
-    
-    // Load custom playlists from localStorage
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('ganatube_playlists');
-      if (stored) {
-        try {
-          this.customPlaylists.set(JSON.parse(stored));
-        } catch (e) {
-          console.error('Failed to parse local playlists', e);
-        }
+  }
+
+  // Load playlists from the MySQL Database
+  async loadPlaylists(email: string) {
+    if (!email) return;
+    try {
+      const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
+      const response: any = await firstValueFrom(this.http.get(`${url}?action=getPlaylists&email=${encodeURIComponent(email)}`));
+      if (response.status === 'success' && response.data) {
+        // Map backend schema (playlist_name, songs) to frontend schema (name, tracks) for compatibility
+        const mappedPlaylists = response.data.map((p: any) => ({
+          playlist_id: p.playlist_id,
+          name: p.playlist_name,
+          is_public: p.is_public,
+          tracks: p.songs || []
+        }));
+        this.customPlaylists.set(mappedPlaylists);
       }
+    } catch (e) {
+      console.error('Failed to load playlists from database', e);
     }
   }
 
@@ -155,28 +162,63 @@ export class UserService {
     });
   }
 
-  // Custom Playlists (Local Storage)
-  createPlaylist(name: string) {
+  // Custom Playlists (Database)
+  async createPlaylist(email: string, name: string, isPublic = false) {
+    if (!email) return false;
     const current = this.customPlaylists();
-    if (current.find(p => p.name === name)) return false;
-    const newPlaylists = [...current, { name, tracks: [] }];
-    this.customPlaylists.set(newPlaylists);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('ganatube_playlists', JSON.stringify(newPlaylists));
+    if (current.find(p => p.name === name)) return false; // Prevent duplicate names locally for quick check
+    
+    try {
+      const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
+      const response: any = await firstValueFrom(this.http.post(`${url}?action=createPlaylist`, {
+        email: email,
+        playlist_name: name,
+        is_public: isPublic ? 1 : 0,
+        songs: []
+      }));
+      
+      if (response.status === 'success' && response.data) {
+        const p = response.data;
+        const newPlaylists = [...this.customPlaylists(), {
+          playlist_id: p.playlist_id,
+          name: p.playlist_name,
+          is_public: p.is_public,
+          tracks: p.songs || []
+        }];
+        this.customPlaylists.set(newPlaylists);
+        return true;
+      }
+    } catch (e) {
+      console.error('Error creating playlist', e);
     }
-    return true;
+    return false;
   }
 
-  addToPlaylist(playlistName: string, track: any) {
+  async addToPlaylist(email: string, playlistIdOrName: string, track: any) {
+    if (!email) return;
     const current = [...this.customPlaylists()];
-    const pIdx = current.findIndex(p => p.name === playlistName);
+    // Find by ID first, then by name for backward compatibility during transition
+    let pIdx = current.findIndex(p => p.playlist_id === playlistIdOrName);
+    if (pIdx < 0) pIdx = current.findIndex(p => p.name === playlistIdOrName);
+    
     if (pIdx >= 0) {
       // Prevent duplicates
       if (!current[pIdx].tracks.find((t: any) => t.videoId === track.videoId)) {
         current[pIdx].tracks.unshift(track);
         this.customPlaylists.set(current);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('ganatube_playlists', JSON.stringify(current));
+        
+        // Sync to database
+        if (current[pIdx].playlist_id) {
+          try {
+            const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
+            await firstValueFrom(this.http.post(`${url}?action=updatePlaylist`, {
+              email: email,
+              playlist_id: current[pIdx].playlist_id,
+              songs: current[pIdx].tracks
+            }));
+          } catch (e) {
+            console.error('Error updating playlist in DB', e);
+          }
         }
       }
     }

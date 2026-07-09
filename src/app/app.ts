@@ -318,15 +318,25 @@ export class App implements OnInit {
     }
   }
 
-  createAndAddToPlaylist() {
+  newPlaylistIsPublic = signal<boolean>(false);
+
+  async createAndAddToPlaylist() {
     const name = this.newPlaylistName().trim();
     if (!name) return;
     const track = this.playlistModalTrack();
     if (!track) return;
+    const user = this.authService.currentUser();
+    if (!user || !user.email) {
+      alert("Please log in to create playlists.");
+      return;
+    }
     
-    this.userService.createPlaylist(name);
-    this.userService.addToPlaylist(name, track);
-    this.newPlaylistName.set('');
+    const created = await this.userService.createPlaylist(user.email as string, name, this.newPlaylistIsPublic());
+    if (created) {
+      await this.userService.addToPlaylist(user.email as string, name, track);
+      this.newPlaylistName.set('');
+      this.newPlaylistIsPublic.set(false);
+    }
   }
 
   isLiked(track: any): boolean {
@@ -415,6 +425,7 @@ export class App implements OnInit {
       if (user && user.email) {
         this.userService.loadProfile(user.email).then(profile => {
           if (profile) {
+            this.userService.loadPlaylists(user.email as string);
             if (profile.preferred_languages && profile.preferred_languages.length > 0) {
               this.preferredLanguages.set(profile.preferred_languages);
             }
