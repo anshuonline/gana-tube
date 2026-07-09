@@ -1,5 +1,9 @@
 <div class="car-mode-overlay" [class.visible]="isVisible">
   
+  <!-- Ambient blurred background -->
+  <div class="cm-bg-ambient" [style.background-image]="'url(' + (playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || '') + ')'"></div>
+  <div class="cm-bg-overlay"></div>
+
   <div class="car-mode-container">
     
     <!-- Top Header -->
