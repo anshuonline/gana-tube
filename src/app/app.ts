@@ -8,6 +8,7 @@ import { MusicPlayerComponent } from './components/music-player/music-player.com
 import { YtPlayerComponent } from './components/yt-player/yt-player.component';
 import { FullScreenPlayerComponent } from './components/full-screen-player/full-screen-player.component';
 import { ListenTogetherComponent } from './components/listen-together/listen-together.component';
+import { TrackMenuComponent } from './components/track-menu/track-menu.component';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
 import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
@@ -66,6 +67,7 @@ export interface SponsoredAd {
     YtPlayerComponent,
     FullScreenPlayerComponent,
     ListenTogetherComponent,
+    TrackMenuComponent,
     PlaylistPageComponent,
     AdvertisePageComponent,
     AdBookingPageComponent,

@@ -615,24 +615,13 @@
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                     </button>
                   </div>
-                  <!-- Dropdown Menu (outside thumbnail to avoid overflow:hidden clip) -->
-                  <div class="track-menu-dropdown" *ngIf="activeMenuTrackId() === track.videoId">
-                    <div class="menu-item" (click)="$event.stopPropagation(); addToQueue(track)">
-                      <svg lucideListPlus [attr.size]="18"></svg> Add to queue
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); playNext(track)">
-                      <svg lucideListStart [attr.size]="18"></svg> Play next
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); openSaveToPlaylist(track)">
-                      <svg lucideFolderPlus [attr.size]="18"></svg> Save to playlist
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); toggleLikeTrack(track)">
-                      <svg lucideHeart [attr.size]="18"></svg> {{ isLiked(track) ? 'Remove from liked songs' : 'Add to liked songs' }}
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); shareTrack(track)">
-                      <svg lucideShare2 [attr.size]="18"></svg> Share
-                    </div>
-                  </div>
+                  <!-- Reusable Track Menu -->
+                  <app-track-menu 
+                    [track]="track" 
+                    [isOpen]="activeMenuTrackId() === track.videoId"
+                    (closeMenu)="activeMenuTrackId.set(null)"
+                    (openPlaylist)="openSaveToPlaylist($event)">
+                  </app-track-menu>
                   <div class="card-info">
                     <p class="track-channel">{{ track.channelTitle | uppercase }}</p>
                     <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
@@ -658,24 +647,13 @@
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
                     </button>
                   </div>
-                  <!-- Dropdown Menu -->
-                  <div class="track-menu-dropdown" *ngIf="activeMenuTrackId() === track.videoId">
-                    <div class="menu-item" (click)="$event.stopPropagation(); addToQueue(track)">
-                      <svg lucideListPlus [attr.size]="18"></svg> Add to queue
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); playNext(track)">
-                      <svg lucideListStart [attr.size]="18"></svg> Play next
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); openSaveToPlaylist(track)">
-                      <svg lucideFolderPlus [attr.size]="18"></svg> Save to playlist
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); toggleLikeTrack(track)">
-                      <svg lucideHeart [attr.size]="18"></svg> {{ isLiked(track) ? 'Remove from liked songs' : 'Add to liked songs' }}
-                    </div>
-                    <div class="menu-item" (click)="$event.stopPropagation(); shareTrack(track)">
-                      <svg lucideShare2 [attr.size]="18"></svg> Share
-                    </div>
-                  </div>
+                  <!-- Reusable Track Menu -->
+                  <app-track-menu 
+                    [track]="track" 
+                    [isOpen]="activeMenuTrackId() === track.videoId"
+                    (closeMenu)="activeMenuTrackId.set(null)"
+                    (openPlaylist)="openSaveToPlaylist($event)">
+                  </app-track-menu>
                 </div>
               </div>
             </ng-container>

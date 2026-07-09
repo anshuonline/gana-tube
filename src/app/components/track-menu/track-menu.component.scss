@@ -1,0 +1,161 @@
+/* Desktop styling (default) */
+.track-menu-container {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: #000000; /* AMOLED Black as requested */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+  min-width: 260px;
+  padding: 8px 0;
+  z-index: 10000;
+  
+  /* Fallback position if it goes off bottom edge in some containers */
+  /* The parent should NOT have overflow: hidden */
+  
+  .menu-items-scroll {
+    max-height: 70vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    svg {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    &.disabled-item {
+      opacity: 0.5;
+    }
+  }
+
+  .menu-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 4px 0;
+  }
+}
+
+/* Mobile Styling - Bottom Sheet */
+.track-menu-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 99998;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.track-menu-container.mobile {
+  position: fixed;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  margin-top: 0;
+  border: none;
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 0 24px 0;
+  z-index: 99999;
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+  
+  /* Ensure it escapes completely */
+  max-width: none;
+  
+  .mobile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+
+    .drag-handle {
+      width: 40px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+
+    .track-info-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      
+      .menu-thumb {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      .menu-text-info {
+        flex: 1;
+        min-width: 0;
+        
+        .menu-title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #fff;
+          margin: 0 0 4px 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .menu-artist {
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.6);
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  .menu-items-scroll {
+    max-height: 60vh;
+    padding-bottom: 20px; // safe area
+  }
+
+  .menu-item {
+    padding: 16px 24px;
+    font-size: 1.05rem;
+  }
+}

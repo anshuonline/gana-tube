@@ -20,22 +20,13 @@
           <svg lucideMoreVertical [attr.size]="24"></svg>
         </button>
 
-        <!-- Dropdown Menu -->
-        <div class="track-menu-dropdown fs-menu" *ngIf="showMenu">
-          <div class="menu-item" (click)="addQueueTrack()">
-            <svg lucideListPlus [attr.size]="18"></svg> Add to queue
-          </div>
-          <div class="menu-item" (click)="emitSaveToPlaylist()">
-            <svg lucideFolderPlus [attr.size]="18"></svg> Save to playlist
-          </div>
-          <div class="menu-item" (click)="toggleLike()">
-            <svg lucideHeart [attr.size]="18" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg> 
-            {{ isCurrentTrackLiked() ? 'Remove from liked' : 'Add to liked songs' }}
-          </div>
-          <div class="menu-item" (click)="copyShareLink()">
-            <svg lucideShare2 [attr.size]="18"></svg> Share
-          </div>
-        </div>
+        <!-- Reusable Track Menu -->
+        <app-track-menu 
+          [track]="playerService.currentTrack()"
+          [isOpen]="showMenu"
+          (closeMenu)="showMenu = false"
+          (openPlaylist)="openPlaylist.emit($event)">
+        </app-track-menu>
       </div>
     </div>
 

@@ -1,0 +1,62 @@
+<!-- Overlay for Mobile to catch outside clicks and apply dimming -->
+<div class="track-menu-overlay" *ngIf="isOpen && isMobile" (click)="close($event)"></div>
+
+<!-- Main Container -->
+<div class="track-menu-container" *ngIf="isOpen" [class.mobile]="isMobile" (click)="$event.stopPropagation()">
+  
+  <!-- Mobile Header (Drag handle + Track Info) -->
+  <div class="mobile-header" *ngIf="isMobile">
+    <div class="drag-handle"></div>
+    <div class="track-info-header" *ngIf="track">
+      <img [src]="track.thumbnail" class="menu-thumb" alt="Track thumbnail">
+      <div class="menu-text-info">
+        <h4 class="menu-title" [title]="track.title">{{ track.title }}</h4>
+        <p class="menu-artist">{{ track.channelTitle }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Items (Scrollable on mobile if needed) -->
+  <div class="menu-items-scroll">
+    <div class="menu-item" (click)="playNext($event)">
+      <svg lucideListStart [attr.size]="20"></svg> Play next
+    </div>
+    
+    <div class="menu-item" (click)="addToQueue($event)">
+      <svg lucideListPlus [attr.size]="20"></svg> Add to queue
+    </div>
+    
+    <div class="menu-item" (click)="saveToPlaylist($event)">
+      <svg lucideFolderPlus [attr.size]="20"></svg> Save to playlist
+    </div>
+    
+    <div class="menu-item" (click)="toggleLike($event)">
+      <svg lucideHeart [attr.size]="20" [attr.fill]="isLiked() ? 'currentColor' : 'none'"></svg> 
+      {{ isLiked() ? 'Remove from liked songs' : 'Add to liked songs' }}
+    </div>
+
+    <hr class="menu-divider">
+    
+    <div class="menu-item" (click)="goToArtist($event)">
+      <svg lucideUser [attr.size]="20"></svg> Go to artist
+    </div>
+    
+    <div class="menu-item" (click)="goToAlbum($event)">
+      <svg lucideDisc [attr.size]="20"></svg> Go to album
+    </div>
+    
+    <hr class="menu-divider">
+    
+    <div class="menu-item" (click)="share($event)">
+      <svg lucideShare2 [attr.size]="20"></svg> Share
+    </div>
+    
+    <div class="menu-item disabled-item" (click)="download($event)">
+      <svg lucideDownload [attr.size]="20"></svg> Download
+    </div>
+    
+    <div class="menu-item disabled-item" (click)="startRadio($event)">
+      <svg lucideRadio [attr.size]="20"></svg> Start radio
+    </div>
+  </div>
+</div>

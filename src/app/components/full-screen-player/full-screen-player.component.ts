@@ -14,14 +14,13 @@ import {
   LucideMic2,
   LucideShare2,
   LucideMoreVertical,
-  LucideHeart,
-  LucideFolderPlus,
-  LucideListPlus
+  LucideHeart
 } from '@lucide/angular';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { FormsModule } from '@angular/forms';
+import { TrackMenuComponent } from '../track-menu/track-menu.component';
 
 @Component({
   selector: 'app-full-screen-player',
@@ -38,11 +37,9 @@ import { FormsModule } from '@angular/forms';
     LucideVolumeX,
     LucideListMusic,
     LucideMic2,
-    LucideShare2,
     LucideMoreVertical,
     LucideHeart,
-    LucideFolderPlus,
-    LucideListPlus
+    TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
   styleUrls: ['./full-screen-player.component.scss']
@@ -107,14 +104,6 @@ export class FullScreenPlayerComponent implements OnInit {
     this.showMenu = !this.showMenu;
   }
 
-  emitSaveToPlaylist(): void {
-    const track = this.playerService.currentTrack();
-    if (track) {
-      this.openPlaylist.emit(track);
-    }
-    this.showMenu = false;
-  }
-
   isCurrentTrackLiked(): boolean {
     const track = this.playerService.currentTrack();
     if (!track) return false;
@@ -129,16 +118,6 @@ export class FullScreenPlayerComponent implements OnInit {
         this.userService.toggleLike(user.email, track, this.userService.preferredLanguages());
       }
       this.algorithmService.toggleLike(track);
-    }
-    this.showMenu = false;
-  }
-
-  addQueueTrack(): void {
-    const track = this.playerService.currentTrack();
-    if (track) {
-      this.playerService.addToQueue(track);
-      this.showToast = true;
-      setTimeout(() => this.showToast = false, 3000);
     }
     this.showMenu = false;
   }
