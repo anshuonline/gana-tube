@@ -225,9 +225,7 @@ export class PlaylistMenuComponent implements OnChanges {
   sharePlaylist(event: Event) {
     event.stopPropagation();
     if (this.playlist?.playlist_id) {
-      const email = this.authService.currentUser()?.email || 'user';
-      const username = email.split('@')[0];
-      const url = `${window.location.origin}/user/${username}/${this.playlist.playlist_id}`;
+      const url = `${window.location.origin}/${this.playlist.playlist_id}`;
       
       if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => {

@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'artist/:name', children: [] },
   { path: 'playlist/:id', children: [] },
   { path: 'user/:username/:id', children: [] },
+  { path: ':id', children: [] },
   { path: 'admin/manage-songs', loadComponent: () => import('./components/admin-manage-songs/admin-manage-songs').then(m => m.AdminManageSongsComponent) },
   { 
     path: 'managegt', 

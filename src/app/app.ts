@@ -602,6 +602,9 @@ export class App implements OnInit {
           this.fetchPublicPlaylist(playlistId, username);
         }
         return;
+      } else if (url.startsWith('pl_')) {
+        this.fetchPublicPlaylist(url, '');
+        return;
       }
 
       // Check if it's a valid static page or one of our main pages
@@ -1412,7 +1415,7 @@ export class App implements OnInit {
     this.selectedPlaylist.set(playlistMeta);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
-    this.router.navigate(['/user', username, pl.playlist_id]);
+    this.router.navigate(['/', pl.playlist_id]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
