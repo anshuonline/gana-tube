@@ -10,7 +10,7 @@
 }
 
 .modal-content {
-  background: #1e1e1e;
+  background: #000000;
   border-radius: 12px;
   width: 90%;
   max-width: 400px;
@@ -72,7 +72,7 @@
     outline: none;
     
     &:focus {
-      border-color: #4facfe;
+      border-color: #ffffff;
     }
   }
 }
@@ -104,10 +104,11 @@
     transition: background 0.3s;
 
     &.active {
-      background: #4facfe;
+      background: #ffffff;
       
       .toggle-knob {
         transform: translateX(20px);
+        background: #000000;
       }
     }
 
@@ -150,11 +151,11 @@
   }
 
   .btn-save {
-    background: #4facfe;
-    color: #fff;
+    background: #ffffff;
+    color: #000000;
     
     &:hover {
-      background: #00f2fe;
+      background: #eeeeee;
     }
     
     &:disabled {

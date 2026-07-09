@@ -32,7 +32,7 @@ import { CommonModule } from '@angular/common';
     }
 
     .confirm-modal {
-      background: #181818;
+      background: #000000;
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 12px;
       padding: 24px;

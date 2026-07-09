@@ -697,6 +697,13 @@ export class App implements OnInit {
         this.closeMenu();
       }
     }
+    
+    // Close playlist menu
+    if (this.activePlaylistMenu()) {
+      if (!target.closest('.track-menu-container') && !target.closest('.desktop-lib-more') && !target.closest('.mobile-lib-more') && !target.closest('.playlist-options-btn')) {
+        this.closePlaylistMenu();
+      }
+    }
   }
 
   openProfilePage(): void {
@@ -1361,7 +1368,9 @@ export class App implements OnInit {
           coverImage: pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh ? pl.songs[0].thumbnailHigh : 
                      (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg'),
           preloadedSongs: pl.songs || [],
-          searchQueries: []
+          searchQueries: [],
+          creator: (email && pl.owner === email.split('@')[0]) ? (this.authService.currentUser()?.displayName || pl.owner) : pl.owner,
+          is_public: pl.is_public
         };
         
         this.selectedPlaylist.set(playlistMeta);
