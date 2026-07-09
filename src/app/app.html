@@ -199,7 +199,7 @@
           <style>
             .desktop-library-view {
               display: grid;
-              grid-template-columns: repeat(4, 1fr);
+              grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
               gap: 20px;
               width: 100%;
               padding: 10px 0 40px;
@@ -801,7 +801,7 @@
     </app-playlist-page>
 
     <!-- Modern Footer -->
-    <footer class="app-footer-modern" *ngIf="currentPage() !== 'playlist' && currentPage() !== 'managegt'">
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'search' && !isSearchMode()">
       <div class="footer-giant-brand">ganatube.in</div>
       <div class="footer-content">
         <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">

@@ -6,7 +6,7 @@ import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-a
 import { firstValueFrom, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { LucideChevronDown, LucideChevronUp, LucideTrash2, LucidePlus, LucideX, LucideGripVertical, LucideTrash, LucideArrowLeft, LucideSearch, LucideRefreshCw } from '@lucide/angular';
+import { LucideChevronDown, LucideChevronUp, LucideTrash2, LucidePlus, LucideX, LucideGripVertical, LucideTrash, LucideArrowLeft, LucideSearch, LucideRefreshCw, LucideCheck } from '@lucide/angular';
 
 interface CustomSection {
   title: string;
@@ -16,7 +16,7 @@ interface CustomSection {
 @Component({
   selector: 'app-managegt-sections',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, LucideChevronDown, LucideChevronUp, LucideTrash2, LucidePlus, LucideX, LucideGripVertical, LucideTrash, LucideArrowLeft, LucideSearch, LucideRefreshCw],
+  imports: [CommonModule, FormsModule, DragDropModule, LucideChevronDown, LucideChevronUp, LucideTrash2, LucidePlus, LucideX, LucideGripVertical, LucideTrash, LucideArrowLeft, LucideSearch, LucideRefreshCw, LucideCheck],
   templateUrl: './managegt-sections.html',
   styleUrls: ['./managegt-sections.scss']
 })
@@ -29,6 +29,7 @@ export class ManagegtSectionsComponent implements OnInit {
   currentSections: CustomSection[] = [];
 
   // Add new section state
+  createMode: 'simple' | 'json' = 'simple';
   newSectionTitle = '';
   jsonInput = '';
   isFetching = false;
@@ -43,8 +44,10 @@ export class ManagegtSectionsComponent implements OnInit {
   // Search State
   searchQuery = '';
   searchResults: YouTubeSearchResult[] = [];
+  selectedSongs = new Set<string>(); // For bulk selection tracking videoIds
   isSearchingSongs = false;
   hasSearchedSongs = false;
+  lazyLoadPage = 0;
 
   apiUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
 
@@ -98,15 +101,24 @@ export class ManagegtSectionsComponent implements OnInit {
   // Master-Detail Navigation
   openSection(index: number) {
     this.activeSectionIndex = index;
+    const sectionTitle = this.currentSections[index].title;
+    
     // Reset search
-    this.searchQuery = '';
+    this.searchQuery = sectionTitle; // Pre-fill with section title for smart recommendations
     this.searchResults = [];
     this.hasSearchedSongs = false;
+    this.selectedSongs.clear();
+    this.lazyLoadPage = 0;
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Automatically perform recommended search
+    this.performSongSearch();
   }
 
   closeSection() {
     this.activeSectionIndex = null;
+    this.selectedSongs.clear();
   }
 
   // Delete Individual Song
@@ -121,24 +133,37 @@ export class ManagegtSectionsComponent implements OnInit {
   }
 
   // Song Search Logic
-  performSongSearch() {
+  performSongSearch(isLoadMore = false) {
     if (!this.searchQuery.trim()) return;
+    
     this.isSearchingSongs = true;
     this.hasSearchedSongs = true;
-    this.searchResults = [];
+    
+    if (!isLoadMore) {
+      this.searchResults = [];
+      this.lazyLoadPage = 0;
+      this.selectedSongs.clear();
+    }
 
-    this.youtubeApi.searchMusic(this.searchQuery, 15).subscribe({
+    // Generate query variation for paginated search
+    let queryVariation = this.searchQuery;
+    if (this.lazyLoadPage === 1) queryVariation = `${this.searchQuery} songs`;
+    if (this.lazyLoadPage === 2) queryVariation = `${this.searchQuery} hits`;
+    if (this.lazyLoadPage === 3) queryVariation = `${this.searchQuery} audio`;
+
+    this.youtubeApi.searchMusic(queryVariation, 15).subscribe({
       next: (results) => {
         const unique = [];
-        const titles = new Set();
+        const existingIds = new Set(this.searchResults.map(r => r.videoId));
+        
         for (const r of results) {
-          let norm = r.title.toLowerCase().replace(/[\(\[].*?[\)\]]/g, '').trim();
-          if (!titles.has(norm)) {
-            titles.add(norm);
+          if (!existingIds.has(r.videoId)) {
+            existingIds.add(r.videoId);
             unique.push(r);
           }
         }
-        this.searchResults = unique.slice(0, 10);
+        
+        this.searchResults = [...this.searchResults, ...unique.slice(0, 10)];
         this.isSearchingSongs = false;
         this.cdr.detectChanges();
       },
@@ -148,6 +173,52 @@ export class ManagegtSectionsComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  loadMoreSongs() {
+    if (this.lazyLoadPage >= 3 || this.isSearchingSongs) return;
+    this.lazyLoadPage++;
+    this.performSongSearch(true);
+  }
+
+  onSearchScroll(event: Event) {
+    const target = event.target as HTMLElement;
+    // Check if we are near bottom (within 50px)
+    if (target.scrollHeight - target.scrollTop <= target.clientHeight + 50) {
+      this.loadMoreSongs();
+    }
+  }
+
+  toggleSongSelection(result: YouTubeSearchResult) {
+    if (this.selectedSongs.has(result.videoId)) {
+      this.selectedSongs.delete(result.videoId);
+    } else {
+      this.selectedSongs.add(result.videoId);
+    }
+  }
+
+  addSelectedSongsToSection() {
+    if (this.activeSectionIndex === null || this.selectedSongs.size === 0) return;
+    
+    const songsToAdd = this.searchResults.filter(r => this.selectedSongs.has(r.videoId));
+    
+    for (const song of songsToAdd) {
+      // Avoid exact duplicates
+      if (!this.currentSections[this.activeSectionIndex].songs.some(s => s.videoId === song.videoId)) {
+        this.currentSections[this.activeSectionIndex].songs.push({
+          videoId: song.videoId,
+          title: song.title,
+          thumbnail: song.thumbnail,
+          thumbnailHigh: song.thumbnailHigh || song.thumbnail,
+          channelTitle: song.channelTitle,
+          publishedAt: song.publishedAt
+        });
+      }
+    }
+    
+    this.selectedSongs.clear(); // clear selection
+    this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+    this.publishSections();
   }
 
   addSongToSection(song: YouTubeSearchResult) {
@@ -166,6 +237,26 @@ export class ManagegtSectionsComponent implements OnInit {
       this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
       setTimeout(() => this.publishSections(), 0);
     }
+  }
+
+  createEmptySection() {
+    if (!this.newSectionTitle.trim()) {
+      this.fetchError = 'Please provide a section title.';
+      return;
+    }
+
+    this.currentSections.unshift({
+      title: this.newSectionTitle.trim(),
+      songs: []
+    });
+
+    this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+    this.publishSections();
+    
+    // Clear form and open the new section
+    this.newSectionTitle = '';
+    this.fetchError = '';
+    this.openSection(0);
   }
 
   async addSection() {

@@ -1109,7 +1109,6 @@ export class App implements OnInit {
 
   onSuggestSearch(query: string): void {
     if (!query) return;
-    this.closeSearchPage();
     this.hasSearched.set(true);
     this.currentQuery = query;
     this.performSearch(query);
@@ -1176,7 +1175,7 @@ export class App implements OnInit {
     this.lazyLoadPage = 0;
     this.isLoading.set(true);
     this.hasSearched.set(true);
-    this.isSearchMode.set(false);
+    this.results.set([]);
 
     if (this.searchFilter() === 'community') {
       // Fetch Community Playlists

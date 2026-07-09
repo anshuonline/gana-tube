@@ -79,7 +79,12 @@
         <input type="text" [(ngModel)]="newSectionTitle" placeholder="e.g. Romantic Hits" class="form-input" />
       </div>
 
-      <div class="form-group">
+      <div class="mode-toggle">
+        <button [class.active]="createMode === 'simple'" (click)="createMode = 'simple'" class="mode-btn">Name Only</button>
+        <button [class.active]="createMode === 'json'" (click)="createMode = 'json'" class="mode-btn">Advanced JSON</button>
+      </div>
+
+      <div class="form-group" *ngIf="createMode === 'json'">
         <label class="flex-label">
           <span>JSON Array or Objects</span>
           <span class="hint">e.g. ["Song 1"] OR [{{ '{' }}"section_name": "Name", "songs": ["Song 1"]{{ '}' }}]</span>
@@ -99,12 +104,18 @@
         Fetching {{ fetchProgress }} / {{ totalToFetch }}
       </div>
 
-      <button class="submit-btn" [disabled]="isFetching || isPublishing" (click)="addSection()">
+      <!-- Button for JSON mode -->
+      <button *ngIf="createMode === 'json'" class="submit-btn" [disabled]="isFetching || isPublishing" (click)="addSection()">
         <span *ngIf="!isFetching && !isPublishing">Fetch & Publish Section</span>
         <span *ngIf="isFetching || isPublishing" class="loading-text">
           <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
           Processing...
         </span>
+      </button>
+
+      <!-- Button for Simple mode -->
+      <button *ngIf="createMode === 'simple'" class="submit-btn" [disabled]="isPublishing" (click)="createEmptySection()">
+        <span>Create Empty Section</span>
       </button>
     </div>
   </ng-container>
@@ -173,34 +184,44 @@
           </button>
         </div>
 
-        <div class="search-results-area">
+        <div class="search-results-area" (scroll)="onSearchScroll($event)">
           <div *ngIf="!hasSearchedSongs" class="empty-state-small">
             <svg lucideSearch [attr.size]="40"></svg>
             <p>Search for a song to add it to "{{ currentSections[activeSectionIndex].title }}"</p>
-          </div>
-
-          <div *ngIf="isSearchingSongs" class="loading-state">
-            <svg lucideRefreshCw class="spin big" [attr.size]="40"></svg>
-            <p>Searching...</p>
           </div>
 
           <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length === 0" class="empty-state-small">
             <p>No results found for "{{searchQuery}}".</p>
           </div>
 
-          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length > 0" class="results-list">
-            <div class="result-item" *ngFor="let result of searchResults">
+          <div *ngIf="hasSearchedSongs && searchResults.length > 0" class="results-list compact">
+            <div class="result-item" *ngFor="let result of searchResults" 
+                 [class.selected]="selectedSongs.has(result.videoId)"
+                 (click)="toggleSongSelection(result)">
+              <div class="checkbox">
+                <svg *ngIf="selectedSongs.has(result.videoId)" lucideCheck [attr.size]="14"></svg>
+              </div>
               <img [src]="result.thumbnail" [alt]="result.title" class="result-thumb">
               <div class="result-info">
                 <div class="result-title">{{ result.title }}</div>
                 <div class="result-artist">{{ result.channelTitle }}</div>
               </div>
-              <button class="add-btn" (click)="addSongToSection(result)">
-                <svg lucidePlus [attr.size]="18"></svg>
-                Add
-              </button>
+            </div>
+            
+            <div *ngIf="isSearchingSongs" class="loading-state lazy-loader">
+              <svg lucideRefreshCw class="spin" [attr.size]="24"></svg>
+              <p>Loading more...</p>
             </div>
           </div>
+        </div>
+
+        <!-- Sticky Bulk Add Bar -->
+        <div class="bulk-add-bar" *ngIf="selectedSongs.size > 0">
+          <span>{{ selectedSongs.size }} selected</span>
+          <button class="add-selected-btn" (click)="addSelectedSongsToSection()">
+            <svg lucidePlus [attr.size]="18"></svg>
+            Add Selected
+          </button>
         </div>
       </div>
     </div>
