@@ -459,7 +459,12 @@ export class MusicPlayerComponent {
   swipeTransform = signal('');
 
   onTouchStart(e: TouchEvent) {
-    if ((e.target as HTMLElement).closest('.fs-queue-section, .volume-slider, .track-progress')) return;
+    // Don't capture touch if it starts inside any scrollable container
+    const scrollableSelector = '.fs-queue-section, .fs-queue-list, .queue-list, .lyrics-container, .volume-slider, .progress-track, [class*="scroll"]';
+    if ((e.target as HTMLElement).closest(scrollableSelector)) {
+      this.isDragging.set(false);
+      return;
+    }
     this.touchStartY.set(e.touches[0].clientY);
     this.touchStartX.set(e.touches[0].clientX);
     this.isDragging.set(true);
@@ -470,14 +475,8 @@ export class MusicPlayerComponent {
     this.touchCurrentY.set(e.touches[0].clientY);
     this.touchCurrentX.set(e.touches[0].clientX);
     
-    const diffY = this.touchCurrentY() - this.touchStartY();
-    const diffX = this.touchCurrentX() - this.touchStartX();
-    
-    // Prevent default scroll if swiping down in fullscreen player
-    if (Math.abs(diffY) > Math.abs(diffX) && e.cancelable) {
-      e.preventDefault();
-    }
-    
+    // Only update swipe transform, do NOT call e.preventDefault() — 
+    // that was blocking scroll inside queue, lyrics, and all modals.
     this.updateSwipeTransform();
   }
 

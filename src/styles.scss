@@ -92,3 +92,10 @@ body {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ---- UNIVERSAL SCROLL ISOLATION FIX ----
+   Prevents background from scrolling when user scrolls inside modals/popups/drawers. */
+.modal-overlay, .modal-body, .playlist-list, .track-menu-dropdown, .queue-drawer, .queue-list, .fs-queue-list, .lyrics-container {
+  overscroll-behavior: contain;
+}
+

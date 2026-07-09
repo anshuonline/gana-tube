@@ -136,6 +136,7 @@
     min-height: 0;
     overflow-y: auto;
     padding-right: 16px;
+    overscroll-behavior: contain;
 
     &::-webkit-scrollbar { width: 6px; }
     &::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
@@ -212,6 +213,7 @@
     min-height: 0;
     overflow-y: auto;
     padding-right: 16px;
+    overscroll-behavior: contain;
 
     &::-webkit-scrollbar { width: 6px; }
     &::-webkit-scrollbar-track { background: transparent; }
