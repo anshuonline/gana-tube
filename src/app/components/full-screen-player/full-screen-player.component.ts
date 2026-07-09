@@ -14,7 +14,8 @@ import {
   LucideMic2,
   LucideShare2,
   LucideMoreVertical,
-  LucideHeart
+  LucideHeart,
+  LucideCar
 } from '@lucide/angular';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
@@ -39,6 +40,7 @@ import { TrackMenuComponent } from '../track-menu/track-menu.component';
     LucideMic2,
     LucideMoreVertical,
     LucideHeart,
+    LucideCar,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',

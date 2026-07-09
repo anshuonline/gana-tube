@@ -488,7 +488,7 @@
   display: flex;
   justify-content: center;
   gap: 32px;
-  margin-top: 16px;
+  margin-top: 40px; /* Increased from 16px to push tabs down */
   padding: 8px 0 24px 0;
 
   .tab-btn {

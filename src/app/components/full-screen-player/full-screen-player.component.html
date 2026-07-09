@@ -16,6 +16,9 @@
         <span class="fs-source">{{ playerService.currentTrack()?.channelTitle }}</span>
       </div>
       <div class="fs-header-right" style="position: relative;">
+        <button class="icon-btn" style="margin-right: 8px; opacity: 0.7;" title="Car Mode (Coming Soon)">
+          <svg lucideCar [attr.size]="24"></svg>
+        </button>
         <button class="icon-btn" (click)="toggleMenu($event)" title="More Options">
           <svg lucideMoreVertical [attr.size]="24"></svg>
         </button>
@@ -171,9 +174,7 @@
 
       </div>
 
-      <!-- Bottom Tabs for Mobile Views -->
       <div class="fs-bottom-tabs">
-        <button class="tab-btn" [class.active]="activeView === 'queue'" (click)="toggleView('queue')">Up next</button>
         <button class="tab-btn" [class.active]="activeView === 'lyrics'" (click)="toggleView('lyrics')">Lyrics</button>
         <button class="tab-btn" [class.active]="activeView === 'related'" (click)="toggleView('related')">Related</button>
       </div>
