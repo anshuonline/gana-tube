@@ -140,6 +140,7 @@ export class PlayerService {
 
   playTrack(track: Track): void {
     this.triggerEngagement();
+    this.isShuffled.set(false);
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -165,6 +166,7 @@ export class PlayerService {
 
   setQueue(tracks: Track[], startIndex = 0): void {
     this.triggerEngagement();
+    this.isShuffled.set(false);
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }

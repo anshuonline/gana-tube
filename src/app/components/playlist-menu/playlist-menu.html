@@ -19,9 +19,16 @@
         <span>Shuffle play</span>
       </li>
 
-      <li (click)="editPlaylist($event)">
+      <li (click)="editPlaylist($event)" *ngIf="!isEditing">
         <svg lucideEdit [attr.size]="20"></svg>
         <span>Edit playlist</span>
+      </li>
+
+      <!-- Inline Edit Mode -->
+      <li *ngIf="isEditing" class="edit-mode-item" (click)="$event.stopPropagation()">
+        <input type="text" [(ngModel)]="editName" class="edit-input" placeholder="Playlist name" autoFocus />
+        <button (click)="saveEdit($event)" class="save-btn"><svg lucideCheck [attr.size]="18"></svg></button>
+        <button (click)="cancelEdit($event)" class="cancel-btn"><svg lucideX [attr.size]="18"></svg></button>
       </li>
 
       <li (click)="playNext($event)">

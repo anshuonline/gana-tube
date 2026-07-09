@@ -1,8 +1,10 @@
 import { Component, Input, Output, EventEmitter, inject, HostListener, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PlayerService, Track } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 import { 
   LucideShuffle,
   LucideEdit,
@@ -17,6 +19,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     LucideShuffle,
     LucideEdit,
     LucideListStart,
@@ -42,8 +45,11 @@ export class PlaylistMenuComponent implements OnChanges {
   public playerService = inject(PlayerService);
   public userService = inject(UserService);
   public authService = inject(AuthService);
+  public toastService = inject(ToastService);
 
   isMobile = false;
+  isEditing = false;
+  editName = '';
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -102,15 +108,31 @@ export class PlaylistMenuComponent implements OnChanges {
 
   editPlaylist(event: Event) {
     event.stopPropagation();
-    const newName = prompt("Enter new playlist name:", this.playlist?.name);
-    if (newName && newName.trim()) {
+    if (this.playlist?.playlist_id) {
+      this.isEditing = true;
+      this.editName = this.playlist.name;
+    } else {
+      this.toastService.info("Cannot edit this playlist");
+    }
+  }
+
+  async saveEdit(event: Event) {
+    event.stopPropagation();
+    const newName = this.editName.trim();
+    if (newName && newName !== this.playlist.name) {
       const email = this.authService.currentUser()?.email;
       if (email && this.playlist.playlist_id) {
-        // Need to implement rename in UserService later if needed,
-        // for now just close
+        // Assume updatePlaylist is added in UserService later, for now just show toast
+        this.toastService.info("Playlist rename will be available soon!");
       }
     }
+    this.isEditing = false;
     this.close();
+  }
+
+  cancelEdit(event: Event) {
+    event.stopPropagation();
+    this.isEditing = false;
   }
 
   playNext(event: Event) {

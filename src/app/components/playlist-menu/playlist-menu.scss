@@ -81,3 +81,45 @@
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+  .edit-mode-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    
+    .edit-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      outline: none;
+      font-size: 0.9rem;
+      
+      &:focus {
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+    }
+    
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 50%;
+      transition: background 0.2s;
+      
+      &.save-btn {
+        color: #4caf50;
+        &:hover { background: rgba(76, 175, 80, 0.1); }
+      }
+      &.cancel-btn {
+        color: #f44336;
+        &:hover { background: rgba(244, 67, 54, 0.1); }
+      }
+    }
+  }
