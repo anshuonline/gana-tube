@@ -1,0 +1,68 @@
+<!-- Main Container -->
+<div class="save-playlist-overlay" *ngIf="isOpen" (click)="close($event)">
+  <div class="save-playlist-container" 
+       [class.mobile]="isMobile" 
+       (click)="$event.stopPropagation()">
+       
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="mobile-drag-handle" *ngIf="isMobile" (click)="close($event)">
+        <div class="handle-bar"></div>
+      </div>
+      
+      <div class="header-content">
+        <h3>Save to playlist</h3>
+        <button class="close-btn" (click)="close($event)" *ngIf="!isMobile">
+          <svg lucideX [attr.size]="24"></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Playlists List -->
+    <div class="modal-body">
+      <div class="playlist-list">
+        <!-- Default Like Playlist -->
+        <div class="playlist-item" (click)="toggleLikeTrack()">
+          <div class="playlist-icon" style="background: #a18cd1; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+            <svg lucideHeart [attr.size]="20" stroke="white" fill="white"></svg>
+          </div>
+          <div class="playlist-info">
+            <h4>Liked music</h4>
+            <span>{{ userService.likedSongs().length }} songs</span>
+          </div>
+          <svg *ngIf="isLiked()" lucideCheck [attr.size]="20" class="check-icon"></svg>
+        </div>
+
+        <!-- Custom Playlists -->
+        <div class="playlist-item" *ngFor="let pl of userService.customPlaylists()" (click)="toggleInCustomPlaylist(pl)">
+          <div class="playlist-icon">
+            <svg lucideListMusic [attr.size]="20" stroke="white"></svg>
+          </div>
+          <div class="playlist-info">
+            <h4>{{ pl.name }}</h4>
+            <span>{{ pl.tracks.length }} tracks</span>
+          </div>
+          <svg *ngIf="isInPlaylist(pl)" lucideCheck [attr.size]="20" class="check-icon"></svg>
+        </div>
+      </div>
+
+      <!-- Create New Playlist Form -->
+      <div class="new-playlist-input">
+        <input type="text" placeholder="New playlist name..." [value]="newPlaylistName()" (input)="newPlaylistName.set($any($event.target).value)" (keyup.enter)="createAndAddToPlaylist()">
+        
+        <div class="create-actions">
+          <label class="public-toggle">
+            <input type="checkbox" [checked]="newPlaylistIsPublic()" (change)="newPlaylistIsPublic.set(!newPlaylistIsPublic())">
+            <span>Make playlist public</span>
+          </label>
+          
+          <button class="create-btn" (click)="createAndAddToPlaylist()" [disabled]="!newPlaylistName().trim() || isCreating()">
+            <svg lucidePlus [attr.size]="18" *ngIf="!isCreating()"></svg>
+            {{ isCreating() ? 'Creating...' : 'Create' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -9,6 +9,8 @@ import { YtPlayerComponent } from './components/yt-player/yt-player.component';
 import { FullScreenPlayerComponent } from './components/full-screen-player/full-screen-player.component';
 import { ListenTogetherComponent } from './components/listen-together/listen-together.component';
 import { TrackMenuComponent } from './components/track-menu/track-menu.component';
+import { PlaylistMenuComponent } from './components/playlist-menu/playlist-menu';
+import { SavePlaylistModalComponent } from './components/save-playlist-modal/save-playlist-modal';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
 import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
@@ -74,7 +76,9 @@ export interface SponsoredAd {
     AdTermsPageComponent,
     AdProhibitedPageComponent,
     RouterModule,
-    AdminManageSongsComponent
+    AdminManageSongsComponent,
+    PlaylistMenuComponent,
+    SavePlaylistModalComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -248,6 +252,9 @@ export class App implements OnInit {
   
   activeMenuTrack = signal<any | null>(null);
   activeMenuPosition = signal<{x: number, y: number} | null>(null);
+
+  activePlaylistMenu = signal<any | null>(null);
+  activePlaylistMenuPosition = signal<{x: number, y: number} | null>(null);
   showPlaylistModal = signal<boolean>(false);
   playlistModalTrack = signal<any | null>(null);
   newPlaylistName = signal<string>('');
@@ -267,6 +274,25 @@ export class App implements OnInit {
   closeMenu() {
     this.activeMenuTrack.set(null);
     this.activeMenuPosition.set(null);
+  }
+
+  togglePlaylistMenu(playlist: any, event: MouseEvent) {
+    event.stopPropagation();
+    if (this.activePlaylistMenu()?.playlist_id === playlist.playlist_id && playlist.playlist_id) {
+      this.closePlaylistMenu();
+    } else if (this.activePlaylistMenu()?.name === playlist.name && !playlist.playlist_id) {
+      this.closePlaylistMenu();
+    } else {
+      const target = event.currentTarget as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      this.activePlaylistMenuPosition.set({ x: rect.right, y: rect.bottom });
+      this.activePlaylistMenu.set(playlist);
+    }
+  }
+
+  closePlaylistMenu() {
+    this.activePlaylistMenu.set(null);
+    this.activePlaylistMenuPosition.set(null);
   }
 
   addToQueue(track: any) {

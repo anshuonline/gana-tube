@@ -1,0 +1,83 @@
+/* Desktop styling (default) */
+.track-menu-container {
+  position: fixed; /* Escape all overflow containers */
+  background: #000000; /* AMOLED Black as requested */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+  min-width: 260px;
+  padding: 8px 0;
+  z-index: 999999;
+  
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    svg {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .menu-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 4px 0;
+  }
+}
+
+/* Mobile Styling */
+.track-menu-container.mobile {
+  position: fixed;
+  top: auto !important;
+  bottom: 0;
+  left: 0 !important;
+  right: 0;
+  width: 100%;
+  margin-top: 0;
+  border: none;
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 0 24px 0;
+  z-index: 999999;
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+  max-width: none;
+  
+  .mobile-drag-handle {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+    
+    .handle-bar {
+      width: 40px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+  }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

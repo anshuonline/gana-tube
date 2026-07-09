@@ -1,0 +1,50 @@
+<!-- Main Container -->
+<div class="track-menu-container" *ngIf="isOpen" 
+     [class.mobile]="isMobile" 
+     [style.left.px]="!isMobile ? calculatedX : null" 
+     [style.top.px]="!isMobile ? calculatedY : null"
+     (click)="close($event)">
+  
+  <div class="track-menu-dropdown" (click)="$event.stopPropagation()">
+    <!-- Mobile header with drag handle -->
+    <div class="mobile-drag-handle" *ngIf="isMobile" (click)="close($event)">
+      <div class="handle-bar"></div>
+    </div>
+
+    <!-- Menu Items -->
+    <ul class="menu-list">
+      
+      <li (click)="shufflePlay($event)">
+        <svg lucideShuffle [attr.size]="20"></svg>
+        <span>Shuffle play</span>
+      </li>
+
+      <li (click)="editPlaylist($event)">
+        <svg lucideEdit [attr.size]="20"></svg>
+        <span>Edit playlist</span>
+      </li>
+
+      <li (click)="playNext($event)">
+        <svg lucideListStart [attr.size]="20"></svg>
+        <span>Play next</span>
+      </li>
+
+      <li (click)="addToQueue($event)">
+        <svg lucideListPlus [attr.size]="20"></svg>
+        <span>Add to queue</span>
+      </li>
+
+      <li (click)="saveToPlaylist($event)">
+        <svg lucideFolderPlus [attr.size]="20"></svg>
+        <span>Save to playlist</span>
+      </li>
+
+      <!-- Delete option only for Custom Playlists -->
+      <li *ngIf="playlist?.playlist_id" (click)="deletePlaylist($event)">
+        <svg lucideTrash2 [attr.size]="20"></svg>
+        <span>Delete playlist</span>
+      </li>
+      
+    </ul>
+  </div>
+</div>

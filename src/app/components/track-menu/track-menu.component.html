@@ -42,11 +42,10 @@
     <hr class="menu-divider">
     
     <!-- Go to Artist (Card Style) -->
-    <div class="menu-item artist-card-item" (click)="goToArtist($event)">
+    <div class="menu-item artist-card-item" style="cursor: default;">
       <img [src]="getArtistImage()" (error)="onImageError($event)" class="artist-avatar" alt="Artist">
       <div class="artist-info">
         <span class="artist-name">{{ track?.channelTitle }}</span>
-        <span class="artist-label">View Artist</span>
       </div>
     </div>
     

@@ -363,30 +363,7 @@
                   <span>View full playlist</span>
                 </div>
               </div>
-              <div class="desktop-lib-more">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- DESKTOP Custom Playlists -->
-          <div class="desktop-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="playCustomPlaylist(pl)">
-            <div class="desktop-lib-thumb">
-              <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
-              <div class="desktop-lib-count">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                {{ pl.tracks.length | number }} videos
-              </div>
-            </div>
-            <div class="desktop-lib-info-row">
-              <div class="desktop-lib-info">
-                <div class="desktop-lib-title">{{ pl.name }}</div>
-                <div class="desktop-lib-sub">
-                  <span>Private • Playlist</span>
-                  <span>Click to play</span>
-                </div>
-              </div>
-              <div class="desktop-lib-more">
+              <div class="desktop-lib-more" (click)="togglePlaylistMenu({name: 'Liked videos', tracks: userService.likedSongs()}, $event)">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
               </div>
             </div>
@@ -410,7 +387,30 @@
                   <span>View full history</span>
                 </div>
               </div>
-              <div class="desktop-lib-more">
+              <div class="desktop-lib-more" (click)="togglePlaylistMenu({name: 'History', tracks: userService.recentPlays()}, $event)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- DESKTOP Custom Playlists -->
+          <div class="desktop-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="playCustomPlaylist(pl)">
+            <div class="desktop-lib-thumb">
+              <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
+              <div class="desktop-lib-count">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                {{ pl.tracks.length | number }} videos
+              </div>
+            </div>
+            <div class="desktop-lib-info-row">
+              <div class="desktop-lib-info">
+                <div class="desktop-lib-title">{{ pl.name }}</div>
+                <div class="desktop-lib-sub">
+                  <span>{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</span>
+                  <span>Click to play</span>
+                </div>
+              </div>
+              <div class="desktop-lib-more" (click)="togglePlaylistMenu(pl, $event)">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
               </div>
             </div>
@@ -432,25 +432,7 @@
               <div class="mobile-lib-title">Liked Music</div>
               <div class="mobile-lib-sub">Private • Playlist</div>
             </div>
-            <div class="mobile-lib-more">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-            </div>
-          </div>
-
-          <!-- MOBILE Custom Playlists -->
-          <div class="mobile-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="playCustomPlaylist(pl)">
-            <div class="mobile-lib-thumb">
-              <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
-              <div class="mobile-lib-count">
-                <svg lucideHeart [attr.size]="12"></svg>
-                {{ pl.tracks.length | number }}
-              </div>
-            </div>
-            <div class="mobile-lib-info">
-              <div class="mobile-lib-title">{{ pl.name }}</div>
-              <div class="mobile-lib-sub">Private • Playlist</div>
-            </div>
-            <div class="mobile-lib-more">
+            <div class="mobile-lib-more" (click)="togglePlaylistMenu({name: 'Liked videos', tracks: userService.likedSongs()}, $event)">
               <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
             </div>
           </div>
@@ -468,7 +450,25 @@
               <div class="mobile-lib-title">Recently Played</div>
               <div class="mobile-lib-sub">Private • History</div>
             </div>
-            <div class="mobile-lib-more">
+            <div class="mobile-lib-more" (click)="togglePlaylistMenu({name: 'History', tracks: userService.recentPlays()}, $event)">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+            </div>
+          </div>
+
+          <!-- MOBILE Custom Playlists -->
+          <div class="mobile-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="playCustomPlaylist(pl)">
+            <div class="mobile-lib-thumb">
+              <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
+              <div class="mobile-lib-count">
+                <svg lucideHeart [attr.size]="12"></svg>
+                {{ pl.tracks.length | number }}
+              </div>
+            </div>
+            <div class="mobile-lib-info">
+              <div class="mobile-lib-title">{{ pl.name }}</div>
+              <div class="mobile-lib-sub">{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</div>
+            </div>
+            <div class="mobile-lib-more" (click)="togglePlaylistMenu(pl, $event)">
               <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
             </div>
           </div>
@@ -867,53 +867,7 @@
     (close)="closeListenTogether()">
   </app-listen-together>
 
-  <!-- Playlist Modal -->
-  <div class="modal-overlay" *ngIf="showPlaylistModal()">
-    <div class="modal-content playlist-modal">
-      <div class="modal-header">
-        <h3>Save to playlist</h3>
-        <button class="close-btn" (click)="closePlaylistModal()">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="playlist-list">
-          <!-- Default Like Playlist -->
-          <div class="playlist-item" (click)="toggleLikeTrack(playlistModalTrack()!)">
-            <div class="playlist-icon" style="background: var(--color-primary);">
-              <svg lucideHeart [attr.size]="20" stroke="white" fill="white"></svg>
-            </div>
-            <div class="playlist-info">
-              <h4>Liked music</h4>
-              <span>{{ userService.likedSongs().length }} songs</span>
-            </div>
-            <svg *ngIf="isLiked(playlistModalTrack())" lucideCheck [attr.size]="20" style="margin-left: auto; color: var(--color-primary);"></svg>
-          </div>
-          <!-- Custom Playlists -->
-          <div class="playlist-item" *ngFor="let pl of userService.customPlaylists()" (click)="userService.addToPlaylist(authService.currentUser()?.email || '', pl.playlist_id || pl.name, playlistModalTrack())">
-            <div class="playlist-icon">
-              <svg lucideListMusic [attr.size]="20" stroke="white"></svg>
-            </div>
-            <div class="playlist-info">
-              <h4>{{ pl.name }}</h4>
-              <span>{{ pl.tracks.length }} tracks</span>
-            </div>
-            <svg *ngIf="isInPlaylist(pl, playlistModalTrack())" lucideCheck [attr.size]="20" style="margin-left: auto; color: var(--color-primary);"></svg>
-          </div>
-        </div>
-        <div class="new-playlist-input">
-          <input type="text" placeholder="New playlist name..." [value]="newPlaylistName()" (input)="newPlaylistName.set($any($event.target).value)">
-          <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; margin-bottom: 10px; cursor: pointer;">
-            <input type="checkbox" [checked]="newPlaylistIsPublic()" (change)="newPlaylistIsPublic.set(!newPlaylistIsPublic())">
-            <span style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">Make playlist public</span>
-          </label>
-          <button (click)="createAndAddToPlaylist()">
-            <svg lucidePlus [attr.size]="18"></svg> Create
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Old Playlist Modal Removed -->
 </div>
 <!-- Global Reusable Track Menu -->
 <app-track-menu 
@@ -925,3 +879,11 @@
   (closeMenu)="closeMenu()"
   (openPlaylist)="openSaveToPlaylist($event)">
 </app-track-menu>
+
+<!-- Global Reusable Save Playlist Modal -->
+<app-save-playlist-modal
+  *ngIf="showPlaylistModal()"
+  [track]="playlistModalTrack()"
+  [isOpen]="showPlaylistModal()"
+  (closeMenu)="closePlaylistModal()">
+</app-save-playlist-modal>
