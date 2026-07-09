@@ -573,11 +573,18 @@
         
         <!-- Dedicated Search Page View -->
         <div class="search-page-view" *ngIf="isSearchMode()">
-          <button class="back-btn" (click)="resetSearchState($event)">
-            <svg lucideChevronLeft [attr.size]="24"></svg> Back to Home
-          </button>
+          <!-- Dynamic Ambient Background applied via CSS dynamically later -->
+          <div class="search-ambient-bg" [style.background-image]="'url(' + getAmbientSearchBg() + ')'" [class.active]="getAmbientSearchBg()"></div>
+          
           <div class="search-page-header">
-            <app-search-bar (search)="onSearch($event)" class="main-search-bar" style="width: 100%; max-width: 800px;"></app-search-bar>
+            <app-search-bar (search)="onSearch($event)" class="main-search-bar" style="width: 100%; max-width: 800px; z-index: 10;"></app-search-bar>
+            
+            <div class="search-filters" *ngIf="hasSearched()">
+              <button class="filter-chip" [class.active]="searchFilter() === 'all'" (click)="setSearchFilter('all')">All</button>
+              <button class="filter-chip" [class.active]="searchFilter() === 'songs'" (click)="setSearchFilter('songs')">Songs</button>
+              <button class="filter-chip" [class.active]="searchFilter() === 'community'" (click)="setSearchFilter('community')">Community Playlists</button>
+              <button class="filter-chip" [class.active]="searchFilter() === 'featured'" (click)="setSearchFilter('featured')">Featured Playlists</button>
+            </div>
           </div>
         </div>
 
@@ -749,24 +756,21 @@
 
         <!-- Search Results Area -->
         <div *ngIf="hasSearched()">
-          <!-- Back to Home Button -->
-          <button class="results-back-btn" (click)="resetSearchState($event)">
-            <svg lucideChevronLeft [attr.size]="20"></svg>
-            Back to Home
-          </button>
-
           <div class="results-header" *ngIf="!isLoading() && results().length > 0">
-            <h2 class="results-title">Results for <span class="results-query">"{{ currentQuery }}"</span></h2>
+            <!-- Optional: We can keep the results title if we want, or rely on Top Result layout -->
           </div>
         </div>
-        <app-search-results
-          *ngIf="hasSearched() || isLoading()"
-          [results]="results()"
+        <app-search-results 
+          *ngIf="hasSearched() && isSearchMode()"
+          [results]="results()" 
           [isLoading]="isLoading()"
           [hasSearched]="hasSearched()"
+          [currentFilter]="searchFilter()"
           (suggestSearch)="onSuggestSearch($event)"
           (playTrack)="onPlaySearchTrack($event)"
-        ></app-search-results>
+          (toggleMenu)="toggleMenu($event.track, $event.event)"
+          (ambientBgFound)="onAmbientBgFound($event)">
+        </app-search-results>
 
         <!-- Lazy Loading Spinner Placeholder -->
         <div class="lazy-loading-placeholder" *ngIf="isLazyLoading()" style="padding: 30px 0; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 10px;">

@@ -181,6 +181,8 @@ export class App implements OnInit {
   isScrolled = signal<boolean>(false);
   isSearchMode = signal<boolean>(false);
   isSearchFocused = signal<boolean>(false);
+  searchFilter = signal<'all' | 'songs' | 'community' | 'featured'>('all');
+  ambientSearchBg = signal<string>('');
 
   // Dynamic algorithmic shelves for home recommendations
   allShelfDefinitions: ShelfDefinition[] = [];
@@ -749,6 +751,23 @@ export class App implements OnInit {
     }
   }
 
+  setSearchFilter(filter: 'all' | 'songs' | 'community' | 'featured'): void {
+    this.searchFilter.set(filter);
+    if (this.currentQuery) {
+      this.performSearch(this.currentQuery);
+    } else if (filter === 'community') {
+      this.performSearch('');
+    }
+  }
+
+  getAmbientSearchBg(): string {
+    return this.ambientSearchBg();
+  }
+
+  onAmbientBgFound(thumbnailUrl: string): void {
+    this.ambientSearchBg.set(thumbnailUrl);
+  }
+
   // --- Auth Methods ---
   async login() {
     try {
@@ -1116,6 +1135,12 @@ export class App implements OnInit {
   }
 
   onPlaySearchTrack(track: YouTubeSearchResult): void {
+    if (track.videoId.startsWith('pl_')) {
+      // It's a community playlist
+      this.fetchPublicPlaylist(track.videoId, track.channelTitle);
+      return;
+    }
+
     // 1. Play track immediately and queue the rest of the search results
     // This ensures that the queue matches the genre/context of what the user searched for.
     const currentResults = this.results();
@@ -1152,6 +1177,37 @@ export class App implements OnInit {
     this.isLoading.set(true);
     this.hasSearched.set(true);
     this.isSearchMode.set(false);
+
+    if (this.searchFilter() === 'community') {
+      // Fetch Community Playlists
+      const url = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
+      fetch(`${url}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            const mapped = data.data.map((pl: any) => ({
+              videoId: pl.playlist_id,
+              title: pl.playlist_name,
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'assets/default-playlist.jpg',
+              channelTitle: pl.owner,
+              publishedAt: pl.created_at
+            }));
+            this.results.set(mapped);
+          } else {
+            this.results.set([]);
+          }
+          this.isLoading.set(false);
+        })
+        .catch(err => {
+          console.error(err);
+          this.results.set([]);
+          this.isLoading.set(false);
+        });
+      return;
+    }
+
+    // Default YouTube Search
     this.youtubeApi.searchMusic(query, 50).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.results.set(res);
@@ -1239,8 +1295,8 @@ export class App implements OnInit {
     const pos = scrollOffset + window.innerHeight;
     const max = document.documentElement.scrollHeight;
     
-    // If we are within 350px of the bottom of the page
-    if (pos >= max - 350) {
+    // True infinite scroll: trigger much earlier (1000px before bottom)
+    if (pos >= max - 1000) {
       if (this.hasSearched()) {
         this.loadMoreResults();
       }

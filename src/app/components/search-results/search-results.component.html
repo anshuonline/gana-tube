@@ -1,0 +1,132 @@
+<!-- Loading State -->
+<div class="loading-state" *ngIf="isLoading && results.length === 0">
+  <!-- Skeletons for Top Result and List -->
+  <div class="skeleton-container">
+    <div class="skeleton-top-result" *ngIf="currentFilter === 'all'"></div>
+    <div class="skeleton-list">
+      <div class="skeleton-list-item" *ngFor="let s of skeletons"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" *ngIf="!isLoading && results.length === 0 && hasSearched">
+  <svg lucideMusic2 class="empty-icon" [attr.size]="64"></svg>
+  <h3>No results found</h3>
+  <p>Try searching for something else</p>
+</div>
+
+<!-- Results Layout -->
+<div class="results-layout" *ngIf="!isLoading && results.length > 0">
+  
+  <!-- "All" Filter View: Top Result + List -->
+  <ng-container *ngIf="currentFilter === 'all'">
+    <!-- Top Result Section -->
+    <div class="top-result-section" *ngIf="topResult" (click)="onPlay(topResult)">
+      <h2 class="section-heading">Top result</h2>
+      <div class="top-result-card" [class.active]="isCurrentTrack(topResult)">
+        <div class="top-thumbnail-wrapper">
+          <img 
+            [src]="topResult.thumbnailHigh || topResult.thumbnail" 
+            [alt]="topResult.title" 
+            (error)="onImgError($event, topResult)"
+            referrerpolicy="no-referrer"
+          />
+          <div class="play-overlay">
+            <svg lucidePlay [attr.size]="36" *ngIf="!isCurrentTrack(topResult)"></svg>
+            <div class="play-ripple" *ngIf="isCurrentTrack(topResult)">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="top-info">
+          <h3 class="top-title">{{ topResult.title }}</h3>
+          <p class="top-meta">
+            <span class="type-badge">Song</span>
+            <span class="dot">•</span>
+            <span class="channel-name">{{ topResult.channelTitle }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Results Section -->
+    <div class="other-results-section">
+      <h2 class="section-heading">Songs</h2>
+      <div class="song-list">
+        <div 
+          class="song-list-item" 
+          *ngFor="let track of otherResults" 
+          [class.active]="isCurrentTrack(track)"
+          (click)="onPlay(track)"
+        >
+          <div class="item-thumbnail">
+            <img 
+              [src]="track.thumbnail" 
+              [alt]="track.title"
+              (error)="onImgError($event, track)"
+              referrerpolicy="no-referrer"
+            />
+            <div class="item-overlay">
+              <svg lucidePlay [attr.size]="20" *ngIf="!isCurrentTrack(track)"></svg>
+              <div class="play-ripple small" *ngIf="isCurrentTrack(track)">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="item-info">
+            <h4 class="item-title">{{ track.title }}</h4>
+            <p class="item-artist">{{ track.channelTitle }}</p>
+          </div>
+          <div class="item-actions">
+            <button class="track-options-btn" (click)="onToggleMenu(track, $event)">
+              <svg lucideMoreVertical [attr.size]="20"></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- "Songs" or Other Filters View: Pure List -->
+  <ng-container *ngIf="currentFilter !== 'all'">
+    <div class="pure-list-section">
+      <div class="song-list">
+        <div 
+          class="song-list-item" 
+          *ngFor="let track of otherResults" 
+          [class.active]="isCurrentTrack(track)"
+          (click)="onPlay(track)"
+        >
+          <div class="item-thumbnail">
+            <img 
+              [src]="track.thumbnail" 
+              [alt]="track.title"
+              (error)="onImgError($event, track)"
+              referrerpolicy="no-referrer"
+            />
+            <div class="item-overlay">
+              <svg lucidePlay [attr.size]="20" *ngIf="!isCurrentTrack(track)"></svg>
+              <div class="play-ripple small" *ngIf="isCurrentTrack(track)">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="item-info">
+            <h4 class="item-title">{{ track.title }}</h4>
+            <p class="item-artist">{{ track.channelTitle }}</p>
+          </div>
+          <div class="item-actions">
+            <button class="track-options-btn" (click)="onToggleMenu(track, $event)">
+              <svg lucideMoreVertical [attr.size]="20"></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>
