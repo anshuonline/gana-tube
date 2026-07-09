@@ -1,143 +1,209 @@
 <div class="page-container">
-  <header class="page-header">
-    <div class="header-content">
-      <h2>Manage Custom Sections</h2>
-      <p>Create and curate custom music sections for the homepage.</p>
-    </div>
-  </header>
+  
+  <!-- MASTER VIEW (List of Sections) -->
+  <ng-container *ngIf="activeSectionIndex === null">
+    <header class="page-header">
+      <div class="header-content">
+        <h2>Manage Custom Sections</h2>
+        <p>Create and curate custom music sections for the homepage.</p>
+      </div>
+    </header>
 
-  <div class="controls-bar">
-    <div class="lang-selector">
-      <button 
-        *ngFor="let lang of languages" 
-        (click)="selectedLanguage = lang; updateCurrentSections()"
-        [class.active]="selectedLanguage === lang"
-        class="lang-btn">
-        {{ lang }}
+    <div class="controls-bar">
+      <div class="lang-selector">
+        <button 
+          *ngFor="let lang of languages" 
+          (click)="selectedLanguage = lang; updateCurrentSections()"
+          [class.active]="selectedLanguage === lang"
+          class="lang-btn">
+          {{ lang }}
+        </button>
+      </div>
+      
+      <button class="delete-all-btn" (click)="deleteAllSections()">
+        <svg lucideTrash [attr.size]="18"></svg>
+        Delete All
       </button>
     </div>
-    
-    <button class="delete-all-btn" (click)="deleteAllSections()">
-      <svg lucideTrash [attr.size]="18"></svg>
-      Delete All Sections
-    </button>
-  </div>
 
-  <div class="sections-list-container">
-    <div class="section-count">
-      <span class="count-badge">{{ currentSections.length }}</span>
-      <h3>Active Sections</h3>
-    </div>
+    <div class="sections-list-container">
+      <div class="section-count">
+        <span class="count-badge">{{ currentSections.length }}</span>
+        <h3>Active Sections</h3>
+      </div>
 
-    <div class="sections-list" cdkDropList (cdkDropListDropped)="drop($event)">
-      
-      <div *ngFor="let section of currentSections; let secIndex = index" 
-           cdkDrag
-           class="section-card" 
-           [class.expanded]="expandedSectionIndex === secIndex">
-           
-        <!-- Section Header -->
-        <div class="section-header" (click)="toggleSection(secIndex)">
-          <div class="header-left">
-            <div cdkDragHandle class="drag-handle" (click)="$event.stopPropagation()">
-              <svg lucideGripVertical [attr.size]="20"></svg>
-            </div>
-            <div class="title-group">
-              <h4>{{ section.title }}</h4>
-              <span class="song-count">{{ section.songs.length }} songs</span>
-            </div>
-          </div>
-          
-          <div class="header-right" (click)="$event.stopPropagation()">
-            <button class="icon-btn danger" (click)="deleteSection(secIndex)" title="Delete Section">
-              <svg lucideTrash2 [attr.size]="20"></svg>
-            </button>
-            <button class="icon-btn toggle" (click)="toggleSection(secIndex)">
-              <svg *ngIf="expandedSectionIndex !== secIndex" lucideChevronDown [attr.size]="24"></svg>
-              <svg *ngIf="expandedSectionIndex === secIndex" lucideChevronUp [attr.size]="24"></svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Section Content (Songs) -->
-        <div class="section-content" *ngIf="expandedSectionIndex === secIndex">
-          <div class="songs-list">
-            
-            <div class="song-item" *ngFor="let song of section.songs; let songIndex = index">
-              <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
-              <div class="song-info">
-                <div class="song-title">{{ song.title }}</div>
-                <div class="song-artist">{{ song.channelTitle }}</div>
+      <div class="sections-list" cdkDropList (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let section of currentSections; let secIndex = index" 
+             cdkDrag
+             class="section-card"
+             (click)="openSection(secIndex)">
+             
+          <div class="section-header">
+            <div class="header-left">
+              <div cdkDragHandle class="drag-handle" (click)="$event.stopPropagation()">
+                <svg lucideGripVertical [attr.size]="20"></svg>
               </div>
-              <button class="icon-btn danger-subtle" (click)="deleteSongFromSection(secIndex, songIndex)" title="Remove Song">
-                <svg lucideX [attr.size]="18"></svg>
+              <div class="title-group">
+                <h4>{{ section.title }}</h4>
+                <span class="song-count">{{ section.songs.length }} songs</span>
+              </div>
+            </div>
+            
+            <div class="header-right" (click)="$event.stopPropagation()">
+              <button class="icon-btn danger" (click)="deleteSection(secIndex)" title="Delete Section">
+                <svg lucideTrash2 [attr.size]="20"></svg>
               </button>
             </div>
-            
-            <button class="add-song-btn" (click)="openSearchModal(secIndex)">
-              <svg lucidePlus [attr.size]="20"></svg>
-              Add Song to {{ section.title }}
-            </button>
           </div>
         </div>
       </div>
-      
-    </div>
 
-    <div *ngIf="currentSections.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <svg lucideChevronDown [attr.size]="32"></svg>
+      <div *ngIf="currentSections.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <svg lucideSearch [attr.size]="32"></svg>
+        </div>
+        <p>No custom sections for {{ selectedLanguage }}. Create one below!</p>
       </div>
-      <p>No custom sections for {{ selectedLanguage }}. Create one below!</p>
     </div>
-  </div>
 
-  <div class="create-section-container">
-    <div class="create-header">
-      <div class="create-icon">
-        <svg lucidePlus [attr.size]="20"></svg>
+    <div class="create-section-container">
+      <div class="create-header">
+        <div class="create-icon">
+          <svg lucidePlus [attr.size]="20"></svg>
+        </div>
+        <h3>Create New Section</h3>
       </div>
-      <h3>Create New Section</h3>
+
+      <div class="form-group">
+        <label>Section Title</label>
+        <input type="text" [(ngModel)]="newSectionTitle" placeholder="e.g. Romantic Hits" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label class="flex-label">
+          <span>JSON Array or Objects</span>
+          <span class="hint">e.g. ["Song 1"] OR [{{ '{' }}"section_name": "Name", "songs": ["Song 1"]{{ '}' }}]</span>
+        </label>
+        <textarea [(ngModel)]="jsonInput" rows="6" placeholder='e.g. ["Song 1"] OR [{"section_name": "Name", "songs": ["Song 1"]}]' class="form-textarea"></textarea>
+      </div>
+
+      <div *ngIf="fetchError" class="error-box">
+        <svg lucideX [attr.size]="18"></svg>
+        {{ fetchError }}
+      </div>
+
+      <div *ngIf="isFetching" class="progress-bar">
+        <div class="progress-fill" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
+      </div>
+      <div *ngIf="isFetching" class="progress-text">
+        Fetching {{ fetchProgress }} / {{ totalToFetch }}
+      </div>
+
+      <button class="submit-btn" [disabled]="isFetching || isPublishing" (click)="addSection()">
+        <span *ngIf="!isFetching && !isPublishing">Fetch & Publish Section</span>
+        <span *ngIf="isFetching || isPublishing" class="loading-text">
+          <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          Processing...
+        </span>
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- DETAIL VIEW (Split Screen) -->
+  <div class="detail-view" *ngIf="activeSectionIndex !== null">
+    
+    <!-- LEFT PANEL: Section Contents -->
+    <div class="detail-left">
+      <div class="detail-header">
+        <button class="back-btn" (click)="closeSection()">
+          <svg lucideArrowLeft [attr.size]="24"></svg>
+        </button>
+        <div class="title-group">
+          <h2>{{ currentSections[activeSectionIndex].title }}</h2>
+          <span class="badge">{{ currentSections[activeSectionIndex].songs.length }} Songs</span>
+        </div>
+      </div>
+
+      <div class="songs-list-container">
+        <div class="songs-list">
+          <div class="song-item" *ngFor="let song of currentSections[activeSectionIndex].songs; let songIndex = index">
+            <div class="song-index">{{ songIndex + 1 }}</div>
+            <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
+            <div class="song-info">
+              <div class="song-title">{{ song.title }}</div>
+              <div class="song-artist">{{ song.channelTitle }}</div>
+            </div>
+            <button class="icon-btn danger-subtle" (click)="deleteSongFromSection(songIndex)" title="Remove Song">
+              <svg lucideTrash2 [attr.size]="18"></svg>
+            </button>
+          </div>
+
+          <div *ngIf="currentSections[activeSectionIndex].songs.length === 0" class="empty-state">
+            <p>No songs in this section. Search and add from the right panel.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Section Title</label>
-      <input type="text" [(ngModel)]="newSectionTitle" placeholder="e.g. Romantic Hits" class="form-input" />
+    <!-- RIGHT PANEL: Search & Add -->
+    <div class="detail-right">
+      <div class="search-panel">
+        <div class="search-header">
+          <h3>Search & Add Songs</h3>
+        </div>
+
+        <div class="search-bar-wrapper">
+          <div class="search-input-box">
+            <svg lucideSearch class="search-icon" [attr.size]="20"></svg>
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              (keyup.enter)="performSongSearch()"
+              placeholder="Search YouTube..." 
+              class="search-input"
+              autofocus
+            />
+            <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; searchResults = []">
+              <svg lucideX [attr.size]="16"></svg>
+            </button>
+          </div>
+          <button class="search-btn" (click)="performSongSearch()" [disabled]="isSearchingSongs || !searchQuery.trim()">
+            <span *ngIf="!isSearchingSongs">Search</span>
+            <svg *ngIf="isSearchingSongs" lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          </button>
+        </div>
+
+        <div class="search-results-area">
+          <div *ngIf="!hasSearchedSongs" class="empty-state-small">
+            <svg lucideSearch [attr.size]="40"></svg>
+            <p>Search for a song to add it to "{{ currentSections[activeSectionIndex].title }}"</p>
+          </div>
+
+          <div *ngIf="isSearchingSongs" class="loading-state">
+            <svg lucideRefreshCw class="spin big" [attr.size]="40"></svg>
+            <p>Searching...</p>
+          </div>
+
+          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length === 0" class="empty-state-small">
+            <p>No results found for "{{searchQuery}}".</p>
+          </div>
+
+          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length > 0" class="results-list">
+            <div class="result-item" *ngFor="let result of searchResults">
+              <img [src]="result.thumbnail" [alt]="result.title" class="result-thumb">
+              <div class="result-info">
+                <div class="result-title">{{ result.title }}</div>
+                <div class="result-artist">{{ result.channelTitle }}</div>
+              </div>
+              <button class="add-btn" (click)="addSongToSection(result)">
+                <svg lucidePlus [attr.size]="18"></svg>
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label class="flex-label">
-        <span>JSON Array or Objects</span>
-        <span class="hint">e.g. ["Song 1"] OR [{{ '{' }}"section_name": "Name", "songs": ["Song 1"]{{ '}' }}]</span>
-      </label>
-      <textarea [(ngModel)]="jsonInput" rows="6" placeholder='e.g. ["Song 1"] OR [{"section_name": "Name", "songs": ["Song 1"]}]' class="form-textarea"></textarea>
-    </div>
-
-    <div *ngIf="fetchError" class="error-box">
-      <svg lucideX [attr.size]="18"></svg>
-      {{ fetchError }}
-    </div>
-
-    <div *ngIf="isFetching" class="progress-bar">
-      <div class="progress-fill" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
-    </div>
-    <div *ngIf="isFetching" class="progress-text">
-      Fetching {{ fetchProgress }} / {{ totalToFetch }}
-    </div>
-
-    <button class="submit-btn" [disabled]="isFetching || isPublishing" (click)="addSection()">
-      <span *ngIf="!isFetching && !isPublishing">Fetch & Publish Section</span>
-      <span *ngIf="isFetching || isPublishing" class="loading-text">
-        <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
-        Processing...
-      </span>
-    </button>
   </div>
 </div>
-
-<!-- Add Song Modal -->
-<app-search-song-modal 
-  *ngIf="showSearchModalForSection !== null"
-  (close)="closeSearchModal()"
-  (songSelected)="addSongToSection($event)">
-</app-search-song-modal>

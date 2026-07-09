@@ -1,230 +1,303 @@
 <div class="page-container">
-  <header class="page-header">
-    <div class="header-content">
-      <h2>Manage Custom Playlists</h2>
-      <p>Curate custom playlists with your own cover arts and release schedules.</p>
-    </div>
-  </header>
-
-  <div class="controls-bar">
-    <div class="lang-selector">
-      <button 
-        *ngFor="let lang of languages" 
-        (click)="onLangChange(lang)"
-        [class.active]="selectedLang === lang"
-        class="lang-btn">
-        {{ lang }}
-      </button>
-    </div>
-    
-    <div class="header-actions">
-      <button class="action-btn outline" (click)="saveOrder()" *ngIf="currentPlaylists.length > 0">
-        <svg lucideSave [attr.size]="18"></svg>
-        Save Order
-      </button>
-      <button class="action-btn danger outline" (click)="deleteAllPlaylists()">
-        <svg lucideTrash [attr.size]="18"></svg>
-        Delete All
-      </button>
-    </div>
-  </div>
-
-  <div class="playlists-list-container">
-    <div class="list-header">
-      <div class="header-left">
-        <span class="count-badge">{{ currentPlaylists.length }}</span>
-        <h3>Active Playlists</h3>
+  
+  <!-- MASTER VIEW (List of Playlists) -->
+  <ng-container *ngIf="activePlaylistIndex === null">
+    <header class="page-header">
+      <div class="header-content">
+        <h2>Manage Custom Playlists</h2>
+        <p>Curate custom playlists with your own cover arts and release schedules.</p>
       </div>
-      <div class="header-right" *ngIf="publishMessage">
-        <span class="success-msg">
-          <svg lucideCheck [attr.size]="16"></svg>
-          {{ publishMessage }}
-        </span>
-      </div>
-    </div>
+    </header>
 
-    <div class="playlists-list" cdkDropList (cdkDropListDropped)="drop($event)">
+    <div class="controls-bar">
+      <div class="lang-selector">
+        <button 
+          *ngFor="let lang of languages" 
+          (click)="onLangChange(lang)"
+          [class.active]="selectedLang === lang"
+          class="lang-btn">
+          {{ lang }}
+        </button>
+      </div>
       
-      <div *ngFor="let playlist of currentPlaylists; let pIndex = index" 
-           cdkDrag
-           class="playlist-card" 
-           [class.expanded]="expandedPlaylistIndex === pIndex"
-           [class.editing]="editingPlaylistId === playlist.id">
-           
-        <!-- Playlist Header -->
-        <div class="playlist-header" (click)="togglePlaylist(pIndex)">
-          <div class="header-left">
-            <div cdkDragHandle class="drag-handle" (click)="$event.stopPropagation()">
-              <svg lucideGripVertical [attr.size]="20"></svg>
-            </div>
-            <img [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover">
-            <div class="title-group">
-              <h4>{{ playlist.title }}</h4>
-              <div class="meta-tags">
-                <span class="tag songs-tag">
-                  <svg lucideMusic [attr.size]="12"></svg>
-                  {{ playlist.songs.length }} songs
-                </span>
-                <span class="tag status-tag" [ngClass]="playlist.status">
-                  <svg *ngIf="playlist.status === 'schedule'" lucideClock [attr.size]="12"></svg>
-                  {{ playlist.status | titlecase }}
-                  <span *ngIf="playlist.status === 'schedule' && playlist.publishDate">
-                    - {{ playlist.publishDate | date:'medium' }}
-                  </span>
-                </span>
-                <span class="tag copy-tag" (click)="copyShareLink(playlist.id, $event)">
-                  <svg *ngIf="copiedPlaylistId() !== playlist.id" lucideCopy [attr.size]="12"></svg>
-                  <svg *ngIf="copiedPlaylistId() === playlist.id" lucideCheck [attr.size]="12"></svg>
-                  {{ copiedPlaylistId() === playlist.id ? 'Copied!' : 'Copy Link' }}
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="header-right" (click)="$event.stopPropagation()">
-            <button class="icon-btn" (click)="startEdit(playlist)" title="Edit Settings">
-              <svg lucideEdit2 [attr.size]="20"></svg>
-            </button>
-            <button class="icon-btn danger" (click)="deletePlaylist(playlist.id)" title="Delete Playlist">
-              <svg lucideTrash2 [attr.size]="20"></svg>
-            </button>
-            <button class="icon-btn toggle" (click)="togglePlaylist(pIndex)">
-              <svg *ngIf="expandedPlaylistIndex !== pIndex" lucideChevronDown [attr.size]="24"></svg>
-              <svg *ngIf="expandedPlaylistIndex === pIndex" lucideChevronUp [attr.size]="24"></svg>
-            </button>
-          </div>
-        </div>
+      <div class="header-actions">
+        <button class="action-btn outline" (click)="saveOrder()" *ngIf="currentPlaylists.length > 0">
+          <svg lucideSave [attr.size]="18"></svg>
+          Save Order
+        </button>
+        <button class="action-btn danger outline" (click)="deleteAllPlaylists()">
+          <svg lucideTrash [attr.size]="18"></svg>
+          Delete All
+        </button>
+      </div>
+    </div>
 
-        <!-- Playlist Content (Songs) -->
-        <div class="playlist-content" *ngIf="expandedPlaylistIndex === pIndex && editingPlaylistId !== playlist.id">
-          <div class="songs-list">
-            
-            <div class="song-item" *ngFor="let song of playlist.songs; let songIndex = index">
-              <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
-              <div class="song-info">
-                <div class="song-title">{{ song.title }}</div>
-                <div class="song-artist">{{ song.channelTitle }}</div>
+    <div class="playlists-list-container">
+      <div class="list-header">
+        <div class="header-left">
+          <span class="count-badge">{{ currentPlaylists.length }}</span>
+          <h3>Active Playlists</h3>
+        </div>
+        <div class="header-right" *ngIf="publishMessage">
+          <span class="success-msg">
+            <svg lucideCheck [attr.size]="16"></svg>
+            {{ publishMessage }}
+          </span>
+        </div>
+      </div>
+
+      <div class="playlists-list" cdkDropList (cdkDropListDropped)="drop($event)">
+        
+        <div *ngFor="let playlist of currentPlaylists; let pIndex = index" 
+             cdkDrag
+             class="playlist-card" 
+             [class.editing]="editingPlaylistId === playlist.id"
+             (click)="editingPlaylistId !== playlist.id ? openPlaylist(pIndex) : null">
+             
+          <!-- Playlist Header (when not editing) -->
+          <div class="playlist-header" *ngIf="editingPlaylistId !== playlist.id">
+            <div class="header-left">
+              <div cdkDragHandle class="drag-handle" (click)="$event.stopPropagation()">
+                <svg lucideGripVertical [attr.size]="20"></svg>
               </div>
-              <button class="icon-btn danger-subtle" (click)="deleteSongFromPlaylist(pIndex, songIndex)" title="Remove Song">
-                <svg lucideX [attr.size]="18"></svg>
+              <img [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover">
+              <div class="title-group">
+                <h4>{{ playlist.title }}</h4>
+                <div class="meta-tags">
+                  <span class="tag songs-tag">
+                    <svg lucideMusic [attr.size]="12"></svg>
+                    {{ playlist.songs.length }} songs
+                  </span>
+                  <span class="tag status-tag" [ngClass]="playlist.status">
+                    <svg *ngIf="playlist.status === 'schedule'" lucideClock [attr.size]="12"></svg>
+                    {{ playlist.status | titlecase }}
+                    <span *ngIf="playlist.status === 'schedule' && playlist.publishDate">
+                      - {{ playlist.publishDate | date:'medium' }}
+                    </span>
+                  </span>
+                  <span class="tag copy-tag" (click)="copyShareLink(playlist.id, $event)">
+                    <svg *ngIf="copiedPlaylistId() !== playlist.id" lucideCopy [attr.size]="12"></svg>
+                    <svg *ngIf="copiedPlaylistId() === playlist.id" lucideCheck [attr.size]="12"></svg>
+                    {{ copiedPlaylistId() === playlist.id ? 'Copied!' : 'Copy Link' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="header-right" (click)="$event.stopPropagation()">
+              <button class="icon-btn" (click)="startEdit(playlist)" title="Edit Settings">
+                <svg lucideEdit2 [attr.size]="20"></svg>
+              </button>
+              <button class="icon-btn danger" (click)="deletePlaylist(playlist.id)" title="Delete Playlist">
+                <svg lucideTrash2 [attr.size]="20"></svg>
               </button>
             </div>
-            
-            <button class="add-song-btn" (click)="openSearchModal(pIndex)">
-              <svg lucidePlus [attr.size]="20"></svg>
-              Add Song to {{ playlist.title }}
+          </div>
+
+          <!-- Edit Form (Inline) -->
+          <div class="edit-form" *ngIf="editingPlaylistId === playlist.id" (click)="$event.stopPropagation()">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Playlist Title</label>
+                <input type="text" [(ngModel)]="playlist.title" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Cover Photo URL</label>
+                <input type="text" [(ngModel)]="playlist.coverImage" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Visibility Status</label>
+                <select [(ngModel)]="playlist.status" class="form-input">
+                  <option value="publish">Public (Publish)</option>
+                  <option value="schedule">Schedule</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
+              <div class="form-group" *ngIf="playlist.status === 'schedule'">
+                <label>Publish Date</label>
+                <input type="datetime-local" [(ngModel)]="playlist.publishDate" class="form-input">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="action-btn cancel" (click)="cancelEdit()">Cancel</button>
+              <button class="action-btn primary" (click)="saveEdit(playlist)">Save Changes</button>
+            </div>
+          </div>
+
+        </div>
+        
+      </div>
+
+      <div *ngIf="currentPlaylists.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <svg lucideMusic [attr.size]="32"></svg>
+        </div>
+        <p>No custom playlists for {{ selectedLang }}. Create one below!</p>
+      </div>
+    </div>
+
+    <div class="create-playlist-container">
+      <div class="create-header">
+        <div class="create-icon">
+          <svg lucidePlus [attr.size]="20"></svg>
+        </div>
+        <h3>Create New Playlist</h3>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Playlist Title</label>
+          <input type="text" [(ngModel)]="newPlaylistTitle" placeholder="e.g. My Favorite Tracks" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Cover Photo URL</label>
+          <input type="text" [(ngModel)]="newPlaylistCoverUrl" placeholder="https://..." class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Visibility Status</label>
+          <select [(ngModel)]="newPlaylistStatus" class="form-input">
+            <option value="publish">Public (Publish Immediately)</option>
+            <option value="schedule">Schedule Publish</option>
+            <option value="private">Private (Only Admin)</option>
+          </select>
+        </div>
+
+        <div class="form-group" *ngIf="newPlaylistStatus === 'schedule'">
+          <label>Select Date & Time</label>
+          <input type="datetime-local" [(ngModel)]="newPlaylistDate" class="form-input" />
+        </div>
+      </div>
+
+      <div class="form-group full-width mt-4">
+        <label class="flex-label">
+          <span>JSON Array of Songs</span>
+          <span class="hint">e.g. ["Song 1", "Song 2"]</span>
+        </label>
+        <textarea [(ngModel)]="jsonInput" rows="4" placeholder='["Song 1", "Song 2"]' class="form-textarea"></textarea>
+      </div>
+
+      <div *ngIf="fetchError" class="error-box">
+        <svg lucideX [attr.size]="18"></svg>
+        {{ fetchError }}
+      </div>
+
+      <div *ngIf="isFetching || isUploading" class="progress-bar">
+        <div class="progress-fill" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
+      </div>
+      <div *ngIf="isFetching || isUploading" class="progress-text">
+        {{ isUploading ? 'Uploading Image...' : 'Fetching ' + fetchProgress + ' / ' + totalToFetch }}
+      </div>
+
+      <button class="submit-btn" [disabled]="isFetching || isUploading || isPublishing" (click)="addPlaylist()">
+        <span *ngIf="!isFetching && !isUploading && !isPublishing">Create Playlist</span>
+        <span *ngIf="isFetching || isUploading || isPublishing" class="loading-text">
+          <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          Processing...
+        </span>
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- DETAIL VIEW (Split Screen) -->
+  <div class="detail-view" *ngIf="activePlaylistIndex !== null">
+    
+    <!-- LEFT PANEL: Playlist Contents -->
+    <div class="detail-left">
+      <div class="detail-header">
+        <button class="back-btn" (click)="closePlaylist()">
+          <svg lucideArrowLeft [attr.size]="24"></svg>
+        </button>
+        <div class="title-group-detail">
+          <img [src]="currentPlaylists[activePlaylistIndex].coverImage" class="detail-cover" />
+          <div class="title-info">
+            <h2>{{ currentPlaylists[activePlaylistIndex].title }}</h2>
+            <span class="badge">{{ currentPlaylists[activePlaylistIndex].songs.length }} Songs</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="songs-list-container">
+        <div class="songs-list">
+          <div class="song-item" *ngFor="let song of currentPlaylists[activePlaylistIndex].songs; let songIndex = index">
+            <div class="song-index">{{ songIndex + 1 }}</div>
+            <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
+            <div class="song-info">
+              <div class="song-title">{{ song.title }}</div>
+              <div class="song-artist">{{ song.channelTitle }}</div>
+            </div>
+            <button class="icon-btn danger-subtle" (click)="deleteSongFromPlaylist(songIndex)" title="Remove Song">
+              <svg lucideTrash2 [attr.size]="18"></svg>
             </button>
           </div>
-        </div>
 
-        <!-- Edit Form -->
-        <div class="edit-form" *ngIf="editingPlaylistId === playlist.id" (click)="$event.stopPropagation()">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Playlist Title</label>
-              <input type="text" [(ngModel)]="playlist.title" class="form-input">
-            </div>
-            <div class="form-group">
-              <label>Cover Photo URL</label>
-              <input type="text" [(ngModel)]="playlist.coverImage" class="form-input">
-            </div>
-            <div class="form-group">
-              <label>Visibility Status</label>
-              <select [(ngModel)]="playlist.status" class="form-input">
-                <option value="publish">Public (Publish)</option>
-                <option value="schedule">Schedule</option>
-                <option value="private">Private</option>
-              </select>
-            </div>
-            <div class="form-group" *ngIf="playlist.status === 'schedule'">
-              <label>Publish Date</label>
-              <input type="datetime-local" [(ngModel)]="playlist.publishDate" class="form-input">
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="action-btn cancel" (click)="cancelEdit()">Cancel</button>
-            <button class="action-btn primary" (click)="saveEdit(playlist)">Save Changes</button>
+          <div *ngIf="currentPlaylists[activePlaylistIndex].songs.length === 0" class="empty-state">
+            <p>No songs in this playlist. Search and add from the right panel.</p>
           </div>
         </div>
       </div>
-      
     </div>
 
-    <div *ngIf="currentPlaylists.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <svg lucideMusic [attr.size]="32"></svg>
+    <!-- RIGHT PANEL: Search & Add -->
+    <div class="detail-right">
+      <div class="search-panel">
+        <div class="search-header">
+          <h3>Search & Add Songs</h3>
+        </div>
+
+        <div class="search-bar-wrapper">
+          <div class="search-input-box">
+            <svg lucideSearch class="search-icon" [attr.size]="20"></svg>
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              (keyup.enter)="performSongSearch()"
+              placeholder="Search YouTube..." 
+              class="search-input"
+              autofocus
+            />
+            <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; searchResults = []">
+              <svg lucideX [attr.size]="16"></svg>
+            </button>
+          </div>
+          <button class="search-btn" (click)="performSongSearch()" [disabled]="isSearchingSongs || !searchQuery.trim()">
+            <span *ngIf="!isSearchingSongs">Search</span>
+            <svg *ngIf="isSearchingSongs" lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          </button>
+        </div>
+
+        <div class="search-results-area">
+          <div *ngIf="!hasSearchedSongs" class="empty-state-small">
+            <svg lucideSearch [attr.size]="40"></svg>
+            <p>Search for a song to add it to "{{ currentPlaylists[activePlaylistIndex].title }}"</p>
+          </div>
+
+          <div *ngIf="isSearchingSongs" class="loading-state">
+            <svg lucideRefreshCw class="spin big" [attr.size]="40"></svg>
+            <p>Searching...</p>
+          </div>
+
+          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length === 0" class="empty-state-small">
+            <p>No results found for "{{searchQuery}}".</p>
+          </div>
+
+          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length > 0" class="results-list">
+            <div class="result-item" *ngFor="let result of searchResults">
+              <img [src]="result.thumbnail" [alt]="result.title" class="result-thumb">
+              <div class="result-info">
+                <div class="result-title">{{ result.title }}</div>
+                <div class="result-artist">{{ result.channelTitle }}</div>
+              </div>
+              <button class="add-btn" (click)="addSongToPlaylist(result)">
+                <svg lucidePlus [attr.size]="18"></svg>
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-      <p>No custom playlists for {{ selectedLang }}. Create one below!</p>
-    </div>
-  </div>
-
-  <div class="create-playlist-container">
-    <div class="create-header">
-      <div class="create-icon">
-        <svg lucidePlus [attr.size]="20"></svg>
-      </div>
-      <h3>Create New Playlist</h3>
     </div>
 
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Playlist Title</label>
-        <input type="text" [(ngModel)]="newPlaylistTitle" placeholder="e.g. My Favorite Tracks" class="form-input" />
-      </div>
-
-      <div class="form-group">
-        <label>Cover Photo URL</label>
-        <input type="text" [(ngModel)]="newPlaylistCoverUrl" placeholder="https://..." class="form-input" />
-      </div>
-
-      <div class="form-group">
-        <label>Visibility Status</label>
-        <select [(ngModel)]="newPlaylistStatus" class="form-input">
-          <option value="publish">Public (Publish Immediately)</option>
-          <option value="schedule">Schedule Publish</option>
-          <option value="private">Private (Only Admin)</option>
-        </select>
-      </div>
-
-      <div class="form-group" *ngIf="newPlaylistStatus === 'schedule'">
-        <label>Select Date & Time</label>
-        <input type="datetime-local" [(ngModel)]="newPlaylistDate" class="form-input" />
-      </div>
-    </div>
-
-    <div class="form-group full-width mt-4">
-      <label class="flex-label">
-        <span>JSON Array of Songs</span>
-        <span class="hint">e.g. ["Song 1", "Song 2"]</span>
-      </label>
-      <textarea [(ngModel)]="jsonInput" rows="4" placeholder='["Song 1", "Song 2"]' class="form-textarea"></textarea>
-    </div>
-
-    <div *ngIf="fetchError" class="error-box">
-      <svg lucideX [attr.size]="18"></svg>
-      {{ fetchError }}
-    </div>
-
-    <div *ngIf="isFetching || isUploading" class="progress-bar">
-      <div class="progress-fill" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
-    </div>
-    <div *ngIf="isFetching || isUploading" class="progress-text">
-      {{ isUploading ? 'Uploading Image...' : 'Fetching ' + fetchProgress + ' / ' + totalToFetch }}
-    </div>
-
-    <button class="submit-btn" [disabled]="isFetching || isUploading || isPublishing" (click)="addPlaylist()">
-      <span *ngIf="!isFetching && !isUploading && !isPublishing">Create Playlist</span>
-      <span *ngIf="isFetching || isUploading || isPublishing" class="loading-text">
-        <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
-        Processing...
-      </span>
-    </button>
   </div>
 </div>
-
-<!-- Add Song Modal -->
-<app-search-song-modal 
-  *ngIf="showSearchModalForPlaylist !== null"
-  (close)="closeSearchModal()"
-  (songSelected)="addSongToPlaylist($event)">
-</app-search-song-modal>

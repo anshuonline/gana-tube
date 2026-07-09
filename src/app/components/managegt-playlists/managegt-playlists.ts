@@ -18,13 +18,12 @@ export interface CustomPlaylist {
   publishDate?: string; // ISO date string
 }
 
-import { LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck, LucideChevronDown, LucideChevronUp, LucidePlus, LucideX, LucideTrash2 } from '@lucide/angular';
-import { SearchSongModalComponent } from '../search-song-modal/search-song-modal.component';
+import { LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck, LucideChevronDown, LucideChevronUp, LucidePlus, LucideX, LucideTrash2, LucideArrowLeft, LucideSearch, LucideRefreshCw } from '@lucide/angular';
 
 @Component({
   selector: 'app-managegt-playlists',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, SearchSongModalComponent, LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck, LucideChevronDown, LucideChevronUp, LucidePlus, LucideX, LucideTrash2],
+  imports: [CommonModule, FormsModule, DragDropModule, LucideSave, LucideClock, LucideGripVertical, LucideMusic, LucideEdit2, LucideTrash, LucideCopy, LucideCheck, LucideChevronDown, LucideChevronUp, LucidePlus, LucideX, LucideTrash2, LucideArrowLeft, LucideSearch, LucideRefreshCw],
   templateUrl: './managegt-playlists.html',
   styleUrls: ['./managegt-playlists.scss']
 })
@@ -46,8 +45,13 @@ export class ManagegtPlaylistsComponent implements OnInit {
   // Edit State
   editingPlaylistId: string | null = null;
 
-  expandedPlaylistIndex: number | null = null;
-  showSearchModalForPlaylist: number | null = null;
+  activePlaylistIndex: number | null = null;
+
+  // Search State
+  searchQuery = '';
+  searchResults: YouTubeSearchResult[] = [];
+  isSearchingSongs = false;
+  hasSearchedSongs = false;
 
   // Fetching state
   isFetching = false;
@@ -114,42 +118,67 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.updateCurrentPlaylists();
   }
 
-  // Expand / Collapse Playlist
-  togglePlaylist(index: number) {
-    if (this.expandedPlaylistIndex === index) {
-      this.expandedPlaylistIndex = null;
-    } else {
-      this.expandedPlaylistIndex = index;
-    }
+  // Master-Detail Navigation
+  openPlaylist(index: number) {
+    this.activePlaylistIndex = index;
+    // Reset search
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.hasSearchedSongs = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  closePlaylist() {
+    this.activePlaylistIndex = null;
   }
 
   // Delete Individual Song
-  deleteSongFromPlaylist(playlistIndex: number, songIndex: number) {
+  deleteSongFromPlaylist(songIndex: number) {
+    if (this.activePlaylistIndex === null) return;
     if (confirm('Are you sure you want to remove this song from the playlist?')) {
-      this.currentPlaylists[playlistIndex].songs.splice(songIndex, 1);
+      this.currentPlaylists[this.activePlaylistIndex].songs.splice(songIndex, 1);
       this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
       this.updateCurrentPlaylists();
       this.publishPlaylists();
     }
   }
 
-  // Add Song Modal
-  openSearchModal(playlistIndex: number) {
-    this.showSearchModalForPlaylist = playlistIndex;
-  }
+  // Song Search Logic
+  performSongSearch() {
+    if (!this.searchQuery.trim()) return;
+    this.isSearchingSongs = true;
+    this.hasSearchedSongs = true;
+    this.searchResults = [];
 
-  closeSearchModal() {
-    this.showSearchModalForPlaylist = null;
+    this.youtubeApi.searchMusic(this.searchQuery, 15).subscribe({
+      next: (results) => {
+        const unique = [];
+        const titles = new Set();
+        for (const r of results) {
+          let norm = r.title.toLowerCase().replace(/[\(\[].*?[\)\]]/g, '').trim();
+          if (!titles.has(norm)) {
+            titles.add(norm);
+            unique.push(r);
+          }
+        }
+        this.searchResults = unique.slice(0, 10);
+        this.isSearchingSongs = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Search error', err);
+        this.isSearchingSongs = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   addSongToPlaylist(song: YouTubeSearchResult) {
-    if (this.showSearchModalForPlaylist !== null) {
-      this.currentPlaylists[this.showSearchModalForPlaylist].songs.push(song);
+    if (this.activePlaylistIndex !== null) {
+      this.currentPlaylists[this.activePlaylistIndex].songs.push(song);
       this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
       this.updateCurrentPlaylists();
       this.publishPlaylists();
-      this.showSearchModalForPlaylist = null;
-      this.expandedPlaylistIndex = this.showSearchModalForPlaylist;
     }
   }
 
@@ -372,7 +401,6 @@ export class ManagegtPlaylistsComponent implements OnInit {
     if (event.previousIndex !== event.currentIndex) {
       moveItemInArray(this.currentPlaylists, event.previousIndex, event.currentIndex);
       this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
-      this.expandedPlaylistIndex = null; // Close to avoid UI glitches
       setTimeout(() => this.publishPlaylists(), 0);
     }
   }
