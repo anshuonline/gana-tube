@@ -130,7 +130,7 @@
                 </button>
               </div>
               <div *ngIf="isEditingUsername()" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <input type="text" [value]="newUsername()" (input)="newUsername.set($any($event.target).value)" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; outline: none; max-width: 150px; text-align: center;">
+                <input type="text" maxlength="50" [value]="newUsername()" (input)="newUsername.set($any($event.target).value)" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; outline: none; max-width: 150px; text-align: center;">
                 <button (click)="saveUsername()" style="background: var(--color-primary); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 8px; font-weight: bold;">Save</button>
                 <button (click)="toggleEditUsername()" style="background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 8px;">Cancel</button>
               </div>
