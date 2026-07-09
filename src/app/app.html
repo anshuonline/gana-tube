@@ -600,7 +600,7 @@
                 </div>
               </div>
               <div class="shelf-grid" #shelfGrid>
-                <div class="song-card" *ngFor="let track of shelf.songs; trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <div class="song-card" *ngFor="let track of shelf.songs; trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
                   <div class="card-thumbnail">
                     <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                     <div class="thumbnail-overlay">
@@ -615,15 +615,6 @@
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                     </button>
                   </div>
-                  <!-- Reusable Track Menu -->
-                  <app-track-menu 
-                    [track]="track" 
-                    [isOpen]="activeMenuTrackId() === track.videoId"
-                    [xPos]="activeMenuPosition()?.x || 0"
-                    [yPos]="activeMenuPosition()?.y || 0"
-                    (closeMenu)="closeMenu()"
-                    (openPlaylist)="openSaveToPlaylist($event)">
-                  </app-track-menu>
                   <div class="card-info">
                     <p class="track-channel">{{ track.channelTitle | uppercase }}</p>
                     <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
@@ -638,7 +629,7 @@
                 <h2 class="shelf-title">{{ shelf.title }}</h2>
               </div>
               <div class="suggested-list-grid">
-                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8); trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrackId() === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8); trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
                   <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                   <div class="suggested-info">
                     <div class="suggested-artist">{{ track.channelTitle | uppercase }}</div>
@@ -649,15 +640,6 @@
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
                     </button>
                   </div>
-                  <!-- Reusable Track Menu -->
-                  <app-track-menu 
-                    [track]="track" 
-                    [isOpen]="activeMenuTrackId() === track.videoId"
-                    [xPos]="activeMenuPosition()?.x || 0"
-                    [yPos]="activeMenuPosition()?.y || 0"
-                    (closeMenu)="closeMenu()"
-                    (openPlaylist)="openSaveToPlaylist($event)">
-                  </app-track-menu>
                 </div>
               </div>
             </ng-container>
@@ -929,3 +911,13 @@
     </div>
   </div>
 </div>
+<!-- Global Reusable Track Menu -->
+<app-track-menu 
+  *ngIf="activeMenuTrack()"
+  [track]="activeMenuTrack()"
+  [isOpen]="!!activeMenuTrack()"
+  [xPos]="activeMenuPosition()?.x || 0"
+  [yPos]="activeMenuPosition()?.y || 0"
+  (closeMenu)="closeMenu()"
+  (openPlaylist)="openSaveToPlaylist($event)">
+</app-track-menu>

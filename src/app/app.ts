@@ -246,7 +246,7 @@ export class App implements OnInit {
   newUsername = signal<string>('');
   currentAmbientBg = signal<string>('');
   
-  activeMenuTrackId = signal<string | null>(null);
+  activeMenuTrack = signal<any | null>(null);
   activeMenuPosition = signal<{x: number, y: number} | null>(null);
   showPlaylistModal = signal<boolean>(false);
   playlistModalTrack = signal<any | null>(null);
@@ -254,25 +254,24 @@ export class App implements OnInit {
 
   toggleMenu(track: any, event: MouseEvent) {
     event.stopPropagation();
-    if (this.activeMenuTrackId() === track.videoId) {
-      this.activeMenuTrackId.set(null);
-      this.activeMenuPosition.set(null);
+    if (this.activeMenuTrack()?.videoId === track.videoId) {
+      this.closeMenu();
     } else {
       const target = event.currentTarget as HTMLElement;
       const rect = target.getBoundingClientRect();
       this.activeMenuPosition.set({ x: rect.right, y: rect.bottom });
-      this.activeMenuTrackId.set(track.videoId);
+      this.activeMenuTrack.set(track);
     }
   }
 
   closeMenu() {
-    this.activeMenuTrackId.set(null);
+    this.activeMenuTrack.set(null);
     this.activeMenuPosition.set(null);
   }
 
   addToQueue(track: any) {
     this.playerService.addToQueue(track);
-    this.activeMenuTrackId.set(null);
+    this.closeMenu();
   }
 
   playNext(track: any) {
@@ -296,13 +295,13 @@ export class App implements OnInit {
     } else {
       alert('Please login to like songs');
     }
-    this.activeMenuTrackId.set(null);
+    this.closeMenu();
   }
 
   openSaveToPlaylist(track: any) {
     this.playlistModalTrack.set(track);
     this.showPlaylistModal.set(true);
-    this.activeMenuTrackId.set(null);
+    this.closeMenu();
   }
 
   closePlaylistModal() {
@@ -630,9 +629,9 @@ export class App implements OnInit {
     }
     
     // Close track menu
-    if (this.activeMenuTrackId()) {
-      if (!target.closest('.track-menu-dropdown') && !target.closest('.track-options-btn')) {
-        this.activeMenuTrackId.set(null);
+    if (this.activeMenuTrack()) {
+      if (!target.closest('.track-menu-container') && !target.closest('.track-options-btn')) {
+        this.closeMenu();
       }
     }
   }
