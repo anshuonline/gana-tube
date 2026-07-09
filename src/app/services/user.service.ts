@@ -196,6 +196,25 @@ export class UserService {
     return false;
   }
 
+  async deletePlaylist(email: string, playlist_id: string): Promise<boolean> {
+    try {
+      const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
+      const response = await fetch(`${url}?action=deletePlaylist`, {
+        method: 'POST',
+        body: JSON.stringify({ email, playlist_id })
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        this.loadPlaylists(email); // Refresh playlists
+        return true;
+      }
+      return false;
+    } catch(e) {
+      console.error("Error deleting playlist:", e);
+      return false;
+    }
+  }
+
   async addToPlaylist(email: string, playlistIdOrName: string, track: any) {
     if (!email) return;
     const current = [...this.customPlaylists()];
@@ -204,23 +223,29 @@ export class UserService {
     if (pIdx < 0) pIdx = current.findIndex(p => p.name === playlistIdOrName);
     
     if (pIdx >= 0) {
-      // Prevent duplicates
-      if (!current[pIdx].tracks.find((t: any) => t.videoId === track.videoId)) {
+      const trackIndex = current[pIdx].tracks.findIndex((t: any) => t.videoId === track.videoId);
+      
+      if (trackIndex >= 0) {
+        // Track exists, remove it
+        current[pIdx].tracks.splice(trackIndex, 1);
+      } else {
+        // Track doesn't exist, add it
         current[pIdx].tracks.unshift(track);
-        this.customPlaylists.set(current);
-        
-        // Sync to database
-        if (current[pIdx].playlist_id) {
-          try {
-            const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
-            await firstValueFrom(this.http.post(`${url}?action=updatePlaylist`, {
-              email: email,
-              playlist_id: current[pIdx].playlist_id,
-              songs: current[pIdx].tracks
-            }));
-          } catch (e) {
-            console.error('Error updating playlist in DB', e);
-          }
+      }
+      
+      this.customPlaylists.set(current);
+      
+      // Sync to database
+      if (current[pIdx].playlist_id) {
+        try {
+          const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
+          await firstValueFrom(this.http.post(`${url}?action=updatePlaylist`, {
+            email: email,
+            playlist_id: current[pIdx].playlist_id,
+            songs: current[pIdx].tracks
+          }));
+        } catch (e) {
+          console.error('Error updating playlist in DB', e);
         }
       }
     }

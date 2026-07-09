@@ -1,14 +1,15 @@
 import { Component, Input, Output, EventEmitter, inject, signal, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX } from '@lucide/angular';
+import { LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX, LucideTrash2 } from '@lucide/angular';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-save-playlist-modal',
   standalone: true,
-  imports: [CommonModule, LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX],
+  imports: [CommonModule, LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX, LucideTrash2, ConfirmModalComponent],
   templateUrl: './save-playlist-modal.html',
   styleUrls: ['./save-playlist-modal.scss']
 })
@@ -25,6 +26,9 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
   newPlaylistIsPublic = signal<boolean>(false);
   isMobile = false;
   isCreating = signal<boolean>(false);
+  
+  showDeleteConfirm = false;
+  playlistToDelete: any = null;
 
   private resizeListener = () => {
     this.isMobile = window.innerWidth <= 768;
@@ -97,5 +101,37 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
     } finally {
       this.isCreating.set(false);
     }
+  }
+
+  deletePlaylistInit(playlist: any, event: Event) {
+    event.stopPropagation();
+    this.playlistToDelete = playlist;
+    this.showDeleteConfirm = true;
+  }
+
+  async confirmDelete() {
+    if (this.playlistToDelete) {
+      const playlistId = this.playlistToDelete.playlist_id;
+      const user = this.authService.currentUser();
+      if (user?.email && playlistId) {
+        try {
+          const success = await this.userService.deletePlaylist(user.email, playlistId);
+          if (success) {
+            this.toastService.success(`Playlist deleted successfully`);
+          } else {
+            this.toastService.error("Failed to delete playlist");
+          }
+        } catch(e) {
+          this.toastService.error("An error occurred");
+        }
+      }
+    }
+    this.showDeleteConfirm = false;
+    this.playlistToDelete = null;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.playlistToDelete = null;
   }
 }
