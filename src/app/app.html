@@ -858,8 +858,15 @@
   <app-full-screen-player 
     [isVisible]="isFullScreenPlayerVisible()"
     (closePlayer)="closeFullScreenPlayer()"
-    (openPlaylist)="openSaveToPlaylist($event)">
+    (openPlaylist)="openSaveToPlaylist($event)"
+    (openCarMode)="toggleCarMode()">
   </app-full-screen-player>
+
+  <!-- Car Mode Player Overlay -->
+  <app-car-mode-player
+    [isVisible]="isCarModeVisible()"
+    (closeMode)="closeCarMode()">
+  </app-car-mode-player>
 
   <!-- Listen Together Modal -->
   <app-listen-together

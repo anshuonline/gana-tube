@@ -27,7 +27,7 @@
       </div>
 
       <div class="fs-header-right" style="position: relative;">
-        <button class="icon-btn" style="margin-right: 8px; opacity: 0.7;" title="Car Mode (Coming Soon)">
+        <button class="icon-btn" style="margin-right: 8px;" title="Car Mode" (click)="openCarMode.emit()">
           <svg lucideCar [attr.size]="24"></svg>
         </button>
         <button class="icon-btn" (click)="toggleMenu($event)" title="More Options">
@@ -180,8 +180,19 @@
           </button>
         </div>
 
-        <button class="fs-control-btn secondary" (click)="toggleView('queue')" title="Up Next">
-          <svg lucideListMusic [attr.size]="24"></svg>
+        <button class="fs-control-btn secondary" (click)="playerService.toggleRepeat()" title="Repeat">
+          <!-- Repeat None -->
+          <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="24" stroke="rgba(255,255,255,0.4)"></svg>
+          <!-- Repeat All -->
+          <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="24" stroke="#fff"></svg>
+          <!-- Repeat One -->
+          <svg *ngIf="playerService.repeatMode() === 'one'" viewBox="0 0 24 24" width="24" height="24" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"></polyline>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <polyline points="7 23 3 19 7 15"></polyline>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            <text x="10" y="16" font-family="sans-serif" font-size="6" font-weight="bold" stroke="none" fill="#fff">1</text>
+          </svg>
         </button>
       </div>
 

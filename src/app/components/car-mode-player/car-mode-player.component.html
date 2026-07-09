@@ -1,0 +1,142 @@
+<div class="car-mode-overlay" [class.visible]="isVisible">
+  
+  <div class="car-mode-container">
+    
+    <!-- Top Header -->
+    <div class="cm-header">
+      <button class="cm-close-btn" (click)="close()">
+        <svg lucideChevronDown [attr.size]="40"></svg>
+      </button>
+      <div class="cm-title">DRIVE MODE</div>
+      <div style="width: 48px;"></div> <!-- Spacer to center title -->
+    </div>
+
+    <div class="cm-content">
+      
+      <!-- Left Column: Player View -->
+      <div class="cm-player-col">
+        <div class="cm-artwork">
+          <img 
+            [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'assets/default-playlist.jpg'" 
+            [alt]="playerService.currentTrack()?.title"
+          />
+        </div>
+
+        <div class="cm-track-info">
+          <h2 class="cm-track-title">{{ playerService.currentTrack()?.title || 'Not Playing' }}</h2>
+          <p class="cm-track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</p>
+        </div>
+
+        <div class="cm-main-controls">
+          <button class="cm-ctrl-btn secondary" [class.active]="playerService.isShuffled()" (click)="playerService.toggleShuffle()">
+            <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          </button>
+
+          <button class="cm-ctrl-btn skip" (click)="playerService.previous()" [disabled]="playerService.currentIndex() <= 0">
+            <svg lucideSkipBack [attr.size]="48" fill="currentColor"></svg>
+          </button>
+          
+          <button class="cm-ctrl-btn play-pause" (click)="playerService.togglePlayPause()">
+            <svg lucidePause [attr.size]="64" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
+            <svg lucidePlay [attr.size]="64" fill="currentColor" style="margin-left: 6px;" *ngIf="!playerService.isPlaying()"></svg>
+          </button>
+          
+          <button class="cm-ctrl-btn skip" (click)="playerService.next()" [disabled]="playerService.currentIndex() >= playerService.queue().length - 1">
+            <svg lucideSkipForward [attr.size]="48" fill="currentColor"></svg>
+          </button>
+
+          <button class="cm-ctrl-btn secondary" (click)="playerService.toggleRepeat()">
+            <!-- Repeat None -->
+            <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="36" stroke="rgba(255,255,255,0.4)"></svg>
+            <!-- Repeat All -->
+            <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="36" stroke="#fff"></svg>
+            <!-- Repeat One -->
+            <svg *ngIf="playerService.repeatMode() === 'one'" viewBox="0 0 24 24" width="36" height="36" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+              <text x="10" y="16" font-family="sans-serif" font-size="6" font-weight="bold" stroke="none" fill="#fff">1</text>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Search & Lists -->
+      <div class="cm-list-col">
+        
+        <!-- Voice Search Bar -->
+        <div class="cm-search-bar">
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (keyup.enter)="performSearch(searchQuery)"
+            placeholder="Search songs..." 
+            class="cm-search-input"
+          />
+          <button class="cm-search-clear" *ngIf="searchQuery" (click)="clearSearch()">
+            <svg lucideX [attr.size]="28"></svg>
+          </button>
+          <button class="cm-voice-btn" [class.listening]="isListening" (click)="startVoiceSearch()">
+            <svg lucideMic [attr.size]="36" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
+          </button>
+        </div>
+
+        <div class="cm-list-container">
+          
+          <!-- Loading State -->
+          <div *ngIf="isSearching" class="cm-message-view">
+            <svg lucideRefreshCw [attr.size]="48" class="spin"></svg>
+            <p>Searching...</p>
+          </div>
+
+          <!-- Search Results View -->
+          <div *ngIf="showSearchResults && !isSearching" class="cm-list">
+            <h3 class="cm-list-title">Search Results</h3>
+            <div 
+              class="cm-list-item" 
+              *ngFor="let track of searchResults"
+              (click)="playSearchResult(track)"
+            >
+              <div class="cm-item-thumb">
+                <img [src]="track.thumbnail" [alt]="track.title" />
+              </div>
+              <div class="cm-item-info">
+                <div class="cm-item-title">{{ track.title }}</div>
+                <div class="cm-item-artist">{{ track.channelTitle }}</div>
+              </div>
+            </div>
+            
+            <div *ngIf="searchResults.length === 0" class="cm-message-view">
+              <p>No results found for "{{ searchQuery }}"</p>
+            </div>
+          </div>
+
+          <!-- Queue View -->
+          <div *ngIf="!showSearchResults && !isSearching" class="cm-list">
+            <h3 class="cm-list-title">Up Next</h3>
+            <div 
+              class="cm-list-item" 
+              *ngFor="let track of playerService.queue(); let i = index"
+              [class.active]="playerService.currentIndex() === i"
+              (click)="playQueueTrack(i)"
+            >
+              <div class="cm-item-thumb">
+                <img [src]="track.thumbnail" [alt]="track.title" />
+              </div>
+              <div class="cm-item-info">
+                <div class="cm-item-title" [class.highlight]="playerService.currentIndex() === i">{{ track.title }}</div>
+                <div class="cm-item-artist">{{ track.channelTitle }}</div>
+              </div>
+              <button class="cm-like-btn" (click)="toggleLike(track, $event)">
+                <svg lucideHeart [attr.size]="32" [attr.fill]="isLiked(track) ? 'currentColor' : 'none'"></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>

@@ -15,7 +15,8 @@ import {
   LucideShare2,
   LucideMoreVertical,
   LucideHeart,
-  LucideCar
+  LucideCar,
+  LucideRepeat
 } from '@lucide/angular';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
@@ -41,6 +42,7 @@ import { TrackMenuComponent } from '../track-menu/track-menu.component';
     LucideMoreVertical,
     LucideHeart,
     LucideCar,
+    LucideRepeat,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
@@ -50,6 +52,7 @@ export class FullScreenPlayerComponent implements OnInit {
   @Input() isVisible = false;
   @Output() closePlayer = new EventEmitter<void>();
   @Output() openPlaylist = new EventEmitter<any>();
+  @Output() openCarMode = new EventEmitter<void>();
   @ViewChild('lyricsContainer') lyricsContainer!: ElementRef;
 
   public playerService = inject(PlayerService);

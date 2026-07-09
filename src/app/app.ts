@@ -32,6 +32,7 @@ import { AdminManageSongsComponent } from './components/admin-manage-songs/admin
 import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 import { PwaService } from './services/pwa.service';
 import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-browser';
+import { CarModePlayerComponent } from './components/car-mode-player/car-mode-player.component';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -70,6 +71,7 @@ export interface SponsoredAd {
     MusicPlayerComponent,
     YtPlayerComponent,
     FullScreenPlayerComponent,
+    CarModePlayerComponent,
     ListenTogetherComponent,
     TrackMenuComponent,
     PlaylistPageComponent,
@@ -96,6 +98,7 @@ export class App implements OnInit {
   isLoading = signal<boolean>(false);
   hasSearched = signal<boolean>(false);
   isFullScreenPlayerVisible = signal<boolean>(false);
+  isCarModeVisible = signal<boolean>(false);
   isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
 
@@ -783,6 +786,14 @@ export class App implements OnInit {
   closeFullScreenPlayer(): void {
     this.isFullScreenPlayerVisible.set(false);
     document.body.style.overflow = '';
+  }
+
+  toggleCarMode() {
+    this.isCarModeVisible.set(!this.isCarModeVisible());
+  }
+
+  closeCarMode() {
+    this.isCarModeVisible.set(false);
   }
 
   openListenTogether(): void {
