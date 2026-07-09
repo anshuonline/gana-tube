@@ -15,7 +15,7 @@ export class SearchResultsComponent implements OnChanges {
   @Input() results: YouTubeSearchResult[] = [];
   @Input() isLoading = false;
   @Input() hasSearched = false;
-  @Input() currentFilter: 'all' | 'songs' | 'community' | 'featured' = 'all';
+  @Input() currentFilter: 'all' | 'songs' | 'albums' | 'playlists' = 'all';
 
   @Output() suggestSearch = new EventEmitter<string>();
   @Output() playTrack = new EventEmitter<YouTubeSearchResult>();

@@ -181,7 +181,7 @@ export class App implements OnInit {
   isScrolled = signal<boolean>(false);
   isSearchMode = signal<boolean>(false);
   isSearchFocused = signal<boolean>(false);
-  searchFilter = signal<'all' | 'songs' | 'community' | 'featured'>('all');
+  searchFilter = signal<'all' | 'songs' | 'albums' | 'playlists'>('all');
   ambientSearchBg = signal<string>('');
 
   // Dynamic algorithmic shelves for home recommendations
@@ -751,11 +751,11 @@ export class App implements OnInit {
     }
   }
 
-  setSearchFilter(filter: 'all' | 'songs' | 'community' | 'featured'): void {
+  setSearchFilter(filter: 'all' | 'songs' | 'albums' | 'playlists'): void {
     this.searchFilter.set(filter);
     if (this.currentQuery) {
       this.performSearch(this.currentQuery);
-    } else if (filter === 'community') {
+    } else if (filter === 'playlists') {
       this.performSearch('');
     }
   }
@@ -1177,7 +1177,7 @@ export class App implements OnInit {
     this.hasSearched.set(true);
     this.results.set([]);
 
-    if (this.searchFilter() === 'community') {
+    if (this.searchFilter() === 'playlists') {
       // Fetch Community Playlists
       const url = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
       fetch(`${url}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
@@ -1521,7 +1521,7 @@ export class App implements OnInit {
 
 
   loadMoreResults(): void {
-    if (!this.currentQuery || this.lazyLoadPage >= 3) {
+    if (!this.currentQuery) {
       return;
     }
 
@@ -1530,12 +1530,10 @@ export class App implements OnInit {
 
     // Generate query variations for paginated mock feel
     let queryVariation = this.currentQuery;
-    if (this.lazyLoadPage === 1) {
-      queryVariation = `${this.currentQuery} music`;
-    } else if (this.lazyLoadPage === 2) {
-      queryVariation = `${this.currentQuery} song`;
-    } else if (this.lazyLoadPage === 3) {
-      queryVariation = `${this.currentQuery} audio`;
+    const variations = ['music', 'song', 'audio', 'lyrical', 'hits', 'official', 'new', 'trending'];
+    if (this.lazyLoadPage > 0) {
+      const idx = (this.lazyLoadPage - 1) % variations.length;
+      queryVariation = `${this.currentQuery} ${variations[idx]}`;
     }
 
     this.youtubeApi.searchMusic(queryVariation, 50).pipe(takeUntil(this.destroy$)).subscribe({

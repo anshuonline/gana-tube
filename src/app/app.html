@@ -199,10 +199,22 @@
           <style>
             .desktop-library-view {
               display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-              gap: 24px;
+              grid-template-columns: repeat(5, 1fr);
+              gap: 20px;
               width: 100%;
               padding: 10px 0 40px;
+            }
+            @media (min-width: 1200px) {
+              .desktop-library-view { grid-template-columns: repeat(6, 1fr); }
+            }
+            @media (min-width: 1500px) {
+              .desktop-library-view { grid-template-columns: repeat(7, 1fr); }
+            }
+            @media (min-width: 1800px) {
+              .desktop-library-view { grid-template-columns: repeat(8, 1fr); }
+            }
+            @media (max-width: 1024px) {
+              .desktop-library-view { grid-template-columns: repeat(4, 1fr); }
             }
             @media (max-width: 768px) {
               .desktop-library-view { display: none !important; }
@@ -212,10 +224,10 @@
             .desktop-lib-item {
               display: flex;
               flex-direction: column;
-              gap: 16px;
+              gap: 12px;
               cursor: pointer;
               background: rgba(255, 255, 255, 0.02);
-              padding: 16px;
+              padding: 12px;
               border-radius: 16px;
               transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
               border: 1px solid rgba(255,255,255,0.02);
@@ -292,17 +304,19 @@
               display: flex;
               align-items: center;
               justify-content: space-between;
-              gap: 12px;
+              gap: 8px;
             }
             .desktop-lib-info {
               display: flex;
               flex-direction: column;
               gap: 4px;
               overflow: hidden;
+              flex: 1;
+              min-width: 0;
             }
             .desktop-lib-title {
               color: #fff;
-              font-size: 1.1rem;
+              font-size: 0.95rem;
               font-weight: 700;
               white-space: nowrap;
               overflow: hidden;
@@ -310,15 +324,19 @@
             }
             .desktop-lib-sub {
               color: rgba(255,255,255,0.5);
-              font-size: 0.85rem;
+              font-size: 0.8rem;
               font-weight: 500;
             }
             .desktop-lib-more {
               color: rgba(255,255,255,0.5);
-              padding: 8px;
+              padding: 6px;
               border-radius: 50%;
               transition: background 0.2s, color 0.2s;
               flex-shrink: 0;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
             .desktop-lib-more:hover {
               background: rgba(255,255,255,0.1);
@@ -631,8 +649,8 @@
             <div class="search-filters" *ngIf="hasSearched()">
               <button class="filter-chip" [class.active]="searchFilter() === 'all'" (click)="setSearchFilter('all')">All</button>
               <button class="filter-chip" [class.active]="searchFilter() === 'songs'" (click)="setSearchFilter('songs')">Songs</button>
-              <button class="filter-chip" [class.active]="searchFilter() === 'community'" (click)="setSearchFilter('community')">Community Playlists</button>
-              <button class="filter-chip" [class.active]="searchFilter() === 'featured'" (click)="setSearchFilter('featured')">Featured Playlists</button>
+              <button class="filter-chip" [class.active]="searchFilter() === 'albums'" (click)="setSearchFilter('albums')">Albums</button>
+              <button class="filter-chip" [class.active]="searchFilter() === 'playlists'" (click)="setSearchFilter('playlists')">Playlists</button>
             </div>
           </div>
         </div>

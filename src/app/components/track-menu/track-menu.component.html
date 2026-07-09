@@ -1,5 +1,5 @@
-<!-- Overlay for Mobile to catch outside clicks and apply dimming -->
-<div class="track-menu-overlay" *ngIf="isOpen && isMobile" (click)="close($event)"></div>
+<!-- Overlay to catch outside clicks and apply dimming -->
+<div class="track-menu-overlay" *ngIf="isOpen" (click)="close($event)"></div>
 
 <!-- Main Container -->
 <div class="track-menu-container" *ngIf="isOpen" 
