@@ -55,3 +55,12 @@
     </ul>
   </div>
 </div>
+
+<app-confirm-modal
+  [isOpen]="showDeleteConfirm"
+  title="Delete Playlist"
+  message="Are you sure you want to delete this playlist? This action cannot be undone."
+  confirmText="Delete"
+  (confirm)="confirmDeleteAction()"
+  (close)="showDeleteConfirm = false">
+</app-confirm-modal>

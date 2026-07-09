@@ -4,9 +4,15 @@
 <!-- Main Container -->
 <div class="track-menu-container" *ngIf="isOpen" 
      [class.mobile]="isMobile" 
+     [class.fullscreen]="isFullScreen"
      [style.left.px]="!isMobile ? calculatedX : null" 
      [style.top.px]="!isMobile ? calculatedY : null"
-     (click)="$event.stopPropagation()">
+     [style.transform]="isMobile && transformY !== 0 ? 'translateY(' + transformY + 'px)' : null"
+     [style.transition]="isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1)'"
+     (click)="$event.stopPropagation()"
+     (touchstart)="onTouchStart($event)"
+     (touchmove)="onTouchMove($event)"
+     (touchend)="onTouchEnd($event)">
   
   <!-- Mobile Header (Drag handle + Track Info) -->
   <div class="mobile-header" *ngIf="isMobile">

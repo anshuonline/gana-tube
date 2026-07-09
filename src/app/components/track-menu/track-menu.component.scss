@@ -188,3 +188,14 @@
     font-size: 1.05rem;
   }
 }
+.track-menu-container.fullscreen {
+  height: 100vh !important;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  
+  .menu-items-scroll {
+    max-height: none;
+    flex: 1;
+  }
+}

@@ -13,6 +13,7 @@ import {
   LucideFolderPlus,
   LucideTrash2
 } from '@lucide/angular';
+import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-playlist-menu',
@@ -24,8 +25,11 @@ import {
     LucideEdit,
     LucideListStart,
     LucideListPlus,
+    LucideListStart,
+    LucideListPlus,
     LucideFolderPlus,
-    LucideTrash2
+    LucideTrash2,
+    ConfirmModalComponent
   ],
   templateUrl: './playlist-menu.html',
   styleUrls: ['./playlist-menu.scss']
@@ -50,6 +54,7 @@ export class PlaylistMenuComponent implements OnChanges {
   isMobile = false;
   isEditing = false;
   editName = '';
+  showDeleteConfirm = false;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -166,8 +171,12 @@ export class PlaylistMenuComponent implements OnChanges {
 
   async deletePlaylist(event: Event) {
     event.stopPropagation();
-    const confirmDelete = confirm('Are you sure you want to delete this playlist?');
-    if (confirmDelete && this.playlist?.playlist_id) {
+    this.showDeleteConfirm = true;
+  }
+
+  async confirmDeleteAction() {
+    this.showDeleteConfirm = false;
+    if (this.playlist?.playlist_id) {
       const email = this.authService.currentUser()?.email;
       if (email) {
         try {
@@ -177,7 +186,10 @@ export class PlaylistMenuComponent implements OnChanges {
             body: JSON.stringify({ email, playlist_id: this.playlist.playlist_id })
           });
           this.userService.loadPlaylists(email);
-        } catch(e) {}
+          this.toastService.success("Playlist deleted successfully");
+        } catch(e) {
+          this.toastService.error("Failed to delete playlist");
+        }
       }
     }
     this.close();

@@ -53,6 +53,13 @@ export class TrackMenuComponent implements OnChanges {
   private router = inject(Router);
 
   isMobile = false;
+  isFullScreen = false;
+  
+  // Touch Drag State
+  private startY = 0;
+  private currentY = 0;
+  public transformY = 0;
+  public isDragging = false;
 
   constructor() {
     this.checkScreenSize();
@@ -62,6 +69,16 @@ export class TrackMenuComponent implements OnChanges {
   checkScreenSize() {
     this.isMobile = window.innerWidth <= 768;
     this.calculatePosition();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    if (this.isOpen) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.track-menu-container') && !target.closest('.icon-btn') && !target.closest('.track-options-btn')) {
+        this.close();
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -100,7 +117,53 @@ export class TrackMenuComponent implements OnChanges {
     if (event) {
       event.stopPropagation();
     }
+    this.isFullScreen = false;
+    this.transformY = 0;
     this.closeMenu.emit();
+  }
+
+  // Touch Event Handlers for Mobile Drag
+  onTouchStart(event: TouchEvent) {
+    if (!this.isMobile) return;
+    this.isDragging = true;
+    this.startY = event.touches[0].clientY;
+  }
+
+  onTouchMove(event: TouchEvent) {
+    if (!this.isDragging || !this.isMobile) return;
+    this.currentY = event.touches[0].clientY;
+    const deltaY = this.currentY - this.startY;
+    
+    if (this.isFullScreen) {
+      // If full screen, only allow dragging down
+      if (deltaY > 0) {
+        this.transformY = deltaY;
+      }
+    } else {
+      // If normal, allow dragging up (negative) or down (positive)
+      this.transformY = deltaY;
+    }
+  }
+
+  onTouchEnd(event: TouchEvent) {
+    if (!this.isDragging || !this.isMobile) return;
+    this.isDragging = false;
+    
+    if (this.isFullScreen) {
+      // Dragged down from full screen
+      if (this.transformY > 150) {
+        this.isFullScreen = false; // Snap back to normal
+      }
+    } else {
+      // Normal mode drag
+      if (this.transformY < -100) {
+        this.isFullScreen = true; // Dragged up to full screen
+      } else if (this.transformY > 150) {
+        this.close(); // Dragged down to close
+        return;
+      }
+    }
+    this.transformY = 0; // Reset transform
   }
 
   isLiked(): boolean {
