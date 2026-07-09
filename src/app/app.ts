@@ -873,15 +873,16 @@ export class App implements OnInit {
       });
 
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      const videoId = params.get('play');
+      const videoId = params.get('v') || params.get('play');
       if (videoId) {
         // Simple search by videoId or fetch details to play
         this.youtubeApi.searchMusic(videoId, 1).subscribe({
           next: (res) => {
             if (res && res.length > 0) {
-              this.playerService.playTrack(res[0]);
-              // Clear param from URL after playing
-              this.router.navigate([], { queryParams: { play: null }, queryParamsHandling: 'merge', replaceUrl: true });
+              // Only play if it's not already the current track to prevent loops
+              if (this.playerService.currentTrack()?.videoId !== videoId) {
+                this.playerService.playTrack(res[0]);
+              }
             }
           }
         });

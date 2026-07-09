@@ -8,6 +8,7 @@ export const routes: Routes = [
   { path: 'search', children: [] },
   { path: 'library', children: [] },
   { path: 'socials', children: [] },
+  { path: 'play', children: [] },
   { path: 'profile', children: [] },
   { path: 'language/:lang', children: [] },
   { path: 'artist/:name', children: [] },

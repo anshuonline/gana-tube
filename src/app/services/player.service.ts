@@ -1,4 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { Location } from '@angular/common';
 import { YouTubeSearchResult } from './youtube-api.service';
 import { AlgorithmService } from './algorithm.service';
 import { YoutubeApiService } from './youtube-api.service';
@@ -22,6 +23,7 @@ export class PlayerService {
   private trackStartTime: number = 0;
   private isFetchingMore = false;
   private isRemoteUpdate = false;
+  private location = inject(Location);
 
   constructor() {
     this.setupSocketListeners();
@@ -160,6 +162,7 @@ export class PlayerService {
       this.currentIndex.set(q.length);
     }
     this.playerState.set('loading');
+    this.location.replaceState('/play?v=' + track.videoId);
     this.loadInPlayer(track.videoId);
     this.fetchMoreTracksIfNeeded();
   }
@@ -192,6 +195,7 @@ export class PlayerService {
     this.isRemoteUpdate = false;
     
     if (tracks[startIndex]) {
+      this.location.replaceState('/play?v=' + tracks[startIndex].videoId);
       this.loadInPlayer(tracks[startIndex].videoId);
     }
     this.fetchMoreTracksIfNeeded();

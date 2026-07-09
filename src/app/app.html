@@ -199,22 +199,22 @@
           <style>
             .desktop-library-view {
               display: grid;
-              grid-template-columns: repeat(5, 1fr);
+              grid-template-columns: repeat(4, 1fr);
               gap: 20px;
               width: 100%;
               padding: 10px 0 40px;
             }
             @media (min-width: 1200px) {
-              .desktop-library-view { grid-template-columns: repeat(6, 1fr); }
+              .desktop-library-view { grid-template-columns: repeat(5, 1fr); }
             }
             @media (min-width: 1500px) {
-              .desktop-library-view { grid-template-columns: repeat(7, 1fr); }
+              .desktop-library-view { grid-template-columns: repeat(6, 1fr); }
             }
             @media (min-width: 1800px) {
-              .desktop-library-view { grid-template-columns: repeat(8, 1fr); }
+              .desktop-library-view { grid-template-columns: repeat(7, 1fr); }
             }
             @media (max-width: 1024px) {
-              .desktop-library-view { grid-template-columns: repeat(4, 1fr); }
+              .desktop-library-view { grid-template-columns: repeat(3, 1fr); }
             }
             @media (max-width: 768px) {
               .desktop-library-view { display: none !important; }
@@ -329,7 +329,8 @@
             }
             .desktop-lib-more {
               color: rgba(255,255,255,0.5);
-              padding: 6px;
+              width: 32px;
+              height: 32px;
               border-radius: 50%;
               transition: background 0.2s, color 0.2s;
               flex-shrink: 0;
