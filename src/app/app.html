@@ -199,8 +199,8 @@
           <style>
             .desktop-library-view {
               display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-              gap: 20px;
+              grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+              gap: 24px;
               width: 100%;
               padding: 10px 0 40px;
             }
@@ -212,43 +212,85 @@
             .desktop-lib-item {
               display: flex;
               flex-direction: column;
-              gap: 12px;
+              gap: 16px;
               cursor: pointer;
+              background: rgba(255, 255, 255, 0.02);
+              padding: 16px;
+              border-radius: 16px;
+              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+              border: 1px solid rgba(255,255,255,0.02);
+            }
+            .desktop-lib-item:hover {
+              background: rgba(255, 255, 255, 0.05);
+              transform: translateY(-4px);
+              box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+              border-color: rgba(255,255,255,0.1);
             }
             .desktop-lib-thumb {
               width: 100%;
-              aspect-ratio: 16 / 9;
+              aspect-ratio: 1 / 1;
               border-radius: 12px;
               position: relative;
               background: #222;
               overflow: hidden;
+              box-shadow: 0 8px 24px rgba(0,0,0,0.4);
             }
             .desktop-lib-thumb img {
               width: 100%;
               height: 100%;
               object-fit: cover;
-              transition: transform 0.3s ease;
+              transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             }
             .desktop-lib-item:hover .desktop-lib-thumb img {
-              transform: scale(1.05);
+              transform: scale(1.08);
             }
             .desktop-lib-count {
               position: absolute;
               bottom: 8px;
               right: 8px;
-              background: rgba(0,0,0,0.8);
+              background: rgba(0,0,0,0.75);
+              backdrop-filter: blur(8px);
               color: white;
-              padding: 4px 8px;
-              border-radius: 4px;
-              font-size: 0.85rem;
+              padding: 4px 10px;
+              border-radius: 20px;
+              font-size: 0.8rem;
               display: flex;
               align-items: center;
-              gap: 4px;
-              font-weight: 500;
+              gap: 6px;
+              font-weight: 600;
+            }
+            .desktop-lib-play-overlay {
+              position: absolute;
+              inset: 0;
+              background: rgba(0,0,0,0.4);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              opacity: 0;
+              transition: opacity 0.3s;
+            }
+            .desktop-lib-item:hover .desktop-lib-play-overlay {
+              opacity: 1;
+            }
+            .desktop-lib-play-btn {
+              width: 48px;
+              height: 48px;
+              background: #fff;
+              color: #000;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transform: translateY(10px);
+              transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+              box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            }
+            .desktop-lib-item:hover .desktop-lib-play-btn {
+              transform: translateY(0);
             }
             .desktop-lib-info-row {
               display: flex;
-              align-items: flex-start;
+              align-items: center;
               justify-content: space-between;
               gap: 12px;
             }
@@ -261,24 +303,27 @@
             .desktop-lib-title {
               color: #fff;
               font-size: 1.1rem;
-              font-weight: 600;
+              font-weight: 700;
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
             }
             .desktop-lib-sub {
-              color: rgba(255,255,255,0.6);
-              font-size: 0.9rem;
-              display: flex;
-              flex-direction: column;
-              gap: 2px;
+              color: rgba(255,255,255,0.5);
+              font-size: 0.85rem;
+              font-weight: 500;
             }
             .desktop-lib-more {
-              color: rgba(255,255,255,0.8);
-              padding: 4px;
+              color: rgba(255,255,255,0.5);
+              padding: 8px;
+              border-radius: 50%;
+              transition: background 0.2s, color 0.2s;
               flex-shrink: 0;
             }
-            
+            .desktop-lib-more:hover {
+              background: rgba(255,255,255,0.1);
+              color: #fff;
+            }
             /* Mobile styles */
             .mobile-library-view {
               display: none;
@@ -349,22 +394,23 @@
           <div class="desktop-lib-item" (click)="openLikedSongs()">
             <div class="desktop-lib-thumb">
               <img [src]="randomLikedThumbnail() || 'assets/default-playlist.jpg'" alt="Liked Music">
+              <div class="desktop-lib-play-overlay">
+                <div class="desktop-lib-play-btn">
+                  <svg lucidePlay [attr.size]="24" style="margin-left: 4px;"></svg>
+                </div>
+              </div>
               <div class="desktop-lib-count">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                {{ userService.likedSongs().length | number }} videos
+                <svg lucideListMusic [attr.size]="14"></svg>
+                {{ userService.likedSongs().length | number }}
               </div>
             </div>
             <div class="desktop-lib-info-row">
               <div class="desktop-lib-info">
                 <div class="desktop-lib-title">Liked videos</div>
-                <div class="desktop-lib-sub">
-                  <span>Private • Playlist</span>
-                  <span>Updated today</span>
-                  <span>View full playlist</span>
-                </div>
+                <div class="desktop-lib-sub">Private • Playlist</div>
               </div>
               <div class="desktop-lib-more" (click)="togglePlaylistMenu({name: 'Liked videos', tracks: userService.likedSongs()}, $event)">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                <svg lucideMoreVertical [attr.size]="20"></svg>
               </div>
             </div>
           </div>
@@ -373,22 +419,23 @@
           <div class="desktop-lib-item" (click)="openRecentlyPlayed()">
             <div class="desktop-lib-thumb">
               <img [src]="randomRecentThumbnail() || 'assets/default-playlist.jpg'" alt="Recently Played">
+              <div class="desktop-lib-play-overlay">
+                <div class="desktop-lib-play-btn">
+                  <svg lucidePlay [attr.size]="24" style="margin-left: 4px;"></svg>
+                </div>
+              </div>
               <div class="desktop-lib-count">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                {{ userService.recentPlays().length | number }} videos
+                <svg lucideListMusic [attr.size]="14"></svg>
+                {{ userService.recentPlays().length | number }}
               </div>
             </div>
             <div class="desktop-lib-info-row">
               <div class="desktop-lib-info">
                 <div class="desktop-lib-title">History</div>
-                <div class="desktop-lib-sub">
-                  <span>Private • History</span>
-                  <span>Updated today</span>
-                  <span>View full history</span>
-                </div>
+                <div class="desktop-lib-sub">Private • History</div>
               </div>
               <div class="desktop-lib-more" (click)="togglePlaylistMenu({name: 'History', tracks: userService.recentPlays()}, $event)">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                <svg lucideMoreVertical [attr.size]="20"></svg>
               </div>
             </div>
           </div>
@@ -397,21 +444,23 @@
           <div class="desktop-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="openCustomPlaylist(pl)">
             <div class="desktop-lib-thumb">
               <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
+              <div class="desktop-lib-play-overlay">
+                <div class="desktop-lib-play-btn">
+                  <svg lucidePlay [attr.size]="24" style="margin-left: 4px;"></svg>
+                </div>
+              </div>
               <div class="desktop-lib-count">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                {{ pl.tracks.length | number }} videos
+                <svg lucideListMusic [attr.size]="14"></svg>
+                {{ pl.tracks.length | number }}
               </div>
             </div>
             <div class="desktop-lib-info-row">
               <div class="desktop-lib-info">
                 <div class="desktop-lib-title">{{ pl.name }}</div>
-                <div class="desktop-lib-sub">
-                  <span>{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</span>
-                  <span>Click to play</span>
-                </div>
+                <div class="desktop-lib-sub">{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</div>
               </div>
               <div class="desktop-lib-more" (click)="togglePlaylistMenu(pl, $event)">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                <svg lucideMoreVertical [attr.size]="20"></svg>
               </div>
             </div>
           </div>
