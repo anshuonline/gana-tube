@@ -14,6 +14,10 @@
       <div class="cm-title">DRIVE MODE</div>
       <div style="width: 48px;"></div> <!-- Spacer to center title -->
     </div>
+    
+    <div class="cm-safe-drive-msg">
+      <span>Eyes on the road, let the music flow.</span>
+    </div>
 
     <div class="cm-content">
       
@@ -33,7 +37,9 @@
         </div>
 
         <div class="cm-track-info">
-          <h2 class="cm-track-title">{{ playerService.currentTrack()?.title || 'Not Playing' }}</h2>
+          <div class="cm-title-wrapper">
+            <h2 class="cm-track-title">{{ playerService.currentTrack()?.title || 'Not Playing' }}</h2>
+          </div>
           <p class="cm-track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</p>
         </div>
 

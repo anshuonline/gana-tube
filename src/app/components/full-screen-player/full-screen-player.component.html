@@ -137,7 +137,9 @@
       <!-- Track Info Row -->
       <div class="fs-track-info-row">
         <div class="fs-track-text">
-          <h2 class="fs-title" [title]="playerService.currentTrack()?.title">{{ playerService.currentTrack()?.title }}</h2>
+          <div class="fs-title-wrapper">
+            <h2 class="fs-title" [title]="playerService.currentTrack()?.title">{{ playerService.currentTrack()?.title }}</h2>
+          </div>
           <p class="fs-artist">{{ playerService.currentTrack()?.channelTitle }}</p>
         </div>
         <button class="fs-toggle-btn like-btn" [class.active]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">

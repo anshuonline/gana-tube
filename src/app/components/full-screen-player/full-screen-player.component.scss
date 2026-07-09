@@ -195,15 +195,26 @@
 .fs-track-text {
   flex: 1;
   overflow: hidden;
+  .fs-title-wrapper {
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    /* Gradient mask so the edges fade out nicely */
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  }
 
   .fs-title {
     font-size: 1.8rem;
     font-weight: 800;
     margin: 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     letter-spacing: -0.5px;
+    padding-right: 50px; /* Space before it repeats or bounces */
+    display: inline-block;
+    min-width: 100%;
+    animation: smoothMarquee 12s linear infinite;
   }
 
   .fs-artist {
