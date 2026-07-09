@@ -809,6 +809,12 @@ export class App implements OnInit {
     this.isFullScreenPlayerVisible.set(true);
     // Prevent background scrolling
     document.body.style.overflow = 'hidden';
+    
+    // Sync URL with the playing track when opening the full player
+    const currentTrack = this.playerService.currentTrack();
+    if (currentTrack) {
+      this.location.replaceState('/play?v=' + currentTrack.videoId);
+    }
   }
 
   closeFullScreenPlayer(): void {
