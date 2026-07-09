@@ -400,9 +400,14 @@ export class App implements OnInit {
 
   async saveUsername() {
     if (this.newUsername().trim()) {
-      const success = await this.authService.updateUsername(this.newUsername().trim());
+      const newName = this.newUsername().trim();
+      const success = await this.authService.updateUsername(newName);
       if (success) {
         this.isEditingUsername.set(false);
+        const email = this.authService.currentUser()?.email;
+        if (email) {
+          await this.userService.updateUsernameInDB(email, newName);
+        }
       } else {
         alert('Failed to update username. Please try again.');
       }

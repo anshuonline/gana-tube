@@ -90,6 +90,20 @@ export class UserService {
     }
   }
 
+  async updateUsernameInDB(email: string, displayName: string): Promise<boolean> {
+    if (!email) return false;
+    try {
+      const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}?action=updateUsername`, {
+        email: email,
+        display_name: displayName
+      }));
+      return response.status === 'success';
+    } catch (error) {
+      console.error('Failed to sync username to DB', error);
+      return false;
+    }
+  }
+
   // Helper to quickly toggle a liked song and sync
   async toggleLike(email: string, songObj: any, currentLangs: string[]) {
     if (!email || !songObj) return;
