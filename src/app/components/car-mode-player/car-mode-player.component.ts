@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
@@ -53,11 +53,23 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   searchResults: YouTubeSearchResult[] = [];
   isSearching = false;
   showSearchResults = false;
+  imageLoadError = false;
   
   private recognition: any;
 
+  constructor() {
+    effect(() => {
+      const track = this.playerService.currentTrack();
+      this.imageLoadError = false;
+    }, { allowSignalWrites: true });
+  }
+
   ngOnInit(): void {
     this.setupSpeechRecognition();
+  }
+
+  onImageError() {
+    this.imageLoadError = true;
   }
 
   ngOnDestroy(): void {
@@ -128,9 +140,20 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     this.showSearchResults = true;
     this.searchResults = [];
 
-    this.youtubeApi.searchMusic(query, 10).subscribe({
+    this.youtubeApi.searchMusic(query, 25).subscribe({
       next: (results) => {
-        this.searchResults = results;
+        // Filter out multiple versions of the same song
+        const unique = [];
+        const titles = new Set();
+        for (const r of results) {
+          // Normalize title to catch duplicates (e.g. removing "Official Video", "Lyrical")
+          let norm = r.title.toLowerCase().replace(/[\(\[].*?[\)\]]/g, '').trim();
+          if (!titles.has(norm)) {
+            titles.add(norm);
+            unique.push(r);
+          }
+        }
+        this.searchResults = unique.slice(0, 10);
         this.isSearching = false;
         this.cdr.detectChanges();
       },
@@ -182,6 +205,27 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     if (user && user.email) {
       await this.userService.toggleLike(user.email, targetTrack, this.userService.preferredLanguages());
     }
+  }
+
+  get progressPercent(): number {
+    const duration = this.playerService.duration();
+    if (!duration) return 0;
+    return Math.min(100, (this.playerService.currentTime() / duration) * 100);
+  }
+
+  formatTime(seconds: number): string {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  onSeek(event: MouseEvent) {
+    const track = event.currentTarget as HTMLElement;
+    const rect = track.getBoundingClientRect();
+    const ratio = (event.clientX - rect.left) / rect.width;
+    const seekTime = ratio * this.playerService.duration();
+    this.playerService.seekTo(Math.max(0, Math.min(seekTime, this.playerService.duration())));
   }
 
   close() {

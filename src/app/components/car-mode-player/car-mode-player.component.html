@@ -21,14 +21,29 @@
       <div class="cm-player-col">
         <div class="cm-artwork">
           <img 
+            *ngIf="!imageLoadError"
             [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'assets/default-playlist.jpg'" 
             [alt]="playerService.currentTrack()?.title"
+            (error)="onImageError()"
           />
+          <div *ngIf="imageLoadError" class="cm-artwork-fallback">
+            <span class="fallback-logo">GanaTube</span>
+            <span class="fallback-text">Cover Image Not Found</span>
+          </div>
         </div>
 
         <div class="cm-track-info">
           <h2 class="cm-track-title">{{ playerService.currentTrack()?.title || 'Not Playing' }}</h2>
           <p class="cm-track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</p>
+        </div>
+
+        <div class="cm-progress-section">
+          <span class="cm-time-label">{{ formatTime(playerService.currentTime()) }}</span>
+          <div class="cm-progress-track" (click)="onSeek($event)">
+            <div class="cm-progress-fill" [style.width.%]="progressPercent"></div>
+            <div class="cm-progress-thumb" [style.left.%]="progressPercent"></div>
+          </div>
+          <span class="cm-time-label">{{ formatTime(playerService.duration()) }}</span>
         </div>
 
         <div class="cm-main-controls">

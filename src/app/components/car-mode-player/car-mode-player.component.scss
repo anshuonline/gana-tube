@@ -97,27 +97,73 @@
 
 .cm-artwork {
   width: 100%;
-  max-width: 600px;
+  max-width: 320px;
   aspect-ratio: 1 / 1;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-  margin-bottom: 40px;
+  margin: 0 auto 30px auto;
+  position: relative;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
+
+  .cm-artwork-fallback {
+    width: 100%;
+    height: 100%;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0; left: 0;
+
+    .fallback-logo, .fallback-text {
+      position: absolute;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: center;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .fallback-logo {
+      font-size: 2rem;
+      color: #fff;
+      animation: fallbackCycleLogo 4s infinite;
+    }
+    
+    .fallback-text {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.7);
+      animation: fallbackCycleText 4s infinite;
+    }
+  }
+}
+
+@keyframes fallbackCycleLogo {
+  0%, 45% { opacity: 1; transform: scale(1); }
+  50%, 95% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fallbackCycleText {
+  0%, 45% { opacity: 0; transform: scale(0.9); }
+  50%, 95% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.9); }
 }
 
 .cm-track-info {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   width: 100%;
 
   .cm-track-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     margin: 0;
     white-space: nowrap;
@@ -126,9 +172,60 @@
   }
 
   .cm-track-artist {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: rgba(255, 255, 255, 0.6);
     margin: 8px 0 0 0;
+  }
+}
+
+.cm-progress-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px auto;
+
+  .cm-time-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-variant-numeric: tabular-nums;
+    min-width: 45px;
+  }
+
+  .cm-progress-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    &:hover .cm-progress-thumb {
+      transform: scale(1);
+    }
+  }
+
+  .cm-progress-fill {
+    height: 100%;
+    background: #fff;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  .cm-progress-thumb {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    margin-left: -8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    transform: scale(0);
+    transition: transform 0.2s;
+    pointer-events: none;
   }
 }
 
