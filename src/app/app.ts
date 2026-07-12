@@ -401,13 +401,20 @@ export class App implements OnInit {
   async saveUsername() {
     if (this.newUsername().trim()) {
       const newName = this.newUsername().trim();
+      const email = this.authService.currentUser()?.email;
+      
+      if (email) {
+        const dbResult = await this.userService.updateUsernameInDB(email, newName);
+        if (!dbResult.success) {
+          alert(dbResult.message || 'Username already taken or database error.');
+          return;
+        }
+      }
+
       const success = await this.authService.updateUsername(newName);
       if (success) {
         this.isEditingUsername.set(false);
-        const email = this.authService.currentUser()?.email;
-        if (email) {
-          await this.userService.updateUsernameInDB(email, newName);
-        }
+        this.userService.displayName.set(newName);
       } else {
         alert('Failed to update username. Please try again.');
       }
@@ -417,7 +424,7 @@ export class App implements OnInit {
   toggleEditUsername() {
     this.isEditingUsername.set(!this.isEditingUsername());
     if (this.isEditingUsername()) {
-      this.newUsername.set(this.authService.currentUser()?.displayName || '');
+      this.newUsername.set(this.userService.displayName() || this.authService.currentUser()?.displayName || '');
     }
   }
 

@@ -18,6 +18,7 @@ export class UserService {
   private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/user-api.php' : 'https://manageads.ganatube.in/user-api.php';
   
   // State for the logged-in user
+  displayName = signal<string | null>(null);
   preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
   likedSongs = signal<any[]>([]);
   recentPlays = signal<any[]>([]);
@@ -56,6 +57,9 @@ export class UserService {
       const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}?action=getProfile&email=${encodeURIComponent(email)}`));
       
       if (response.status === 'success') {
+        if (response.display_name !== undefined) {
+          this.displayName.set(response.display_name);
+        }
         if (response.liked_songs) {
           this.likedSongs.set(response.liked_songs);
         }
@@ -90,17 +94,17 @@ export class UserService {
     }
   }
 
-  async updateUsernameInDB(email: string, displayName: string): Promise<boolean> {
-    if (!email) return false;
+  async updateUsernameInDB(email: string, displayName: string): Promise<{ success: boolean; message?: string }> {
+    if (!email) return { success: false, message: 'Email missing' };
     try {
       const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}?action=updateUsername`, {
         email: email,
         display_name: displayName
       }));
-      return response.status === 'success';
+      return { success: response.status === 'success', message: response.message };
     } catch (error) {
       console.error('Failed to sync username to DB', error);
-      return false;
+      return { success: false, message: 'Server error occurred' };
     }
   }
 
