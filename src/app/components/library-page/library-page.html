@@ -19,7 +19,7 @@
       <!-- Liked Music -->
       <div class="desktop-lib-item" (click)="openLikedSongs()">
         <div class="desktop-lib-thumb">
-          <img [src]="randomLikedThumbnail() || 'assets/default-playlist.jpg'" alt="Liked Music">
+          <img [src]="randomLikedThumbnail() || 'https://ui-avatars.com/api/?name=Liked+Music&background=a78bfa&color=fff&size=400'" alt="Liked Music">
           <div class="desktop-lib-play-overlay">
             <div class="desktop-lib-play-btn">
               <svg lucidePlay [attr.size]="28" style="margin-left: 4px;"></svg>
@@ -44,7 +44,7 @@
       <!-- History -->
       <div class="desktop-lib-item" (click)="openRecentlyPlayed()">
         <div class="desktop-lib-thumb">
-          <img [src]="randomRecentThumbnail() || 'assets/default-playlist.jpg'" alt="Recently Played">
+          <img [src]="randomRecentThumbnail() || 'https://ui-avatars.com/api/?name=History&background=60a5fa&color=fff&size=400'" alt="Recently Played">
           <div class="desktop-lib-play-overlay">
             <div class="desktop-lib-play-btn">
               <svg lucidePlay [attr.size]="28" style="margin-left: 4px;"></svg>
@@ -69,7 +69,7 @@
       <!-- Custom Playlists -->
       <div class="desktop-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="openCustomPlaylist(pl)">
         <div class="desktop-lib-thumb">
-          <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
+          <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'https://ui-avatars.com/api/?name=' + pl.name + '&background=random&color=fff&size=400'" [alt]="pl.name">
           <div class="desktop-lib-play-overlay">
             <div class="desktop-lib-play-btn">
               <svg lucidePlay [attr.size]="28" style="margin-left: 4px;"></svg>
@@ -101,7 +101,7 @@
       <!-- Liked Music -->
       <div class="mobile-lib-item" (click)="openLikedSongs()">
         <div class="mobile-lib-thumb">
-          <img [src]="randomLikedThumbnail() || 'assets/default-playlist.jpg'" alt="Liked Music">
+          <img [src]="randomLikedThumbnail() || 'https://ui-avatars.com/api/?name=Liked+Music&background=a78bfa&color=fff&size=400'" alt="Liked Music">
           <div class="mobile-lib-count">
             <svg lucideHeart [attr.size]="12"></svg>
             {{ userService.likedSongs().length | number }}
@@ -119,7 +119,7 @@
       <!-- History -->
       <div class="mobile-lib-item" (click)="openRecentlyPlayed()">
         <div class="mobile-lib-thumb">
-          <img [src]="randomRecentThumbnail() || 'assets/default-playlist.jpg'" alt="Recently Played">
+          <img [src]="randomRecentThumbnail() || 'https://ui-avatars.com/api/?name=History&background=60a5fa&color=fff&size=400'" alt="Recently Played">
           <div class="mobile-lib-count">
             <svg lucideListMusic [attr.size]="12"></svg>
             {{ userService.recentPlays().length | number }}
@@ -137,7 +137,7 @@
       <!-- Custom Playlists -->
       <div class="mobile-lib-item" *ngFor="let pl of userService.customPlaylists()" (click)="openCustomPlaylist(pl)">
         <div class="mobile-lib-thumb">
-          <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'assets/default-playlist.jpg'" [alt]="pl.name">
+          <img [src]="pl.tracks.length > 0 ? (pl.tracks[0].thumbnailHigh || pl.tracks[0].thumbnail) : 'https://ui-avatars.com/api/?name=' + pl.name + '&background=random&color=fff&size=400'" [alt]="pl.name">
           <div class="mobile-lib-count">
             <svg lucideListMusic [attr.size]="12"></svg>
             {{ pl.tracks.length | number }}
