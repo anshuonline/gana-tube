@@ -969,6 +969,7 @@ export class App implements OnInit {
   loadInitialShelves(language?: string): void {
     const lang = language || this.homeScreenLanguage();
     this.shelvesLoading.set(true);
+    this.shelfLoading.set(false);
     this.loadedShelves.set([]);
 
     // Fetch algorithmic dynamic shelves
@@ -1118,7 +1119,9 @@ export class App implements OnInit {
 
     forkJoin(observables).subscribe({
       next: (results: any[]) => {
-        if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
+        if (language && language !== this.homeScreenLanguage()) {
+           return; // Ignore stale callback
+        }
         const newShelves: any[] = [];
         results.forEach((songs: any, index: number) => {
           if (songs && songs.length > 0) {
