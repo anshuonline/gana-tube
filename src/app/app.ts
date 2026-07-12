@@ -1450,7 +1450,9 @@ export class App implements OnInit {
       preloadedSongs: pl.tracks,
       searchQueries: [],
       creator: this.authService.currentUser()?.displayName || username,
-      is_public: pl.is_public
+      is_public: pl.is_public,
+      is_owner: pl.is_owner !== undefined ? pl.is_owner : true,
+      is_saved: pl.is_saved
     };
     
     this.selectedPlaylist.set(playlistMeta);
@@ -1477,8 +1479,9 @@ export class App implements OnInit {
                      (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg'),
           preloadedSongs: pl.songs || [],
           searchQueries: [],
-          creator: (email && pl.owner === email.split('@')[0]) ? (this.authService.currentUser()?.displayName || pl.owner) : pl.owner,
-          is_public: pl.is_public
+          creator: (email && pl.owner_email === email) ? (this.authService.currentUser()?.displayName || pl.owner) : pl.owner,
+          is_public: pl.is_public,
+          is_owner: (email && pl.owner_email === email) ? true : false
         };
         
         this.selectedPlaylist.set(playlistMeta);
