@@ -1,7 +1,7 @@
 # GanaTube Project Rules
 
 - **Git Commits & Pushes**: Do not automatically commit or push code to the Git repository. ONLY run `git push` or `git commit` when the user explicitly instructs you to do so.
-- **Frontend Builds**: Whenever you make changes to Angular frontend files (HTML/TS/SCSS/routing), ALWAYS remember to run `npm run build:local` and include the updated `dist/` folder in the next commit, so the live server gets the updated build when deployed.
+- **CRITICAL: Frontend Builds & Pushing**: Whenever you make changes to Angular frontend files (HTML/TS/SCSS/routing), you MUST ALWAYS run `npm run build:local`. **BEFORE committing, you MUST explicitly run `git add dist/` (or `git add dist/ganatube`) along with your source files.** If you forget to add the `dist/` folder to your commit, the live server will NOT get the updated build and the user will see old UI. THIS IS A ZERO-TOLERANCE RULE.
 - **Repositories**: This project spans across two primary GitHub repositories:
   1. **GanaTube (Frontend)**: Located at `f:\APPS\ganatube`. Contains the Angular frontend codebase.
   2. **ManageAds (Backend/API)**: Located at `C:\xampp\htdocs\manageads`. Contains the PHP backend APIs (like `playlist-api.php`).
@@ -11,3 +11,4 @@
 -   * * C o l o r   S c h e m e * * :   W e b s i t e   k a   c o l o r   s c h e m e   m a i n t a i n   k a r n a   h a i :   w h i t e   t e x t   o n   A M O L E D   b l a c k   b a c k g r o u n d   ( # 0 0 0 0 0 0 ) .  
  -   * * C o l o r   P a l e t t e * * :   W e b s i t e   k a   c o l o r   p a l e t t e   m a i n l y   A M O L E D   b l a c k   b g   ( # 0 0 0 0 0 0 )   a u r   w h i t e   i c o n s / t e x t   h o n a   c h a h i y e .   B a k i   k o i   d u s r a   c o l o r   u s e   n a h i   k a r n a   h a i ,   s i r f   D e l e t e   b u t t o n   r e d   h o g a .   A g a r   u s e r   e x p l i c i t l y   k i s i   a u r   j a g a h   k o i   s p e c i f i c   c o l o r   u s e   k a r n e   b o l e ,   t a b h i   d u s r a   c o l o r   u s e   k a r n a   h a i .  
 - **Component Styling**: Alag-alag components ke liye alag-alag `.scss` files banni chahiye. `app.scss` mein saare components ka CSS/code nahi likhna hai, make it strictly mandatory to encapsulate styles.
+- **NEVER FORGET TO PUSH**: Hamesha yaad rakhein ki code change karne ke baad usko turant dono repositories (`manageads` aur `gana-tube`) par `git push` karna hai baato mein lag kar bhul nahi jana hai.
