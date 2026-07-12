@@ -505,6 +505,17 @@ export class App implements OnInit {
             }
             this.algorithmService.syncFromBackend(profile.liked_songs, profile.listening_preferences);
             
+            // Sync Firebase displayName to DB if it's missing in DB
+            if (!this.userService.displayName() && user.displayName) {
+              // Ensure we don't exceed the 20 chars limit for DB
+              const cleanName = user.displayName.substring(0, 20);
+              this.userService.updateUsernameInDB(user.email as string, cleanName).then(res => {
+                if (res.success) {
+                  this.userService.displayName.set(cleanName);
+                }
+              });
+            }
+            
             // If user refreshed on liked-songs or recently-played page, re-open now that profile is loaded
             if (this.router.url.includes('/playlist/liked-songs')) {
               this.openLikedSongs();
