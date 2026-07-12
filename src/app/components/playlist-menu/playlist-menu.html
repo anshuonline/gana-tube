@@ -22,7 +22,7 @@
         <span>Shuffle play</span>
       </li>
 
-      <li (click)="editPlaylist($event)">
+      <li (click)="editPlaylist($event)" *ngIf="!playlist?.is_saved">
         <svg lucideEdit [attr.size]="20"></svg>
         <span>Edit playlist</span>
       </li>
@@ -37,13 +37,13 @@
         <span>Add to queue</span>
       </li>
 
-      <li class="menu-item" (click)="saveToPlaylist($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history'">
+      <li class="menu-item" (click)="saveToPlaylist($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history' && !playlist?.is_saved">
         <svg lucideFolderPlus [attr.size]="20"></svg>
         <span>Save to playlist</span>
       </li>
 
       <!-- Visibility Toggle -->
-      <li class="menu-item" (click)="toggleVisibility($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history'">
+      <li class="menu-item" (click)="toggleVisibility($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history' && !playlist?.is_saved">
         <svg *ngIf="playlist?.is_public" lucideGlobe [attr.size]="20"></svg>
         <svg *ngIf="!playlist?.is_public" lucideLock [attr.size]="20"></svg>
         <span>Make {{ playlist?.is_public ? 'Private' : 'Public' }}</span>
@@ -57,8 +57,9 @@
 
       <!-- Delete option -->
       <li class="menu-item" (click)="deletePlaylist($event)" *ngIf="playlist?.playlist_id && playlist?.playlist_id !== 'liked-songs' && playlist?.playlist_id !== 'history'" style="color: #f44336;">
-        <svg lucideTrash2 [attr.size]="20"></svg>
-        <span>Delete playlist</span>
+        <svg *ngIf="playlist?.is_saved" lucideTrash2 [attr.size]="20"></svg>
+        <svg *ngIf="!playlist?.is_saved" lucideTrash2 [attr.size]="20"></svg>
+        <span>{{ playlist?.is_saved ? 'Remove from library' : 'Delete playlist' }}</span>
       </li>
       
     </ul>

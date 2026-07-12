@@ -247,15 +247,24 @@ export class PlaylistMenuComponent implements OnChanges {
       const email = this.authService.currentUser()?.email;
       if (email) {
         try {
-          const url = this.userService['apiUrl'].replace('user-api.php', 'playlist-api.php');
-          await fetch(`${url}?action=deletePlaylist`, {
-            method: 'POST',
-            body: JSON.stringify({ email, playlist_id: this.playlist.playlist_id })
-          });
-          this.userService.loadPlaylists(email);
-          this.toastService.success("Playlist deleted successfully");
+          if (this.playlist.is_saved) {
+            const success = await this.userService.unsavePlaylist(email, this.playlist.playlist_id);
+            if (success) {
+              this.toastService.success("Playlist removed from library");
+            } else {
+              this.toastService.error("Failed to remove playlist");
+            }
+          } else {
+            const url = this.userService['apiUrl'].replace('user-api.php', 'playlist-api.php');
+            await fetch(`${url}?action=deletePlaylist`, {
+              method: 'POST',
+              body: JSON.stringify({ email, playlist_id: this.playlist.playlist_id })
+            });
+            this.userService.loadPlaylists(email);
+            this.toastService.success("Playlist deleted successfully");
+          }
         } catch(e) {
-          this.toastService.error("Failed to delete playlist");
+          this.toastService.error(this.playlist.is_saved ? "Failed to remove playlist" : "Failed to delete playlist");
         }
       }
     }
