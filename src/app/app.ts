@@ -400,7 +400,11 @@ export class App implements OnInit {
 
   async saveUsername() {
     if (this.newUsername().trim()) {
-      const newName = this.newUsername().trim();
+      let newName = this.newUsername().trim();
+      if (newName.length > 20) {
+        alert('Username cannot exceed 20 characters.');
+        return;
+      }
       const email = this.authService.currentUser()?.email;
       
       if (email) {
