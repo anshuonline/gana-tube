@@ -43,12 +43,46 @@ export class UserService {
           playlist_id: p.playlist_id,
           name: p.playlist_name,
           is_public: p.is_public,
+          is_owner: p.is_owner !== undefined ? p.is_owner : true,
+          is_saved: p.is_owner === false,
           tracks: p.songs || []
         }));
         this.customPlaylists.set(mappedPlaylists);
       }
     } catch (e) {
       console.error('Failed to load playlists from database', e);
+    }
+  }
+
+  async savePlaylist(email: string, playlistId: string): Promise<boolean> {
+    if (!email || !playlistId) return false;
+    try {
+      const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
+      const response: any = await firstValueFrom(this.http.post(`${url}?action=savePlaylist`, { email, playlist_id: playlistId }));
+      if (response.status === 'success') {
+        this.loadPlaylists(email); // Refresh playlists
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error('Failed to save playlist', e);
+      return false;
+    }
+  }
+
+  async unsavePlaylist(email: string, playlistId: string): Promise<boolean> {
+    if (!email || !playlistId) return false;
+    try {
+      const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
+      const response: any = await firstValueFrom(this.http.post(`${url}?action=unsavePlaylist`, { email, playlist_id: playlistId }));
+      if (response.status === 'success') {
+        this.loadPlaylists(email); // Refresh playlists
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error('Failed to unsave playlist', e);
+      return false;
     }
   }
 

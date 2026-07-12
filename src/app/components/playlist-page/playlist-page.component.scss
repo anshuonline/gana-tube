@@ -154,7 +154,7 @@
     }
   }
   
-  .play-all-btn, .share-btn {
+  .play-all-btn, .share-btn, .save-playlist-btn {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -165,7 +165,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s, background 0.3s;
+    transition: transform 0.2s, background 0.3s, color 0.3s;
     
     &:disabled {
       opacity: 0.5;
@@ -189,6 +189,19 @@
     }
     &.copied {
       background: #10b981;
+      color: white;
+      transform: scale(1.05);
+    }
+  }
+
+  .save-playlist-btn {
+    background: rgba(255, 255, 255, 0.1);
+    &:hover:not(:disabled) {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    &.saved {
+      background: #a78bfa;
       color: white;
       transform: scale(1.05);
     }

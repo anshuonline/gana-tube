@@ -6,12 +6,15 @@ import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { PlaylistMeta } from '../../data/playlists.data';
 import { SponsoredAd } from '../../app';
-import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart } from '@lucide/angular';
+import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus } from '@lucide/angular';
+
+import { ToastService } from '../../services/toast.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart],
+  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -28,6 +31,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
   private youtubeApi = inject(YoutubeApiService);
   public playerService = inject(PlayerService);
   private userService = inject(UserService);
+  public authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
   constructor() {}
 
@@ -135,5 +140,39 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
       console.error('Could not copy text: ', err);
       prompt('Copy this link:', url);
     });
+  }
+
+  isSaved(): boolean {
+    if (!this.playlist || this.playlist.is_owner === true) return false;
+    const userPlaylists = this.userService.customPlaylists();
+    return userPlaylists.some(p => p.playlist_id === this.playlist.id && p.is_saved);
+  }
+
+  async toggleSavePlaylist(): Promise<void> {
+    const user = this.authService.currentUser();
+    if (!user || !user.email) {
+      this.toastService.show('Please log in to save playlists', 'error');
+      return;
+    }
+    
+    if (this.playlist.is_owner === true) {
+      return;
+    }
+
+    if (this.isSaved()) {
+      const success = await this.userService.unsavePlaylist(user.email, this.playlist.id);
+      if (success) {
+        this.toastService.show('Playlist removed from your library', 'success');
+      } else {
+        this.toastService.show('Failed to remove playlist', 'error');
+      }
+    } else {
+      const success = await this.userService.savePlaylist(user.email, this.playlist.id);
+      if (success) {
+        this.toastService.show('Playlist saved to your library', 'success');
+      } else {
+        this.toastService.show('Failed to save playlist', 'error');
+      }
+    }
   }
 }

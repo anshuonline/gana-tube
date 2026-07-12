@@ -59,6 +59,10 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
     return playlist.tracks.some((t: any) => t.videoId === this.track.videoId);
   }
 
+  getOwnedPlaylists(): any[] {
+    return this.userService.customPlaylists().filter(p => !p.is_saved);
+  }
+
   async toggleLikeTrack() {
     const user = this.authService.currentUser();
     if (user && user.email && this.track) {

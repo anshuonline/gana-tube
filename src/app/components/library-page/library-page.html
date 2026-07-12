@@ -83,7 +83,11 @@
         <div class="desktop-lib-info-row">
           <div class="desktop-lib-info">
             <div class="desktop-lib-title">{{ pl.name }}</div>
-            <div class="desktop-lib-sub">{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</div>
+            <div class="desktop-lib-sub">
+              <span *ngIf="pl.is_saved" style="color: #a78bfa; font-weight: 600;">Saved</span>
+              <span *ngIf="pl.is_saved"> • </span>
+              {{ pl.is_public ? 'Public' : 'Private' }} • Playlist
+            </div>
           </div>
           <div class="desktop-lib-more" (click)="togglePlaylistMenu(pl, $event)">
             <svg lucideMoreVertical [attr.size]="20"></svg>
@@ -141,7 +145,11 @@
         </div>
         <div class="mobile-lib-info">
           <div class="mobile-lib-title">{{ pl.name }}</div>
-          <div class="mobile-lib-sub">{{ pl.is_public ? 'Public' : 'Private' }} • Playlist</div>
+          <div class="mobile-lib-sub">
+            <span *ngIf="pl.is_saved" style="color: #a78bfa; font-weight: 600;">Saved</span>
+            <span *ngIf="pl.is_saved"> • </span>
+            {{ pl.is_public ? 'Public' : 'Private' }} • Playlist
+          </div>
         </div>
         <div class="mobile-lib-more" (click)="togglePlaylistMenu(pl, $event)">
           <svg lucideMoreVertical [attr.size]="20"></svg>

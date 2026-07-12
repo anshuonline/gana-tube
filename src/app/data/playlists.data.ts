@@ -8,6 +8,8 @@ export interface PlaylistMeta {
   preloadedSongs?: any[];
   creator?: string;
   is_public?: boolean;
+  is_owner?: boolean;
+  is_saved?: boolean;
 }
 
 export const PLAYLISTS: PlaylistMeta[] = [

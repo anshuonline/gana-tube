@@ -23,6 +23,15 @@
         <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
           <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
         </button>
+        
+        <ng-container *ngIf="playlist.id !== 'liked-songs' && playlist.creator && playlist.is_owner === false">
+          <button class="save-playlist-btn" (click)="toggleSavePlaylist()" [class.saved]="isSaved()">
+            <svg lucideFolderPlus [attr.size]="20" *ngIf="!isSaved()"></svg>
+            <svg lucideCheck [attr.size]="20" *ngIf="isSaved()"></svg>
+            {{ isSaved() ? 'Saved' : 'Save Playlist' }}
+          </button>
+        </ng-container>
+
         <button *ngIf="playlist.id !== 'liked-songs'" class="share-btn" (click)="sharePlaylist()" [class.copied]="isCopied()">
           <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="20"></svg>
           <svg *ngIf="isCopied()" lucideCheck [attr.size]="20"></svg>
