@@ -5,7 +5,13 @@
       Your Library
     </h1>
     
-    <div *ngIf="!authService.currentUser()" style="text-align: center; padding: 60px 0; background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+    <!-- Loading State -->
+    <div *ngIf="authService.currentUser() === undefined" style="text-align: center; padding: 60px 0;">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Logged Out State -->
+    <div *ngIf="authService.currentUser() === null" style="text-align: center; padding: 60px 0; background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
       <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; font-size: 1.1rem;">Please log in to view your personalized library.</p>
       <button class="action-btn" (click)="login()" style="display: inline-flex; background: linear-gradient(135deg, #a855f7, #6366f1); color: white; padding: 14px 32px; border-radius: 30px; font-weight: 700; font-size: 1.1rem; cursor: pointer; border: none; box-shadow: 0 10px 20px rgba(168, 85, 247, 0.4); transition: transform 0.2s;">
         Log In

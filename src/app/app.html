@@ -106,8 +106,17 @@
         <div class="profile-card user-card modern-user-card">
           <div class="banner-bg"></div>
           <div class="user-content" style="position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <!-- Loading State -->
+            <ng-container *ngIf="authService.currentUser() === undefined">
+              <div class="avatar-wrapper">
+                <div class="avatar-placeholder" style="animation: pulse 1.5s infinite;"></div>
+              </div>
+              <h2 style="width: 120px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 8px; animation: pulse 1.5s infinite;"></h2>
+              <span class="account-type" style="width: 80px; height: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; animation: pulse 1.5s infinite;"></span>
+            </ng-container>
+
             <!-- Logged Out State -->
-            <ng-container *ngIf="!authService.currentUser()">
+            <ng-container *ngIf="authService.currentUser() === null">
               <div class="avatar-wrapper">
                 <div class="avatar-placeholder">
                   <svg lucideUser [attr.size]="48"></svg>
