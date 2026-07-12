@@ -261,6 +261,7 @@ export class App implements OnInit {
   preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
   
   isEditingUsername = signal<boolean>(false);
+  isSavingUsername = signal<boolean>(false);
   newUsername = signal<string>('');
   currentAmbientBg = signal<string>('');
   
@@ -402,15 +403,18 @@ export class App implements OnInit {
     if (this.newUsername().trim()) {
       let newName = this.newUsername().trim();
       if (newName.length > 20) {
-        alert('Username cannot exceed 20 characters.');
+        this.toastService.error('Username cannot exceed 20 characters.');
         return;
       }
       const email = this.authService.currentUser()?.email;
       
+      this.isSavingUsername.set(true);
+
       if (email) {
         const dbResult = await this.userService.updateUsernameInDB(email, newName);
         if (!dbResult.success) {
-          alert(dbResult.message || 'Username already taken or database error.');
+          this.toastService.error(dbResult.message || 'Username already taken or database error.');
+          this.isSavingUsername.set(false);
           return;
         }
       }
@@ -419,9 +423,12 @@ export class App implements OnInit {
       if (success) {
         this.isEditingUsername.set(false);
         this.userService.displayName.set(newName);
+        this.toastService.success('Username saved successfully!');
       } else {
-        alert('Failed to update username. Please try again.');
+        this.toastService.error('Failed to update username. Please try again.');
       }
+      
+      this.isSavingUsername.set(false);
     }
   }
 
@@ -432,6 +439,10 @@ export class App implements OnInit {
     }
   }
 
+  getDisplayUsername(): string {
+    const name = this.userService.displayName() || this.authService.currentUser()?.displayName || 'User';
+    return name.length > 20 ? name.substring(0, 20) + '...' : name;
+  }
 
   togglePreferredLanguage(lang: string): void {
     const current = this.preferredLanguages();

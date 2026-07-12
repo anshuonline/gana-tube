@@ -124,15 +124,17 @@
                 <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" />
               </div>
               <div *ngIf="!isEditingUsername()" style="display: flex; align-items: center; justify-content: center; gap: 8px; max-width: 100%;">
-                <h2 style="word-break: break-all; text-align: center; max-width: 80%;">{{ userService.displayName() || authService.currentUser()?.displayName || 'User' }}</h2>
+                <h2 style="word-break: break-all; text-align: center; max-width: 80%;">{{ getDisplayUsername() }}</h2>
                 <button (click)="toggleEditUsername()" style="background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; padding: 4px;" title="Edit Username">
                   <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 </button>
               </div>
               <div *ngIf="isEditingUsername()" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <input type="text" maxlength="20" [value]="newUsername()" (input)="newUsername.set($any($event.target).value)" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; outline: none; max-width: 150px; text-align: center;">
-                <button (click)="saveUsername()" style="background: var(--color-primary); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 8px; font-weight: bold;">Save</button>
-                <button (click)="toggleEditUsername()" style="background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 8px;">Cancel</button>
+                <input type="text" maxlength="20" [value]="newUsername()" (input)="newUsername.set($any($event.target).value)" [disabled]="isSavingUsername()" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; outline: none; max-width: 150px; text-align: center;">
+                <button (click)="saveUsername()" [disabled]="isSavingUsername()" style="background: var(--color-primary); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 8px; font-weight: bold; opacity: {{ isSavingUsername() ? 0.7 : 1 }};">
+                  {{ isSavingUsername() ? 'Saving...' : 'Save' }}
+                </button>
+                <button (click)="toggleEditUsername()" [disabled]="isSavingUsername()" style="background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 8px; opacity: {{ isSavingUsername() ? 0.7 : 1 }};">Cancel</button>
               </div>
               <span class="account-type">{{ authService.currentUser()?.email }}</span>
               <button class="login-action-btn logout-btn" (click)="logout()" style="opacity: 1; pointer-events: auto; cursor: pointer;">Logout</button>
