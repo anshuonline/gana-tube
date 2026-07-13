@@ -34,19 +34,20 @@
 }
 
 .top-result-card {
-  background: rgba(20, 20, 20, 0.6);
+  background: linear-gradient(145deg, rgba(30, 30, 30, 0.8), rgba(15, 15, 15, 0.9));
   border-radius: 16px;
-  padding: 20px;
+  padding: 32px 24px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  height: calc(100% - 50px); /* Fill the flex container */
 
   &:hover {
-    background: rgba(30, 30, 30, 0.8);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(20, 20, 20, 1));
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6);
 
     .play-overlay svg {
       opacity: 1;
@@ -55,19 +56,19 @@
   }
 
   &.active {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(40, 40, 40, 0.9);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.95), rgba(25, 25, 25, 1));
   }
 }
 
 .top-thumbnail-wrapper {
-  width: 100px;
-  height: 100px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   position: relative;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.6);
 
   img {
     width: 100%;
@@ -96,15 +97,16 @@
 
 .top-info {
   .top-title {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 800;
     color: #fff;
-    margin: 0 0 8px;
+    margin: 0 0 12px;
     line-height: 1.2;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    letter-spacing: -0.5px;
   }
 
   .top-meta {
@@ -176,13 +178,14 @@
 }
 
 .item-thumbnail {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
   margin-right: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 
   img {
     width: 100%;
@@ -214,13 +217,14 @@
   justify-content: center;
 
   .item-title {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: #fff;
-    margin: 0 0 4px;
-    font-weight: 500;
+    margin: 0 0 6px;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: -0.2px;
   }
 
   .item-artist {

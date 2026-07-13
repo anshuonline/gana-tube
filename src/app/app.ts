@@ -699,6 +699,16 @@ export class App implements OnInit {
         
         if (url === 'search') {
           this.isSearchMode.set(true);
+          const urlObj = new URL('http://localhost' + event.urlAfterRedirects);
+          const q = urlObj.searchParams.get('q');
+          if (q) {
+             if (this.currentQuery !== q || !this.hasSearched()) {
+                this.executeSearchApi(q);
+             }
+             if (this.searchBar && this.searchBar.query !== q) {
+                this.searchBar.query = q;
+             }
+          }
         } else {
           this.isSearchMode.set(false);
         }
@@ -845,9 +855,9 @@ export class App implements OnInit {
   setSearchFilter(filter: 'all' | 'songs' | 'albums' | 'playlists'): void {
     this.searchFilter.set(filter);
     if (this.currentQuery) {
-      this.performSearch(this.currentQuery);
+      this.executeSearchApi(this.currentQuery);
     } else if (filter === 'playlists') {
-      this.performSearch('');
+      this.executeSearchApi('');
     }
   }
 
@@ -1210,8 +1220,6 @@ export class App implements OnInit {
 
   onSuggestSearch(query: string): void {
     if (!query) return;
-    this.hasSearched.set(true);
-    this.currentQuery = query;
     this.performSearch(query);
     
     // Sync listening preference to backend if logged in
@@ -1302,6 +1310,11 @@ export class App implements OnInit {
   }
 
   performSearch(query: string): void {
+    if (!query) return;
+    this.router.navigate(['/search'], { queryParams: { q: query } });
+  }
+
+  executeSearchApi(query: string): void {
     this.currentQuery = query;
     this.lazyLoadPage = 0;
     this.isLoading.set(true);
