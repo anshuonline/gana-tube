@@ -140,7 +140,44 @@
   .playlist-meta {
     font-size: 1.1rem;
     color: rgba(255, 255, 255, 0.7);
-    margin: 0 0 16px 0;
+    margin: 0;
+  }
+  
+  .playlist-stats {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+    width: fit-content;
+
+    @media (max-width: 768px) {
+      margin: 12px auto 24px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      font-size: 0.95rem;
+
+      svg {
+        color: #ffffff;
+      }
+    }
+
+    .stat-divider {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+    }
   }
   
   .playlist-actions {
