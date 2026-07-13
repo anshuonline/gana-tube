@@ -23,7 +23,7 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
   toastService = inject(ToastService);
 
   newPlaylistName = signal<string>('');
-  newPlaylistIsPublic = signal<boolean>(false);
+  newPlaylistIsPublic = signal<boolean>(true);
   isMobile = false;
   isCreating = signal<boolean>(false);
   

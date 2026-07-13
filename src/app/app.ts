@@ -18,6 +18,7 @@ import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
+import { AppStateService } from './services/app-state.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
@@ -492,8 +493,17 @@ export class App implements OnInit {
     private meta: Meta,
     private title: Title,
     public authService: AuthService,
-    public userService: UserService
+    public userService: UserService,
+    private appState: AppStateService
   ) {
+    effect(() => {
+      const trackToSave = this.appState.savePlaylistTrack();
+      if (trackToSave) {
+        this.openSaveToPlaylist(trackToSave);
+        this.appState.savePlaylistTrack.set(null); // Reset after opening
+      }
+    }, { allowSignalWrites: true });
+
     effect(() => {
       const user = this.authService.currentUser();
       if (user && user.email) {

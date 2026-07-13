@@ -12,4 +12,10 @@ export class AppStateService {
   openListenTogether() {
     this.isListenTogetherVisible.set(true);
   }
+
+  savePlaylistTrack = signal<any | null>(null);
+
+  openSavePlaylist(track: any) {
+    this.savePlaylistTrack.set(track);
+  }
 }

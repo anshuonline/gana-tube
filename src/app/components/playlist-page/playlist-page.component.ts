@@ -12,6 +12,7 @@ import { TrackMenuComponent } from '../track-menu/track-menu.component';
 
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
+import { AppStateService } from '../../services/app-state.service';
 
 @Component({
   selector: 'app-playlist-page',
@@ -35,11 +36,16 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
   private userService = inject(UserService);
   public authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private appState = inject(AppStateService);
 
   isMenuOpen = false;
   menuX = 0;
   menuY = 0;
   activeMenuTrack: any = null;
+
+  openSaveModal(track: any) {
+    this.appState.openSavePlaylist(track);
+  }
 
   constructor() {}
 
@@ -234,10 +240,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
       } else {
         this.toastService.show('Failed to save playlist', 'error');
       }
-      }
     }
   }
-
   openTrackMenu(track: YouTubeSearchResult, event: MouseEvent): void {
     event.stopPropagation();
     this.activeMenuTrack = track;

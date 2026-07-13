@@ -65,8 +65,7 @@
       <p>No songs found for this playlist.</p>
     </div>
 
-    <div *ngIf="!isLoading() && songs().length > 0" class="songs-list" 
-         cdkDropList (cdkDropListDropped)="onDrop($event)">
+    <div *ngIf="!isLoading() && songs().length > 0" class="songs-list-container">
       <div class="song-header-row">
         <div class="col-index">#</div>
         <div class="col-title">Title</div>
@@ -74,7 +73,9 @@
         <div class="col-time">Published</div>
         <div class="col-actions"></div>
       </div>
-      <ng-container *ngFor="let song of songs(); let i = index">
+      
+      <div class="songs-drop-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+        <ng-container *ngFor="let song of songs(); let i = index">
         <div class="song-row" 
              cdkDrag 
              [cdkDragDisabled]="!playlist.is_owner || playlist.id === 'liked-songs' || playlist.id.startsWith('search-')"
@@ -117,8 +118,9 @@
           <span class="ad-label">Sponsored</span>
         </div>
       </ng-container>
+        </div>
+      </div>
     </div>
-  </div>
 </div>
 
 <app-track-menu
@@ -130,5 +132,6 @@
   [playlistContextId]="playlist.id"
   [isOwner]="playlist.is_owner"
   (removeFromPlaylist)="removeFromPlaylist($event)"
+  (openPlaylist)="openSaveModal($event)"
   (closeMenu)="closeTrackMenu()">
 </app-track-menu>
