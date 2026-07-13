@@ -565,47 +565,77 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .fs-container {
-    padding: 20px 16px 24px;
+    padding: 16px 16px 20px;
+    height: 100vh;
+    height: 100dvh; /* Prevent iOS Safari bottom bar clipping */
   }
 
   .fs-header {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    height: 40px;
     
     .icon-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
     }
   }
 
   .fs-top-tabs {
-    gap: 16px;
+    gap: 12px;
     .tab-btn {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
+  }
+
+  .fs-main {
+    margin-bottom: 16px;
+    min-height: 0; /* Let flex item shrink */
   }
 
   .fs-artwork-container {
     max-width: 100%;
-    width: calc(100vw - 64px); /* Extra padding for mobile */
+    width: auto;
+    height: auto;
+    max-height: clamp(200px, 45vh, 350px);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+  }
+
+  .fs-bottom {
+    gap: 16px;
+    padding: 0;
+    margin-bottom: auto; /* Push it slightly up if extra space */
+  }
+
+  .fs-track-info-row {
+    margin-bottom: -4px;
   }
 
   .fs-track-text .fs-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
   
   .fs-track-text .fs-artist {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin-top: 2px;
   }
 
-  .fs-controls-row .fs-main-controls {
-    gap: 20px;
+  .fs-progress-container {
+    /* Slightly compress progress bar area */
+  }
 
-    .play-pause {
-      width: 64px;
-      height: 64px;
-      svg {
-        width: 36px;
-        height: 36px;
+  .fs-controls-row {
+    margin-top: -8px;
+    .fs-main-controls {
+      gap: 16px;
+
+      .play-pause {
+        width: 60px;
+        height: 60px;
+        svg {
+          width: 32px;
+          height: 32px;
+        }
       }
     }
   }

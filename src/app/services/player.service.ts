@@ -40,6 +40,7 @@ export class PlayerService {
   isShuffled = signal<boolean>(false);
   repeatMode = signal<'none' | 'one' | 'all'>('none');
   currentLanguage = signal<string>('Hindi');
+  isPlaylistContext = signal<boolean>(false);
 
   // Computed signal for the current track
   currentTrack = computed(() => {
@@ -143,6 +144,7 @@ export class PlayerService {
   playTrack(track: Track): void {
     this.triggerEngagement();
     this.isShuffled.set(false);
+    this.isPlaylistContext.set(false);
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -216,7 +218,7 @@ export class PlayerService {
     if (this.isShuffled()) {
       nextIdx = Math.floor(Math.random() * q.length);
     } else if (nextIdx >= q.length) {
-      if (this.repeatMode() === 'all') nextIdx = 0;
+      if (this.repeatMode() === 'all' || this.isPlaylistContext()) nextIdx = 0;
       else return;
     }
     this.currentIndex.set(nextIdx);
@@ -401,8 +403,8 @@ export class PlayerService {
   private fetchMoreTracksIfNeeded(): void {
     const q = this.queue();
     const idx = this.currentIndex();
-    // Fetch more if we have 3 or fewer tracks left to play, and not repeating all
-    if (idx >= q.length - 3 && !this.isFetchingMore && this.repeatMode() !== 'all') {
+    // Fetch more if we have 3 or fewer tracks left to play, and not repeating all, and NOT in playlist context
+    if (idx >= q.length - 3 && !this.isFetchingMore && this.repeatMode() !== 'all' && !this.isPlaylistContext()) {
       this.isFetchingMore = true;
       const lang = this.currentLanguage();
       
@@ -458,8 +460,8 @@ export class PlayerService {
       this.ytPlayer?.playVideo();
     } else {
       const q = this.queue();
-      // Auto-generate queue if we reach the end
-      if (this.currentIndex() === q.length - 1) {
+      // Auto-generate queue if we reach the end and not in playlist context
+      if (this.currentIndex() === q.length - 1 && !this.isPlaylistContext() && this.repeatMode() !== 'all') {
         const current = this.currentTrack();
         if (current) {
           this.algorithmService.getAutoplayQueue(current).subscribe(newTracks => {

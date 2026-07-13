@@ -175,20 +175,18 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     }).catch(e => console.error('Error incrementing play count', e));
   }
 
-  playSong(index: number): void {
-    const currentSongs = this.songs();
-    if (currentSongs && currentSongs.length > 0) {
-      this.playerService.queue.set([...currentSongs]);
-      this.playerService.currentIndex.set(index);
-      this.playerService.playTrack(currentSongs[index]);
+  playAll(): void {
+    if (this.songs().length > 0) {
+      this.playerService.isPlaylistContext.set(true);
+      this.playerService.setQueue([...this.songs()]);
       this.incrementPlayCount();
     }
   }
 
-  playAll(): void {
-    if (this.songs().length > 0) {
-      this.playSong(0);
-    }
+  playSong(index: number): void {
+    this.playerService.isPlaylistContext.set(true);
+    this.playerService.setQueue([...this.songs()], index);
+    this.incrementPlayCount();
   }
 
   goBack(): void {
