@@ -7,18 +7,7 @@
     <div class="playlist-cover-container">
       <img *ngIf="playlist.id !== 'liked-songs'" [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'">
       
-      <div class="playlist-stats" *ngIf="playlist.id !== 'liked-songs'">
-        <div class="stat-item" title="Total Plays">
-          <svg lucideBarChart2 [attr.size]="18" fill="currentColor"></svg>
-          <span>{{ playlist.playCount || 0 }} Plays</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item" title="Estimated Duration">
-          <svg lucideTimer [attr.size]="18" fill="currentColor"></svg>
-          <span>{{ getEstimatedDuration() }}</span>
-        </div>
-      </div>
-      
+
       <div *ngIf="playlist.id === 'liked-songs'" class="liked-songs-cover">
         <svg lucideHeart [attr.size]="64" fill="white" stroke="none" class="glowing-heart"></svg>
       </div>
@@ -31,6 +20,19 @@
         <span *ngIf="playlist.is_public !== undefined"> • {{ playlist.is_public ? 'Public' : 'Private' }}</span>
         • {{ isLoading() ? 'Loading...' : songs().length + ' songs' }}
       </p>
+
+      <div class="playlist-stats" *ngIf="playlist.id !== 'liked-songs'">
+        <div class="stat-item" title="Total Plays">
+          <svg lucideBarChart2 [attr.size]="18" fill="currentColor"></svg>
+          <span>{{ playlist.playCount || 0 }} Plays</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item" title="Estimated Duration">
+          <svg lucideTimer [attr.size]="18" fill="currentColor"></svg>
+          <span>{{ getEstimatedDuration() }}</span>
+        </div>
+      </div>
+
       <div class="playlist-actions">
         <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
           <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
