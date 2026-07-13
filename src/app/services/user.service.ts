@@ -43,9 +43,10 @@ export class UserService {
           playlist_id: p.playlist_id,
           name: p.playlist_name,
           is_public: p.is_public,
-          is_owner: p.is_owner !== undefined ? p.is_owner : true,
-          is_saved: p.is_owner === false,
-          tracks: p.songs || []
+          tracks: p.songs || [],
+          is_owner: p.is_owner,
+          is_saved: !p.is_owner,
+          owner: p.owner
         }));
         this.customPlaylists.set(mappedPlaylists);
       }

@@ -1453,7 +1453,7 @@ export class App implements OnInit {
                  (pl.tracks.length > 0 && pl.tracks[0].thumbnail ? pl.tracks[0].thumbnail : 'assets/default-playlist.jpg'),
       preloadedSongs: pl.tracks,
       searchQueries: [],
-      creator: this.authService.currentUser()?.displayName || username,
+      creator: pl.owner || (this.authService.currentUser()?.displayName || username),
       is_public: pl.is_public,
       is_owner: pl.is_owner !== undefined ? pl.is_owner : true,
       is_saved: pl.is_saved

@@ -147,16 +147,19 @@
     display: flex;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
 
     @media (max-width: 768px) {
       justify-content: center;
       width: 100%;
+      flex-direction: column;
     }
   }
   
   .play-all-btn, .share-btn, .save-playlist-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     color: white;
     border: none;
@@ -165,44 +168,58 @@
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s, background 0.3s, color 0.3s;
+    transition: transform 0.2s, background 0.3s, color 0.3s, border-color 0.3s;
     
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 14px 20px;
+    }
   }
 
   .play-all-btn {
-    background: #8b5cf6;
+    background: #ffffff;
+    color: #000000;
     &:hover:not(:disabled) {
       transform: scale(1.05);
-      background: #9c72f7;
+      background: #e5e5e5;
     }
   }
 
   .share-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     &:hover:not(:disabled) {
       transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #ffffff;
     }
     &.copied {
-      background: #10b981;
-      color: white;
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
       transform: scale(1.05);
     }
   }
 
   .save-playlist-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     &:hover:not(:disabled) {
       transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #ffffff;
     }
     &.saved {
-      background: #a78bfa;
-      color: white;
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
       transform: scale(1.05);
     }
   }
