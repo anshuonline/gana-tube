@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile } from 'firebase/auth';
+import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -24,7 +24,7 @@ export class AuthService {
 
   async loginWithGoogle(): Promise<void> {
     try {
-      await signInWithPopup(this.auth, this.provider);
+      await signInWithRedirect(this.auth, this.provider);
     } catch (error) {
       console.error('Login failed', error);
       throw error;
