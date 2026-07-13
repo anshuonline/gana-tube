@@ -128,16 +128,16 @@ export class UserService {
     }
   }
 
-  async updateUsernameInDB(email: string, displayName: string): Promise<{ success: boolean; message?: string }> {
-    if (!email) return { success: false, message: 'Email missing' };
+  async updateUsernameInDB(email: string, displayName: string, auto: boolean = false): Promise<{ success: boolean; message?: string; display_name?: string }> {
     try {
       const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}?action=updateUsername`, {
-        email: email,
-        display_name: displayName
+        email,
+        display_name: displayName,
+        auto: auto
       }));
-      return { success: response.status === 'success', message: response.message };
+      return { success: response.status === 'success', message: response.message, display_name: response.display_name };
     } catch (error) {
-      console.error('Failed to sync username to DB', error);
+      console.error('Failed to update username in DB', error);
       return { success: false, message: 'Server error occurred' };
     }
   }

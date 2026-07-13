@@ -509,8 +509,12 @@ export class App implements OnInit {
             if (!this.userService.displayName() && user.displayName) {
               // Ensure we don't exceed the 20 chars limit for DB
               const cleanName = user.displayName.substring(0, 20);
-              this.userService.updateUsernameInDB(user.email as string, cleanName).then(res => {
-                if (res.success) {
+              this.userService.updateUsernameInDB(user.email as string, cleanName, true).then(res => {
+                if (res.success && res.display_name) {
+                  this.userService.displayName.set(res.display_name);
+                  // Update Firebase auth profile to keep it in sync
+                  this.authService.updateUsername(res.display_name);
+                } else if (res.success) {
                   this.userService.displayName.set(cleanName);
                 }
               });
