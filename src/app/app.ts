@@ -614,6 +614,7 @@ export class App implements OnInit {
                 album.is_owner = false;
                 album.is_public = true;
                 album.language = 'English';
+                if (!album.searchQueries) album.searchQueries = [];
                 this.openPlaylist(album);
               } else {
                 this.router.navigate(['/home']);
@@ -627,6 +628,7 @@ export class App implements OnInit {
                 playlist.is_owner = false;
                 playlist.is_public = true;
                 playlist.language = 'English';
+                if (!playlist.searchQueries) playlist.searchQueries = [];
                 this.openPlaylist(playlist);
               } else {
                 this.router.navigate(['/home']);
@@ -1247,6 +1249,7 @@ export class App implements OnInit {
           album.is_owner = false;
           album.is_public = true;
           album.language = 'English';
+          if (!album.searchQueries) album.searchQueries = [];
           this.openPlaylist(album);
         }
       });
@@ -1261,6 +1264,7 @@ export class App implements OnInit {
           playlist.is_owner = false;
           playlist.is_public = true;
           playlist.language = 'English';
+          if (!playlist.searchQueries) playlist.searchQueries = [];
           this.openPlaylist(playlist);
         }
       });

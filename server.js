@@ -252,21 +252,48 @@ app.get('/api/album', async (req, res) => {
     const yt = await getYTMusic();
     const album = await yt.getAlbum(id);
     
-    // Map tracks to standard YouTubeSearchResult format
-    const songs = (album.songs || []).map(song => ({
-      videoId: song.videoId,
-      title: song.name || song.title,
-      channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : album.artist?.name || 'Unknown Artist'),
-      thumbnail: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[0].url : '',
-      thumbnailHigh: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : '',
-      publishedAt: new Date().toISOString()
-    }));
+    // getAlbum returns metadata but 0 songs, so use playlistId with getPlaylistVideos
+    let songs = [];
+    const albumPlaylistId = album.playlistId;
+    if (albumPlaylistId) {
+      try {
+        const videos = await yt.getPlaylistVideos(albumPlaylistId);
+        songs = (videos || []).map(song => ({
+          videoId: song.videoId,
+          title: song.name || song.title,
+          channelTitle: (song.artist && song.artist.name) || (album.artist && album.artist.name) || 'Unknown Artist',
+          thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : 
+                     (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[0].url : ''),
+          thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : 
+                        (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : ''),
+          duration: song.duration,
+          publishedAt: album.year ? `${album.year}-01-01T00:00:00Z` : new Date().toISOString()
+        }));
+      } catch (e) {
+        console.warn('getPlaylistVideos failed for album, falling back:', e.message);
+      }
+    }
+    
+    // If getPlaylistVideos failed, try mapping from album.songs (may still be 0)
+    if (songs.length === 0 && album.songs && album.songs.length > 0) {
+      songs = album.songs.map(song => ({
+        videoId: song.videoId,
+        title: song.name || song.title,
+        channelTitle: (song.artist && song.artist.name) || (album.artist && album.artist.name) || 'Unknown Artist',
+        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : 
+                   (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[0].url : ''),
+        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : 
+                      (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : ''),
+        publishedAt: album.year ? `${album.year}-01-01T00:00:00Z` : new Date().toISOString()
+      }));
+    }
     
     res.json({
       id: album.albumId || id,
       title: album.name || album.title,
       creator: (album.artist && album.artist.name) || (typeof album.artist === 'string' ? album.artist : 'YouTube Music'),
       coverImage: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : '',
+      searchQueries: [],
       preloadedSongs: songs
     });
   } catch (error) {
@@ -285,22 +312,42 @@ app.get('/api/playlist', async (req, res) => {
     if (playlistId.startsWith('VL')) {
       playlistId = playlistId.substring(2);
     }
+    
+    // Get playlist metadata
     const playlist = await yt.getPlaylist(playlistId);
     
-    const songs = (playlist.videos || playlist.songs || playlist.tracks || []).map(song => ({
-      videoId: song.videoId,
-      title: song.name || song.title,
-      channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : 'Unknown Artist'),
-      thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
-      thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
-      publishedAt: new Date().toISOString()
-    }));
+    // getPlaylist returns metadata but 0 tracks, use getPlaylistVideos for actual songs
+    let songs = [];
+    try {
+      const videos = await yt.getPlaylistVideos(playlistId);
+      songs = (videos || []).map(song => ({
+        videoId: song.videoId,
+        title: song.name || song.title,
+        channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : 'Unknown Artist'),
+        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
+        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
+        duration: song.duration,
+        publishedAt: new Date().toISOString()
+      }));
+    } catch (e) {
+      console.warn('getPlaylistVideos failed, trying getPlaylist tracks:', e.message);
+      // Fallback to whatever getPlaylist returned (likely 0 but try anyway)
+      songs = (playlist.videos || playlist.songs || playlist.tracks || []).map(song => ({
+        videoId: song.videoId,
+        title: song.name || song.title,
+        channelTitle: (song.artist && song.artist.name) || 'Unknown Artist',
+        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
+        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
+        publishedAt: new Date().toISOString()
+      }));
+    }
     
     res.json({
       id: playlist.playlistId || id,
       title: playlist.name || playlist.title,
-      creator: (playlist.author && playlist.author.name) || (typeof playlist.author === 'string' ? playlist.author : 'YouTube Music'),
+      creator: (playlist.author && playlist.author.name) || (playlist.artist && playlist.artist.name) || (typeof playlist.author === 'string' ? playlist.author : 'YouTube Music'),
       coverImage: playlist.thumbnails && playlist.thumbnails.length > 0 ? playlist.thumbnails[playlist.thumbnails.length - 1].url : '',
+      searchQueries: [],
       preloadedSongs: songs
     });
   } catch (error) {
