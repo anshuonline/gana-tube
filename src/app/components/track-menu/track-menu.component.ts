@@ -13,7 +13,8 @@ import {
   LucideShare2,
   LucideUser,
   LucideDownload,
-  LucideRadio
+  LucideRadio,
+  LucideTrash2
 } from '@lucide/angular';
 
 @Component({
@@ -28,7 +29,8 @@ import {
     LucideShare2,
     LucideUser,
     LucideDownload,
-    LucideRadio
+    LucideRadio,
+    LucideTrash2
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -45,6 +47,10 @@ export class TrackMenuComponent implements OnChanges {
   
   @Output() closeMenu = new EventEmitter<void>();
   @Output() openPlaylist = new EventEmitter<any>();
+  
+  @Input() playlistContextId?: string;
+  @Input() isOwner?: boolean;
+  @Output() removeFromPlaylist = new EventEmitter<any>();
 
   public playerService = inject(PlayerService);
   public authService = inject(AuthService);

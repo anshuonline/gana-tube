@@ -25,7 +25,7 @@
       <!-- Liked Music -->
       <div class="desktop-lib-item" (click)="openLikedSongs()">
         <div class="desktop-lib-thumb">
-          <img [src]="randomLikedThumbnail() || 'https://ui-avatars.com/api/?name=Liked+Music&background=a78bfa&color=fff&size=400'" alt="Liked Music">
+          <img [src]="randomLikedThumbnail() || 'https://ui-avatars.com/api/?name=Liked+Music&background=ffffff&color=000&size=400'" alt="Liked Music">
           <div class="desktop-lib-play-overlay">
             <div class="desktop-lib-play-btn">
               <svg lucidePlay [attr.size]="28" style="margin-left: 4px;"></svg>
@@ -90,7 +90,7 @@
           <div class="desktop-lib-info">
             <div class="desktop-lib-title">{{ pl.name }}</div>
             <div class="desktop-lib-sub">
-              <span *ngIf="pl.is_saved" style="color: #a78bfa; font-weight: 600;">Saved</span>
+              <span *ngIf="pl.is_saved" style="color: #ffffff; font-weight: 600;">Saved</span>
               <span *ngIf="pl.is_saved"> • </span>
               {{ pl.is_public ? 'Public' : 'Private' }} • Playlist
             </div>
@@ -107,7 +107,7 @@
       <!-- Liked Music -->
       <div class="mobile-lib-item" (click)="openLikedSongs()">
         <div class="mobile-lib-thumb">
-          <img [src]="randomLikedThumbnail() || 'https://ui-avatars.com/api/?name=Liked+Music&background=a78bfa&color=fff&size=400'" alt="Liked Music">
+          <img [src]="randomLikedThumbnail() || 'https://ui-avatars.com/api/?name=Liked+Music&background=ffffff&color=000&size=400'" alt="Liked Music">
           <div class="mobile-lib-count">
             <svg lucideHeart [attr.size]="12"></svg>
             {{ userService.likedSongs().length | number }}
@@ -152,7 +152,7 @@
         <div class="mobile-lib-info">
           <div class="mobile-lib-title">{{ pl.name }}</div>
           <div class="mobile-lib-sub">
-            <span *ngIf="pl.is_saved" style="color: #a78bfa; font-weight: 600;">Saved</span>
+            <span *ngIf="pl.is_saved" style="color: #ffffff; font-weight: 600;">Saved</span>
             <span *ngIf="pl.is_saved"> • </span>
             {{ pl.is_public ? 'Public' : 'Private' }} • Playlist
           </div>

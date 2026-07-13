@@ -10,6 +10,7 @@ export interface PlaylistMeta {
   is_public?: boolean;
   is_owner?: boolean;
   is_saved?: boolean;
+  playCount?: number;
 }
 
 export const PLAYLISTS: PlaylistMeta[] = [

@@ -6,7 +6,9 @@ import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { PlaylistMeta } from '../../data/playlists.data';
 import { SponsoredAd } from '../../app';
-import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideHeadphones, LucideClock } from '@lucide/angular';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical } from '@lucide/angular';
+import { TrackMenuComponent } from '../track-menu/track-menu.component';
 
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
@@ -14,7 +16,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideHeadphones, LucideClock],
+  imports: [CommonModule, DragDropModule, TrackMenuComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -33,6 +35,11 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
   private userService = inject(UserService);
   public authService = inject(AuthService);
   private toastService = inject(ToastService);
+
+  isMenuOpen = false;
+  menuX = 0;
+  menuY = 0;
+  activeMenuTrack: any = null;
 
   constructor() {}
 
@@ -227,6 +234,65 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
       } else {
         this.toastService.show('Failed to save playlist', 'error');
       }
+      }
     }
+  }
+
+  openTrackMenu(track: YouTubeSearchResult, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeMenuTrack = track;
+    this.menuX = event.clientX;
+    this.menuY = event.clientY;
+    this.isMenuOpen = true;
+  }
+
+  closeTrackMenu(): void {
+    this.isMenuOpen = false;
+    this.activeMenuTrack = null;
+  }
+
+  onDrop(event: CdkDragDrop<YouTubeSearchResult[]>): void {
+    const currentSongs = [...this.songs()];
+    moveItemInArray(currentSongs, event.previousIndex, event.currentIndex);
+    this.songs.set(currentSongs);
+    
+    // Save to DB if it's user's custom playlist
+    if (this.playlist.is_owner && this.playlist.id !== 'liked-songs' && !this.playlist.id.startsWith('search-')) {
+      this.syncPlaylistToDB(currentSongs);
+    } else if (this.playlist.id === 'liked-songs') {
+      this.userService.likedSongs.set(currentSongs);
+    }
+  }
+
+  removeFromPlaylist(track: YouTubeSearchResult): void {
+    const currentSongs = this.songs().filter(s => s.videoId !== track.videoId);
+    this.songs.set(currentSongs);
+    this.closeTrackMenu();
+    this.toastService.show(`Removed ${track.title} from playlist`, 'success');
+    
+    if (this.playlist.is_owner && this.playlist.id !== 'liked-songs' && !this.playlist.id.startsWith('search-')) {
+      this.syncPlaylistToDB(currentSongs);
+    } else if (this.playlist.id === 'liked-songs') {
+      this.userService.likedSongs.set(currentSongs);
+    }
+  }
+
+  private syncPlaylistToDB(songs: YouTubeSearchResult[]): void {
+    const host = window.location.hostname;
+    const apiUrl = host === 'localhost' 
+      ? 'http://localhost/manageads/playlist-api.php' 
+      : 'https://manageads.ganatube.in/playlist-api.php';
+    const email = this.authService.currentUser()?.email;
+    if (!email) return;
+
+    fetch(`${apiUrl}?action=updatePlaylist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        email: email,
+        playlist_id: this.playlist.id,
+        songs: songs
+      })
+    }).catch(e => console.error('Error syncing playlist', e));
   }
 }

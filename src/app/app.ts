@@ -1456,7 +1456,8 @@ export class App implements OnInit {
       creator: pl.owner || (this.authService.currentUser()?.displayName || username),
       is_public: pl.is_public,
       is_owner: pl.is_owner !== undefined ? pl.is_owner : true,
-      is_saved: pl.is_saved
+      is_saved: pl.is_saved,
+      playCount: pl.playCount || 0
     };
     
     this.selectedPlaylist.set(playlistMeta);
@@ -1485,7 +1486,8 @@ export class App implements OnInit {
           searchQueries: [],
           creator: (email && pl.owner_email === email) ? (this.authService.currentUser()?.displayName || pl.owner) : pl.owner,
           is_public: pl.is_public,
-          is_owner: (email && pl.owner_email === email) ? true : false
+          is_owner: (email && pl.owner_email === email) ? true : false,
+          playCount: pl.play_count || 0
         };
         
         this.selectedPlaylist.set(playlistMeta);

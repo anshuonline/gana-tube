@@ -7,6 +7,18 @@
     <div class="playlist-cover-container">
       <img *ngIf="playlist.id !== 'liked-songs'" [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'">
       
+      <div class="playlist-stats" *ngIf="playlist.id !== 'liked-songs'">
+        <div class="stat-item" title="Total Plays">
+          <svg lucideBarChart2 [attr.size]="18" fill="currentColor"></svg>
+          <span>{{ playlist.playCount || 0 }} Plays</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item" title="Estimated Duration">
+          <svg lucideTimer [attr.size]="18" fill="currentColor"></svg>
+          <span>{{ getEstimatedDuration() }}</span>
+        </div>
+      </div>
+      
       <div *ngIf="playlist.id === 'liked-songs'" class="liked-songs-cover">
         <svg lucideHeart [attr.size]="64" fill="white" stroke="none" class="glowing-heart"></svg>
       </div>
@@ -51,17 +63,26 @@
       <p>No songs found for this playlist.</p>
     </div>
 
-    <div *ngIf="!isLoading() && songs().length > 0" class="songs-list">
+    <div *ngIf="!isLoading() && songs().length > 0" class="songs-list" 
+         cdkDropList (cdkDropListDropped)="onDrop($event)">
       <div class="song-header-row">
         <div class="col-index">#</div>
         <div class="col-title">Title</div>
         <div class="col-artist">Artist</div>
         <div class="col-time">Published</div>
+        <div class="col-actions"></div>
       </div>
       <ng-container *ngFor="let song of songs(); let i = index">
-        <div class="song-row" (click)="playSong(i)" [class.active]="playerService.currentTrack()?.videoId === song.videoId">
+        <div class="song-row" 
+             cdkDrag 
+             [cdkDragDisabled]="!playlist.is_owner || playlist.id === 'liked-songs' || playlist.id.startsWith('search-')"
+             (click)="playSong(i)" 
+             [class.active]="playerService.currentTrack()?.videoId === song.videoId">
           <div class="col-index">
-            <span class="index-num" *ngIf="playerService.currentTrack()?.videoId !== song.videoId">{{ i + 1 }}</span>
+            <div class="drag-handle" cdkDragHandle *ngIf="playlist.is_owner && playlist.id !== 'liked-songs' && !playlist.id.startsWith('search-')" (click)="$event.stopPropagation()">
+              <svg lucideGripVertical [attr.size]="16" class="grip-icon"></svg>
+            </div>
+            <span class="index-num" *ngIf="playerService.currentTrack()?.videoId !== song.videoId && (!playlist.is_owner || playlist.id === 'liked-songs' || playlist.id.startsWith('search-'))">{{ i + 1 }}</span>
             <div class="play-ripple-small" *ngIf="playerService.currentTrack()?.videoId === song.videoId">
               <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
@@ -73,6 +94,11 @@
           </div>
           <div class="col-artist song-artist-col" [title]="song.channelTitle">{{ song.channelTitle }}</div>
           <div class="col-time song-time-col">{{ song.publishedAt | date:'mediumDate' }}</div>
+          <div class="col-actions">
+            <button class="track-menu-trigger" (click)="openTrackMenu(song, $event)">
+              <svg lucideMoreVertical [attr.size]="20"></svg>
+            </button>
+          </div>
         </div>
 
         <!-- Playlist In-Feed Ad (Every 10 songs, Max 5) -->
@@ -90,5 +116,18 @@
         </div>
       </ng-container>
     </div>
+    </div>
   </div>
 </div>
+
+<app-track-menu
+  *ngIf="isMenuOpen"
+  [track]="activeMenuTrack"
+  [isOpen]="isMenuOpen"
+  [xPos]="menuX"
+  [yPos]="menuY"
+  [playlistContextId]="playlist.id"
+  [isOwner]="playlist.is_owner"
+  (removeFromPlaylist)="removeFromPlaylist($event)"
+  (closeMenu)="closeTrackMenu()">
+</app-track-menu>

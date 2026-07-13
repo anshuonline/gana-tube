@@ -46,7 +46,8 @@ export class UserService {
           tracks: p.songs || [],
           is_owner: p.is_owner,
           is_saved: !p.is_owner,
-          owner: p.owner
+          owner: p.owner,
+          playCount: p.play_count || 0
         }));
         this.customPlaylists.set(mappedPlaylists);
       }

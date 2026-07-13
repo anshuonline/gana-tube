@@ -40,6 +40,11 @@
       <svg lucideFolderPlus [attr.size]="20"></svg> Save to playlist
     </div>
     
+    <div class="menu-item remove-item" *ngIf="playlistContextId && isOwner" (click)="onRemoveFromPlaylist()">
+      <svg lucideTrash2 [attr.size]="20" style="color: #ef4444;"></svg> 
+      <span style="color: #ef4444;">Remove from playlist</span>
+    </div>
+    
     <div class="menu-item" (click)="toggleLike($event)">
       <svg lucideHeart [attr.size]="20" [attr.fill]="isLiked() ? 'currentColor' : 'none'"></svg> 
       {{ isLiked() ? 'Remove from liked songs' : 'Add to liked songs' }}

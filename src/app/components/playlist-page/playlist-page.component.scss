@@ -118,7 +118,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #a78bfa;
+    color: #ffffff;
 
     @media (max-width: 768px) {
       align-self: center;
@@ -468,12 +468,12 @@
     top: -8px;
     left: 8px;
     background: rgba(0, 0, 0, 0.9);
-    color: #a855f7;
+    color: #ffffff;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 1px;
     padding: 2px 8px;
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 10px;
     pointer-events: none;
     text-transform: uppercase;
@@ -485,4 +485,69 @@
     height: 50px;
     margin: 16px auto;
   }
+}
+
+.drag-handle {
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.5);
+  margin-right: 8px;
+  padding: 4px;
+  
+  &:hover {
+    color: #ffffff;
+  }
+  
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.col-actions {
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+  
+  .track-menu-trigger {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+  }
+}
+
+/* CDK Drag Drop Styles */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.5);
+  background: #181818;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  opacity: 0.9;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.2;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.songs-list.cdk-drop-list-dragging .song-row:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
