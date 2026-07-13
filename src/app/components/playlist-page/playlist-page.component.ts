@@ -6,7 +6,7 @@ import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { PlaylistMeta } from '../../data/playlists.data';
 import { SponsoredAd } from '../../app';
-import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus } from '@lucide/angular';
+import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideHeadphones, LucideClock } from '@lucide/angular';
 
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus],
+  imports: [CommonModule, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideHeadphones, LucideClock],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -90,6 +90,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
           
           this.songs.set(updatedSongs);
           this.isLoading.set(false);
+          this.fetchMissingDurations(updatedSongs);
           
           if (this.playlist.id === 'liked-songs') {
             this.userService.likedSongs.set(updatedSongs);
@@ -98,6 +99,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
       } else {
         this.songs.set(this.playlist.preloadedSongs);
         this.isLoading.set(false);
+        this.fetchMissingDurations(this.playlist.preloadedSongs);
       }
       return;
     }
@@ -106,7 +108,58 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries, this.playlist.id).subscribe((results) => {
       this.songs.set(results);
       this.isLoading.set(false);
+      this.fetchMissingDurations(results);
     });
+  }
+
+  fetchMissingDurations(currentList: YouTubeSearchResult[]): void {
+    const missingIds = currentList.filter(s => s.duration === undefined).map(s => s.videoId);
+    if (missingIds.length === 0) return;
+
+    this.youtubeApi.getVideoDetails(missingIds).subscribe(details => {
+      const updated = currentList.map(song => {
+        if (song.duration === undefined) {
+          const fetched = details.find(d => d.videoId === song.videoId);
+          if (fetched && fetched.duration !== undefined) {
+            return { ...song, duration: fetched.duration };
+          }
+        }
+        return song;
+      });
+      this.songs.set(updated);
+    });
+  }
+
+  getEstimatedDuration(): string {
+    const totalSongs = this.songs().length;
+    if (totalSongs === 0) return '0 min';
+    
+    let totalSeconds = 0;
+    for (const song of this.songs()) {
+      totalSeconds += song.duration || 210;
+    }
+    
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    
+    if (hours > 0) {
+      return `${hours} hr ${minutes} min`;
+    }
+    return `${minutes} min`;
+  }
+
+  incrementPlayCount(): void {
+    if (this.playlist.id === 'liked-songs' || this.playlist.id.startsWith('search-')) return;
+    
+    const host = window.location.hostname;
+    const apiUrl = host === 'localhost' 
+      ? 'http://localhost/manageads/playlist-api.php' 
+      : 'https://manageads.ganatube.in/playlist-api.php';
+      
+    fetch(`${apiUrl}?action=incrementPlayCount`, {
+      method: 'POST',
+      body: JSON.stringify({ playlist_id: this.playlist.id })
+    }).catch(e => console.error('Error incrementing play count', e));
   }
 
   playSong(index: number): void {
@@ -115,6 +168,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
       this.playerService.queue.set([...currentSongs]);
       this.playerService.currentIndex.set(index);
       this.playerService.playTrack(currentSongs[index]);
+      this.incrementPlayCount();
     }
   }
 

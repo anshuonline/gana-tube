@@ -135,7 +135,7 @@ export class PlaylistMenuComponent implements OnChanges {
       try {
         const url = this.userService['apiUrl'].replace('user-api.php', 'playlist-api.php');
         const user = this.authService.currentUser();
-        const response: any = await fetch(`${url}?action=editPlaylist`, {
+        const response: any = await fetch(`${url}?action=updatePlaylist`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

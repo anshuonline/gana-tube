@@ -11,6 +11,7 @@ export interface YouTubeSearchResult {
   thumbnail: string;
   thumbnailHigh: string;
   publishedAt: string;
+  duration?: number;
 }
 
 @Injectable({
@@ -127,31 +128,57 @@ export class YoutubeApiService {
   getVideoDetails(videoIds: string[]): Observable<YouTubeSearchResult[]> {
     if (!videoIds || videoIds.length === 0) return of([]);
     
-    // We can only query up to 50 ids at a time with YouTube API
-    const idsToFetch = videoIds.slice(0, 50).join(',');
-
     if (!this.apiKey || this.apiKey === 'YOUR_YOUTUBE_API_KEY_HERE') {
       return of([]);
     }
 
-    const params = new HttpParams()
-      .set('part', 'snippet')
-      .set('id', idsToFetch)
-      .set('key', this.apiKey);
+    const maxPerRequest = 50;
+    const requests: Observable<YouTubeSearchResult[]>[] = [];
 
-    return this.http.get<any>(`${this.apiUrl}/videos`, { params }).pipe(
-      map(response => 
-        response.items.map((item: any) => ({
-          videoId: item.id,
-          title: this.decodeHtml(item.snippet.title),
-          channelTitle: item.snippet.channelTitle,
-          thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
-          thumbnailHigh: item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.standard?.url || item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
-          publishedAt: item.snippet.publishedAt,
-        }))
-      ),
-      catchError(() => of([]))
+    for (let i = 0; i < videoIds.length; i += maxPerRequest) {
+      const chunk = videoIds.slice(i, i + maxPerRequest);
+      const params = new HttpParams()
+        .set('part', 'snippet,contentDetails')
+        .set('id', chunk.join(','))
+        .set('key', this.apiKey);
+
+      requests.push(
+        this.http.get<any>(`${this.apiUrl}/videos`, { params }).pipe(
+          map(response => 
+            response.items ? response.items.map((item: any) => ({
+              videoId: item.id,
+              title: this.decodeHtml(item.snippet.title),
+              channelTitle: item.snippet.channelTitle,
+              thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
+              thumbnailHigh: item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.standard?.url || item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+              publishedAt: item.snippet.publishedAt,
+              duration: this.parseISO8601Duration(item.contentDetails?.duration)
+            })) : []
+          ),
+          catchError(() => of([]))
+        )
+      );
+    }
+
+    return forkJoin(requests).pipe(
+      map(resultsArray => {
+        const all: YouTubeSearchResult[] = [];
+        for (const arr of resultsArray) {
+          all.push(...arr);
+        }
+        return all;
+      })
     );
+  }
+
+  private parseISO8601Duration(duration: string): number {
+    if (!duration) return 210;
+    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    if (!match) return 210;
+    const hours = (parseInt(match[1]) || 0);
+    const minutes = (parseInt(match[2]) || 0);
+    const seconds = (parseInt(match[3]) || 0);
+    return hours * 3600 + minutes * 60 + seconds;
   }
 
   private injectCuratedSongs(query: string, results: YouTubeSearchResult[]): YouTubeSearchResult[] {
