@@ -262,10 +262,10 @@ app.get('/api/album', async (req, res) => {
           videoId: song.videoId,
           title: song.name || song.title,
           channelTitle: (song.artist && song.artist.name) || (album.artist && album.artist.name) || 'Unknown Artist',
-          thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : 
-                     (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[0].url : ''),
-          thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : 
-                        (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : ''),
+          thumbnail: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : 
+                     (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : ''),
+          thumbnailHigh: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : 
+                        (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : ''),
           duration: song.duration,
           publishedAt: album.year ? `${album.year}-01-01T00:00:00Z` : new Date().toISOString()
         }));
@@ -280,10 +280,10 @@ app.get('/api/album', async (req, res) => {
         videoId: song.videoId,
         title: song.name || song.title,
         channelTitle: (song.artist && song.artist.name) || (album.artist && album.artist.name) || 'Unknown Artist',
-        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : 
-                   (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[0].url : ''),
-        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : 
-                      (album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : ''),
+        thumbnail: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : 
+                   (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : ''),
+        thumbnailHigh: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : 
+                      (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : ''),
         publishedAt: album.year ? `${album.year}-01-01T00:00:00Z` : new Date().toISOString()
       }));
     }
