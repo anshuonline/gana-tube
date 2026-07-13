@@ -1212,6 +1212,9 @@ export class App implements OnInit {
       this.youtubeApi.getAlbum(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(album => {
         this.isLoading.set(false);
         if (album) {
+          album.is_owner = false;
+          album.is_public = true;
+          album.language = 'English';
           this.openPlaylist(album);
         }
       });
@@ -1223,6 +1226,9 @@ export class App implements OnInit {
       this.youtubeApi.getYTPlaylist(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
         this.isLoading.set(false);
         if (playlist) {
+          playlist.is_owner = false;
+          playlist.is_public = true;
+          playlist.language = 'English';
           this.openPlaylist(playlist);
         }
       });

@@ -264,9 +264,9 @@ app.get('/api/album', async (req, res) => {
     
     res.json({
       id: album.albumId || id,
-      name: album.name || album.title,
-      owner: (album.artist && album.artist.name) || (typeof album.artist === 'string' ? album.artist : 'YouTube Music'),
-      thumbnail: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : '',
+      title: album.name || album.title,
+      creator: (album.artist && album.artist.name) || (typeof album.artist === 'string' ? album.artist : 'YouTube Music'),
+      coverImage: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : '',
       preloadedSongs: songs
     });
   } catch (error) {
@@ -281,9 +281,13 @@ app.get('/api/playlist', async (req, res) => {
   if (!id) return res.status(400).json({ error: 'id required' });
   try {
     const yt = await getYTMusic();
-    const playlist = await yt.getPlaylist(id);
+    let playlistId = id;
+    if (playlistId.startsWith('VL')) {
+      playlistId = playlistId.substring(2);
+    }
+    const playlist = await yt.getPlaylist(playlistId);
     
-    const songs = (playlist.videos || playlist.songs || []).map(song => ({
+    const songs = (playlist.videos || playlist.songs || playlist.tracks || []).map(song => ({
       videoId: song.videoId,
       title: song.name || song.title,
       channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : 'Unknown Artist'),
@@ -294,9 +298,9 @@ app.get('/api/playlist', async (req, res) => {
     
     res.json({
       id: playlist.playlistId || id,
-      name: playlist.name || playlist.title,
-      owner: (playlist.author && playlist.author.name) || (typeof playlist.author === 'string' ? playlist.author : 'YouTube Music'),
-      thumbnail: playlist.thumbnails && playlist.thumbnails.length > 0 ? playlist.thumbnails[playlist.thumbnails.length - 1].url : '',
+      title: playlist.name || playlist.title,
+      creator: (playlist.author && playlist.author.name) || (typeof playlist.author === 'string' ? playlist.author : 'YouTube Music'),
+      coverImage: playlist.thumbnails && playlist.thumbnails.length > 0 ? playlist.thumbnails[playlist.thumbnails.length - 1].url : '',
       preloadedSongs: songs
     });
   } catch (error) {
