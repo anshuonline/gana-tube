@@ -600,10 +600,42 @@ export class App implements OnInit {
             `${targetPlaylist.title} - GanaTube`,
             `Listen to ${targetPlaylist.title} and other trending playlists for free on GanaTube.`
           );
+          this.currentPage.set('playlist');
+          this.isSearchMode.set(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (playlistId) {
+          if (playlistId.startsWith('pl_')) {
+            this.fetchPublicPlaylist(playlistId, '');
+          } else if (playlistId.startsWith('MPREb_')) {
+            this.isLoading.set(true);
+            this.youtubeApi.getAlbum(playlistId).pipe(takeUntil(this.destroy$)).subscribe(album => {
+              this.isLoading.set(false);
+              if (album) {
+                album.is_owner = false;
+                album.is_public = true;
+                album.language = 'English';
+                this.openPlaylist(album);
+              } else {
+                this.router.navigate(['/home']);
+              }
+            });
+          } else if (playlistId.startsWith('PL') || playlistId.startsWith('VL') || playlistId.startsWith('RD') || playlistId.startsWith('OL')) {
+            this.isLoading.set(true);
+            this.youtubeApi.getYTPlaylist(playlistId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
+              this.isLoading.set(false);
+              if (playlist) {
+                playlist.is_owner = false;
+                playlist.is_public = true;
+                playlist.language = 'English';
+                this.openPlaylist(playlist);
+              } else {
+                this.router.navigate(['/home']);
+              }
+            });
+          } else {
+            this.router.navigate(['/home']);
+          }
         }
-        this.currentPage.set('playlist');
-        this.isSearchMode.set(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       } else if (event.urlAfterRedirects.startsWith('/advertise')) {
         this.currentPage.set('advertise');
