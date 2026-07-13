@@ -12,6 +12,7 @@ export interface YouTubeSearchResult {
   thumbnailHigh: string;
   publishedAt: string;
   duration?: number;
+  type?: string;
 }
 
 @Injectable({
@@ -56,14 +57,13 @@ export class YoutubeApiService {
       });
   }
 
-  searchMusic(query: string, maxResults = 20): Observable<YouTubeSearchResult[]> {
-    const cacheKey = `search_${query}_${maxResults}`;
+  searchMusic(query: string, maxResults = 20, type: 'song' | 'album' | 'playlist' = 'song'): Observable<YouTubeSearchResult[]> {
+    const cacheKey = `search_${type}_${query}_${maxResults}`;
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) { // 24 hours expiry
-          // Shuffle the cached array so the user sees fresh songs at the front every time!
           const shuffled = [...parsed.data].sort(() => 0.5 - Math.random());
           return of(shuffled);
         }
@@ -72,10 +72,10 @@ export class YoutubeApiService {
       }
     }
 
-    // Primary: fetch from our local backend server (powered by ytmusicapi)
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams()
       .set('q', query)
+      .set('type', type)
       .set('limit', maxResults.toString());
 
     return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/songs`, { params }).pipe(
@@ -121,6 +121,28 @@ export class YoutubeApiService {
           }
         }
         return results;
+      })
+    );
+  }
+
+  getYTPlaylist(playlistId: string): Observable<any> {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams().set('id', playlistId);
+    return this.http.get<any>(`${backendUrl}/playlist`, { params }).pipe(
+      catchError((err) => {
+        console.error('Failed to fetch YT playlist', err);
+        return of(null);
+      })
+    );
+  }
+
+  getAlbum(albumId: string): Observable<any> {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams().set('id', albumId);
+    return this.http.get<any>(`${backendUrl}/album`, { params }).pipe(
+      catchError((err) => {
+        console.error('Failed to fetch YT album', err);
+        return of(null);
       })
     );
   }

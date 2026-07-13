@@ -193,6 +193,11 @@ export class TrackMenuComponent implements OnChanges {
     this.close();
   }
 
+  onRemoveFromPlaylist() {
+    this.removeFromPlaylist.emit(this.track);
+    this.close();
+  }
+
   saveToPlaylist(event: Event) {
     event.stopPropagation();
     if (this.track) {

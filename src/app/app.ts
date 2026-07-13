@@ -1201,9 +1201,31 @@ export class App implements OnInit {
   }
 
   onPlaySearchTrack(track: YouTubeSearchResult): void {
-    if (track.videoId.startsWith('pl_')) {
+    if (track.videoId.startsWith('pl_') || track.type === 'community-playlist') {
       // It's a community playlist
       this.fetchPublicPlaylist(track.videoId, track.channelTitle);
+      return;
+    }
+
+    if (track.type === 'album') {
+      this.isLoading.set(true);
+      this.youtubeApi.getAlbum(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(album => {
+        this.isLoading.set(false);
+        if (album) {
+          this.selectedPlaylist.set(album);
+        }
+      });
+      return;
+    }
+
+    if (track.type === 'playlist') {
+      this.isLoading.set(true);
+      this.youtubeApi.getYTPlaylist(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
+        this.isLoading.set(false);
+        if (playlist) {
+          this.selectedPlaylist.set(playlist);
+        }
+      });
       return;
     }
 
@@ -1244,37 +1266,58 @@ export class App implements OnInit {
     this.hasSearched.set(true);
     this.results.set([]);
 
+    if (this.searchFilter() === 'albums') {
+      this.youtubeApi.searchMusic(query, 50, 'album').pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => {
+          this.results.set(res);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.results.set([]);
+          this.isLoading.set(false);
+        },
+      });
+      return;
+    }
+
     if (this.searchFilter() === 'playlists') {
-      // Fetch Community Playlists
+      // Fetch Community Playlists & YouTube Playlists in parallel
       const url = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
-      fetch(`${url}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
+      
+      const communityPromise = fetch(`${url}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
           if (data.status === 'success') {
-            const mapped = data.data.map((pl: any) => ({
+            return data.data.map((pl: any) => ({
               videoId: pl.playlist_id,
               title: pl.playlist_name,
               thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg',
               thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'assets/default-playlist.jpg',
               channelTitle: pl.owner,
-              publishedAt: pl.created_at
+              publishedAt: pl.created_at,
+              type: 'community-playlist'
             }));
-            this.results.set(mapped);
-          } else {
-            this.results.set([]);
           }
-          this.isLoading.set(false);
-        })
-        .catch(err => {
-          console.error(err);
-          this.results.set([]);
-          this.isLoading.set(false);
+          return [];
+        }).catch(() => []);
+
+      const ytPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
+        this.youtubeApi.searchMusic(query, 50, 'playlist').pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => resolve(res),
+          error: () => resolve([])
         });
+      });
+
+      Promise.all([communityPromise, ytPromise]).then(([communityResults, ytResults]) => {
+        // Interleave or just concat
+        this.results.set([...communityResults, ...ytResults]);
+        this.isLoading.set(false);
+      });
       return;
     }
 
-    // Default YouTube Search
-    this.youtubeApi.searchMusic(query, 50).pipe(takeUntil(this.destroy$)).subscribe({
+    // Default YouTube Search (Songs / All)
+    this.youtubeApi.searchMusic(query, 50, 'song').pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.results.set(res);
         this.isLoading.set(false);

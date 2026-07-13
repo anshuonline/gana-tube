@@ -180,22 +180,22 @@ app.get('/api/songs', async (req, res) => {
   try {
     const yt = await getYTMusic();
     const limit = parseInt(req.query.limit) || 20;
-    console.log(`Searching songs: "${rawQuery}" → enhanced: "${query}" (limit: ${limit})`);
+    const type = req.query.type || 'song';
+    console.log(`Searching ${type}s: "${rawQuery}" → enhanced: "${query}" (limit: ${limit})`);
     
-    let results = await yt.searchSongs(query);
-    
-    // ytmusic-api natively returns 20 results per search.
-    // We removed parallel searches to avoid triggering Google's 403 rate limits.
-    if (limit > 20 && results && results.length > 0) {
-      // Just return what we have to prevent API blocks
+    let results = [];
+    if (type === 'album') {
+      results = await yt.searchAlbums(query);
+    } else if (type === 'playlist') {
+      results = await yt.searchPlaylists(query);
+    } else {
+      results = await yt.searchSongs(query);
     }
-
     
     // Always enforce the limit, whether it is 1 or 50.
     if (results && results.length > limit) {
       results = results.slice(0, limit);
     }
-
 
     // Helper to upgrade YouTube Music / Video thumbnails to high resolution (HD)
     const toHDUrl = (url) => {
@@ -216,21 +216,24 @@ app.get('/api/songs', async (req, res) => {
         ? item.artist.name 
         : (typeof item.artist === 'string' ? item.artist : 'Unknown Artist');
         
+      const videoId = item.videoId || item.albumId || item.playlistId;
+
       let thumbnailLow = item.thumbnails && item.thumbnails.length > 0
         ? item.thumbnails[0].url
-        : `https://img.youtube.com/vi/${item.videoId}/default.jpg`;
+        : `https://img.youtube.com/vi/${videoId}/default.jpg`;
 
       let thumbnailHigh = item.thumbnails && item.thumbnails.length > 0
         ? item.thumbnails[item.thumbnails.length - 1].url
-        : `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
+        : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
       return {
-        videoId: item.videoId,
-        title: item.name,
+        videoId: videoId,
+        title: item.name || item.title,
         channelTitle: artistName,
         thumbnail: toHDUrl(thumbnailLow),
         thumbnailHigh: toHDUrl(thumbnailHigh),
         publishedAt: new Date().toISOString(),
+        type: type // return the requested type to help frontend routing
       };
     });
 
@@ -238,6 +241,67 @@ app.get('/api/songs', async (req, res) => {
   } catch (error) {
     console.error('Error during search:', error);
     res.status(500).json({ error: 'An error occurred during search' });
+  }
+});
+
+// Album details endpoint
+app.get('/api/album', async (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(400).json({ error: 'id required' });
+  try {
+    const yt = await getYTMusic();
+    const album = await yt.getAlbum(id);
+    
+    // Map tracks to standard YouTubeSearchResult format
+    const songs = (album.songs || []).map(song => ({
+      videoId: song.videoId,
+      title: song.name || song.title,
+      channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : album.artist?.name || 'Unknown Artist'),
+      thumbnail: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[0].url : '',
+      thumbnailHigh: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : '',
+      publishedAt: new Date().toISOString()
+    }));
+    
+    res.json({
+      id: album.albumId || id,
+      name: album.name || album.title,
+      owner: (album.artist && album.artist.name) || (typeof album.artist === 'string' ? album.artist : 'YouTube Music'),
+      thumbnail: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : '',
+      preloadedSongs: songs
+    });
+  } catch (error) {
+    console.error('Error fetching album:', error);
+    res.status(500).json({ error: 'Failed to fetch album' });
+  }
+});
+
+// Playlist details endpoint
+app.get('/api/playlist', async (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(400).json({ error: 'id required' });
+  try {
+    const yt = await getYTMusic();
+    const playlist = await yt.getPlaylist(id);
+    
+    const songs = (playlist.videos || playlist.songs || []).map(song => ({
+      videoId: song.videoId,
+      title: song.name || song.title,
+      channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : 'Unknown Artist'),
+      thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
+      thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
+      publishedAt: new Date().toISOString()
+    }));
+    
+    res.json({
+      id: playlist.playlistId || id,
+      name: playlist.name || playlist.title,
+      owner: (playlist.author && playlist.author.name) || (typeof playlist.author === 'string' ? playlist.author : 'YouTube Music'),
+      thumbnail: playlist.thumbnails && playlist.thumbnails.length > 0 ? playlist.thumbnails[playlist.thumbnails.length - 1].url : '',
+      preloadedSongs: songs
+    });
+  } catch (error) {
+    console.error('Error fetching playlist:', error);
+    res.status(500).json({ error: 'Failed to fetch playlist' });
   }
 });
 
