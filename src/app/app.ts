@@ -1212,7 +1212,7 @@ export class App implements OnInit {
       this.youtubeApi.getAlbum(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(album => {
         this.isLoading.set(false);
         if (album) {
-          this.selectedPlaylist.set(album);
+          this.openPlaylist(album);
         }
       });
       return;
@@ -1223,7 +1223,7 @@ export class App implements OnInit {
       this.youtubeApi.getYTPlaylist(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
         this.isLoading.set(false);
         if (playlist) {
-          this.selectedPlaylist.set(playlist);
+          this.openPlaylist(playlist);
         }
       });
       return;
