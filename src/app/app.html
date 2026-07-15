@@ -164,20 +164,7 @@
           </div>
         </div>
 
-        <!-- Background Play Card -->
-        <div class="profile-card settings-card bg-play-card">
-          <div class="flex-between">
-            <div>
-              <h3>Background Play</h3>
-              <p *ngIf="!isIOS()">Keep music playing when screen is off (Experimental)</p>
-              <p *ngIf="isIOS()" class="text-red-400 text-xs mt-1">Not supported on iOS Safari due to Apple restrictions.</p>
-            </div>
-            <label class="toggle-switch" [style.opacity]="isIOS() ? '0.5' : '1'">
-              <input type="checkbox" [checked]="bgPlayService.isEnabled()" (change)="toggleBgPlay($event)" [disabled]="isIOS()">
-              <span class="slider round" [class.disabled]="isIOS()"></span>
-            </label>
-          </div>
-        </div>
+
 
         <!-- Listen Together Card -->
         <div class="profile-card social-card listen-together-card disabled-card">

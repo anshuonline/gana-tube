@@ -19,7 +19,6 @@ import { AlgorithmService, ShelfDefinition } from './services/algorithm.service'
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { AppStateService } from './services/app-state.service';
-import { BackgroundPlayService } from './services/background-play.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
@@ -218,7 +217,6 @@ export class App implements OnInit {
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
   private location = inject(Location);
-  bgPlayService = inject(BackgroundPlayService);
   private sanitizer = inject(DomSanitizer);
   private titleService = inject(Title);
   public toastService = inject(ToastService);
@@ -835,32 +833,6 @@ export class App implements OnInit {
     this.musicQuality.set(quality);
     // In a real app, this would also tell the YT player to change quality if possible
   }
-
-  toggleBgPlay(event: any): void {
-    if (this.isIOS()) {
-      event.preventDefault();
-      this.toastService.show('Background Play is not supported on iOS Safari.', 'error');
-      return;
-    }
-    this.bgPlayService.toggleSetting(event.target.checked);
-    if (event.target.checked) {
-      this.toastService.show('Background Play Enabled. A silent signal will keep tab alive.', 'success');
-      if (this.playerService.isPlaying()) {
-        this.bgPlayService.startSilentAudio();
-      }
-    } else {
-      this.toastService.show('Background Play Disabled', 'info');
-      this.bgPlayService.stopSilentAudio();
-    }
-  }
-
-  isIOS(): boolean {
-    if (typeof navigator !== 'undefined') {
-      return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    }
-    return false;
-  }
-
 
   onSearchFocus(): void {
     this.isSearchMode.set(false);

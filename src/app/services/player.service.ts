@@ -6,7 +6,6 @@ import { YoutubeApiService } from './youtube-api.service';
 import { RoomService } from './room.service';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
-import { BackgroundPlayService } from './background-play.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -21,7 +20,6 @@ export class PlayerService {
   private roomService = inject(RoomService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
-  private bgPlayService = inject(BackgroundPlayService);
   private trackStartTime: number = 0;
   private isFetchingMore = false;
   private isRemoteUpdate = false;
@@ -29,32 +27,6 @@ export class PlayerService {
 
   constructor() {
     this.setupSocketListeners();
-    this.setupVisibilityListener();
-  }
-
-  private setupVisibilityListener() {
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          // Coming back to foreground
-          if (this.bgPlayService.isEnabled() && this.playerState() === 'playing') {
-             // In case browser paused the video, resume it
-             if (this.ytPlayer && typeof this.ytPlayer.playVideo === 'function') {
-               this.ytPlayer.playVideo();
-             }
-          }
-        } else {
-          // Going to background
-          if (this.bgPlayService.isEnabled() && this.playerState() === 'playing') {
-             // Force AudioContext to resume and make sure YT is playing
-             this.bgPlayService.startSilentAudio();
-             if (this.ytPlayer && typeof this.ytPlayer.playVideo === 'function') {
-               this.ytPlayer.playVideo();
-             }
-          }
-        }
-      });
-    }
   }
 
 
@@ -382,18 +354,15 @@ export class PlayerService {
         this.playerState.set('playing');
         this.duration.set(this.ytPlayer?.getDuration() || 0);
         this.startProgressTracking();
-        this.bgPlayService.startSilentAudio();
         break;
       case 2: // paused
         this.playerState.set('paused');
         this.stopProgressTracking();
-        this.bgPlayService.stopSilentAudio();
         break;
       case 0: // ended
         this.playerState.set('ended');
         this.stopProgressTracking();
         this.currentTime.set(0);
-        this.bgPlayService.stopSilentAudio();
         this.handleTrackEnd();
         break;
       case 3: // buffering
