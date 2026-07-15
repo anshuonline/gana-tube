@@ -146,15 +146,6 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private handleLoadVideo(videoId: string): void {
-    // Stop all other players just in case
-    for (let i = 0; i < this.totalPlayers; i++) {
-      if (i !== this.activePlayerIndex) {
-        if (typeof this.players[i].stopVideo === 'function') {
-          this.players[i].stopVideo();
-        }
-      }
-    }
-
     // Check if the video is already cued in one of the background players
     let foundIndex = -1;
     for (let i = 0; i < this.totalPlayers; i++) {
@@ -164,12 +155,17 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
+    const oldActiveIndex = this.activePlayerIndex;
+
     if (foundIndex !== -1 && foundIndex !== this.activePlayerIndex) {
       // It's preloaded! Swap active player
-      // Mute the old active player
-      this.players[this.activePlayerIndex].mute();
-      
       this.activePlayerIndex = foundIndex;
+      
+      // Stop the old active player to save bandwidth
+      if (typeof this.players[oldActiveIndex].stopVideo === 'function') {
+        this.players[oldActiveIndex].stopVideo();
+      }
+      this.cuedVideoIds[oldActiveIndex] = '';
       
       // Unmute the new active player and play
       if (!this.playerService.isMuted()) {
@@ -185,6 +181,16 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.players[this.activePlayerIndex].setVolume(this.playerService.volume());
       this.players[this.activePlayerIndex].loadVideoById(videoId);
+      
+      // Stop other background players since the queue path might have changed
+      for (let i = 0; i < this.totalPlayers; i++) {
+        if (i !== this.activePlayerIndex) {
+          if (typeof this.players[i].stopVideo === 'function') {
+            this.players[i].stopVideo();
+          }
+          this.cuedVideoIds[i] = ''; // Clear so schedulePreloading can re-cue properly
+        }
+      }
     }
   }
 
