@@ -69,6 +69,7 @@
       <div class="song-header-row">
         <div class="col-index">#</div>
         <div class="col-title">Title</div>
+        <div class="col-duration" style="text-align: right; padding-right: 16px;"><svg lucideTimer [attr.size]="16"></svg></div>
         <div class="col-artist">Artist</div>
         <div class="col-time">Published</div>
         <div class="col-actions"></div>
@@ -95,8 +96,10 @@
             <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
             <span class="song-title" [title]="song.title">{{ song.title }}</span>
           </div>
+          <div class="col-duration song-duration-col" style="font-variant-numeric: tabular-nums; text-align: right; padding-right: 16px; opacity: 0.7; font-size: 0.9em;">
+            {{ song.duration ? formatTime(song.duration) : '' }}
+          </div>
           <div class="col-artist song-artist-col" [title]="song.channelTitle">
-            <span class="song-duration-inline" *ngIf="song.duration" style="opacity: 0.7; margin-right: 6px; font-variant-numeric: tabular-nums; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">{{ formatTime(song.duration) }}</span>
             {{ song.channelTitle }}
           </div>
           <div class="col-time song-time-col">{{ song.publishedAt | date:'mediumDate' }}</div>
