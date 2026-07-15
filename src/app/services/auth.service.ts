@@ -25,8 +25,10 @@ export class AuthService {
   async loginWithGoogle(): Promise<void> {
     try {
       await signInWithPopup(this.auth, this.provider);
-    } catch (error) {
-      console.error('Login failed', error);
+    } catch (error: any) {
+      if (error?.code !== 'auth/cancelled-popup-request' && error?.code !== 'auth/popup-closed-by-user') {
+        console.error('Login failed', error);
+      }
       throw error;
     }
   }

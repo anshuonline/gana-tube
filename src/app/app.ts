@@ -870,7 +870,11 @@ export class App implements OnInit {
   }
 
   // --- Auth Methods ---
+  isLoggingIn = false;
+
   async login() {
+    if (this.isLoggingIn) return;
+    this.isLoggingIn = true;
     try {
       await this.authService.loginWithGoogle();
     } catch (e: any) {
@@ -882,6 +886,8 @@ export class App implements OnInit {
         console.error('Login error:', e);
         this.toastService.error('Failed to login. Please try again.');
       }
+    } finally {
+      this.isLoggingIn = false;
     }
   }
 
