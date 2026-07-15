@@ -593,6 +593,10 @@ export class App implements OnInit {
           this.openLikedSongs();
           return;
         }
+        if (playlistId === 'recently-played') {
+          this.openRecentlyPlayed();
+          return;
+        }
         const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
         if (targetPlaylist) {
           this.selectedPlaylist.set(targetPlaylist);
