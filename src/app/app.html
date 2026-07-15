@@ -153,6 +153,23 @@
           </div>
         </div>
 
+        <!-- Login Help Card -->
+        <div class="profile-card settings-card login-help-card" *ngIf="authService.currentUser() === null">
+          <div class="help-content">
+            <h3 style="color: #ff4d4d; margin-top: 0; display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              Login Not Working?
+            </h3>
+            <p style="font-size: 0.9rem; color: #a0a0a0; line-height: 1.5; margin-bottom: 12px;">
+              If clicking the login button doesn't do anything, your browser's Adblocker or Privacy Shield is blocking the login window.
+            </p>
+            <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 0.85rem; color: #e0e0e0; line-height: 1.6;">
+              <strong style="color: #fff;">How to fix:</strong><br>
+              • <strong>Brave Browser:</strong> Click the Lion 🦁 icon in the URL bar and turn <b>Shields DOWN</b> for this site.<br>
+              • <strong>Adblockers:</strong> Click your extension icon (uBlock, AdBlock) and <b>whitelist</b> or <b>pause</b> it for ganatube.in.
+            </div>
+          </div>
+        </div>
         <!-- Music Quality Card -->
         <div class="profile-card settings-card music-quality-card">
           <h3>Music Quality</h3>
