@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile } from 'firebase/auth';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile, browserPopupRedirectResolver } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -24,7 +24,9 @@ export class AuthService {
 
   async loginWithGoogle(): Promise<void> {
     try {
-      await signInWithPopup(this.auth, this.provider);
+      // Use browserPopupRedirectResolver explicitly to avoid conflicts
+      // with YouTube IFrame API's iframe/callback mechanism
+      await signInWithPopup(this.auth, this.provider, browserPopupRedirectResolver);
     } catch (error: any) {
       if (error?.code !== 'auth/cancelled-popup-request' && error?.code !== 'auth/popup-closed-by-user') {
         console.error('Login failed', error);

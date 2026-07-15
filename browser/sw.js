@@ -1,16 +1,18 @@
 const CACHE_NAME = 'ganatube-v1';
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
-  '/ganatube.png',
-  '/manifest.json'
+  '/index.html'
 ];
 
-// Install - cache static assets
+// Install - cache static assets (gracefully skip failures)
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+      return Promise.allSettled(
+        STATIC_ASSETS.map((url) => cache.add(url).catch(() => {
+          console.warn('SW: Failed to cache:', url);
+        }))
+      );
     })
   );
   self.skipWaiting();
@@ -30,13 +32,29 @@ self.addEventListener('activate', (event) => {
 
 // Fetch - network first, fallback to cache
 self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+
   // Skip non-GET requests and API calls
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/')) {
+  if (event.request.method !== 'GET' || url.includes('/api/')) {
     return;
   }
 
   // Skip socket.io requests
-  if (event.request.url.includes('/socket.io/')) {
+  if (url.includes('/socket.io/')) {
+    return;
+  }
+
+  // Skip Firebase Auth and Google APIs (these must never be cached/intercepted)
+  if (
+    url.includes('googleapis.com') ||
+    url.includes('firebaseapp.com') ||
+    url.includes('gstatic.com') ||
+    url.includes('accounts.google.com') ||
+    url.includes('apis.google.com') ||
+    url.includes('firebaseinstallations') ||
+    url.includes('identitytoolkit') ||
+    url.includes('securetoken')
+  ) {
     return;
   }
 
@@ -66,3 +84,4 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
