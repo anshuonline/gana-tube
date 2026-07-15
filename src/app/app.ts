@@ -1113,7 +1113,6 @@ export class App implements OnInit {
           loadedCount++;
           if (loadedCount >= initialDefinitions.length) {
             this.shelvesLoading.set(false);
-            setTimeout(() => this.loadNextShelf(lang), 500);
           }
         } else {
           // Algorithmic shelf, needs fetching
@@ -1139,7 +1138,6 @@ export class App implements OnInit {
               loadedCount++;
               if (loadedCount >= initialDefinitions.length) {
                 this.shelvesLoading.set(false);
-                setTimeout(() => this.loadNextShelf(language), 500);
               }
             },
             error: (err) => {
@@ -1151,7 +1149,6 @@ export class App implements OnInit {
               loadedCount++;
               if (loadedCount >= initialDefinitions.length) {
                 this.shelvesLoading.set(false);
-                setTimeout(() => this.loadNextShelf(language), 500);
               }
             }
           });
@@ -1167,8 +1164,8 @@ export class App implements OnInit {
       return;
     }
 
-    // Load up to 5 shelves at once
-    const batchSize = 5;
+    // Load 2 shelves at a time for smoother lazy loading
+    const batchSize = 2;
     const nextDefs = this.allShelfDefinitions.slice(currentCount, currentCount + batchSize);
     
     this.loadingShelfTitle.set(nextDefs[0].title + (nextDefs.length > 1 ? ' & more...' : ''));
@@ -1208,21 +1205,12 @@ export class App implements OnInit {
           this.loadedShelves.update(shelves => [...shelves, ...newShelves]);
         }
         this.shelfLoading.set(false);
-        
-        // Continue loading next batch in background if more shelves exist
-        if (this.loadedShelves().length < this.allShelfDefinitions.length) {
-          setTimeout(() => this.loadNextShelf(language), 1000);
-        }
+        // Note: Automatic recursive loading removed to allow scroll-based lazy loading
       },
       error: (err: any) => {
         console.error('Failed to load shelf batch', err);
         if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
         this.shelfLoading.set(false);
-        
-        // Continue loading next batch in background even if this one failed
-        if (this.loadedShelves().length < this.allShelfDefinitions.length) {
-          setTimeout(() => this.loadNextShelf(), 1000);
-        }
       }
     });
   }
@@ -1472,10 +1460,12 @@ export class App implements OnInit {
     const pos = scrollOffset + window.innerHeight;
     const max = document.documentElement.scrollHeight;
     
-    // True infinite scroll: trigger much earlier (1000px before bottom)
-    if (pos >= max - 1000) {
+    // True infinite scroll: trigger much earlier (1500px before bottom)
+    if (pos >= max - 1500) {
       if (this.hasSearched()) {
         this.loadMoreResults();
+      } else if (this.currentPage() === 'home' && this.loadedShelves().length < this.allShelfDefinitions.length) {
+        this.loadNextShelf(this.homeScreenLanguage());
       }
     }
   }
