@@ -62,6 +62,13 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     }
   }
 
+  formatTime(seconds?: number): string {
+    if (!seconds || isNaN(seconds) || seconds < 0) return '';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
   loadAd(): void {
     const host = window.location.hostname;
     const adApiUrl = host === 'localhost' 

@@ -95,7 +95,10 @@
             <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
             <span class="song-title" [title]="song.title">{{ song.title }}</span>
           </div>
-          <div class="col-artist song-artist-col" [title]="song.channelTitle">{{ song.channelTitle }}</div>
+          <div class="col-artist song-artist-col" [title]="song.channelTitle">
+            <span class="song-duration-inline" *ngIf="song.duration" style="opacity: 0.7; margin-right: 6px; font-variant-numeric: tabular-nums; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">{{ formatTime(song.duration) }}</span>
+            {{ song.channelTitle }}
+          </div>
           <div class="col-time song-time-col">{{ song.publishedAt | date:'mediumDate' }}</div>
           <div class="col-actions">
             <button class="track-menu-trigger" (click)="openTrackMenu(song, $event)">
