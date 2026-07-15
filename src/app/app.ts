@@ -876,8 +876,11 @@ export class App implements OnInit {
     } catch (e: any) {
       if (e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
         console.log('Login popup closed by user.');
+      } else if (e.code === 'auth/popup-blocked') {
+        this.toastService.error('Popup blocked. Please enable popups for this site to login.');
       } else {
         console.error('Login error:', e);
+        this.toastService.error('Failed to login. Please try again.');
       }
     }
   }

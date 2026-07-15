@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile, getRedirectResult } from 'firebase/auth';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -20,21 +20,11 @@ export class AuthService {
     onAuthStateChanged(this.auth, (user) => {
       this.currentUser.set(user);
     });
-
-    // Handle redirect result
-    getRedirectResult(this.auth).then((result) => {
-      if (result) {
-        this.currentUser.set(result.user);
-      }
-    }).catch((error) => {
-      console.error('Redirect login failed', error);
-      // Fallback or error handling
-    });
   }
 
   async loginWithGoogle(): Promise<void> {
     try {
-      await signInWithRedirect(this.auth, this.provider);
+      await signInWithPopup(this.auth, this.provider);
     } catch (error) {
       console.error('Login failed', error);
       throw error;
