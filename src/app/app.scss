@@ -14,6 +14,11 @@
   z-index: 1200;
   background: transparent;
   transition: all 0.3s ease;
+  padding-left: 70px; /* Account for desktop sidebar */
+  
+  @media (max-width: 768px) {
+    padding-left: 0;
+  }
   
   &.scrolled {
     background: rgba(0, 0, 0, 0.7);
