@@ -302,7 +302,7 @@
           <div class="search-page-header">
             <app-search-bar (search)="onSearch($event)" class="main-search-bar" style="width: 100%; max-width: 800px; z-index: 10;"></app-search-bar>
             
-            <div class="search-filters" *ngIf="hasSearched()">
+            <div class="search-filters">
               <button class="filter-chip" [class.active]="searchFilter() === 'all'" (click)="setSearchFilter('all')">All</button>
               <button class="filter-chip" [class.active]="searchFilter() === 'songs'" (click)="setSearchFilter('songs')">Songs</button>
               <button class="filter-chip" [class.active]="searchFilter() === 'albums'" (click)="setSearchFilter('albums')">Albums</button>
