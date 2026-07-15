@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile, browserPopupRedirectResolver } from 'firebase/auth';
+import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, User, onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -20,19 +20,22 @@ export class AuthService {
     onAuthStateChanged(this.auth, (user) => {
       this.currentUser.set(user);
     });
+
+    // Handle redirect result when user returns from Google sign-in
+    getRedirectResult(this.auth).catch((error) => {
+      if (error?.code !== 'auth/popup-closed-by-user') {
+        console.error('Redirect sign-in error:', error);
+      }
+    });
   }
 
   async loginWithGoogle(): Promise<void> {
-    try {
-      // Use browserPopupRedirectResolver explicitly to avoid conflicts
-      // with YouTube IFrame API's iframe/callback mechanism
-      await signInWithPopup(this.auth, this.provider, browserPopupRedirectResolver);
-    } catch (error: any) {
-      if (error?.code !== 'auth/cancelled-popup-request' && error?.code !== 'auth/popup-closed-by-user') {
-        console.error('Login failed', error);
-      }
-      throw error;
-    }
+    // Use signInWithRedirect instead of signInWithPopup.
+    // signInWithPopup crashes on ganatube.in because the authDomain
+    // (ganatube-8ec4a.firebaseapp.com) differs from the hosting domain,
+    // causing cross-origin iframe communication failures (getContext error).
+    // signInWithRedirect avoids this entirely by using URL redirects.
+    await signInWithRedirect(this.auth, this.provider);
   }
 
   async logout(): Promise<void> {
