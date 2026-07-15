@@ -422,6 +422,26 @@ app.get('/api/synced-lyrics', async (req, res) => {
   }
 });
 
+// Firebase Auth handler proxy - allows authDomain to be set to ganatube.in
+// instead of firebaseapp.com, fixing cross-origin popup/redirect issues
+app.get('/__/auth/*', (req, res) => {
+  const firebaseAuthUrl = `https://ganatube-8ec4a.firebaseapp.com${req.originalUrl}`;
+  const https = require('https');
+  https.get(firebaseAuthUrl, (proxyRes) => {
+    // Forward status and headers
+    res.status(proxyRes.statusCode);
+    Object.keys(proxyRes.headers).forEach(key => {
+      // Don't forward certain headers that cause issues
+      if (!['content-encoding', 'transfer-encoding', 'connection'].includes(key.toLowerCase())) {
+        res.setHeader(key, proxyRes.headers[key]);
+      }
+    });
+    proxyRes.pipe(res);
+  }).on('error', (err) => {
+    console.error('Firebase auth proxy error:', err);
+    res.status(502).send('Auth proxy error');
+  });
+});
 
 // Serve Angular static frontend files from 'browser' folder
 app.use(express.static(path.join(__dirname, 'dist', 'ganatube', 'browser')));
