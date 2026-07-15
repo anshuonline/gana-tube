@@ -6,6 +6,7 @@ import { YoutubeApiService } from './youtube-api.service';
 import { RoomService } from './room.service';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { BackgroundPlayService } from './background-play.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -20,6 +21,7 @@ export class PlayerService {
   private roomService = inject(RoomService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private bgPlayService = inject(BackgroundPlayService);
   private trackStartTime: number = 0;
   private isFetchingMore = false;
   private isRemoteUpdate = false;
@@ -353,15 +355,18 @@ export class PlayerService {
         this.playerState.set('playing');
         this.duration.set(this.ytPlayer?.getDuration() || 0);
         this.startProgressTracking();
+        this.bgPlayService.startSilentAudio();
         break;
       case 2: // paused
         this.playerState.set('paused');
         this.stopProgressTracking();
+        this.bgPlayService.stopSilentAudio();
         break;
       case 0: // ended
         this.playerState.set('ended');
         this.stopProgressTracking();
         this.currentTime.set(0);
+        this.bgPlayService.stopSilentAudio();
         this.handleTrackEnd();
         break;
       case 3: // buffering

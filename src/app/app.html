@@ -164,6 +164,20 @@
           </div>
         </div>
 
+        <!-- Background Play Card -->
+        <div class="profile-card settings-card bg-play-card">
+          <div class="flex-between">
+            <div>
+              <h3>Background Play</h3>
+              <p>Keep music playing when screen is off (Experimental)</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [checked]="bgPlayService.isEnabled()" (change)="toggleBgPlay($event)">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+
         <!-- Listen Together Card -->
         <div class="profile-card social-card listen-together-card disabled-card">
           <h3>Listen Together <span class="coming-soon-badge">Coming Soon</span></h3>
