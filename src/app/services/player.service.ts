@@ -29,7 +29,34 @@ export class PlayerService {
 
   constructor() {
     this.setupSocketListeners();
+    this.setupVisibilityListener();
   }
+
+  private setupVisibilityListener() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          // Coming back to foreground
+          if (this.bgPlayService.isEnabled() && this.playerState() === 'playing') {
+             // In case browser paused the video, resume it
+             if (this.ytPlayer && typeof this.ytPlayer.playVideo === 'function') {
+               this.ytPlayer.playVideo();
+             }
+          }
+        } else {
+          // Going to background
+          if (this.bgPlayService.isEnabled() && this.playerState() === 'playing') {
+             // Force AudioContext to resume and make sure YT is playing
+             this.bgPlayService.startSilentAudio();
+             if (this.ytPlayer && typeof this.ytPlayer.playVideo === 'function') {
+               this.ytPlayer.playVideo();
+             }
+          }
+        }
+      });
+    }
+  }
+
 
   // Signals for state management
   queue = signal<Track[]>([]);

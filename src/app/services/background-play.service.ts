@@ -13,6 +13,10 @@ export class BackgroundPlayService {
   
   // Track if we are currently playing the silent audio
   private isPlaying = false;
+  private silentAudioEl: HTMLAudioElement | null = null;
+  
+  // Base64 silent MP3
+  private silentMp3 = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU2LjM2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIAD+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+AAAAAExhdmM1Ni40MSAAAAAAAAAAAAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAA//vQQAAP8AAAEOgAAAAAABzQAAAAAAASAEeAAAAAAABzQAAAAAAACIAAAAEAAAB//70EAA//wAAAT4AAAAAAAEGAAAAAAABAAR4AAAAAAABzQAAAAAAAgAAAAQQAAH//vQQAD//AAABPgAAAAAAAQYAAAAAAAEABHgAAAAAAAHNAAAAAAACAAAABBAAAf/+9BAAP/8AAAE+AAAAAAABBgAAAAAAAQAEeAAAAAAABzQAAAAAAAIAAAAEAAAH//70EAA//wAAAT4AAAAAAAEGAAAAAAABAAR4AAAAAAABzQAAAAAAAgAAAAQQAAH//vQQAD//AAABPgAAAAAAAQYAAAAAAAEABHgAAAAAAAHNAAAAAAACAAAABBAAAf/+9BAAP/8AAAE+AAAAAAABBgAAAAAAAQAEeAAAAAAABzQAAAAAAAIAAAAEAAAH//70EAA//wAAAT4AAAAAAAEGAAAAAAABAAR4AAAAAAABzQAAAAAAAgAAAAQQAAH//vQQAD//AAABPgAAAAAAAQYAAAAAAAEABHgAAAAAAAHNAAAAAAACAAAABBAAAf/+9BAAP/8AAAE+AAAAAAABBgAAAAAAAQAEeAAAAAAABzQAAAAAAAIAAAAEAAAH//70EAA//wAAAT4AAAAAAAEGAAAAAAABAAR4AAAAAAABzQAAAAAAAgAAAAQQAAH//vQQAD//AAABPgAAAAAAAQYAAAAAAAEABHgAAAAAAAHNAAAAAAACAAAABBAAAf';
 
   constructor() {
     this.loadSetting();
@@ -63,13 +67,22 @@ export class BackgroundPlayService {
       this.oscillator = this.audioContext.createOscillator();
       this.gainNode = this.audioContext.createGain();
 
-      // Completely silent
-      this.gainNode.gain.value = 0;
+      // Completely silent? NO! If gain is exactly 0, browser ignores it. Use 0.001
+      this.gainNode.gain.value = 0.001;
 
       this.oscillator.connect(this.gainNode);
       this.gainNode.connect(this.audioContext.destination);
 
       this.oscillator.start();
+      
+      // Also start a silent HTML5 audio element
+      if (!this.silentAudioEl) {
+        this.silentAudioEl = new Audio(this.silentMp3);
+        this.silentAudioEl.loop = true;
+        this.silentAudioEl.volume = 0.01;
+      }
+      this.silentAudioEl.play().catch(e => console.warn('Silent audio play failed', e));
+
       this.isPlaying = true;
     } catch (e) {
       console.warn('Failed to start silent audio for background playback:', e);
@@ -93,6 +106,10 @@ export class BackgroundPlayService {
       // We can also suspend the context to save resources
       if (this.audioContext && this.audioContext.state === 'running') {
         this.audioContext.suspend();
+      }
+      
+      if (this.silentAudioEl) {
+        this.silentAudioEl.pause();
       }
       
       this.isPlaying = false;
