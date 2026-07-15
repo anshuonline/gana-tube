@@ -837,6 +837,11 @@ export class App implements OnInit {
   }
 
   toggleBgPlay(event: any): void {
+    if (this.isIOS()) {
+      event.preventDefault();
+      this.toastService.show('Background Play is not supported on iOS Safari.', 'error');
+      return;
+    }
     this.bgPlayService.toggleSetting(event.target.checked);
     if (event.target.checked) {
       this.toastService.show('Background Play Enabled. A silent signal will keep tab alive.', 'success');
@@ -848,6 +853,14 @@ export class App implements OnInit {
       this.bgPlayService.stopSilentAudio();
     }
   }
+
+  isIOS(): boolean {
+    if (typeof navigator !== 'undefined') {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+    return false;
+  }
+
 
   onSearchFocus(): void {
     this.isSearchMode.set(false);

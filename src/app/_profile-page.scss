@@ -405,6 +405,10 @@
     transition: .4s;
     border-radius: 34px;
     
+    &.disabled {
+      cursor: not-allowed;
+    }
+    
     &:before {
       position: absolute;
       content: "";
