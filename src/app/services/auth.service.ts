@@ -23,10 +23,15 @@ export class AuthService {
   }
 
   async loginWithGoogle(): Promise<void> {
-    // With authDomain set to ganatube.in (same as hosting domain),
-    // signInWithPopup works without cross-origin issues.
-    // The server proxies /__/auth/* requests to Firebase.
-    await signInWithPopup(this.auth, this.provider);
+    try {
+      await signInWithPopup(this.auth, this.provider);
+    } catch (error: any) {
+      // Don't log user-initiated cancellations
+      if (error?.code !== 'auth/cancelled-popup-request' && error?.code !== 'auth/popup-closed-by-user') {
+        console.error('Login failed', error);
+      }
+      throw error;
+    }
   }
 
   async logout(): Promise<void> {
@@ -41,12 +46,9 @@ export class AuthService {
   async updateUsername(newName: string): Promise<boolean> {
     try {
       if (this.auth.currentUser) {
-        // Here you would normally check your DB if the username is available
-        // For now, we update Firebase Auth profile directly
         await updateProfile(this.auth.currentUser, {
           displayName: newName
         });
-        // Update local signal to reflect immediately
         this.currentUser.set({ ...this.auth.currentUser });
         return true;
       }

@@ -7,7 +7,7 @@ export const environment = {
   backendUrl: '/api',
   firebase: {
     apiKey: "AIzaSyBK4yJx3qsX0h5pCPxTVJgWzLkpcK_anU0",
-    authDomain: "ganatube.in",
+    authDomain: "ganatube-8ec4a.firebaseapp.com",
     projectId: "ganatube-8ec4a",
     storageBucket: "ganatube-8ec4a.firebasestorage.app",
     messagingSenderId: "749322584286",
