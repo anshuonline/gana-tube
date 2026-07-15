@@ -881,7 +881,7 @@ export class App implements OnInit {
       if (e?.code === 'auth/cancelled-popup-request' || e?.code === 'auth/popup-closed-by-user') {
         console.log('Login popup closed by user.');
       } else if (e?.code === 'auth/popup-blocked') {
-        this.toastService.error('Popup blocked! URL bar mein upar right side ❌ icon par click karein aur "Always allow" select karke wapas login karein.', 15000);
+        this.toastService.error("Popup blocked! Please click the ❌ icon on the right side of your URL bar, select 'Always allow', and try logging in again.", 15000);
       } else {
         console.error('Login error:', e);
         this.toastService.error('Failed to login. Please try again.');
