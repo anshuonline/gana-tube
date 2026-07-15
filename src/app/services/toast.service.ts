@@ -13,27 +13,27 @@ export class ToastService {
   toasts = signal<ToastMessage[]>([]);
   private idCounter = 0;
 
-  show(message: string, type: 'success' | 'error' | 'info' = 'info') {
+  show(message: string, type: 'success' | 'error' | 'info' = 'info', duration: number = 3000) {
     const id = this.idCounter++;
     const newToast: ToastMessage = { id, message, type };
     this.toasts.update(current => [...current, newToast]);
     
-    // Auto remove after 3 seconds
+    // Auto remove after duration
     setTimeout(() => {
       this.remove(id);
-    }, 3000);
+    }, duration);
   }
 
-  success(message: string) {
-    this.show(message, 'success');
+  success(message: string, duration: number = 3000) {
+    this.show(message, 'success', duration);
   }
 
-  error(message: string) {
-    this.show(message, 'error');
+  error(message: string, duration: number = 3000) {
+    this.show(message, 'error', duration);
   }
 
-  info(message: string) {
-    this.show(message, 'info');
+  info(message: string, duration: number = 3000) {
+    this.show(message, 'info', duration);
   }
 
   remove(id: number) {
