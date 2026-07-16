@@ -129,10 +129,8 @@ export class App implements OnInit {
   selectedPlaylist = signal<PlaylistMeta | null>(null);
   
   homePlaylists = computed(() => {
-    // Show all custom playlists + up to 2 default playlists
-    const custom = this.customPlaylists().filter(p => p.language === this.homeScreenLanguage());
-    const defaults = PLAYLISTS.filter(p => p.language === this.homeScreenLanguage()).slice(0, 2);
-    return [...custom, ...defaults];
+    // Show only dynamic custom playlists for the selected language
+    return this.customPlaylists().filter(p => p.language === this.homeScreenLanguage());
   });
 
   // Top Artists Data

@@ -1,0 +1,20 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # If an existing asset or directory is requested go to it as it is
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+  RewriteRule ^ - [L]
+  
+  # If the requested resource doesn't exist, use index.html
+  RewriteRule ^ /index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Prevent caching of index.html so updates show instantly
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
