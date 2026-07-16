@@ -585,6 +585,11 @@ export class App implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
+      // Mark that user has navigated within the app (useful for back button logic)
+      if (this.currentPage() !== 'home' || event.id > 1) {
+        (window as any).hasNavigatedInApp = true;
+      }
+
       let url = event.urlAfterRedirects.split('/')[1] || 'home';
       url = url.split('?')[0]; // Ignore query params
       
@@ -1700,7 +1705,7 @@ export class App implements OnInit {
 
   closePlaylist(): void {
     this.selectedPlaylist.set(null);
-    if (window.history.length > 1) {
+    if ((window as any).hasNavigatedInApp) {
       this.location.back();
     } else {
       this.currentPage.set('home');
