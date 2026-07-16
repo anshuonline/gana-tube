@@ -127,10 +127,13 @@ export class App implements OnInit {
   });
   
   selectedPlaylist = signal<PlaylistMeta | null>(null);
-  
+  ytPlaylistsForHome = signal<PlaylistMeta[]>([]);
+
   homePlaylists = computed(() => {
-    // Show only dynamic custom playlists for the selected language
-    return this.customPlaylists().filter(p => p.language === this.homeScreenLanguage());
+    // Show dynamic custom playlists and dynamic YTMusic playlists for the selected language
+    const custom = this.customPlaylists().filter(p => p.language === this.homeScreenLanguage());
+    const yt = this.ytPlaylistsForHome();
+    return [...custom, ...yt];
   });
 
   // Top Artists Data
@@ -1040,6 +1043,24 @@ export class App implements OnInit {
     this.shelvesLoading.set(true);
     this.shelfLoading.set(false);
     this.loadedShelves.set([]);
+
+    // Fetch dynamic YTMusic playlists for this language
+    this.youtubeApi.searchMusic(`${lang} top hit songs playlist`, 6, 'playlist').subscribe({
+      next: (results) => {
+        const mapped: PlaylistMeta[] = results.map(r => ({
+          id: r.videoId,
+          title: r.title,
+          language: lang,
+          coverImage: r.thumbnailHigh || r.thumbnail,
+          searchQueries: [],
+          creator: r.channelTitle
+        }));
+        this.ytPlaylistsForHome.set(mapped);
+      },
+      error: () => {
+        this.ytPlaylistsForHome.set([]);
+      }
+    });
 
     // Fetch algorithmic dynamic shelves
     this.algorithmService.getVariableRewardShelves(lang).subscribe(algorithmicShelves => {
