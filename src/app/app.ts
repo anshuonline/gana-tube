@@ -983,9 +983,7 @@ export class App implements OnInit {
       })
       .catch(err => console.error('Failed to load in-feed banner', err));
 
-    this.apiKeyMissing =
-      !environment.youtubeApiKey ||
-      environment.youtubeApiKey === 'YOUR_YOUTUBE_API_KEY_HERE';
+    this.apiKeyMissing = false;
 
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))

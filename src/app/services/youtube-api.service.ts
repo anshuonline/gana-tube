@@ -19,9 +19,8 @@ export interface YouTubeSearchResult {
   providedIn: 'root',
 })
 export class YoutubeApiService {
-  private apiUrl = environment.youtubeApiUrl;
-  private apiKey = environment.youtubeApiKey;
   private dynamicCuratedSongs: Record<string, any[]> | null = null;
+  private cacheDuration = 24 * 60 * 60 * 1000; // 24 hours
 
   constructor(private http: HttpClient) {
     this.fetchLiveCuratedSongs();
@@ -81,20 +80,15 @@ export class YoutubeApiService {
     return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/songs`, { params }).pipe(
       catchError((err) => {
         console.warn('Backend server failed, falling back to YouTube Data API:', err);
-        // Fallback: YouTube Data API
-        if (!this.apiKey || this.apiKey === 'YOUR_YOUTUBE_API_KEY_HERE') {
-          return of(this.getMockResults(query));
-        }
-
+        // Fallback: Backend proxy for YouTube Data API
         const fallbackParams = new HttpParams()
           .set('part', 'snippet')
           .set('q', query)
           .set('type', 'video')
           .set('videoCategoryId', '10') // Music category
-          .set('maxResults', maxResults.toString())
-          .set('key', this.apiKey);
+          .set('maxResults', maxResults.toString());
 
-        return this.http.get<any>(`${this.apiUrl}/search`, { params: fallbackParams }).pipe(
+        return this.http.get<any>(`${backendUrl}/yt-search`, { params: fallbackParams }).pipe(
           map((response) =>
             response.items.map((item: any) => ({
               videoId: item.id.videoId,
@@ -150,10 +144,7 @@ export class YoutubeApiService {
   getVideoDetails(videoIds: string[]): Observable<YouTubeSearchResult[]> {
     if (!videoIds || videoIds.length === 0) return of([]);
     
-    if (!this.apiKey || this.apiKey === 'YOUR_YOUTUBE_API_KEY_HERE') {
-      return of([]);
-    }
-
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const maxPerRequest = 50;
     const requests: Observable<YouTubeSearchResult[]>[] = [];
 
@@ -161,11 +152,10 @@ export class YoutubeApiService {
       const chunk = videoIds.slice(i, i + maxPerRequest);
       const params = new HttpParams()
         .set('part', 'snippet,contentDetails')
-        .set('id', chunk.join(','))
-        .set('key', this.apiKey);
+        .set('id', chunk.join(','));
 
       requests.push(
-        this.http.get<any>(`${this.apiUrl}/videos`, { params }).pipe(
+        this.http.get<any>(`${backendUrl}/yt-videos`, { params }).pipe(
           map(response => 
             response.items ? response.items.map((item: any) => ({
               videoId: item.id,

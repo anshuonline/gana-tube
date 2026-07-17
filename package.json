@@ -23,6 +23,7 @@
     "@angular/youtube-player": "^22.0.3",
     "@lucide/angular": "^1.23.0",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "firebase": "^12.15.0",
     "mysql2": "^3.22.5",

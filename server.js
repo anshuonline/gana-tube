@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const YTMusic = require('ytmusic-api');
@@ -423,6 +424,53 @@ app.get('/api/synced-lyrics', async (req, res) => {
 });
 
 
+
+// Proxy for YouTube Data API Search Fallback
+app.get('/api/yt-search', async (req, res) => {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'YOUTUBE_API_KEY missing in backend' });
+
+  try {
+    const params = new URLSearchParams({
+      part: req.query.part || 'snippet',
+      q: req.query.q || '',
+      type: req.query.type || 'video',
+      videoCategoryId: req.query.videoCategoryId || '10',
+      maxResults: req.query.maxResults || '20',
+      key: apiKey
+    });
+
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`);
+    if (!response.ok) throw new Error(`YouTube API returned ${response.status}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching yt-search:', error);
+    res.status(500).json({ error: 'Failed to fetch from YouTube Search API' });
+  }
+});
+
+// Proxy for YouTube Data API Videos details
+app.get('/api/yt-videos', async (req, res) => {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'YOUTUBE_API_KEY missing in backend' });
+
+  try {
+    const params = new URLSearchParams({
+      part: req.query.part || 'snippet,contentDetails',
+      id: req.query.id || '',
+      key: apiKey
+    });
+
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params.toString()}`);
+    if (!response.ok) throw new Error(`YouTube API returned ${response.status}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching yt-videos:', error);
+    res.status(500).json({ error: 'Failed to fetch from YouTube Videos API' });
+  }
+});
 
 // Serve Angular static frontend files from 'browser' folder
 app.use(express.static(path.join(__dirname, 'dist', 'ganatube', 'browser')));
