@@ -51,12 +51,25 @@
       
       <!-- Artwork View -->
       <div class="fs-player-view" *ngIf="activeView === 'artwork'">
-        <div class="fs-artwork-container">
+        <div class="fs-artwork-container" (click)="onCoverClick($event)">
           <img 
             [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
             [alt]="playerService.currentTrack()?.title"
             class="fs-album-art"
           />
+          
+          <!-- Guide Overlay for Double Tap -->
+          <div class="touch-guide-overlay" *ngIf="showDoubleTapGuide" (click)="hideGuide($event)">
+            <div class="guide-content">
+              <div class="touch-ripple"></div>
+              <p>Double tap to like</p>
+            </div>
+          </div>
+          
+          <!-- Heart Animation Overlay -->
+          <div class="heart-animation-overlay" *ngIf="showLikeAnimation">
+            <svg lucideHeart [attr.size]="140" fill="#fff" color="#fff"></svg>
+          </div>
         </div>
       </div>
 

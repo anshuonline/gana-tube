@@ -100,7 +100,59 @@ export class FullScreenPlayerComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Show guide after 1 second if it's the first time
+    const hasSeenGuide = localStorage.getItem('ganatube_has_seen_double_tap_guide');
+    if (!hasSeenGuide) {
+      setTimeout(() => {
+        this.showDoubleTapGuide = true;
+        // Auto hide after 4 seconds if not interacted
+        setTimeout(() => {
+          this.hideGuide(null);
+        }, 4000);
+      }, 1000);
+    }
+  }
+
+  // Double Tap & Guide Logic
+  showDoubleTapGuide = false;
+  showLikeAnimation = false;
+  lastTapTime = 0;
+
+  hideGuide(event: Event | null): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (this.showDoubleTapGuide) {
+      this.showDoubleTapGuide = false;
+      localStorage.setItem('ganatube_has_seen_double_tap_guide', 'true');
+    }
+  }
+
+  onCoverClick(event: Event): void {
+    this.hideGuide(event);
+    
+    const now = Date.now();
+    const DOUBLE_CLICK_TIME = 400; // ms
+    if (now - this.lastTapTime < DOUBLE_CLICK_TIME) {
+      // Double tap detected
+      this.triggerLikeAnimation();
+      this.lastTapTime = 0;
+    } else {
+      this.lastTapTime = now;
+    }
+  }
+
+  triggerLikeAnimation(): void {
+    if (!this.isCurrentTrackLiked()) {
+      this.toggleLike();
+    }
+    
+    this.showLikeAnimation = true;
+    setTimeout(() => {
+      this.showLikeAnimation = false;
+    }, 800);
+  }
 
   close(): void {
     this.closePlayer.emit();
