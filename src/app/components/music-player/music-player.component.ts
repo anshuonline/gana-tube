@@ -226,8 +226,12 @@ import { AuthService } from '../../services/auth.service';
       <div class="fs-container" [class.with-queue]="showFSQueue()">
         <!-- Left Pane: Large Modern Cover Art (80% size) -->
         <div class="fs-vinyl-section" *ngIf="!showFSQueue()">
-          <div class="fs-cover-card" *ngIf="playerService.currentTrack() as track">
+          <div class="fs-cover-card" *ngIf="playerService.currentTrack() as track" (click)="onCoverClick($event)">
             <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" referrerpolicy="no-referrer" />
+            
+            <div class="heart-animation-overlay" *ngIf="showLikeAnimation()">
+              <svg lucideHeart [attr.size]="140" fill="#fff" color="#fff"></svg>
+            </div>
           </div>
         </div>
 
@@ -450,6 +454,37 @@ export class MusicPlayerComponent {
       return; // Do not open FS if clicking controls
     }
     this.toggleFullScreen();
+  }
+
+  // Double tap to like
+  lastTapTime = 0;
+  showLikeAnimation = signal<boolean>(false);
+
+  onCoverClick(event: Event): void {
+    const now = Date.now();
+    const DOUBLE_CLICK_TIME = 400; // ms
+    if (now - this.lastTapTime < DOUBLE_CLICK_TIME) {
+      // Double click detected
+      this.triggerLikeAnimation(event);
+      this.lastTapTime = 0;
+    } else {
+      this.lastTapTime = now;
+    }
+  }
+
+  triggerLikeAnimation(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    // Toggle like if not already liked
+    if (!this.isCurrentTrackLiked()) {
+      this.toggleLike(event);
+    }
+    
+    this.showLikeAnimation.set(true);
+    setTimeout(() => {
+      this.showLikeAnimation.set(false);
+    }, 800); // Wait for animation to finish
   }
 
   // Swipe Gestures
