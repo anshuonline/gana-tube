@@ -118,6 +118,8 @@ export class FullScreenPlayerComponent implements OnInit {
   showDoubleTapGuide = false;
   showLikeAnimation = false;
   lastTapTime = 0;
+  heartX = 50; // percentage
+  heartY = 50; // percentage
 
   hideGuide(event: Event | null): void {
     if (event) {
@@ -129,13 +131,18 @@ export class FullScreenPlayerComponent implements OnInit {
     }
   }
 
-  onCoverClick(event: Event): void {
+  onCoverClick(event: MouseEvent): void {
     this.hideGuide(event);
     
     const now = Date.now();
     const DOUBLE_CLICK_TIME = 400; // ms
     if (now - this.lastTapTime < DOUBLE_CLICK_TIME) {
       // Double tap detected
+      const target = event.currentTarget as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      this.heartX = ((event.clientX - rect.left) / rect.width) * 100;
+      this.heartY = ((event.clientY - rect.top) / rect.height) * 100;
+
       this.triggerLikeAnimation();
       this.lastTapTime = 0;
     } else {

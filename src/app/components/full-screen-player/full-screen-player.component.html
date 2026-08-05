@@ -67,14 +67,11 @@
           </div>
           
           <!-- Heart Animation Overlay -->
-          <div class="heart-animation-overlay" *ngIf="showLikeAnimation">
-            <svg width="0" height="0" style="position: absolute;">
-              <linearGradient id="likeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ff4b82" />
-                <stop offset="100%" stop-color="#ff0040" />
-              </linearGradient>
-            </svg>
-            <svg lucideHeart [attr.size]="240" fill="url(#likeGradient)" stroke="url(#likeGradient)"></svg>
+          <div class="heart-animation-overlay" *ngIf="showLikeAnimation"
+               [style.left.%]="heartX" [style.top.%]="heartY">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/A_perfect_SVG_heart.svg/3840px-A_perfect_SVG_heart.svg.png" 
+                 alt="heart" 
+                 class="animated-heart-img" />
           </div>
         </div>
       </div>
