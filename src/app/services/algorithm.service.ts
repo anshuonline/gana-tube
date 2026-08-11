@@ -227,6 +227,14 @@ export class AlgorithmService {
   }
 
   public getVariableRewardShelves(language: string = 'Hindi'): Observable<ShelfDefinition[]> {
+    // Ensure taste_profile exists to prevent crashes
+    if (!this.profile.taste_profile) {
+      this.profile.taste_profile = { genre_scores: {}, artist_scores: {} };
+    }
+    if (!this.profile.taste_profile.artist_scores) {
+      this.profile.taste_profile.artist_scores = {};
+    }
+
     const topArtists = Object.entries(this.profile.taste_profile.artist_scores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)

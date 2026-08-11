@@ -1140,6 +1140,9 @@ export class App implements OnInit {
               if (language && language !== this.homeScreenLanguage()) {
                 // Stale callback, just increment count to prevent hanging if it was the current one somehow
                 loadedCount++;
+                if (loadedCount >= initialDefinitions.length) {
+                  this.shelvesLoading.set(false);
+                }
                 return; 
               }
               
@@ -1163,6 +1166,9 @@ export class App implements OnInit {
               console.error(`Failed to load shelf: ${def.title}`, err);
               if (language && language !== this.homeScreenLanguage()) {
                 loadedCount++;
+                if (loadedCount >= initialDefinitions.length) {
+                  this.shelvesLoading.set(false);
+                }
                 return;
               }
               loadedCount++;
