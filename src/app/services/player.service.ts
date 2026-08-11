@@ -42,6 +42,11 @@ export class PlayerService {
   repeatMode = signal<'none' | 'one' | 'all'>('none');
   currentLanguage = signal<string>('Hindi');
   isPlaylistContext = signal<boolean>(false);
+  
+  // Audio Quality
+  musicQuality = signal<'High' | 'Standard' | 'Data Saver'>(
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('gt_music_quality') : null) as any || 'High'
+  );
 
   // Computed signal for the current track
   currentTrack = computed(() => {
@@ -320,6 +325,22 @@ export class PlayerService {
         this.isMuted.set(false);
         this.ytPlayer.unMute();
       }
+    }
+  }
+
+  setMusicQuality(quality: 'High' | 'Standard' | 'Data Saver'): void {
+    this.musicQuality.set(quality);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_music_quality', quality);
+    }
+    // Change quality of currently playing video
+    if (this.ytPlayer && this.ytPlayer.setPlaybackQuality) {
+      const qMap = {
+        'High': 'hd720',
+        'Standard': 'medium',
+        'Data Saver': 'small'
+      };
+      this.ytPlayer.setPlaybackQuality(qMap[quality]);
     }
   }
 

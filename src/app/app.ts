@@ -250,7 +250,9 @@ export class App implements OnInit {
   randomRecentThumbnail = signal<string | null>(null);
 
   // Profile & Settings State
-  musicQuality = signal<'High' | 'Standard' | 'Data Saver'>('High');
+  get musicQuality() {
+    return this.playerService.musicQuality;
+  }
   preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
   
   isEditingUsername = signal<boolean>(false);
@@ -831,8 +833,7 @@ export class App implements OnInit {
   }
 
   setMusicQuality(quality: 'High' | 'Standard' | 'Data Saver'): void {
-    this.musicQuality.set(quality);
-    // In a real app, this would also tell the YT player to change quality if possible
+    this.playerService.setMusicQuality(quality);
   }
 
   onSearchFocus(): void {
