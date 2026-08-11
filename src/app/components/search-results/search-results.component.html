@@ -45,7 +45,7 @@
         <div class="top-info">
           <h3 class="top-title">{{ topResult.title }}</h3>
           <p class="top-meta">
-            <span class="type-badge">Song</span>
+            <span class="type-badge" [class.playlist-badge]="topResult.type === 'playlist' || topResult.type === 'community-playlist'">{{ (topResult.type === 'playlist' || topResult.type === 'community-playlist') ? 'Playlist' : 'Song' }}</span>
             <span class="dot">•</span>
             <span class="channel-name">{{ topResult.channelTitle }}</span>
           </p>

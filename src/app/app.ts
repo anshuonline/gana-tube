@@ -1398,16 +1398,66 @@ export class App implements OnInit {
     }
 
     // Default YouTube Search (Songs / All)
-    this.youtubeApi.searchMusic(query, 50, 'song').pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.results.set(res);
+    if (this.searchFilter() === 'all') {
+      // In "All" mode, fetch songs + top playlist in parallel
+      const songsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
+        this.youtubeApi.searchMusic(query, 50, 'song').pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => resolve(res),
+          error: () => resolve([])
+        });
+      });
+
+      // Fetch top playlist match (community + YT Music)
+      const playlistUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
+      
+      const communityPlaylistPromise = fetch(`${playlistUrl}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success' && data.data && data.data.length > 0) {
+            const pl = data.data[0];
+            return {
+              videoId: pl.playlist_id,
+              title: pl.playlist_name,
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'assets/default-playlist.jpg',
+              channelTitle: pl.owner,
+              publishedAt: pl.created_at,
+              type: 'community-playlist'
+            } as YouTubeSearchResult;
+          }
+          return null;
+        }).catch(() => null);
+
+      const ytPlaylistPromise = new Promise<YouTubeSearchResult | null>((resolve) => {
+        this.youtubeApi.searchMusic(query, 1, 'playlist').pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => resolve(res && res.length > 0 ? { ...res[0], type: 'playlist' } : null),
+          error: () => resolve(null)
+        });
+      });
+
+      Promise.all([songsPromise, communityPlaylistPromise, ytPlaylistPromise]).then(([songs, communityPl, ytPl]) => {
+        // Pick the best playlist to show as top result (prefer community)
+        const topPlaylist = communityPl || ytPl;
+        if (topPlaylist) {
+          this.results.set([topPlaylist, ...songs]);
+        } else {
+          this.results.set(songs);
+        }
         this.isLoading.set(false);
-      },
-      error: () => {
-        this.results.set([]);
-        this.isLoading.set(false);
-      },
-    });
+      });
+    } else {
+      // Songs-only filter
+      this.youtubeApi.searchMusic(query, 50, 'song').pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => {
+          this.results.set(res);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.results.set([]);
+          this.isLoading.set(false);
+        },
+      });
+    }
   }
 
 

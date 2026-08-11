@@ -123,6 +123,10 @@
       font-size: 0.8rem;
       font-weight: 600;
       color: #fff;
+
+      &.playlist-badge {
+        background: rgba(255,255,255,0.2);
+      }
     }
 
     .dot {
