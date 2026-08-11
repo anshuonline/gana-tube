@@ -171,6 +171,78 @@ function enhanceQuery(rawQuery) {
 }
 // ────────────────────────────────────────────────────────────────────────────
 
+const trendingCache = {};
+
+app.get('/api/trending', async (req, res) => {
+  const lang = req.query.lang || 'Hindi';
+  const limit = parseInt(req.query.limit) || 12;
+  const cacheKey = lang.toLowerCase();
+
+  // 1 hour cache (3600000 ms)
+  if (trendingCache[cacheKey] && (Date.now() - trendingCache[cacheKey].timestamp < 3600000)) {
+    let results = [...trendingCache[cacheKey].results];
+    // Shuffle the cached results so it looks different on refresh
+    results = results.sort(() => 0.5 - Math.random());
+    return res.json(results.slice(0, limit));
+  }
+
+  try {
+    const yt = await getYTMusic();
+    const query = `Trending ${lang} Songs`;
+    let results = await yt.searchSongs(query);
+    
+    // Helper to upgrade YouTube Music / Video thumbnails to high resolution (HD)
+    const toHDUrl = (url) => {
+      if (!url) return '';
+      if (url.includes('img.youtube.com')) {
+        return url.replace('/default.jpg', '/hqdefault.jpg');
+      }
+      return url
+        .replace(/=w\d+-h\d+/, '=w600-h600')
+        .replace(/-w\d+-h\d+/, '-w600-h600')
+        .replace(/\/s\d+-/, '/s600-');
+    };
+
+    const mappedResults = results.map(item => {
+      const artistName = item.artist && typeof item.artist === 'object' 
+        ? item.artist.name 
+        : (typeof item.artist === 'string' ? item.artist : 'Unknown Artist');
+        
+      const videoId = item.videoId || item.albumId || item.playlistId;
+
+      let thumbnailLow = item.thumbnails && item.thumbnails.length > 0
+        ? item.thumbnails[0].url
+        : `https://img.youtube.com/vi/${videoId}/default.jpg`;
+
+      let thumbnailHigh = item.thumbnails && item.thumbnails.length > 0
+        ? item.thumbnails[item.thumbnails.length - 1].url
+        : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+      return {
+        videoId: videoId,
+        title: item.name || item.title,
+        channelTitle: artistName,
+        thumbnail: toHDUrl(thumbnailLow),
+        thumbnailHigh: toHDUrl(thumbnailHigh),
+        duration: item.duration,
+        publishedAt: new Date().toISOString(),
+        type: 'song'
+      };
+    });
+
+    trendingCache[cacheKey] = {
+      timestamp: Date.now(),
+      results: mappedResults
+    };
+
+    let shuffled = [...mappedResults].sort(() => 0.5 - Math.random());
+    res.json(shuffled.slice(0, limit));
+  } catch (error) {
+    console.error('Error fetching trending:', error);
+    res.status(500).json({ error: 'Failed to fetch trending songs' });
+  }
+});
+
 // Search endpoint
 app.get('/api/songs', async (req, res) => {
   const rawQuery = req.query.q;

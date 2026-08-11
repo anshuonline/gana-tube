@@ -30,6 +30,7 @@ export interface UserProfile {
 export interface ShelfDefinition {
   title: string;
   query: string;
+  type?: 'search' | 'trending';
   songs?: YouTubeSearchResult[];
 }
 
@@ -246,6 +247,11 @@ export class AlgorithmService {
 
     const shelves: ShelfDefinition[] = [
       {
+        title: `Trending in ${language} 🔥`,
+        query: `Trending ${language} Songs`,
+        type: 'trending'
+      },
+      {
         title: "Suggested for You",
         query: `${randomVibe} ${language} songs ${randomYear}${randomModifier}`
       }
@@ -280,10 +286,7 @@ export class AlgorithmService {
     });
 
     if (this.profile.history.length < 3) {
-      // New user - keep exactly 2 default playlists
-      const newUsers1 = ['trending', 'viral', 'top charts'];
-      shelves.push({ title: `Trending ${language} Hits 🔥`, query: `${newUsers1[Math.floor(Math.random() * newUsers1.length)]} ${language} songs today` });
-      
+      // New user
       const newUsers2 = ['all time best', 'classic hits', 'golden era'];
       shelves.push({ title: "All-Time Blockbusters 🎵", query: `${newUsers2[Math.floor(Math.random() * newUsers2.length)]} ${language} songs` });
     } else {

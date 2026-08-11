@@ -56,6 +56,20 @@ export class YoutubeApiService {
       });
   }
 
+  getTrendingMusic(language: string = 'Hindi', limit: number = 12): Observable<YouTubeSearchResult[]> {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams()
+      .set('lang', language)
+      .set('limit', limit.toString());
+
+    return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/trending`, { params }).pipe(
+      catchError((err) => {
+        console.warn('Backend trending server failed, falling back to search API:', err);
+        return this.searchMusic(`Trending ${language} Songs`, limit);
+      })
+    );
+  }
+
   searchMusic(query: string, maxResults = 20, type: 'song' | 'album' | 'playlist' = 'song'): Observable<YouTubeSearchResult[]> {
     const cacheKey = `search_${type}_${query}_${maxResults}`;
     const cached = localStorage.getItem(cacheKey);

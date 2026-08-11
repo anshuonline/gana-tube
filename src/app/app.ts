@@ -1126,7 +1126,11 @@ export class App implements OnInit {
           }
         } else {
           // Algorithmic shelf, needs fetching
-          this.youtubeApi.searchMusic(def.query, 50).subscribe({
+          const fetchObservable = def.type === 'trending' 
+            ? this.youtubeApi.getTrendingMusic(lang, 12)
+            : this.youtubeApi.searchMusic(def.query, 50);
+
+          fetchObservable.subscribe({
             next: (songs) => {
               if (language && language !== this.homeScreenLanguage()) {
                 // Stale callback, just increment count to prevent hanging if it was the current one somehow
@@ -1191,7 +1195,11 @@ export class App implements OnInit {
       if (def.songs && def.songs.length > 0) {
         return of(def.songs);
       } else {
-        return this.youtubeApi.searchMusic(def.query, 50).pipe(
+        const fetchObservable = def.type === 'trending'
+          ? this.youtubeApi.getTrendingMusic(language || this.homeScreenLanguage(), 12)
+          : this.youtubeApi.searchMusic(def.query, 50);
+
+        return fetchObservable.pipe(
           // Catch errors for individual shelf loads so the whole batch doesn't fail
           catchError((err: any) => {
             console.error(`Failed to load shelf: ${def.title}`, err);
