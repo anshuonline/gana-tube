@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideDisc3, LucideChevronLeft, LucideChevronRight, LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideMegaphone, LucideShare2, LucideCheck, LucideHeart, LucideListPlus, LucideListStart, LucideFolderPlus, LucideListMusic, LucidePlus } from '@lucide/angular';
+import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -48,8 +48,6 @@ export interface SponsoredAd {
   standalone: true,
   imports: [
     CommonModule,
-    LucideChevronLeft,
-    LucideChevronRight,
     LucideSearch,
     LucideMusic,
     LucideUsers,
@@ -59,15 +57,8 @@ export interface SponsoredAd {
     LucideLibrary,
     LucideUser,
     LucideMessageSquare,
-    LucideMegaphone,
     LucideShare2,
     LucideCheck,
-    LucideHeart,
-    LucideListPlus,
-    LucideListStart,
-    LucideFolderPlus,
-    LucideListMusic,
-    LucidePlus,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,

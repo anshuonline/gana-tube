@@ -11,7 +11,6 @@ import {
   LucideFolderPlus,
   LucideHeart,
   LucideShare2,
-  LucideUser,
   LucideDownload,
   LucideRadio,
   LucideTrash2
@@ -27,7 +26,6 @@ import {
     LucideFolderPlus,
     LucideHeart,
     LucideShare2,
-    LucideUser,
     LucideDownload,
     LucideRadio,
     LucideTrash2

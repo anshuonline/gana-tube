@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ganatube-v2';
+const CACHE_NAME = 'ganatube-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -28,7 +28,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch - network first, fallback to cache
+// Fetch - smart caching strategy
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
 
@@ -44,6 +44,24 @@ self.addEventListener('fetch', (event) => {
   // Skip Angular SPA admin routes — let the browser handle navigation
   if (url.includes('/managegt/')) return;
 
+  // Cache-first for hashed static assets (JS/CSS) - they never change
+  if (url.match(/\.[a-zA-Z0-9_-]{8,}\.(js|css)$/)) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  // Network-first for everything else
   event.respondWith(
     fetch(event.request)
       .then((response) => {

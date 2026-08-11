@@ -1,13 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucidePlay, LucidePlus, LucideMoreVertical, LucideMusic2 } from '@lucide/angular';
+import { LucidePlay, LucideMoreVertical, LucideMusic2 } from '@lucide/angular';
 import { YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucidePlus, LucideMoreVertical, LucideMusic2],
+  imports: [CommonModule, LucidePlay, LucideMoreVertical, LucideMusic2],
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.scss']
 })

@@ -1,12 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const YTMusic = require('ytmusic-api');
 const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('fs');
 const path = require('path');
 const app = express();
+app.use(compression()); // Enable gzip compression for all responses
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
