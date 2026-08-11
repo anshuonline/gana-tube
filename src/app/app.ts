@@ -1651,7 +1651,8 @@ export class App implements OnInit {
   }
 
   openLikedSongs(): void {
-    const likedSongs = this.userService.likedSongs().map(song => {
+    const rawLiked = [...this.userService.likedSongs()].reverse();
+    const likedSongs = rawLiked.map(song => {
       if (typeof song === 'string') {
         return {
           videoId: song,

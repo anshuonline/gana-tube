@@ -76,7 +76,7 @@
       </div>
       
       <div class="songs-drop-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
-        <ng-container *ngFor="let song of songs(); let i = index">
+        <ng-container *ngFor="let song of displayedSongs(); let i = index">
         <div class="song-row" 
              cdkDrag 
              [cdkDragDisabled]="!playlist.is_owner || playlist.id === 'liked-songs' || playlist.id.startsWith('search-')"

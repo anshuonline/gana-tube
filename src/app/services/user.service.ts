@@ -179,8 +179,8 @@ export class UserService {
     plays = plays.filter(song => typeof song === 'string' ? song !== songObj.videoId : song.videoId !== songObj.videoId);
     
     plays.unshift(songObj);
-    if (plays.length > 20) {
-      plays = plays.slice(0, 20); // Keep max 20 recent plays
+    if (plays.length > 100) {
+      plays = plays.slice(0, 100); // Keep max 100 recent plays
     }
     
     this.recentPlays.set(plays);

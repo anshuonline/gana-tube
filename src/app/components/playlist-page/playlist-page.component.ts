@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
@@ -26,6 +26,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
   @Output() back = new EventEmitter<void>();
 
   songs = signal<YouTubeSearchResult[]>([]);
+  displayLimit = signal<number>(20);
+  displayedSongs = computed(() => this.songs().slice(0, this.displayLimit()));
   isLoading = signal<boolean>(true);
   isCopied = signal<boolean>(false);
   playlistAd = signal<SponsoredAd | null>(null);
@@ -42,6 +44,22 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
   menuX = 0;
   menuY = 0;
   activeMenuTrack: any = null;
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    const windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
+    const body = document.body;
+    const html = document.documentElement;
+    const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+    const windowBottom = windowHeight + window.pageYOffset;
+    
+    // If user scrolled to near the bottom (within 500px)
+    if (windowBottom >= docHeight - 500) {
+      if (this.displayLimit() < this.songs().length) {
+        this.displayLimit.update(limit => limit + 20);
+      }
+    }
+  }
 
   openSaveModal(track: any) {
     this.appState.openSavePlaylist(track);
