@@ -233,6 +233,7 @@ app.get('/api/songs', async (req, res) => {
         channelTitle: artistName,
         thumbnail: toHDUrl(thumbnailLow),
         thumbnailHigh: toHDUrl(thumbnailHigh),
+        duration: item.duration,
         publishedAt: new Date().toISOString(),
         type: type // return the requested type to help frontend routing
       };
@@ -453,7 +454,42 @@ app.get('/api/yt-search', async (req, res) => {
 // Proxy for YouTube Data API Videos details
 app.get('/api/yt-videos', async (req, res) => {
   const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'YOUTUBE_API_KEY missing in backend' });
+  const ids = (req.query.id || '').split(',').filter(Boolean);
+  
+  if (!apiKey) {
+    try {
+      const yt = await getYTMusic();
+      const results = await Promise.all(ids.map(async (id) => {
+        try {
+          const song = await yt.getSong(id);
+          if (!song) return null;
+          return {
+            id: song.videoId,
+            snippet: {
+              title: song.name,
+              channelTitle: song.artist?.name || 'Unknown Artist',
+              publishedAt: new Date().toISOString(),
+              thumbnails: {
+                medium: { url: `https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg` },
+                maxres: { url: `https://img.youtube.com/vi/${song.videoId}/maxresdefault.jpg` },
+                standard: { url: `https://img.youtube.com/vi/${song.videoId}/hqdefault.jpg` },
+                high: { url: `https://img.youtube.com/vi/${song.videoId}/hqdefault.jpg` }
+              }
+            },
+            contentDetails: {
+              duration: `PT${song.duration}S`
+            }
+          };
+        } catch (e) {
+          return null;
+        }
+      }));
+      return res.json({ items: results.filter(Boolean) });
+    } catch(e) {
+      console.error('Error in fallback yt-videos:', e);
+      return res.status(500).json({ error: 'Failed to fetch from fallback YT API' });
+    }
+  }
 
   try {
     const params = new URLSearchParams({

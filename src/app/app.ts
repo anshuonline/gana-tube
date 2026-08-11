@@ -1572,7 +1572,12 @@ export class App implements OnInit {
     this.selectedPlaylist.set(playlist);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
-    this.router.navigate(['/playlist', playlist.id]);
+    
+    const targetUrl = `/playlist/${playlist.id}`;
+    if (!this.router.url.includes(targetUrl)) {
+      this.router.navigate(['/playlist', playlist.id]);
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1599,7 +1604,12 @@ export class App implements OnInit {
     this.selectedPlaylist.set(playlistMeta);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
-    this.router.navigate(['/', pl.playlist_id]);
+    
+    const targetUrl = `/${pl.playlist_id}`;
+    if (!this.router.url.includes(targetUrl)) {
+      this.router.navigate(['/', pl.playlist_id]);
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1670,7 +1680,12 @@ export class App implements OnInit {
     this.selectedPlaylist.set(playlistMeta);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
-    this.router.navigate(['/playlist', 'liked-songs']);
+    
+    const targetUrl = '/playlist/liked-songs';
+    if (!this.router.url.includes(targetUrl)) {
+      this.router.navigate(['/playlist', 'liked-songs']);
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1703,7 +1718,12 @@ export class App implements OnInit {
     this.selectedPlaylist.set(playlistMeta);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
-    this.router.navigate(['/playlist', 'recently-played']);
+    
+    const targetUrl = '/playlist/recently-played';
+    if (!this.router.url.includes(targetUrl)) {
+      this.router.navigate(['/playlist', 'recently-played']);
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
