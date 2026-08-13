@@ -67,6 +67,9 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   lyricsLoading = false;
   showToast = false;
   
+  relatedTracks: Track[] = [];
+  relatedLoading = false;
+  
   showCoverAd = false;
   private adTimers: any[] = [];
 
@@ -236,6 +239,8 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
       this.activeView = view;
       if (view === 'lyrics') {
         this.fetchLyrics();
+      } else if (view === 'related') {
+        this.fetchRelated();
       }
     }
   }
@@ -249,7 +254,33 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.parsedLyrics = [];
     this.activeLineIndex = -1;
     
-    const query = `${track.title} ${track.channelTitle}`;
+    // Better cleaning: remove common noise words from title
+    let cleanTitle = track.title
+      .replace(/\(Official.*?\)/gi, '')
+      .replace(/\[Official.*?\]/gi, '')
+      .replace(/\(Lyric.*?\)/gi, '')
+      .replace(/\[Lyric.*?\]/gi, '')
+      .replace(/\(Audio.*?\)/gi, '')
+      .replace(/\[Audio.*?\]/gi, '')
+      .replace(/\(Music Video.*?\)/gi, '')
+      .replace(/\[Music Video.*?\]/gi, '')
+      .replace(/\(Full.*?\)/gi, '')
+      .replace(/\[Full.*?\]/gi, '')
+      .replace(/\(HD.*?\)/gi, '')
+      .replace(/\[HD.*?\]/gi, '')
+      .replace(/Official Video/gi, '')
+      .replace(/Video Song/gi, '')
+      .replace(/Full Song/gi, '')
+      .replace(/Lyrical/gi, '')
+      .replace(/\|.*/g, '')
+      .trim();
+    
+    let cleanArtist = (track.channelTitle || '')
+      .replace(/ - Topic/g, '')
+      .replace(/VEVO$/i, '')
+      .trim();
+    
+    const query = `${cleanTitle} ${cleanArtist}`;
     
     this.youtubeApi.getSyncedLyrics(query).subscribe(res => {
       if (res && res.syncedLyrics) {
@@ -289,6 +320,27 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+
+  fetchRelated(): void {
+    const track = this.playerService.currentTrack();
+    if (!track) return;
+    
+    this.relatedLoading = true;
+    this.relatedTracks = [];
+    
+    const query = `${track.channelTitle} ${track.title} similar songs`;
+    this.youtubeApi.searchMusic(query).subscribe(res => {
+      this.relatedTracks = res || [];
+      this.relatedLoading = false;
+    }, err => {
+      console.error('Error fetching related tracks', err);
+      this.relatedLoading = false;
+    });
+  }
+
+  playRelatedTrack(track: Track): void {
+    this.playerService.playTrack(track);
   }
 
   scrollToActiveLine(): void {

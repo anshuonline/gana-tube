@@ -52,6 +52,11 @@
       <!-- Artwork View -->
       <div class="fs-player-view" *ngIf="activeView === 'artwork'">
         <div class="fs-artwork-container" (click)="onCoverClick($event)">
+          <!-- 3-dot menu button on cover -->
+          <button class="fs-cover-menu-btn" (click)="toggleMenu($event); $event.stopPropagation()" title="More Options">
+            <svg lucideMoreVertical [attr.size]="24"></svg>
+          </button>
+          
           <img 
             [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
             [alt]="playerService.currentTrack()?.title"
@@ -153,8 +158,27 @@
 
         <!-- Related View -->
         <div class="fs-related-view" *ngIf="activeView === 'related'">
-          <div class="related-placeholder" style="text-align: center; color: rgba(255,255,255,0.5); padding: 80px 20px;">
-            <p>More like this coming soon...</p>
+          <div *ngIf="relatedLoading" class="related-loading">
+            <div class="spinner"></div>
+            <span>Finding similar songs...</span>
+          </div>
+
+          <div *ngIf="!relatedLoading && relatedTracks.length > 0" class="related-list">
+            <div 
+              class="related-item" 
+              *ngFor="let track of relatedTracks"
+              (click)="playRelatedTrack(track)"
+            >
+              <img [src]="track.thumbnail" [alt]="track.title" class="related-thumb" />
+              <div class="related-info">
+                <div class="related-title">{{ track.title }}</div>
+                <div class="related-artist">{{ track.channelTitle }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!relatedLoading && relatedTracks.length === 0" class="related-not-found">
+            <p>No related songs found.</p>
           </div>
         </div>
 
@@ -231,6 +255,7 @@
 
       <!-- Bottom Nav (Lyrics & Related toggles) -->
       <div class="fs-bottom-nav">
+        <span class="nav-item" (click)="toggleView('queue')">Up Next</span>
         <span class="nav-item" (click)="toggleView('lyrics')">Lyrics</span>
         <span class="nav-item" (click)="toggleView('related')">Related</span>
       </div>
