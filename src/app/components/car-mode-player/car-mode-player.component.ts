@@ -48,6 +48,9 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   public userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
 
+  @Input() playerCoverAd: any = null;
+  @Input() safePlayerCoverAdUrl: any = null;
+
   isListening = false;
   searchQuery = '';
   searchResults: YouTubeSearchResult[] = [];
@@ -55,12 +58,35 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   showSearchResults = false;
   imageLoadError = false;
   
+  showCoverAd = false;
+  private adTimers: any[] = [];
+  
   private recognition: any;
 
   constructor() {
     effect(() => {
       const track = this.playerService.currentTrack();
       this.imageLoadError = false;
+      
+      // Manage Ad Timers
+      if (track) {
+        this.clearAdTimers();
+        this.showCoverAd = false;
+        
+        // Wait 10 seconds before showing ad
+        this.adTimers.push(setTimeout(() => {
+          if (this.playerCoverAd && this.playerCoverAd.isActive && this.isVisible) {
+            this.showCoverAd = true;
+            this.cdr.detectChanges();
+          }
+        }, 10000));
+        
+        // Hide ad after 15 seconds (total 25s)
+        this.adTimers.push(setTimeout(() => {
+          this.showCoverAd = false;
+          this.cdr.detectChanges();
+        }, 25000));
+      }
     }, { allowSignalWrites: true });
   }
 
@@ -76,6 +102,12 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     if (this.recognition) {
       this.recognition.stop();
     }
+    this.clearAdTimers();
+  }
+  
+  clearAdTimers(): void {
+    this.adTimers.forEach(t => clearTimeout(t));
+    this.adTimers = [];
   }
 
   setupSpeechRecognition() {

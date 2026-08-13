@@ -23,16 +23,31 @@
       
       <!-- Left Column: Player View -->
       <div class="cm-player-col">
-        <div class="cm-artwork">
+        <div class="cm-artwork" [class.ad-active]="showCoverAd">
           <img 
             *ngIf="!imageLoadError"
             [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'assets/default-playlist.jpg'" 
             [alt]="playerService.currentTrack()?.title"
             (error)="onImageError()"
+            class="cm-album-art"
           />
           <div *ngIf="imageLoadError" class="cm-artwork-fallback">
             <span class="fallback-logo">GanaTube</span>
             <span class="fallback-text">Cover Image Not Found</span>
+          </div>
+          
+          <!-- Animated Ad Overlay -->
+          <div class="fs-cover-ad-container" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
+             <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" [href]="playerCoverAd?.linkUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
+               <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="fs-cover-ad-media" />
+             </a>
+             <iframe *ngIf="playerCoverAd?.customCode" 
+                     [src]="safePlayerCoverAdUrl"
+                     class="fs-cover-ad-media"
+                     scrolling="no"
+                     frameborder="0">
+             </iframe>
+             <span class="fs-cover-ad-label">Sponsored</span>
           </div>
         </div>
 

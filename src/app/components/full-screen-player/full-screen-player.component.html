@@ -56,7 +56,22 @@
             [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
             [alt]="playerService.currentTrack()?.title"
             class="fs-album-art"
+            [class.ad-active]="showCoverAd"
           />
+          
+          <!-- Animated Ad Overlay -->
+          <div class="fs-cover-ad-container" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
+             <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" [href]="playerCoverAd?.linkUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
+               <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="fs-cover-ad-media" />
+             </a>
+             <iframe *ngIf="playerCoverAd?.customCode" 
+                     [src]="safePlayerCoverAdUrl"
+                     class="fs-cover-ad-media"
+                     scrolling="no"
+                     frameborder="0">
+             </iframe>
+             <span class="fs-cover-ad-label">Sponsored</span>
+          </div>
           
           <!-- Guide Overlay for Double Tap -->
           <div class="touch-guide-overlay" *ngIf="showDoubleTapGuide" (click)="hideGuide($event)">

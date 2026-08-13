@@ -196,6 +196,7 @@ export class App implements OnInit {
   // Sponsored Ad State
   sponsoredAd = signal<SponsoredAd | null>(null);
   inFeedAd = signal<SponsoredAd | null>(null);
+  playerCoverAd = signal<SponsoredAd | null>(null);
   showAd = signal<boolean>(true);
 
   // Dynamic Hero Header Data (from ManageGT admin)
@@ -227,6 +228,7 @@ export class App implements OnInit {
 
   safeHomeFeedAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('home_feed_banner'));
   safeBottomPlayerAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('bottom_player_banner'));
+  safePlayerCoverAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('player_cover_ad'));
 
   // Helpers for Fallback Design
   getInitials(name: string): string {
@@ -983,6 +985,16 @@ export class App implements OnInit {
         }
       })
       .catch(err => console.error('Failed to load in-feed banner', err));
+
+    // Fetch Player Cover Ad
+    fetch(`${adApiUrl}?placeholder=player_cover_ad`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.isActive) {
+          this.playerCoverAd.set(data);
+        }
+      })
+      .catch(err => console.error('Failed to load player cover banner', err));
 
     this.apiKeyMissing = false;
 

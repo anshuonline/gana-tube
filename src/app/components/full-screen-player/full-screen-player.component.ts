@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService } from '../../services/youtube-api.service';
@@ -41,7 +41,7 @@ import { TrackMenuComponent } from '../track-menu/track-menu.component';
   templateUrl: './full-screen-player.component.html',
   styleUrls: ['./full-screen-player.component.scss']
 })
-export class FullScreenPlayerComponent implements OnInit {
+export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   @Input() isVisible = false;
   @Output() closePlayer = new EventEmitter<void>();
   @Output() openPlaylist = new EventEmitter<any>();
@@ -54,6 +54,9 @@ export class FullScreenPlayerComponent implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
 
+  @Input() playerCoverAd: any = null;
+  @Input() safePlayerCoverAdUrl: any = null;
+
   activeView: 'artwork' | 'queue' | 'lyrics' | 'related' = 'artwork';
   showMenu = false;
   menuX = 0;
@@ -63,6 +66,9 @@ export class FullScreenPlayerComponent implements OnInit {
   activeLineIndex: number = -1;
   lyricsLoading = false;
   showToast = false;
+  
+  showCoverAd = false;
+  private adTimers: any[] = [];
 
   constructor() {
     // Automatically fetch lyrics when track changes if lyrics view is open
@@ -71,7 +77,25 @@ export class FullScreenPlayerComponent implements OnInit {
       if (track && this.activeView === 'lyrics') {
         this.fetchLyrics();
       }
-    });
+      
+      // Manage Ad Timers
+      if (track) {
+        this.clearAdTimers();
+        this.showCoverAd = false;
+        
+        // Wait 10 seconds before showing ad
+        this.adTimers.push(setTimeout(() => {
+          if (this.playerCoverAd && this.playerCoverAd.isActive && this.isVisible) {
+            this.showCoverAd = true;
+          }
+        }, 10000));
+        
+        // Hide ad after 15 seconds (total 25s)
+        this.adTimers.push(setTimeout(() => {
+          this.showCoverAd = false;
+        }, 25000));
+      }
+    }, { allowSignalWrites: true });
 
     // Automatically track active lyric line based on playback time
     effect(() => {
@@ -105,6 +129,15 @@ export class FullScreenPlayerComponent implements OnInit {
         }, 4000);
       }, 1000);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.clearAdTimers();
+  }
+
+  clearAdTimers(): void {
+    this.adTimers.forEach(t => clearTimeout(t));
+    this.adTimers = [];
   }
 
   // Double Tap & Guide Logic

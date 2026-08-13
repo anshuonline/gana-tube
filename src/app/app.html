@@ -603,6 +603,8 @@
   <!-- Full Screen Player Overlay -->
   <app-full-screen-player 
     [isVisible]="isFullScreenPlayerVisible()"
+    [playerCoverAd]="playerCoverAd()"
+    [safePlayerCoverAdUrl]="safePlayerCoverAdUrl"
     (closePlayer)="closeFullScreenPlayer()"
     (openPlaylist)="openSaveToPlaylist($event)"
     (openCarMode)="toggleCarMode()">
@@ -611,6 +613,8 @@
   <!-- Car Mode Player Overlay -->
   <app-car-mode-player
     [isVisible]="isCarModeVisible()"
+    [playerCoverAd]="playerCoverAd()"
+    [safePlayerCoverAdUrl]="safePlayerCoverAdUrl"
     (closeMode)="closeCarMode()">
   </app-car-mode-player>
 
