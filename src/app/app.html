@@ -399,7 +399,7 @@
                 <img [src]="inFeedAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
               </a>
               <iframe *ngIf="inFeedAd()?.customCode" 
-                      [src]="getSafeUrl(getAdIframeUrl('home_feed_banner'))"
+                      [src]="safeHomeFeedAdUrl"
                       class="sponsored-ad-iframe"
                       scrolling="no"
                       frameborder="0">
@@ -585,7 +585,7 @@
 
     <!-- Show Iframe if custom code exists -->
     <iframe *ngIf="sponsoredAd()?.customCode" 
-            [src]="getSafeUrl(getAdIframeUrl('bottom_player_banner'))"
+            [src]="safeBottomPlayerAdUrl"
             class="sponsored-ad-iframe"
             scrolling="no"
             frameborder="0">

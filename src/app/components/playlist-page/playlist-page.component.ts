@@ -113,6 +113,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     return `${baseUrl}/ad_iframe.php?placeholder=${placeholder}`;
   }
 
+  safePlaylistAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('playlist_in_feed_banner'));
+
   loadSongs(): void {
     if (this.playlist.preloadedSongs && this.playlist.preloadedSongs.length > 0) {
       // Check if they are legacy dummy songs (Unknown Title)

@@ -225,6 +225,9 @@ export class App implements OnInit {
     return `${baseUrl}/ad_iframe.php?placeholder=${placeholder}`;
   }
 
+  safeHomeFeedAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('home_feed_banner'));
+  safeBottomPlayerAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('bottom_player_banner'));
+
   // Helpers for Fallback Design
   getInitials(name: string): string {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
