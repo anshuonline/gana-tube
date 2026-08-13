@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService } from '../../services/youtube-api.service';
@@ -53,6 +53,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   public algorithmService = inject(AlgorithmService);
   private authService = inject(AuthService);
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() playerCoverAd: any = null;
   @Input() safePlayerCoverAdUrl: any = null;
@@ -214,6 +215,14 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.showMenu = !this.showMenu;
   }
 
+  onRightClick(event: MouseEvent): void {
+    event.preventDefault(); // Prevent default browser context menu
+    // Open menu at mouse coordinates instead of element rect if we want
+    this.menuX = event.clientX;
+    this.menuY = event.clientY;
+    this.showMenu = true;
+  }
+
   isCurrentTrackLiked(): boolean {
     const track = this.playerService.currentTrack();
     if (!track) return false;
@@ -294,8 +303,11 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         this.youtubeApi.getLyrics(track.videoId).subscribe(ly => {
           this.lyrics = ly;
           this.lyricsLoading = false;
+          this.cdr.detectChanges();
         });
+        return;
       }
+      this.cdr.detectChanges();
     });
   }
 
@@ -333,9 +345,11 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.youtubeApi.searchMusic(query).subscribe(res => {
       this.relatedTracks = res || [];
       this.relatedLoading = false;
+      this.cdr.detectChanges();
     }, err => {
       console.error('Error fetching related tracks', err);
       this.relatedLoading = false;
+      this.cdr.detectChanges();
     });
   }
 

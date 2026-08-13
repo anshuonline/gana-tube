@@ -51,12 +51,7 @@
       
       <!-- Artwork View -->
       <div class="fs-player-view" *ngIf="activeView === 'artwork'">
-        <div class="fs-artwork-container" (click)="onCoverClick($event)">
-          <!-- 3-dot menu button on cover -->
-          <button class="fs-cover-menu-btn" (click)="toggleMenu($event); $event.stopPropagation()" title="More Options">
-            <svg lucideMoreVertical [attr.size]="24"></svg>
-          </button>
-          
+        <div class="fs-artwork-container" (click)="onCoverClick($event)" (contextmenu)="onRightClick($event)">
           <img 
             [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
             [alt]="playerService.currentTrack()?.title"
@@ -218,9 +213,12 @@
 
       <!-- Playback Controls -->
       <div class="fs-controls-row">
-        <button class="fs-control-btn secondary" [class.active]="playerService.isShuffled()" title="Shuffle" (click)="playerService.toggleShuffle()">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-        </button>
+        <!-- Left Side Controls -->
+        <div style="display: flex; gap: 4px; flex: 1;">
+          <button class="fs-control-btn secondary" [class.active]="playerService.isShuffled()" title="Shuffle" (click)="playerService.toggleShuffle()">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          </button>
+        </div>
 
         <div class="fs-main-controls">
           <button class="fs-control-btn skip" (click)="playerService.previous()" [disabled]="playerService.currentIndex() <= 0">
@@ -237,20 +235,37 @@
           </button>
         </div>
 
-        <button class="fs-control-btn secondary" (click)="playerService.toggleRepeat()" title="Repeat">
-          <!-- Repeat None -->
-          <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="24" stroke="rgba(255,255,255,0.4)"></svg>
-          <!-- Repeat All -->
-          <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="24" stroke="#fff"></svg>
-          <!-- Repeat One -->
-          <svg *ngIf="playerService.repeatMode() === 'one'" viewBox="0 0 24 24" width="24" height="24" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="17 1 21 5 17 9"></polyline>
-            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-            <polyline points="7 23 3 19 7 15"></polyline>
-            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-            <text x="10" y="16" font-family="sans-serif" font-size="6" font-weight="bold" stroke="none" fill="#fff">1</text>
-          </svg>
-        </button>
+        <!-- Right Side Controls -->
+        <div style="display: flex; gap: 4px; flex: 1; justify-content: flex-end;">
+          <button class="fs-control-btn secondary" (click)="playerService.toggleMute()" title="Mute">
+            <!-- Unmuted -->
+            <svg *ngIf="!playerService.isMuted()" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <!-- Muted -->
+            <svg *ngIf="playerService.isMuted()" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+
+          <button class="fs-control-btn secondary" (click)="playerService.toggleRepeat()" title="Repeat">
+            <!-- Repeat None -->
+            <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="24" stroke="rgba(255,255,255,0.4)"></svg>
+            <!-- Repeat All -->
+            <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="24" stroke="#fff"></svg>
+            <!-- Repeat One -->
+            <svg *ngIf="playerService.repeatMode() === 'one'" viewBox="0 0 24 24" width="24" height="24" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+              <text x="10" y="16" font-family="sans-serif" font-size="6" font-weight="bold" stroke="none" fill="#fff">1</text>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Bottom Nav (Lyrics & Related toggles) -->
