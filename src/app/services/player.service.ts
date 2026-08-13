@@ -195,6 +195,19 @@ export class PlayerService {
     this.fetchMoreTracksIfNeeded();
   }
 
+  updateQueueOrder(newQueue: Track[], newCurrentIndex: number): void {
+    this.queue.set(newQueue);
+    this.currentIndex.set(newCurrentIndex);
+    
+    if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
+      this.roomService.getSocket().emit('sync_queue', {
+        roomId: this.roomService.currentRoom(),
+        queue: newQueue,
+        currentIndex: newCurrentIndex
+      });
+    }
+  }
+
   togglePlayPause(): void {
     if (!this.ytPlayer) return;
     if (this.playerState() === 'playing') {

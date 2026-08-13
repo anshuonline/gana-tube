@@ -12,13 +12,15 @@ import {
   LucideMoreVertical,
   LucideHeart,
   LucideCar,
-  LucideRepeat
+  LucideRepeat,
+  LucideGripVertical
 } from '@lucide/angular';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { FormsModule } from '@angular/forms';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-full-screen-player',
@@ -26,6 +28,7 @@ import { TrackMenuComponent } from '../track-menu/track-menu.component';
   imports: [
     CommonModule, 
     FormsModule,
+    DragDropModule,
     LucideChevronDown, 
     LucidePlay, 
     LucidePause, 
@@ -36,6 +39,7 @@ import { TrackMenuComponent } from '../track-menu/track-menu.component';
     LucideHeart,
     LucideCar,
     LucideRepeat,
+    LucideGripVertical,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
@@ -372,6 +376,21 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   playQueueTrack(index: number): void {
     const queue = this.playerService.queue();
     this.playerService.setQueue(queue, index);
+  }
+
+  onDrop(event: CdkDragDrop<Track[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    
+    const queue = [...this.playerService.queue()];
+    let currentIdx = this.playerService.currentIndex();
+    const currentPlayingTrack = queue[currentIdx];
+    
+    moveItemInArray(queue, event.previousIndex, event.currentIndex);
+    
+    // Find the new index of the currently playing track
+    const newCurrentIdx = queue.findIndex(t => t === currentPlayingTrack);
+    
+    this.playerService.updateQueueOrder(queue, newCurrentIdx);
   }
 
   formatTime(seconds: number): string {

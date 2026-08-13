@@ -96,13 +96,18 @@
         
         <!-- Queue View (Up Next) -->
         <div class="fs-queue-view" *ngIf="activeView === 'queue'">
-          <div class="queue-list">
+          <div class="queue-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
             <div 
               class="queue-item" 
               *ngFor="let track of playerService.queue(); let i = index"
               [class.active]="playerService.currentIndex() === i"
               (click)="playQueueTrack(i)"
+              cdkDrag
+              cdkDragLockAxis="y"
             >
+              <div class="queue-drag-handle" cdkDragHandle (click)="$event.stopPropagation()">
+                <svg lucideGripVertical [attr.size]="20" style="color: rgba(255,255,255,0.3);"></svg>
+              </div>
               <div class="queue-item-thumb">
                 <img [src]="track.thumbnail" [alt]="track.title" />
                 <div class="play-overlay" *ngIf="playerService.currentIndex() === i">
