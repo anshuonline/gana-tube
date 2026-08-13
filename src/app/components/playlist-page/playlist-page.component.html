@@ -116,7 +116,7 @@
             <img [src]="playlistAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
           </a>
           <iframe *ngIf="playlistAd()?.customCode" 
-                  [src]="getSafeUrl('http://localhost/manageads/ad_iframe.php?placeholder=playlist_in_feed_banner')"
+                  [src]="getSafeUrl(getAdIframeUrl('playlist_in_feed_banner'))"
                   class="sponsored-ad-iframe"
                   scrolling="no"
                   frameborder="0">

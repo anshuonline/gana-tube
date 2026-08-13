@@ -219,6 +219,12 @@ export class App implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
+  getAdIframeUrl(placeholder: string): string {
+    const isLocalhost = typeof window !== 'undefined' && window.location.origin.includes('localhost');
+    const baseUrl = isLocalhost ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
+    return `${baseUrl}/ad_iframe.php?placeholder=${placeholder}`;
+  }
+
   // Helpers for Fallback Design
   getInitials(name: string): string {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();

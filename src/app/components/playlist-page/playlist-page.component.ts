@@ -107,6 +107,12 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
+  getAdIframeUrl(placeholder: string): string {
+    const isLocalhost = typeof window !== 'undefined' && window.location.origin.includes('localhost');
+    const baseUrl = isLocalhost ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
+    return `${baseUrl}/ad_iframe.php?placeholder=${placeholder}`;
+  }
+
   loadSongs(): void {
     if (this.playlist.preloadedSongs && this.playlist.preloadedSongs.length > 0) {
       // Check if they are legacy dummy songs (Unknown Title)
