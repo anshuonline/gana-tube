@@ -84,21 +84,21 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         this.showCoverAd = false;
         
         const loopAd = () => {
-          // Wait 10 seconds before showing ad
+          // Wait 5 seconds before showing ad
           const t1 = setTimeout(() => {
             if (this.playerCoverAd && this.playerCoverAd.isActive && this.isVisible) {
               this.showCoverAd = true;
             }
             
-            // Wait 15 seconds before hiding (total cycle = 25s)
+            // Wait 5 seconds before hiding (total cycle = 10s)
             const t2 = setTimeout(() => {
               this.showCoverAd = false;
               
               // Start next cycle
               loopAd();
-            }, 15000);
+            }, 5000);
             this.adTimers.push(t2);
-          }, 10000);
+          }, 5000);
           this.adTimers.push(t1);
         };
         
