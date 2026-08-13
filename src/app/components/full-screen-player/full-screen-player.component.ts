@@ -124,6 +124,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         }
         if (newIndex !== this.activeLineIndex) {
           this.activeLineIndex = newIndex;
+          this.cdr.detectChanges();
           this.scrollToActiveLine();
         }
       }
