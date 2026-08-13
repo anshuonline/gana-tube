@@ -230,6 +230,39 @@ export class App implements OnInit {
   safeBottomPlayerAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('bottom_player_banner'));
   safePlayerCoverAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('player_cover_ad'));
 
+  injectHeaderScript(customHtml: string): void {
+    if (typeof window === 'undefined' || !customHtml) return;
+    
+    try {
+      const container = document.createElement('div');
+      container.innerHTML = customHtml;
+      
+      Array.from(container.childNodes).forEach(node => {
+        if (node.nodeName.toLowerCase() === 'script') {
+          const originalScript = node as HTMLScriptElement;
+          const newScript = document.createElement('script');
+          
+          Array.from(originalScript.attributes).forEach(attr => {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+          
+          if (originalScript.text) {
+            newScript.text = originalScript.text;
+          }
+          
+          document.head.appendChild(newScript);
+        } else if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE) {
+          // If there are other tags (e.g. meta, link, noscript), just append them directly
+          if (node.textContent?.trim() !== '') {
+            document.head.appendChild(node.cloneNode(true));
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Error injecting header script:', e);
+    }
+  }
+
   // Helpers for Fallback Design
   getInitials(name: string): string {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -995,6 +1028,20 @@ export class App implements OnInit {
         }
       })
       .catch(err => console.error('Failed to load player cover banner', err));
+
+    // Fetch and Inject Header Scripts
+    fetch(`${adApiUrl}?action=header_scripts`)
+      .then(res => res.json())
+      .then(scripts => {
+        if (Array.isArray(scripts)) {
+          scripts.forEach(script => {
+            if (script && script.custom_code) {
+              this.injectHeaderScript(script.custom_code);
+            }
+          });
+        }
+      })
+      .catch(err => console.error('Failed to load header scripts', err));
 
     this.apiKeyMissing = false;
 
