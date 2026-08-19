@@ -235,80 +235,125 @@ export class AlgorithmService {
     if (!this.profile.taste_profile.artist_scores) {
       this.profile.taste_profile.artist_scores = {};
     }
+    if (!this.profile.taste_profile.genre_scores) {
+      this.profile.taste_profile.genre_scores = {};
+    }
 
     const topArtists = Object.entries(this.profile.taste_profile.artist_scores)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(e => e[0]);
+
+    const topGenres = Object.entries(this.profile.taste_profile.genre_scores)
+      .filter(([genre]) => genre !== 'general')
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(e => e[0]);
 
-    const randomYear = [2022, 2023, 2024, 2025, 2026][Math.floor(Math.random() * 5)];
+    const randomYear = [2023, 2024, 2025, 2026][Math.floor(Math.random() * 4)];
     const randomVibe = ['hits', 'trending', 'viral', 'best of', 'new releases', 'top'][Math.floor(Math.random() * 6)];
     const randomModifier = topArtists.length > 0 ? ` ${topArtists[Math.floor(Math.random() * topArtists.length)]}` : '';
 
     const shelves: ShelfDefinition[] = [
       {
-        title: `Trending in ${language} 🔥`,
+        title: `Trending in ${language}`,
         query: `Trending ${language} Songs`,
         type: 'trending'
       },
       {
-        title: "Suggested for You",
+        title: 'Suggested for You',
         query: `${randomVibe} ${language} songs ${randomYear}${randomModifier}`
       }
     ];
 
-    // Context-Aware Naming
+    // Context-Aware Naming (no emojis)
     const hour = new Date().getHours();
-    let timeGreeting = "Day";
+    let timeGreeting = 'Day';
     let timeQuery = `popular ${language} hits`;
     
     if (hour >= 6 && hour < 12) {
-      timeGreeting = "Morning Boost ☀️";
+      timeGreeting = 'Morning Boost';
       const mornings = ['morning motivation', 'morning chill', 'waking up', 'fresh morning'];
       timeQuery = `${mornings[Math.floor(Math.random() * mornings.length)]} ${language} songs`;
     } else if (hour >= 12 && hour < 17) {
-      timeGreeting = "Afternoon Vibes 🎵";
+      timeGreeting = 'Afternoon Vibes';
       const afternoons = ['afternoon drive', 'pop', 'upbeat', 'feel good'];
       timeQuery = `${afternoons[Math.floor(Math.random() * afternoons.length)]} ${language} songs`;
     } else if (hour >= 17 && hour < 21) {
-      timeGreeting = "Evening Melodies 🌆";
+      timeGreeting = 'Evening Melodies';
       const evenings = ['evening romantic', 'unplugged', 'sunset chill', 'acoustic'];
       timeQuery = `${evenings[Math.floor(Math.random() * evenings.length)]} ${language} songs ${randomYear}`;
     } else {
-      timeGreeting = "Late Night Feels 🌙";
+      timeGreeting = 'Late Night Feels';
       const nights = ['late night lofi', 'midnight chill', 'night drive', 'sleep relaxing'];
       timeQuery = `${nights[Math.floor(Math.random() * nights.length)]} ${language} songs`;
     }
 
     shelves.push({
-      title: "Your " + timeGreeting,
+      title: 'Your ' + timeGreeting,
       query: timeQuery
     });
 
     if (this.profile.history.length < 3) {
-      // New user
+      // New user — show broad discovery shelves
       const newUsers2 = ['all time best', 'classic hits', 'golden era'];
-      shelves.push({ title: "All-Time Blockbusters 🎵", query: `${newUsers2[Math.floor(Math.random() * newUsers2.length)]} ${language} songs` });
+      shelves.push({ title: 'All-Time Classics', query: `${newUsers2[Math.floor(Math.random() * newUsers2.length)]} ${language} songs` });
     } else {
-      // Personalized shelves
+      // --- Personalized shelves ---
+
+      // "More from {Artist}" — fetch NEW songs by their top artist
       if (topArtists.length > 0) {
-        const topModifiers = ['hits', 'live', 'best songs', 'audio'];
+        const artistQueryFormats = ['official songs full audio', 'all songs audio', 'top songs official', 'best songs collection'];
         shelves.push({
-          title: "Because you like " + topArtists[0],
-          query: topArtists[0] + " " + topModifiers[Math.floor(Math.random() * topModifiers.length)]
+          title: 'More from ' + topArtists[0],
+          query: topArtists[0] + ' ' + artistQueryFormats[Math.floor(Math.random() * artistQueryFormats.length)]
         });
       }
 
-      const madeForYouModifiers = ['hits', 'mashup', 'remix', 'jukebox'];
+      // "Made For You" — smart genre-based discovery
+      // When user has 20+ liked songs, use genre analysis for truly personalized results
+      const likedCount = this.profile.liked_songs.length;
+      let madeForYouQuery = '';
+      
+      if (likedCount >= 20 && topGenres.length > 0) {
+        // Smart mode: combine top genre + secondary artist for cross-discovery
+        const genreLabels: Record<string, string> = {
+          'lofi': 'lofi chill',
+          'romantic': 'romantic love',
+          'sad': 'sad emotional heartbreak',
+          'party': 'party dance upbeat',
+          'punjabi': 'punjabi',
+          'bollywood': 'bollywood'
+        };
+        const genreQuery = genreLabels[topGenres[0]] || topGenres[0];
+        const secondArtist = topArtists.length > 1 ? topArtists[1] : '';
+        madeForYouQuery = `${genreQuery} ${language} songs ${secondArtist} ${randomYear}`.trim();
+      } else if (topArtists.length > 1) {
+        // Moderate mode: use secondary artist
+        const madeForYouModifiers = ['hits', 'songs collection', 'best songs', 'jukebox'];
+        madeForYouQuery = topArtists[1] + ' ' + madeForYouModifiers[Math.floor(Math.random() * madeForYouModifiers.length)];
+      } else {
+        madeForYouQuery = `trending ${language} songs ${randomYear}`;
+      }
+
       shelves.push({
-        title: "Made For You 💜",
-        query: topArtists.length > 1 ? (topArtists[1] + " " + madeForYouModifiers[Math.floor(Math.random() * madeForYouModifiers.length)]) : `trending ${language} songs ${randomYear}`
+        title: 'Made For You',
+        query: madeForYouQuery
       });
 
+      // "Fans Also Listen To" — third artist if available
+      if (topArtists.length > 2) {
+        shelves.push({
+          title: 'Fans Also Listen To',
+          query: `${topArtists[2]} official songs audio ${randomYear}`
+        });
+      }
+
+      // "Fresh Picks" — new releases in their language
       const freshModifiers = ['new release', 'latest', 'brand new'];
       shelves.push({
-        title: "Fresh Finds For You ✨",
-        query: `${freshModifiers[Math.floor(Math.random() * freshModifiers.length)]} ${language} pop songs`
+        title: 'Fresh Picks',
+        query: `${freshModifiers[Math.floor(Math.random() * freshModifiers.length)]} ${language} songs ${randomYear}`
       });
     }
 
