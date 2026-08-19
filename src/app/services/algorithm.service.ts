@@ -70,7 +70,7 @@ export class AlgorithmService {
       this.userService.syncProfile({
         email: user.email,
         preferred_languages: this.userService.preferredLanguages ? this.userService.preferredLanguages() : [],
-        liked_songs: this.profile.liked_songs,
+        liked_songs: this.userService.likedSongs(),
         recent_plays: this.userService.recentPlays ? this.userService.recentPlays() : [],
         listening_preferences: this.profile.search_history // We map search_history to listening_preferences
       });

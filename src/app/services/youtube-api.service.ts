@@ -181,7 +181,39 @@ export class YoutubeApiService {
               duration: this.parseISO8601Duration(item.contentDetails?.duration)
             })) : []
           ),
-          catchError(() => of([]))
+          catchError((err) => {
+            console.warn('Backend yt-videos failed, falling back to individual searches', err);
+            // Fallback: search for each video ID using yt-search
+            const fallbackRequests = chunk.map(id => {
+              const fallbackParams = new HttpParams()
+                .set('part', 'snippet')
+                .set('q', id)
+                .set('type', 'video')
+                .set('maxResults', '1');
+                
+              return this.http.get<any>(`${backendUrl}/yt-search`, { params: fallbackParams }).pipe(
+                map(res => {
+                  if (res && res.items && res.items.length > 0) {
+                    const item = res.items[0];
+                    return {
+                      videoId: item.id?.videoId || item.id,
+                      title: this.decodeHtml(item.snippet.title),
+                      channelTitle: item.snippet.channelTitle,
+                      thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
+                      thumbnailHigh: item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.standard?.url || item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+                      publishedAt: item.snippet.publishedAt
+                    } as YouTubeSearchResult;
+                  }
+                  return null;
+                }),
+                catchError(() => of(null))
+              );
+            });
+            
+            return forkJoin(fallbackRequests).pipe(
+              map((results: any[]) => results.filter(r => r !== null))
+            );
+          })
         )
       );
     }
