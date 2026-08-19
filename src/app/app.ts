@@ -35,6 +35,7 @@ import { PwaService } from './services/pwa.service';
 import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-browser';
 import { CarModePlayerComponent } from './components/car-mode-player/car-mode-player.component';
 import { LibraryPageComponent } from './components/library-page/library-page';
+import { FeedbackPopupComponent } from './components/feedback-popup/feedback-popup.component';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -77,7 +78,8 @@ export interface SponsoredAd {
     PlaylistMenuComponent,
     SavePlaylistModalComponent,
     ToastComponent,
-    LibraryPageComponent
+    LibraryPageComponent,
+    FeedbackPopupComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -211,6 +213,8 @@ export class App implements OnInit {
   heroData = signal<Record<string, { badge: string; title: string; subtitle: string; imageUrl: string; buttonText: string; buttonLink?: string }>>({});
 
   private manageApiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
+
+  showFeedbackPopup = signal<boolean>(false);
 
   carouselIndex = 0;
   private carouselInterval: any;
@@ -1107,6 +1111,13 @@ export class App implements OnInit {
         }
       }, 50);
     });
+
+    // Trigger feedback popup once per session after 60s if not submitted
+    setTimeout(() => {
+      if (!localStorage.getItem('gt_feedback_submitted')) {
+        this.showFeedbackPopup.set(true);
+      }
+    }, 60000);
   }
 
   fetchHeroData(): void {

@@ -1,0 +1,50 @@
+<div class="feedback-overlay" (click)="closePopup()">
+  <div class="feedback-modal" (click)="$event.stopPropagation()">
+    
+    <button class="close-btn" (click)="closePopup()" title="Maybe Later">
+      <svg lucideX [attr.size]="20"></svg>
+    </button>
+    
+    <div class="feedback-header">
+      <div class="icon-wrapper">
+        <svg lucideHeartHandshake [attr.size]="32" class="glow-icon"></svg>
+      </div>
+      <h2>Enjoying GanaTube?</h2>
+      <p>Help us improve your music experience. Rate us and drop a suggestion!</p>
+    </div>
+
+    <div class="rating-section">
+      <div class="stars">
+        <button *ngFor="let star of stars" 
+                class="star-btn"
+                (mouseenter)="setHoverRating(star)"
+                (mouseleave)="setHoverRating(0)"
+                (click)="setRating(star)"
+                [class.active]="star <= (hoverRating() || rating())">
+          <svg lucideStar [attr.size]="36" [class.filled]="star <= (hoverRating() || rating())"></svg>
+        </button>
+      </div>
+      <div class="rating-text" *ngIf="rating() > 0">
+        {{ rating() === 5 ? 'Awesome! ❤️' : rating() >= 3 ? 'Thanks! 😊' : 'We will do better! 💪' }}
+      </div>
+    </div>
+
+    <div class="suggestion-section">
+      <textarea 
+        [(ngModel)]="suggestion" 
+        placeholder="Any suggestions for new features or improvements? (Optional)" 
+        rows="3"
+        class="glass-input">
+      </textarea>
+    </div>
+
+    <div class="feedback-actions">
+      <button class="btn-cancel" (click)="closePopup()">Maybe Later</button>
+      <button class="btn-submit" (click)="submitFeedback()" [disabled]="isSubmitting()">
+        <svg lucideSend [attr.size]="18" *ngIf="!isSubmitting()"></svg>
+        <span *ngIf="!isSubmitting()">Submit Feedback</span>
+        <span *ngIf="isSubmitting()">Sending...</span>
+      </button>
+    </div>
+  </div>
+</div>

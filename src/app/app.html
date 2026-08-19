@@ -656,3 +656,7 @@
 
 <!-- Global Toast Notifications -->
 <app-toast></app-toast>
+
+<!-- Feedback Popup -->
+<app-feedback-popup *ngIf="showFeedbackPopup()" (close)="showFeedbackPopup.set(false)"></app-feedback-popup>
+
