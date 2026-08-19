@@ -64,9 +64,9 @@
 
             <!-- Progress -->
             <div class="cm-progress">
-              <div class="cm-progress-bar" (click)="onSeek($event)">
-                <div class="cm-progress-fill" [style.width.%]="progressPercent"></div>
-                <div class="cm-progress-thumb" [style.left.%]="progressPercent"></div>
+              <div class="cm-progress-bar" (mousedown)="onScrubStart($event)" (touchstart)="onScrubStart($event)">
+                <div class="cm-progress-fill" [style.width.%]="displayProgressPercent"></div>
+                <div class="cm-progress-thumb" [style.left.%]="displayProgressPercent"></div>
               </div>
               <div class="cm-time-row">
                 <span>{{ formatTime(playerService.currentTime()) }}</span>

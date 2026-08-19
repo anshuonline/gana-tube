@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ChangeDetectorRef, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ChangeDetectorRef, effect, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
@@ -250,10 +250,70 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     }
   }
 
+  isScrubbing = signal<boolean>(false);
+  scrubPercent = signal<number>(0);
+  scrubTarget: HTMLElement | null = null;
+
   get progressPercent(): number {
     const duration = this.playerService.duration();
     if (!duration) return 0;
     return Math.min(100, (this.playerService.currentTime() / duration) * 100);
+  }
+
+  get displayProgressPercent(): number {
+    return this.isScrubbing() ? this.scrubPercent() : this.progressPercent;
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  @HostListener('window:touchmove', ['$event'])
+  onWindowMove(event: MouseEvent | TouchEvent): void {
+    if (!this.isScrubbing()) return;
+    this.calculateScrub(event);
+  }
+
+  @HostListener('window:mouseup', ['$event'])
+  @HostListener('window:touchend', ['$event'])
+  onWindowUp(event: MouseEvent | TouchEvent): void {
+    if (!this.isScrubbing()) return;
+    this.isScrubbing.set(false);
+    this.calculateScrub(event, true);
+    this.scrubTarget = null;
+  }
+
+  onScrubStart(event: MouseEvent | TouchEvent): void {
+    const target = event.currentTarget as HTMLElement;
+    this.scrubTarget = target;
+    this.isScrubbing.set(true);
+    this.calculateScrub(event);
+  }
+
+  calculateScrub(event: MouseEvent | TouchEvent, doSeek = false): void {
+    if (!this.scrubTarget) return;
+    
+    // Prevent scrolling while seeking on mobile
+    if (event.type === 'touchmove') {
+        event.preventDefault();
+    }
+
+    const rect = this.scrubTarget.getBoundingClientRect();
+    let clientX = 0;
+    
+    if (event instanceof MouseEvent) {
+      clientX = event.clientX;
+    } else if (event.touches && event.touches.length > 0) {
+      clientX = event.touches[0].clientX;
+    } else if (event.changedTouches && event.changedTouches.length > 0) {
+      clientX = event.changedTouches[0].clientX;
+    }
+    
+    let ratio = (clientX - rect.left) / rect.width;
+    ratio = Math.max(0, Math.min(ratio, 1));
+    this.scrubPercent.set(ratio * 100);
+
+    if (doSeek) {
+      const seekTime = ratio * this.playerService.duration();
+      this.playerService.seekTo(seekTime);
+    }
   }
 
   formatTime(seconds: number): string {
@@ -264,6 +324,7 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   }
 
   onSeek(event: MouseEvent) {
+    // Retained for backward compatibility if needed, actual logic handled by onScrubStart
     const track = event.currentTarget as HTMLElement;
     const rect = track.getBoundingClientRect();
     const ratio = (event.clientX - rect.left) / rect.width;
