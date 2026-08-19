@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck } from '@lucide/angular';
 

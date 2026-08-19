@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core Static Pages -->
+  <url>
+    <loc>https://ganatube.in/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://ganatube.in/advertise</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ganatube.in/ad-booking</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ganatube.in/ad-terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://ganatube.in/ad-prohibited</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Language Pages -->
+  <url><loc>https://ganatube.in/language/hindi</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/english</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/punjabi</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/telugu</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/tamil</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/bhojpuri</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/haryanvi</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/marathi</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/bengali</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/gujarati</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/kannada</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ganatube.in/language/malayalam</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+
+  <!-- Popular Artists Pages -->
+  <url><loc>https://ganatube.in/artist/arijit-singh</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/neha-kakkar</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/shreya-ghoshal</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/kishore-kumar</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/lata-mangeshkar</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/kumar-sanu</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/udit-narayan</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/sonu-nigam</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/badshah</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/guru-randhawa</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/diljit-dosanjh</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/sidhu-moose-wala</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/yo-yo-honey-singh</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/anirudh-ravichander</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/a-r-rahman</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/justin-bieber</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/taylor-swift</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/the-weeknd</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ganatube.in/artist/ed-sheeran</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+</urlset>
