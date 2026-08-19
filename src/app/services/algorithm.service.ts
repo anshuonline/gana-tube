@@ -250,9 +250,28 @@ export class AlgorithmService {
       .slice(0, 3)
       .map(e => e[0]);
 
-    const randomYear = [2023, 2024, 2025, 2026][Math.floor(Math.random() * 4)];
-    const randomVibe = ['hits', 'trending', 'viral', 'best of', 'new releases', 'top'][Math.floor(Math.random() * 6)];
-    const randomModifier = topArtists.length > 0 ? ` ${topArtists[Math.floor(Math.random() * topArtists.length)]}` : '';
+    const randomYear = [2022, 2023, 2024, 2025, 2026, 'this week', 'new releases'][Math.floor(Math.random() * 7)];
+    const randomVibe = ['hits', 'trending', 'viral', 'best of', 'top', 'chartbusters', 'mashup', 'jukebox', 'chill', 'party'][Math.floor(Math.random() * 10)];
+    
+    // Pick 1-2 random top artists to mix up the suggestions
+    let mixModifier = '';
+    if (topArtists.length > 0) {
+      const shuffledArtists = [...topArtists].sort(() => 0.5 - Math.random());
+      mixModifier = Math.random() > 0.5 && shuffledArtists.length > 1
+        ? ` ${shuffledArtists[0]} & ${shuffledArtists[1]}`
+        : ` ${shuffledArtists[0]}`;
+    }
+    
+    const genreModifier = topGenres.length > 0 ? ` ${topGenres[Math.floor(Math.random() * topGenres.length)]}` : '';
+    
+    // Add randomness to the query structure so it's not the same format every time
+    const queryFormats = [
+      `${randomVibe} ${language} ${genreModifier} songs ${randomYear}${mixModifier}`,
+      `${language}${mixModifier} ${randomVibe} ${randomYear}`,
+      `${genreModifier} ${language} songs ${randomYear}${mixModifier}`,
+      `Best of${mixModifier} ${language} ${randomYear}`
+    ];
+    const finalQuery = queryFormats[Math.floor(Math.random() * queryFormats.length)].trim().replace(/\s+/g, ' ');
 
     const shelves: ShelfDefinition[] = [
       {
@@ -262,7 +281,7 @@ export class AlgorithmService {
       },
       {
         title: 'Suggested for You',
-        query: `${randomVibe} ${language} songs ${randomYear}${randomModifier}`
+        query: finalQuery
       }
     ];
 

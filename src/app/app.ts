@@ -113,6 +113,9 @@ export class App implements OnInit {
   // Playlists State
   customPlaylists = signal<PlaylistMeta[]>([]);
   
+  // Track displayed video IDs to prevent duplicates on the home page
+  displayedVideoIds = new Set<string>();
+  
   allPlaylists = computed(() => {
     return [...this.customPlaylists(), ...PLAYLISTS];
   });
@@ -1143,6 +1146,7 @@ export class App implements OnInit {
     });
 
     // Fetch algorithmic dynamic shelves
+    this.displayedVideoIds.clear();
     this.algorithmService.getVariableRewardShelves(lang).subscribe(algorithmicShelves => {
       if (language && language !== this.homeScreenLanguage()) return;
       
@@ -1196,10 +1200,18 @@ export class App implements OnInit {
 
       initialDefinitions.forEach((def) => {
         if (def.songs && def.songs.length > 0) {
-          // It's a custom section, already has songs!
+          // Custom section, already has songs!
+          
+          let dedupedSongs = def.songs.filter(s => {
+            if (!s || !s.videoId) return false;
+            if (this.displayedVideoIds.has(s.videoId)) return false;
+            this.displayedVideoIds.add(s.videoId);
+            return true;
+          });
+          
           this.loadedShelves.update(shelvesList => {
             const updated = [...shelvesList];
-            updated.push({ title: def.title, query: def.query, songs: def.songs! });
+            updated.push({ title: def.title, query: def.query, songs: dedupedSongs });
             return updated.sort((a, b) => {
               const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
               const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
@@ -1214,7 +1226,7 @@ export class App implements OnInit {
           // Algorithmic shelf, needs fetching
           const fetchObservable = def.type === 'trending' 
             ? this.youtubeApi.getTrendingMusic(lang, 12)
-            : this.youtubeApi.searchMusic(def.query, 15);
+            : this.youtubeApi.searchMusic(def.query, def.title === 'Suggested for You' ? 30 : 15);
 
           fetchObservable.subscribe({
             next: (songs) => {
@@ -1228,9 +1240,20 @@ export class App implements OnInit {
               }
               
               if (songs && songs.length > 0) {
+                if (def.title === 'Suggested for You') {
+                  songs = songs.sort(() => 0.5 - Math.random());
+                }
+                
+                let dedupedSongs = songs.filter(s => {
+                  if (!s || !s.videoId) return false;
+                  if (this.displayedVideoIds.has(s.videoId)) return false;
+                  this.displayedVideoIds.add(s.videoId);
+                  return true;
+                });
+                
                 this.loadedShelves.update(shelvesList => {
                   const updated = [...shelvesList];
-                  updated.push({ title: def.title, query: def.query, songs });
+                  updated.push({ title: def.title, query: def.query, songs: dedupedSongs });
                   return updated.sort((a, b) => {
                     const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
                     const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
@@ -1283,7 +1306,7 @@ export class App implements OnInit {
       } else {
         const fetchObservable = def.type === 'trending'
           ? this.youtubeApi.getTrendingMusic(language || this.homeScreenLanguage(), 12)
-          : this.youtubeApi.searchMusic(def.query, 15);
+          : this.youtubeApi.searchMusic(def.query, def.title === 'Suggested for You' ? 30 : 15);
 
         return fetchObservable.pipe(
           // Catch errors for individual shelf loads so the whole batch doesn't fail
@@ -1301,15 +1324,27 @@ export class App implements OnInit {
            return; // Ignore stale callback
         }
         const newShelves: any[] = [];
-        results.forEach((songs: any, index: number) => {
-          if (songs && songs.length > 0) {
-            newShelves.push({
-              title: nextDefs[index].title,
-              query: nextDefs[index].query,
-              songs
-            });
+      results.forEach((songs: any, index: number) => {
+        if (songs && songs.length > 0) {
+          
+          if (nextDefs[index].title === 'Suggested for You') {
+            songs = songs.sort(() => 0.5 - Math.random());
           }
-        });
+          
+          let dedupedSongs = songs.filter((s: any) => {
+            if (!s || !s.videoId) return false;
+            if (this.displayedVideoIds.has(s.videoId)) return false;
+            this.displayedVideoIds.add(s.videoId);
+            return true;
+          });
+
+          newShelves.push({
+            title: nextDefs[index].title,
+            query: nextDefs[index].query,
+            songs: dedupedSongs
+          });
+        }
+      });    
         
         if (newShelves.length > 0) {
           this.loadedShelves.update(shelves => [...shelves, ...newShelves]);
