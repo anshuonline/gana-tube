@@ -177,6 +177,11 @@ export class App implements OnInit {
   isSearchMode = signal<boolean>(false);
   isSearchFocused = signal<boolean>(false);
   searchFilter = signal<'all' | 'songs' | 'albums' | 'playlists'>('all');
+  
+  // Track currently loading playlist to prevent race conditions
+  currentLoadingPlaylistId: string | null = null;
+
+  @ViewChild('searchInput') searchInput!: ElementRef;
   ambientSearchBg = signal<string>('');
 
   // Dynamic algorithmic shelves for home recommendations
@@ -251,7 +256,7 @@ export class App implements OnInit {
           }
           
           document.head.appendChild(newScript);
-        } else if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE) {
+        } else if (node.nodeType === node.ELEMENT_NODE || node.nodeType === node.TEXT_NODE) {
           // If there are other tags (e.g. meta, link, noscript), just append them directly
           if (node.textContent?.trim() !== '') {
             document.head.appendChild(node.cloneNode(true));
@@ -630,6 +635,11 @@ export class App implements OnInit {
       let url = event.urlAfterRedirects.split('/')[1] || 'home';
       url = url.split('?')[0]; // Ignore query params
       
+      // Clear tracking if navigating away from playlist page
+      if (url !== 'playlist') {
+        this.currentLoadingPlaylistId = null;
+      }
+      
       if (url === 'playlist') {
         const playlistId = event.urlAfterRedirects.split('/')[2];
         if (playlistId === 'liked-songs') {
@@ -651,12 +661,16 @@ export class App implements OnInit {
           this.isSearchMode.set(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (playlistId) {
+          this.currentLoadingPlaylistId = playlistId; // Set tracking ID
           if (playlistId.startsWith('pl_')) {
             this.fetchPublicPlaylist(playlistId, '');
           } else if (playlistId.startsWith('MPREb_')) {
             this.isLoading.set(true);
             this.youtubeApi.getAlbum(playlistId).pipe(takeUntil(this.destroy$)).subscribe(album => {
               this.isLoading.set(false);
+              // Only open if this is still the playlist we are trying to load
+              if (this.currentLoadingPlaylistId !== playlistId) return;
+              
               if (album) {
                 album.is_owner = false;
                 album.is_public = true;
@@ -671,6 +685,9 @@ export class App implements OnInit {
             this.isLoading.set(true);
             this.youtubeApi.getYTPlaylist(playlistId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
               this.isLoading.set(false);
+              // Only open if this is still the playlist we are trying to load
+              if (this.currentLoadingPlaylistId !== playlistId) return;
+              
               if (playlist) {
                 playlist.is_owner = false;
                 playlist.is_public = true;
@@ -1339,14 +1356,18 @@ export class App implements OnInit {
   onPlaySearchTrack(track: YouTubeSearchResult): void {
     if (track.videoId.startsWith('pl_') || track.type === 'community-playlist') {
       // It's a community playlist
+      this.currentLoadingPlaylistId = track.videoId;
       this.fetchPublicPlaylist(track.videoId, track.channelTitle);
       return;
     }
 
     if (track.type === 'album') {
+      this.currentLoadingPlaylistId = track.videoId;
       this.isLoading.set(true);
       this.youtubeApi.getAlbum(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(album => {
         this.isLoading.set(false);
+        if (this.currentLoadingPlaylistId !== track.videoId) return;
+        
         if (album) {
           album.is_owner = false;
           album.is_public = true;
@@ -1359,9 +1380,12 @@ export class App implements OnInit {
     }
 
     if (track.type === 'playlist') {
+      this.currentLoadingPlaylistId = track.videoId;
       this.isLoading.set(true);
       this.youtubeApi.getYTPlaylist(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
         this.isLoading.set(false);
+        if (this.currentLoadingPlaylistId !== track.videoId) return;
+        
         if (playlist) {
           playlist.is_owner = false;
           playlist.is_public = true;
@@ -1733,10 +1757,16 @@ export class App implements OnInit {
 
   async fetchPublicPlaylist(playlistId: string, username: string) {
     const email = this.authService.currentUser()?.email || '';
+    // Ensure we track this load
+    this.currentLoadingPlaylistId = playlistId;
+    
     try {
       const url = this.userService['apiUrl'].replace('user-api.php', 'playlist-api.php');
       const response = await fetch(`${url}?action=getPublicPlaylist&playlist_id=${playlistId}&email=${encodeURIComponent(email)}`);
       const data = await response.json();
+      
+      // If user navigated or clicked another playlist while loading, ignore this result
+      if (this.currentLoadingPlaylistId !== playlistId) return;
       
       if (data.status === 'success' && data.data) {
         const pl = data.data;
@@ -1757,13 +1787,24 @@ export class App implements OnInit {
         this.selectedPlaylist.set(playlistMeta);
         this.currentPage.set('playlist');
         this.isSearchMode.set(false);
+        
+        const targetUrl = `/playlist/${playlistId}`;
+        if (!this.router.url.includes(targetUrl)) {
+          this.router.navigate(['/playlist', playlistId]);
+        }
       } else {
         // Fallback if not found or private
-        this.router.navigate(['/home']);
+        if (this.router.url.includes(playlistId)) {
+          this.router.navigate(['/home']);
+        }
         this.toastService.error("Playlist not found or is private");
       }
     } catch(e) {
-      this.router.navigate(['/home']);
+      if (this.currentLoadingPlaylistId !== playlistId) return;
+      
+      if (this.router.url.includes(playlistId)) {
+        this.router.navigate(['/home']);
+      }
       this.toastService.error("Error loading playlist");
     }
   }
