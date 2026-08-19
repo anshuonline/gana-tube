@@ -231,6 +231,11 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   isCurrentTrackLiked(): boolean {
     const track = this.playerService.currentTrack();
     if (!track) return false;
+    
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      return this.userService.likedSongs().some(song => (typeof song === 'string' ? song : song.videoId) === track.videoId);
+    }
     return this.algorithmService.isLiked(track.videoId);
   }
 

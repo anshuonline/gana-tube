@@ -235,7 +235,11 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   }
 
   isLiked(track: Track): boolean {
-    return this.userService.likedSongs().some(s => s.videoId === track.videoId);
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      return this.userService.likedSongs().some(s => (typeof s === 'string' ? s : s.videoId) === track.videoId);
+    }
+    return this.algorithmService.isLiked(track.videoId);
   }
 
   async toggleLike(track?: Track, event?: Event) {
@@ -248,6 +252,7 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     if (user && user.email) {
       await this.userService.toggleLike(user.email, targetTrack, this.userService.preferredLanguages());
     }
+    this.algorithmService.toggleLike(targetTrack);
   }
 
   isScrubbing = signal<boolean>(false);
