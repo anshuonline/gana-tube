@@ -6,106 +6,114 @@
 
   <div class="car-mode-container">
     
-    <!-- Top Header -->
+    <!-- Compact Header -->
     <div class="cm-header">
       <button class="cm-close-btn" (click)="close()">
-        <svg lucideChevronDown [attr.size]="40"></svg>
+        <svg lucideChevronDown [attr.size]="32"></svg>
       </button>
-      <div class="cm-title-area" style="display: flex; align-items: center;">
-        <div class="cm-title">DRIVE MODE</div>
-        <div class="cm-safe-drive-msg">Eyes on the road, let the music flow.</div>
+      <div class="cm-header-center">
+        <span class="cm-mode-label">DRIVE MODE</span>
+        <span class="cm-safe-msg">Eyes on the road, let the music flow.</span>
       </div>
-      <div style="width: 64px;"></div> <!-- Spacer to balance close btn -->
+      <div class="cm-header-spacer"></div>
     </div>
 
+    <!-- Main Content: Two Column Layout -->
     <div class="cm-content">
       
-      <!-- Left Column: Player View -->
+      <!-- LEFT: Now Playing -->
       <div class="cm-player-col">
-        <div class="cm-artwork" [class.ad-active]="showCoverAd">
-          <img 
-            *ngIf="!imageLoadError"
-            [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'assets/default-playlist.jpg'" 
-            [alt]="playerService.currentTrack()?.title"
-            (error)="onImageError()"
-            class="cm-album-art"
-          />
-          <div *ngIf="imageLoadError" class="cm-artwork-fallback">
-            <span class="fallback-logo">GanaTube</span>
-            <span class="fallback-text">Cover Image Not Found</span>
+        
+        <div class="cm-now-playing">
+          <!-- Album Art -->
+          <div class="cm-artwork-wrapper">
+            <div class="cm-artwork" [class.ad-active]="showCoverAd">
+              <img 
+                *ngIf="!imageLoadError"
+                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'assets/default-playlist.jpg'" 
+                [alt]="playerService.currentTrack()?.title"
+                (error)="onImageError()"
+                class="cm-album-art"
+              />
+              <div *ngIf="imageLoadError" class="cm-artwork-fallback">
+                <span>GanaTube</span>
+              </div>
+              
+              <!-- Ad Overlay -->
+              <div class="cm-ad-overlay" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
+                <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" [href]="playerCoverAd?.linkUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
+                  <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="cm-ad-media" />
+                </a>
+                <iframe *ngIf="playerCoverAd?.customCode" 
+                        [src]="safePlayerCoverAdUrl"
+                        class="cm-ad-media"
+                        scrolling="no"
+                        frameborder="0">
+                </iframe>
+                <span class="cm-ad-label">Ad</span>
+              </div>
+            </div>
           </div>
-          
-          <!-- Animated Ad Overlay -->
-          <div class="fs-cover-ad-container" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
-             <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" [href]="playerCoverAd?.linkUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
-               <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="fs-cover-ad-media" />
-             </a>
-             <iframe *ngIf="playerCoverAd?.customCode" 
-                     [src]="safePlayerCoverAdUrl"
-                     class="fs-cover-ad-media"
-                     scrolling="no"
-                     frameborder="0">
-             </iframe>
-             <span class="fs-cover-ad-label">Sponsored</span>
+
+          <!-- Track Info + Controls -->
+          <div class="cm-controls-area">
+            <div class="cm-track-info">
+              <h2 class="cm-track-title">{{ playerService.currentTrack()?.title || 'Not Playing' }}</h2>
+              <p class="cm-track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</p>
+            </div>
+
+            <!-- Progress -->
+            <div class="cm-progress">
+              <div class="cm-progress-bar" (click)="onSeek($event)">
+                <div class="cm-progress-fill" [style.width.%]="progressPercent"></div>
+                <div class="cm-progress-thumb" [style.left.%]="progressPercent"></div>
+              </div>
+              <div class="cm-time-row">
+                <span>{{ formatTime(playerService.currentTime()) }}</span>
+                <span>{{ formatTime(playerService.duration()) }}</span>
+              </div>
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="cm-controls">
+              <button class="cm-btn cm-btn-secondary" [class.active]="playerService.isShuffled()" (click)="playerService.toggleShuffle()">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              </button>
+
+              <button class="cm-btn cm-btn-skip" (click)="playerService.previous()" [disabled]="playerService.currentIndex() <= 0">
+                <svg lucideSkipBack [attr.size]="36" fill="currentColor"></svg>
+              </button>
+              
+              <button class="cm-btn cm-btn-play" (click)="playerService.togglePlayPause()">
+                <svg lucidePause [attr.size]="44" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
+                <svg lucidePlay [attr.size]="44" fill="currentColor" style="margin-left: 4px;" *ngIf="!playerService.isPlaying()"></svg>
+              </button>
+              
+              <button class="cm-btn cm-btn-skip" (click)="playerService.next()" [disabled]="playerService.currentIndex() >= playerService.queue().length - 1">
+                <svg lucideSkipForward [attr.size]="36" fill="currentColor"></svg>
+              </button>
+
+              <button class="cm-btn cm-btn-secondary" (click)="playerService.toggleRepeat()">
+                <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="28" stroke="currentColor"></svg>
+                <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="28" stroke="#fff"></svg>
+                <svg *ngIf="playerService.repeatMode() === 'one'" viewBox="0 0 24 24" width="28" height="28" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="17 1 21 5 17 9"></polyline>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                  <polyline points="7 23 3 19 7 15"></polyline>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                  <text x="10" y="16" font-family="sans-serif" font-size="6" font-weight="bold" stroke="none" fill="#fff">1</text>
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div class="cm-track-info">
-          <div class="cm-title-wrapper">
-            <h2 class="cm-track-title">{{ playerService.currentTrack()?.title || 'Not Playing' }}</h2>
-          </div>
-          <p class="cm-track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</p>
-        </div>
-
-        <div class="cm-progress-section">
-          <span class="cm-time-label">{{ formatTime(playerService.currentTime()) }}</span>
-          <div class="cm-progress-track" (click)="onSeek($event)">
-            <div class="cm-progress-fill" [style.width.%]="progressPercent"></div>
-            <div class="cm-progress-thumb" [style.left.%]="progressPercent"></div>
-          </div>
-          <span class="cm-time-label">{{ formatTime(playerService.duration()) }}</span>
-        </div>
-
-        <div class="cm-main-controls">
-          <button class="cm-ctrl-btn secondary" [class.active]="playerService.isShuffled()" (click)="playerService.toggleShuffle()">
-            <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-          </button>
-
-          <button class="cm-ctrl-btn skip" (click)="playerService.previous()" [disabled]="playerService.currentIndex() <= 0">
-            <svg lucideSkipBack [attr.size]="48" fill="currentColor"></svg>
-          </button>
-          
-          <button class="cm-ctrl-btn play-pause" (click)="playerService.togglePlayPause()">
-            <svg lucidePause [attr.size]="64" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
-            <svg lucidePlay [attr.size]="64" fill="currentColor" style="margin-left: 6px;" *ngIf="!playerService.isPlaying()"></svg>
-          </button>
-          
-          <button class="cm-ctrl-btn skip" (click)="playerService.next()" [disabled]="playerService.currentIndex() >= playerService.queue().length - 1">
-            <svg lucideSkipForward [attr.size]="48" fill="currentColor"></svg>
-          </button>
-
-          <button class="cm-ctrl-btn secondary" (click)="playerService.toggleRepeat()">
-            <!-- Repeat None -->
-            <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="36" stroke="rgba(255,255,255,0.4)"></svg>
-            <!-- Repeat All -->
-            <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="36" stroke="#fff"></svg>
-            <!-- Repeat One -->
-            <svg *ngIf="playerService.repeatMode() === 'one'" viewBox="0 0 24 24" width="36" height="36" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="17 1 21 5 17 9"></polyline>
-              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-              <polyline points="7 23 3 19 7 15"></polyline>
-              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-              <text x="10" y="16" font-family="sans-serif" font-size="6" font-weight="bold" stroke="none" fill="#fff">1</text>
-            </svg>
-          </button>
         </div>
       </div>
 
-      <!-- Right Column: Search & Lists -->
-      <div class="cm-list-col">
+      <!-- RIGHT: Queue Panel -->
+      <div class="cm-queue-panel">
         
-        <!-- Voice Search Bar -->
-        <div class="cm-search-bar">
+        <!-- Search -->
+        <div class="cm-search">
           <input 
             type="text" 
             [(ngModel)]="searchQuery" 
@@ -114,68 +122,72 @@
             class="cm-search-input"
           />
           <button class="cm-search-clear" *ngIf="searchQuery" (click)="clearSearch()">
-            <svg lucideX [attr.size]="28"></svg>
+            <svg lucideX [attr.size]="20"></svg>
           </button>
           <button class="cm-voice-btn" [class.listening]="isListening" (click)="startVoiceSearch()">
-            <svg lucideMic [attr.size]="36" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
+            <svg lucideMic [attr.size]="24" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
           </button>
         </div>
 
-        <div class="cm-list-container">
+        <!-- Queue / Search Results -->
+        <div class="cm-queue-scroll">
           
-          <!-- Loading State -->
-          <div *ngIf="isSearching" class="cm-message-view">
-            <svg lucideRefreshCw [attr.size]="48" class="spin"></svg>
+          <!-- Loading -->
+          <div *ngIf="isSearching" class="cm-empty-state">
+            <svg lucideRefreshCw [attr.size]="32" class="spin"></svg>
             <p>Searching...</p>
           </div>
 
-          <!-- Search Results View -->
-          <div *ngIf="showSearchResults && !isSearching" class="cm-list">
-            <h3 class="cm-list-title">Search Results</h3>
+          <!-- Search Results -->
+          <div *ngIf="showSearchResults && !isSearching">
+            <div class="cm-queue-header">Search Results</div>
             <div 
-              class="cm-list-item" 
+              class="cm-queue-item" 
               *ngFor="let track of searchResults"
               (click)="playSearchResult(track)"
             >
-              <div class="cm-item-thumb">
+              <div class="cm-q-thumb">
                 <img [src]="track.thumbnail" [alt]="track.title" />
               </div>
-              <div class="cm-item-info">
-                <div class="cm-item-title">{{ track.title }}</div>
-                <div class="cm-item-artist">{{ track.channelTitle }}</div>
+              <div class="cm-q-info">
+                <div class="cm-q-title">{{ track.title }}</div>
+                <div class="cm-q-artist">{{ track.channelTitle }}</div>
               </div>
             </div>
             
-            <div *ngIf="searchResults.length === 0" class="cm-message-view">
-              <p>No results found for "{{ searchQuery }}"</p>
+            <div *ngIf="searchResults.length === 0" class="cm-empty-state">
+              <p>No results for "{{ searchQuery }}"</p>
             </div>
           </div>
 
-          <!-- Queue View -->
-          <div *ngIf="!showSearchResults && !isSearching" class="cm-list">
-            <h3 class="cm-list-title">Up Next</h3>
+          <!-- Up Next Queue -->
+          <div *ngIf="!showSearchResults && !isSearching">
+            <div class="cm-queue-header">Up Next</div>
             <div 
-              class="cm-list-item" 
+              class="cm-queue-item" 
               *ngFor="let track of playerService.queue(); let i = index"
               [class.active]="playerService.currentIndex() === i"
               (click)="playQueueTrack(i)"
             >
-              <div class="cm-item-thumb">
+              <div class="cm-q-thumb">
                 <img [src]="track.thumbnail" [alt]="track.title" />
+                <div class="cm-q-playing" *ngIf="playerService.currentIndex() === i && playerService.isPlaying()">
+                  <span></span><span></span><span></span>
+                </div>
               </div>
-              <div class="cm-item-info">
-                <div class="cm-item-title" [class.highlight]="playerService.currentIndex() === i">{{ track.title }}</div>
-                <div class="cm-item-artist">{{ track.channelTitle }}</div>
+              <div class="cm-q-info">
+                <div class="cm-q-title">{{ track.title }}</div>
+                <div class="cm-q-artist">{{ track.channelTitle }}</div>
               </div>
-              <button class="cm-like-btn" (click)="toggleLike(track, $event)">
-                <svg lucideHeart [attr.size]="32" [attr.fill]="isLiked(track) ? 'currentColor' : 'none'"></svg>
+              <button class="cm-q-like" (click)="toggleLike(track, $event)">
+                <svg lucideHeart [attr.size]="22" [attr.fill]="isLiked(track) ? 'currentColor' : 'none'"></svg>
               </button>
             </div>
           </div>
 
         </div>
       </div>
-      
+
     </div>
   </div>
 </div>
