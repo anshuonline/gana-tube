@@ -1183,6 +1183,15 @@ export class App implements OnInit {
         // 2. Recently Played
         // 3. Other algorithmic dynamic shelves
         // 4. Custom Admin Sections
+        // Save a reference to all pool songs for offline suggestions
+        const offlinePool = customShelves.flatMap(s => s.songs || []);
+        
+        // Populate offline suggestions directly in the shelf definition to avoid API call later
+        if (suggestedShelf.length > 0 && offlinePool.length > 0) {
+          const shuffledPool = [...offlinePool].sort(() => 0.5 - Math.random());
+          suggestedShelf[0].songs = shuffledPool;
+        }
+
         this.allShelfDefinitions = [
           ...suggestedShelf,
           ...recentShelves, 
@@ -1226,7 +1235,7 @@ export class App implements OnInit {
           // Algorithmic shelf, needs fetching
           const fetchObservable = def.type === 'trending' 
             ? this.youtubeApi.getTrendingMusic(lang, 12)
-            : this.youtubeApi.searchMusic(def.query, def.title === 'Suggested for You' ? 30 : 15);
+            : this.youtubeApi.searchMusic(def.query, 15);
 
           fetchObservable.subscribe({
             next: (songs) => {
@@ -1306,7 +1315,7 @@ export class App implements OnInit {
       } else {
         const fetchObservable = def.type === 'trending'
           ? this.youtubeApi.getTrendingMusic(language || this.homeScreenLanguage(), 12)
-          : this.youtubeApi.searchMusic(def.query, def.title === 'Suggested for You' ? 30 : 15);
+          : this.youtubeApi.searchMusic(def.query, 15);
 
         return fetchObservable.pipe(
           // Catch errors for individual shelf loads so the whole batch doesn't fail
