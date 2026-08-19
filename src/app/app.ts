@@ -1171,7 +1171,8 @@ export class App implements OnInit {
         const customShelves: ShelfDefinition[] = langCustomSections.map(cs => ({
           title: cs.title,
           query: '', // We already have the songs, no need to query
-          songs: cs.songs
+          songs: cs.songs,
+          type: 'custom'
         }));
 
         // Add Recently Played if available
@@ -1185,25 +1186,42 @@ export class App implements OnInit {
           });
         }
 
-        // Extract 'Suggested for You' (the first algorithmic shelf)
-        const suggestedShelf = algorithmicShelves.length > 0 ? [algorithmicShelves[0]] : [];
-        const restOfAlgorithmicShelves = algorithmicShelves.length > 1 ? algorithmicShelves.slice(1) : [];
+        // Extract 'Trending' and 'Suggested for You' correctly
+        const trendingShelf = algorithmicShelves.length > 0 ? [algorithmicShelves[0]] : [];
+        const suggestedShelf = algorithmicShelves.length > 1 ? [algorithmicShelves[1]] : [];
+        const restOfAlgorithmicShelves = algorithmicShelves.length > 2 ? algorithmicShelves.slice(2) : [];
 
-        // Combine them in the requested order:
-        // 1. Suggestions (Suggested for You)
-        // 2. Recently Played
-        // 3. Other algorithmic dynamic shelves
-        // 4. Custom Admin Sections
         // Save a reference to all pool songs for offline suggestions
         const offlinePool = customShelves.flatMap(s => s.songs || []);
         
-        // Populate offline suggestions directly in the shelf definition to avoid API call later
+        // Populate offline suggestions directly in 'Suggested for You' to avoid API call
         if (suggestedShelf.length > 0 && offlinePool.length > 0) {
-          const shuffledPool = [...offlinePool].sort(() => 0.5 - Math.random());
+          // Keep track of recently suggested to avoid repeats
+          let recentSuggested: string[] = [];
+          try {
+            recentSuggested = JSON.parse(localStorage.getItem('gt_recent_suggested') || '[]');
+          } catch(e) {}
+          
+          // Filter out recently suggested songs to give fresh recommendations
+          let freshPool = offlinePool.filter(s => !recentSuggested.includes(s.videoId));
+          if (freshPool.length < 10) {
+            freshPool = offlinePool; // Reset if we run out of fresh songs
+            recentSuggested = [];
+          }
+          
+          // Shuffle and pick top 15
+          const shuffledPool = [...freshPool].sort(() => 0.5 - Math.random()).slice(0, 15);
+          
+          // Save new batch to recent
+          const newRecent = [...recentSuggested, ...shuffledPool.map(s => s.videoId)].slice(-50); // Keep last 50
+          localStorage.setItem('gt_recent_suggested', JSON.stringify(newRecent));
+
           suggestedShelf[0].songs = shuffledPool;
+          suggestedShelf[0].type = 'custom'; // Mark as custom so it doesn't fetch
         }
 
         this.allShelfDefinitions = [
+          ...trendingShelf,
           ...suggestedShelf,
           ...recentShelves, 
           ...restOfAlgorithmicShelves,
@@ -1224,6 +1242,9 @@ export class App implements OnInit {
           
           let dedupedSongs = def.songs.filter(s => {
             if (!s || !s.videoId) return false;
+            // Never deduplicate custom shelves, always show what the admin curated
+            if (def.type === 'custom') return true;
+            
             if (this.displayedVideoIds.has(s.videoId)) return false;
             this.displayedVideoIds.add(s.videoId);
             return true;
@@ -1266,6 +1287,7 @@ export class App implements OnInit {
                 
                 let dedupedSongs = songs.filter(s => {
                   if (!s || !s.videoId) return false;
+                  if (def.type === 'custom') return true;
                   if (this.displayedVideoIds.has(s.videoId)) return false;
                   this.displayedVideoIds.add(s.videoId);
                   return true;

@@ -30,7 +30,7 @@ export interface UserProfile {
 export interface ShelfDefinition {
   title: string;
   query: string;
-  type?: 'search' | 'trending';
+  type?: 'search' | 'trending' | 'custom';
   songs?: YouTubeSearchResult[];
 }
 
