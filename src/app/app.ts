@@ -1214,7 +1214,7 @@ export class App implements OnInit {
           // Algorithmic shelf, needs fetching
           const fetchObservable = def.type === 'trending' 
             ? this.youtubeApi.getTrendingMusic(lang, 12)
-            : this.youtubeApi.searchMusic(def.query, 50);
+            : this.youtubeApi.searchMusic(def.query, 15);
 
           fetchObservable.subscribe({
             next: (songs) => {
@@ -1283,7 +1283,7 @@ export class App implements OnInit {
       } else {
         const fetchObservable = def.type === 'trending'
           ? this.youtubeApi.getTrendingMusic(language || this.homeScreenLanguage(), 12)
-          : this.youtubeApi.searchMusic(def.query, 50);
+          : this.youtubeApi.searchMusic(def.query, 15);
 
         return fetchObservable.pipe(
           // Catch errors for individual shelf loads so the whole batch doesn't fail
@@ -1597,8 +1597,19 @@ export class App implements OnInit {
     }
   }
 
+  private scrollRafId: number | null = null;
+
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
+    // Debounce scroll handler via requestAnimationFrame for buttery smooth scrolling
+    if (this.scrollRafId !== null) return;
+    this.scrollRafId = requestAnimationFrame(() => {
+      this.scrollRafId = null;
+      this.handleScroll();
+    });
+  }
+
+  private handleScroll(): void {
     const scrollOffset = document.documentElement.scrollTop || document.body.scrollTop;
     this.isScrolled.set(scrollOffset > 50);
 

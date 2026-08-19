@@ -798,9 +798,10 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  /* Performance fix: Skip rendering off-screen sections to fix lag */
+  /* Pro-level rendering optimization: skip layout+paint for off-screen sections */
   content-visibility: auto;
-  contain-intrinsic-size: 320px;
+  contain-intrinsic-block-size: 320px;
+  contain: layout style paint;
 }
 
 .shelf-title {
@@ -828,6 +829,9 @@
   padding: 4px 0 16px;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
+  /* GPU layer promotion for smooth horizontal scroll */
+  transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -846,7 +850,6 @@
   cursor: pointer;
   position: relative;
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: transform;
 }
 
 .song-card:hover {

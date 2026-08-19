@@ -349,7 +349,7 @@
                 </div>
               </div>
               <div class="shelf-grid" #shelfGrid>
-                <div class="song-card" *ngFor="let track of shelf.songs; trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
+                <div class="song-card" *ngFor="let track of shelf.songs.slice(0, 15); trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
                   <div class="card-thumbnail">
                     <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
                     <div class="thumbnail-overlay">
