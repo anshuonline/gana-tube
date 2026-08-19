@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, Chan
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
+import { AlgorithmService } from '../../services/algorithm.service';
 import { 
   LucideChevronDown, 
   LucidePlay, 
@@ -46,6 +47,7 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   private youtubeApi = inject(YoutubeApiService);
   private authService = inject(AuthService);
   public userService = inject(UserService);
+  private algorithmService = inject(AlgorithmService);
   private cdr = inject(ChangeDetectorRef);
 
   @Input() playerCoverAd: any = null;
