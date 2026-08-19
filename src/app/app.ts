@@ -1903,7 +1903,7 @@ export class App implements OnInit {
       if (typeof song === 'string') {
         return {
           videoId: song,
-          title: 'Unknown Title',
+          title: 'Loading...',
           channelTitle: 'GanaTube',
           thumbnail: `https://i.ytimg.com/vi/${song}/mqdefault.jpg`,
           thumbnailHigh: `https://i.ytimg.com/vi/${song}/maxresdefault.jpg`,
@@ -1929,6 +1929,29 @@ export class App implements OnInit {
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
     
+    // Fetch missing details
+    const missingIds = rawLiked.filter(s => typeof s === 'string') as string[];
+    if (missingIds.length > 0) {
+      this.youtubeApi.getVideoDetails(missingIds).subscribe(details => {
+        if (details && details.length > 0) {
+          const current = this.selectedPlaylist();
+          if (current?.id === 'liked-songs') {
+            const detailsMap = new Map(details.map(d => [d.videoId, d]));
+            const updatedSongs = current.preloadedSongs!.map(s => {
+              if (s.title === 'Loading...' && detailsMap.has(s.videoId)) {
+                return detailsMap.get(s.videoId)!;
+              }
+              return s;
+            });
+            this.selectedPlaylist.set({
+              ...current,
+              preloadedSongs: updatedSongs
+            });
+          }
+        }
+      });
+    }
+    
     const targetUrl = '/playlist/liked-songs';
     if (!this.router.url.includes(targetUrl)) {
       this.router.navigate(['/playlist', 'liked-songs']);
@@ -1938,11 +1961,12 @@ export class App implements OnInit {
   }
 
   openRecentlyPlayed(): void {
-    const recentPlays = this.userService.recentPlays().map(song => {
+    const rawRecent = this.userService.recentPlays();
+    const recentPlays = rawRecent.map(song => {
       if (typeof song === 'string') {
         return {
           videoId: song,
-          title: 'Unknown Title',
+          title: 'Loading...',
           channelTitle: 'GanaTube',
           thumbnail: `https://i.ytimg.com/vi/${song}/mqdefault.jpg`,
           thumbnailHigh: `https://i.ytimg.com/vi/${song}/maxresdefault.jpg`,
@@ -1966,6 +1990,29 @@ export class App implements OnInit {
     this.selectedPlaylist.set(playlistMeta);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
+    
+    // Fetch missing details
+    const missingIds = rawRecent.filter(s => typeof s === 'string') as string[];
+    if (missingIds.length > 0) {
+      this.youtubeApi.getVideoDetails(missingIds).subscribe(details => {
+        if (details && details.length > 0) {
+          const current = this.selectedPlaylist();
+          if (current?.id === 'recently-played') {
+            const detailsMap = new Map(details.map(d => [d.videoId, d]));
+            const updatedSongs = current.preloadedSongs!.map(s => {
+              if (s.title === 'Loading...' && detailsMap.has(s.videoId)) {
+                return detailsMap.get(s.videoId)!;
+              }
+              return s;
+            });
+            this.selectedPlaylist.set({
+              ...current,
+              preloadedSongs: updatedSongs
+            });
+          }
+        }
+      });
+    }
     
     const targetUrl = '/playlist/recently-played';
     if (!this.router.url.includes(targetUrl)) {
