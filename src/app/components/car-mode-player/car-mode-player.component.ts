@@ -219,10 +219,9 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     this.playerService.currentIndex.set(index !== -1 ? index : 0);
     this.playerService.playTrack(track);
     
-    // Clear search will hide the search results and show the "Up Next" queue,
-    // which now contains the full search results. This fulfills the user's need 
-    // to keep playing search results while displaying the active song.
-    this.clearSearch();
+    // Hide search results view so it shows the Up Next queue (which now contains the search results)
+    // but keep the searchQuery text so the user knows what they searched for.
+    this.showSearchResults = false;
   }
 
   playQueueTrack(index: number) {
