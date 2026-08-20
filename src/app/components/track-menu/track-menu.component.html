@@ -65,6 +65,10 @@
     <div class="menu-item" (click)="share($event)">
       <svg lucideShare2 [attr.size]="20"></svg> Share
     </div>
+
+    <div class="menu-item" (click)="toggleSleepTimer($event)">
+      <svg lucideMoon [attr.size]="20"></svg> Sleep Timer
+    </div>
     
     <div class="menu-item disabled-item" (click)="download($event)">
       <svg lucideDownload [attr.size]="20"></svg> Download

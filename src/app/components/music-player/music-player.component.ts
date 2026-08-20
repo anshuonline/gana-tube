@@ -19,8 +19,7 @@ import {
   LucideTrash2,
   LucideHeart,
   LucideShare2,
-  LucideMoon,
-  LucideMoreVertical
+  LucideMoon
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
@@ -50,8 +49,7 @@ import { AuthService } from '../../services/auth.service';
     LucideTrash2,
     LucideHeart,
     LucideShare2,
-    LucideMoon,
-    LucideMoreVertical
+    LucideMoon
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
@@ -217,16 +215,6 @@ import { AuthService } from '../../services/auth.service';
           <span class="logo-text" style="font-size: 1.3rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube.in</span>
         </div>
         <div style="display: flex; gap: 16px;">
-          <div style="position: relative;">
-            <button class="fs-close-btn" (click)="showFsMenu.set(!showFsMenu())" title="More Options">
-              <svg lucideMoreVertical [attr.size]="24"></svg>
-            </button>
-            <div class="fs-dropdown-menu" *ngIf="showFsMenu()">
-              <button class="fs-dropdown-item" (click)="toggleSleepModal(); showFsMenu.set(false)">
-                <svg lucideMoon [attr.size]="18"></svg> Sleep Timer
-              </button>
-            </div>
-          </div>
           <button class="fs-close-btn" [class.active]="showFSQueue()" (click)="toggleFSQueue()" title="Toggle Queue">
             <svg lucideListMusic [attr.size]="24"></svg>
           </button>
@@ -371,19 +359,19 @@ import { AuthService } from '../../services/auth.service';
     </div>
 
     <!-- Sleep Timer Modal (Outside of both player-bar and fullscreen-overlay) -->
-    <div class="sleep-modal-overlay" *ngIf="showSleepModal()" (click)="showSleepModal.set(false)">
+    <div class="sleep-modal-overlay" *ngIf="playerService.showSleepModal()" (click)="playerService.showSleepModal.set(false)">
       <div class="sleep-modal" (click)="$event.stopPropagation()">
         <h3>Sleep Timer</h3>
-        <p class="sleep-active-text" *ngIf="sleepTimerActive()">Active: {{ formatSleepTimeRemaining() }} left</p>
+        <p class="sleep-active-text" *ngIf="playerService.sleepTimerActive()">Active: {{ playerService.formatSleepTimeRemaining() }} left</p>
         <div class="sleep-options">
-          <button class="sleep-opt-btn" (click)="setSleepTimer(5)">5 Minutes</button>
-          <button class="sleep-opt-btn" (click)="setSleepTimer(10)">10 Minutes</button>
-          <button class="sleep-opt-btn" (click)="setSleepTimer(15)">15 Minutes</button>
-          <button class="sleep-opt-btn" (click)="setSleepTimer(30)">30 Minutes</button>
-          <button class="sleep-opt-btn" (click)="setSleepTimer(60)">60 Minutes</button>
-          <button class="sleep-cancel-btn" *ngIf="sleepTimerActive()" (click)="cancelSleepTimer()">Turn Off Timer</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(5)">5 Minutes</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(10)">10 Minutes</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(15)">15 Minutes</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(30)">30 Minutes</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(60)">60 Minutes</button>
+          <button class="sleep-cancel-btn" *ngIf="playerService.sleepTimerActive()" (click)="playerService.cancelSleepTimer()">Turn Off Timer</button>
         </div>
-        <button class="sleep-close-btn" (click)="showSleepModal.set(false)">Close</button>
+        <button class="sleep-close-btn" (click)="playerService.showSleepModal.set(false)">Close</button>
       </div>
     </div>
   `,
@@ -395,7 +383,6 @@ export class MusicPlayerComponent implements OnDestroy {
   isFullScreen = signal<boolean>(false);
   showQueue = signal<boolean>(false);
   showFSQueue = signal<boolean>(false);
-  showFsMenu = signal<boolean>(false);
   showToast = signal<boolean>(false);
 
   constructor(
@@ -404,53 +391,9 @@ export class MusicPlayerComponent implements OnDestroy {
     private userService: UserService,
     private authService: AuthService
   ) {}
-  
-  showSleepModal = signal<boolean>(false);
-  sleepTimerActive = signal<boolean>(false);
-  sleepTimeRemaining = signal<number>(0);
-  private sleepTimerInterval: any = null;
 
   ngOnDestroy() {
-    this.cancelSleepTimer();
-  }
-
-  toggleSleepModal(): void {
-    this.showSleepModal.set(!this.showSleepModal());
-  }
-
-  setSleepTimer(minutes: number): void {
-    this.cancelSleepTimer();
-    this.sleepTimeRemaining.set(minutes * 60);
-    this.sleepTimerActive.set(true);
-    this.showSleepModal.set(false);
-
-    this.sleepTimerInterval = setInterval(() => {
-      const current = this.sleepTimeRemaining();
-      if (current <= 1) {
-        this.cancelSleepTimer();
-        if (this.playerService.playerState() === 'playing') {
-          this.playerService.togglePlayPause();
-        }
-      } else {
-        this.sleepTimeRemaining.set(current - 1);
-      }
-    }, 1000);
-  }
-
-  cancelSleepTimer(): void {
-    if (this.sleepTimerInterval) {
-      clearInterval(this.sleepTimerInterval);
-      this.sleepTimerInterval = null;
-    }
-    this.sleepTimerActive.set(false);
-    this.sleepTimeRemaining.set(0);
-  }
-
-  formatSleepTimeRemaining(): string {
-    const totalSeconds = this.sleepTimeRemaining();
-    const m = Math.floor(totalSeconds / 60);
-    const s = Math.floor(totalSeconds % 60);
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
+    // Moved to PlayerService
   }
 
   isScrubbing = signal<boolean>(false);

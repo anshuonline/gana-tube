@@ -13,7 +13,8 @@ import {
   LucideShare2,
   LucideDownload,
   LucideRadio,
-  LucideTrash2
+  LucideTrash2,
+  LucideMoon
 } from '@lucide/angular';
 
 @Component({
@@ -28,7 +29,8 @@ import {
     LucideShare2,
     LucideDownload,
     LucideRadio,
-    LucideTrash2
+    LucideTrash2,
+    LucideMoon
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -180,6 +182,12 @@ export class TrackMenuComponent implements OnChanges {
     if (this.track) {
       this.playerService.addNext(this.track);
     }
+    this.close();
+  }
+
+  toggleSleepTimer(event: Event) {
+    event.stopPropagation();
+    this.playerService.toggleSleepModal();
     this.close();
   }
 

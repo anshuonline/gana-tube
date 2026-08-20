@@ -63,6 +63,51 @@ export class PlayerService {
   private ytPlayer: any = null;
   private progressInterval: any = null;
 
+  // Sleep Timer State
+  showSleepModal = signal<boolean>(false);
+  sleepTimerActive = signal<boolean>(false);
+  sleepTimeRemaining = signal<number>(0);
+  private sleepTimerInterval: any = null;
+
+  toggleSleepModal(): void {
+    this.showSleepModal.set(!this.showSleepModal());
+  }
+
+  setSleepTimer(minutes: number): void {
+    this.cancelSleepTimer();
+    this.sleepTimeRemaining.set(minutes * 60);
+    this.sleepTimerActive.set(true);
+    this.showSleepModal.set(false);
+
+    this.sleepTimerInterval = setInterval(() => {
+      const current = this.sleepTimeRemaining();
+      if (current <= 1) {
+        this.cancelSleepTimer();
+        if (this.playerState() === 'playing') {
+          this.togglePlayPause();
+        }
+      } else {
+        this.sleepTimeRemaining.set(current - 1);
+      }
+    }, 1000);
+  }
+
+  cancelSleepTimer(): void {
+    if (this.sleepTimerInterval) {
+      clearInterval(this.sleepTimerInterval);
+      this.sleepTimerInterval = null;
+    }
+    this.sleepTimerActive.set(false);
+    this.sleepTimeRemaining.set(0);
+  }
+
+  formatSleepTimeRemaining(): string {
+    const totalSeconds = this.sleepTimeRemaining();
+    const m = Math.floor(totalSeconds / 60);
+    const s = Math.floor(totalSeconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
   setYtPlayer(player: any): void {
     this.ytPlayer = player;
     // Restore volume
