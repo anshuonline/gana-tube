@@ -362,15 +362,35 @@ import { AuthService } from '../../services/auth.service';
     <div class="sleep-modal-overlay" *ngIf="playerService.showSleepModal()" (click)="playerService.showSleepModal.set(false)">
       <div class="sleep-modal" (click)="$event.stopPropagation()">
         <h3>Sleep Timer</h3>
-        <p class="sleep-active-text" *ngIf="playerService.sleepTimerActive()">Active: {{ playerService.formatSleepTimeRemaining() }} left</p>
+        <p class="sleep-active-text" *ngIf="playerService.sleepTimerActive()">
+          <span *ngIf="playerService.sleepAtEndOfTrack()">Active: Until End of Track</span>
+          <span *ngIf="!playerService.sleepAtEndOfTrack()">Active: {{ playerService.formatSleepTimeRemaining() }} left</span>
+        </p>
+        
         <div class="sleep-options">
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(5)">5 Minutes</button>
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(10)">10 Minutes</button>
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(15)">15 Minutes</button>
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(30)">30 Minutes</button>
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(60)">60 Minutes</button>
-          <button class="sleep-cancel-btn" *ngIf="playerService.sleepTimerActive()" (click)="playerService.cancelSleepTimer()">Turn Off Timer</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepAtEndOfTrack()">End of Track</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(15)">15 Min</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(30)">30 Min</button>
+          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(60)">60 Min</button>
         </div>
+        
+        <div class="sleep-custom-container">
+          <div class="sleep-custom-header">
+            <span>Custom Timer</span>
+            <span>{{ customSleepTime() }} Min</span>
+          </div>
+          <input 
+            type="range" 
+            class="sleep-slider" 
+            min="1" 
+            max="120" 
+            [ngModel]="customSleepTime()" 
+            (ngModelChange)="customSleepTime.set($event)"
+            (change)="playerService.setSleepTimer(customSleepTime())"
+          />
+        </div>
+
+        <button class="sleep-cancel-btn" *ngIf="playerService.sleepTimerActive()" (click)="playerService.cancelSleepTimer()">Turn Off Timer</button>
         <button class="sleep-close-btn" (click)="playerService.showSleepModal.set(false)">Close</button>
       </div>
     </div>
@@ -384,6 +404,7 @@ export class MusicPlayerComponent implements OnDestroy {
   showQueue = signal<boolean>(false);
   showFSQueue = signal<boolean>(false);
   showToast = signal<boolean>(false);
+  customSleepTime = signal<number>(30);
 
   constructor(
     public playerService: PlayerService,

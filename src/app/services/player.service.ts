@@ -67,6 +67,7 @@ export class PlayerService {
   showSleepModal = signal<boolean>(false);
   sleepTimerActive = signal<boolean>(false);
   sleepTimeRemaining = signal<number>(0);
+  sleepAtEndOfTrack = signal<boolean>(false);
   private sleepTimerInterval: any = null;
 
   toggleSleepModal(): void {
@@ -92,12 +93,20 @@ export class PlayerService {
     }, 1000);
   }
 
+  setSleepAtEndOfTrack(): void {
+    this.cancelSleepTimer();
+    this.sleepAtEndOfTrack.set(true);
+    this.sleepTimerActive.set(true);
+    this.showSleepModal.set(false);
+  }
+
   cancelSleepTimer(): void {
     if (this.sleepTimerInterval) {
       clearInterval(this.sleepTimerInterval);
       this.sleepTimerInterval = null;
     }
     this.sleepTimerActive.set(false);
+    this.sleepAtEndOfTrack.set(false);
     this.sleepTimeRemaining.set(0);
   }
 
@@ -535,6 +544,13 @@ export class PlayerService {
 
   private handleTrackEnd(): void {
     this.triggerEngagement();
+
+    if (this.sleepAtEndOfTrack()) {
+      this.cancelSleepTimer();
+      // Sleep at end of track triggered, stop playback
+      return;
+    }
+
     if (this.repeatMode() === 'one') {
       this.seekTo(0);
       this.ytPlayer?.playVideo();
