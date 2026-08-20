@@ -1248,3 +1248,71 @@
 }
 
 
+
+.sleep-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sleep-modal {
+  background: #121212;
+  border-radius: 20px;
+  padding: 24px;
+  width: 90%;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+  h3 {
+    margin: 0 0 16px;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .sleep-active-text {
+    color: #4CAF50;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .sleep-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+    .sleep-opt-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 12px;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: 600;
+      transition: all 0.2s;
+      &:hover {
+        background: rgba(255,255,255,0.1);
+      }
+    }
+    .sleep-cancel-btn {
+      background: rgba(244,67,54,0.1);
+      border: 1px solid rgba(244,67,54,0.3);
+      padding: 12px;
+      border-radius: 12px;
+      color: #F44336;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+  }
+  .sleep-close-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: #fff;
+    color: #000;
+    font-weight: 700;
+    border: none;
+  }
+}
+

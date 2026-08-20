@@ -1,4 +1,4 @@
-import { Component, signal, HostListener, Output, EventEmitter } from '@angular/core';
+import { Component, signal, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -18,7 +18,8 @@ import {
   LucideListMusic,
   LucideTrash2,
   LucideHeart,
-  LucideShare2
+  LucideShare2,
+  LucideMoon
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
@@ -47,7 +48,8 @@ import { AuthService } from '../../services/auth.service';
     LucideListMusic,
     LucideTrash2,
     LucideHeart,
-    LucideShare2
+    LucideShare2,
+    LucideMoon
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
@@ -148,6 +150,9 @@ import { AuthService } from '../../services/auth.service';
         </button>
         <button class="ctrl-btn secondary" (click)="copyShareLink()" title="Share Link">
           <svg lucideShare2 [attr.size]="18"></svg>
+        </button>
+        <button class="ctrl-btn secondary" [class.active]="sleepTimerActive()" (click)="toggleSleepModal()" title="Sleep Timer">
+          <svg lucideMoon [attr.size]="18"></svg>
         </button>
         <button class="ctrl-btn secondary" (click)="playerService.toggleMute()" title="Toggle Mute">
           <svg *ngIf="playerService.isMuted() || playerService.volume() === 0" lucideVolumeX [attr.size]="18"></svg>
@@ -298,6 +303,15 @@ import { AuthService } from '../../services/auth.service';
             >
               <svg lucideShuffle [attr.size]="28"></svg>
             </button>
+            
+            <button
+              class="fs-ctrl-btn secondary"
+              [class.active]="sleepTimerActive()"
+              (click)="toggleSleepModal()"
+              title="Sleep Timer"
+            >
+              <svg lucideMoon [attr.size]="28"></svg>
+            </button>
 
             <button class="fs-ctrl-btn" (click)="playerService.previous()" title="Previous">
               <svg lucideSkipBack [attr.size]="36"></svg>
@@ -354,11 +368,28 @@ import { AuthService } from '../../services/auth.service';
       <div class="toast-notification" [class.show]="showToast()">
         Link copied to clipboard!
       </div>
+      
+      <!-- Sleep Timer Modal -->
+      <div class="sleep-modal-overlay" *ngIf="showSleepModal()" (click)="showSleepModal.set(false)">
+        <div class="sleep-modal" (click)="$event.stopPropagation()">
+          <h3>Sleep Timer</h3>
+          <p class="sleep-active-text" *ngIf="sleepTimerActive()">Active: {{ formatSleepTimeRemaining() }} left</p>
+          <div class="sleep-options">
+            <button class="sleep-opt-btn" (click)="setSleepTimer(5)">5 Minutes</button>
+            <button class="sleep-opt-btn" (click)="setSleepTimer(10)">10 Minutes</button>
+            <button class="sleep-opt-btn" (click)="setSleepTimer(15)">15 Minutes</button>
+            <button class="sleep-opt-btn" (click)="setSleepTimer(30)">30 Minutes</button>
+            <button class="sleep-opt-btn" (click)="setSleepTimer(60)">60 Minutes</button>
+            <button class="sleep-cancel-btn" *ngIf="sleepTimerActive()" (click)="cancelSleepTimer()">Turn Off Timer</button>
+          </div>
+          <button class="sleep-close-btn" (click)="showSleepModal.set(false)">Close</button>
+        </div>
+      </div>
     </div>
   `,
   styleUrls: ['./music-player.component.scss'],
 })
-export class MusicPlayerComponent {
+export class MusicPlayerComponent implements OnDestroy {
   @Output() expand = new EventEmitter<void>();
   
   isFullScreen = signal<boolean>(false);
@@ -372,6 +403,54 @@ export class MusicPlayerComponent {
     private userService: UserService,
     private authService: AuthService
   ) {}
+  
+  showSleepModal = signal<boolean>(false);
+  sleepTimerActive = signal<boolean>(false);
+  sleepTimeRemaining = signal<number>(0);
+  private sleepTimerInterval: any = null;
+
+  ngOnDestroy() {
+    this.cancelSleepTimer();
+  }
+
+  toggleSleepModal(): void {
+    this.showSleepModal.set(!this.showSleepModal());
+  }
+
+  setSleepTimer(minutes: number): void {
+    this.cancelSleepTimer();
+    this.sleepTimeRemaining.set(minutes * 60);
+    this.sleepTimerActive.set(true);
+    this.showSleepModal.set(false);
+
+    this.sleepTimerInterval = setInterval(() => {
+      const current = this.sleepTimeRemaining();
+      if (current <= 1) {
+        this.cancelSleepTimer();
+        if (this.playerService.playerState() === 'playing') {
+          this.playerService.togglePlayPause();
+        }
+      } else {
+        this.sleepTimeRemaining.set(current - 1);
+      }
+    }, 1000);
+  }
+
+  cancelSleepTimer(): void {
+    if (this.sleepTimerInterval) {
+      clearInterval(this.sleepTimerInterval);
+      this.sleepTimerInterval = null;
+    }
+    this.sleepTimerActive.set(false);
+    this.sleepTimeRemaining.set(0);
+  }
+
+  formatSleepTimeRemaining(): string {
+    const totalSeconds = this.sleepTimeRemaining();
+    const m = Math.floor(totalSeconds / 60);
+    const s = Math.floor(totalSeconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
 
   isScrubbing = signal<boolean>(false);
   scrubPercent = signal<number>(0);
