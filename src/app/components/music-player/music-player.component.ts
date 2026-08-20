@@ -386,7 +386,7 @@ import { AuthService } from '../../services/auth.service';
             max="120" 
             [ngModel]="customSleepTime()" 
             (ngModelChange)="customSleepTime.set($event)"
-            (change)="playerService.setSleepTimer(customSleepTime())"
+            (change)="playerService.setSleepTimer(customSleepTime(), false)"
           />
         </div>
 

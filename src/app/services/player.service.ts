@@ -74,11 +74,14 @@ export class PlayerService {
     this.showSleepModal.set(!this.showSleepModal());
   }
 
-  setSleepTimer(minutes: number): void {
+  setSleepTimer(minutes: number, closeModal: boolean = true): void {
     this.cancelSleepTimer();
     this.sleepTimeRemaining.set(minutes * 60);
     this.sleepTimerActive.set(true);
-    this.showSleepModal.set(false);
+    
+    if (closeModal) {
+      this.showSleepModal.set(false);
+    }
 
     this.sleepTimerInterval = setInterval(() => {
       const current = this.sleepTimeRemaining();
