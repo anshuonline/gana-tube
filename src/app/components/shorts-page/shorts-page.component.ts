@@ -134,12 +134,12 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         };
         this.queue.set([item]);
         this.playCurrent();
-        this.fetchRandomQueue(10); // Fetch more in background
+        this.fetchRandomQueue(5); // Fetch 5 in background
       }
     });
   }
 
-  private fetchRandomQueue(limit = 10) {
+  private fetchRandomQueue(limit = 5) {
     const randomQuery = this.backgroundQueries[Math.floor(Math.random() * this.backgroundQueries.length)];
     this.youtubeApi.searchMusic(randomQuery, limit).subscribe(res => {
       const items: ShortItem[] = res.map(track => ({
@@ -153,6 +153,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
       if (currentQ.length === 0) {
         this.playCurrent();
       } else {
+        // If we were waiting for items, preload next now
         this.preloadNext();
       }
     });
@@ -194,9 +195,14 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
   private preloadNext() {
     const nextIndex = this.currentIndex() + 1;
+    
+    // Smart optimized fetch: if less than 3 songs left in queue, fetch 5 more
+    if (this.queue().length - this.currentIndex() <= 3) {
+      this.fetchRandomQueue(5);
+    }
+
     if (nextIndex >= this.queue().length) {
-      this.fetchRandomQueue(10); // Fetch more if running out
-      return;
+      return; // Waiting for fetch to complete
     }
 
     const nextItem = this.queue()[nextIndex];

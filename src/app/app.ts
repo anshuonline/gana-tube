@@ -99,7 +99,7 @@ export class App implements OnInit {
   isCarModeVisible = signal<boolean>(false);
   isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
-  appVersion = 'v1.0.2';
+  appVersion = 'v1.0.4';
   currentYear = new Date().getFullYear();
 
   // Ad Booking State
