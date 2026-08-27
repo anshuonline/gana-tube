@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
@@ -29,7 +29,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   // Dual IFrame setup
   playerA: any = null;
   playerB: any = null;
-  activePlayerId = signal<'A' | 'B'>('A');
+  activePlayerId = computed<'A' | 'B'>(() => this.currentIndex() % 2 === 0 ? 'A' : 'B');
   
   isApiLoaded = false;
   isLoading = signal<boolean>(true);
@@ -195,8 +195,14 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
     const currentItem = this.queue()[this.currentIndex()];
     const activePlayer = this.activePlayerId() === 'A' ? this.playerA : this.playerB;
+    const idlePlayer = this.activePlayerId() === 'A' ? this.playerB : this.playerA;
     
-    // Load and play
+    // Stop the idle player just in case it's still playing
+    if (idlePlayer && idlePlayer.stopVideo) {
+      idlePlayer.stopVideo();
+    }
+    
+    // Load and play current
     if (activePlayer && activePlayer.loadVideoById) {
       activePlayer.loadVideoById({
         videoId: currentItem.videoId,
@@ -216,8 +222,8 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   private preloadNext() {
     const nextIndex = this.currentIndex() + 1;
     
-    // Smart optimized fetch: if less than 3 songs left in queue, fetch 5 more
-    if (this.queue().length - this.currentIndex() <= 3) {
+    // Smart optimized fetch: if we are close to end (e.g. 4 items left), fetch 5 more
+    if (this.queue().length - this.currentIndex() <= 4) {
       this.fetchRandomQueue(5);
     }
 
@@ -247,14 +253,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const nextIndex = this.currentIndex() + 1;
     if (nextIndex < this.queue().length) {
       this.currentIndex.set(nextIndex);
-      // Switch active player
-      this.activePlayerId.set(this.activePlayerId() === 'A' ? 'B' : 'A');
-      
-      // Stop previous
-      const idlePlayer = this.activePlayerId() === 'A' ? this.playerB : this.playerA;
-      if (idlePlayer && idlePlayer.stopVideo) {
-        idlePlayer.stopVideo();
-      }
+      // activePlayerId automatically computes from currentIndex
       
       this.playCurrent();
       
@@ -278,17 +277,13 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const itemHeight = container.clientHeight;
     const scrollPos = container.scrollTop;
     
+    // Calculate which item is currently most visible
     const newIndex = Math.round(scrollPos / itemHeight);
     
     if (newIndex !== this.currentIndex() && newIndex >= 0 && newIndex < this.queue().length) {
       // User swiped to a new item
       this.currentIndex.set(newIndex);
-      this.activePlayerId.set(this.activePlayerId() === 'A' ? 'B' : 'A');
-      
-      const idlePlayer = this.activePlayerId() === 'A' ? this.playerB : this.playerA;
-      if (idlePlayer && idlePlayer.stopVideo) {
-        idlePlayer.stopVideo();
-      }
+      // activePlayerId will automatically update via computed()
       
       this.playCurrent();
     }

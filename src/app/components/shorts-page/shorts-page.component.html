@@ -14,6 +14,14 @@
     <p>Tap to Play</p>
   </div>
 
+  <!-- Top Nav (Fixed globally) -->
+  <div class="shorts-header fixed-header">
+    <button class="icon-btn back-btn" (click)="goBack()">
+      <svg lucideChevronLeft [attr.size]="28"></svg>
+    </button>
+    <span class="header-title">Shorts</span>
+  </div>
+
   <div class="loading-overlay" *ngIf="isLoading() && !needsInteraction()">
     <div class="spinner"></div>
     <p>Loading...</p>
@@ -38,14 +46,6 @@
     <!-- Immersive Background -->
     <div class="bg-blur" [style.backgroundImage]="'url(' + item.thumbnailHigh + ')'"></div>
     <div class="bg-overlay"></div>
-    
-    <!-- Top Nav -->
-    <div class="shorts-header">
-      <button class="icon-btn" (click)="goBack()">
-        <svg lucideChevronLeft [attr.size]="28"></svg>
-      </button>
-      <span class="header-title">Shorts</span>
-    </div>
 
     <!-- Center Content (Spinning CD) -->
     <div class="center-content">

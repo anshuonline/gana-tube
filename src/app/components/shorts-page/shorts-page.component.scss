@@ -168,27 +168,29 @@
 }
 
 .shorts-header {
-  position: absolute;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
-  padding: 20px;
+  padding: env(safe-area-inset-top, 20px) 20px 20px 20px;
   display: flex;
   align-items: center;
-  z-index: 10;
+  z-index: 50; /* Ensure it stays above everything */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
   
-  .icon-btn {
-    background: transparent;
+  .back-btn {
+    background: none;
     border: none;
     color: #fff;
-    padding: 8px;
     cursor: pointer;
-  }
-  
-  .header-title {
-    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 1.1rem;
-    margin-left: 10px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    padding: 10px; /* Make tap target larger */
+    margin-top: 5px;
   }
 }
 
