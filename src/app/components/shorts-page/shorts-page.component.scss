@@ -66,6 +66,40 @@
   100% { box-shadow: 0 0 0 0 rgba(30, 215, 96, 0); }
 }
 
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.floating-heart {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2000;
+  transform: translate(-50%, -50%);
+  animation: floatUpAndFade 1s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  filter: drop-shadow(0 10px 20px rgba(255, 0, 85, 0.5));
+}
+
+@keyframes floatUpAndFade {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(10deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -100%) scale(1) rotate(-5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -300%) scale(0.8) rotate(0deg);
+    opacity: 0;
+  }
+}
+
 .hidden-players {
   position: absolute;
   top: -9999px;

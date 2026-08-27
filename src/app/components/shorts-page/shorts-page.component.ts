@@ -33,6 +33,9 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   isApiLoaded = false;
   isLoading = signal<boolean>(true);
   needsInteraction = signal<boolean>(true); // Require tap-to-play
+  floatingHearts = signal<{id: number, x: number, y: number}[]>([]);
+  private heartIdCounter = 0;
+  private lastTap = 0;
   
   private playbackTimer: any;
   private backgroundQueries = ['trending music', 'latest hit songs', 'party songs', 'lofi beats', 'bollywood hits', 'punjabi hits'];
@@ -302,6 +305,41 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   playFullSong(item: ShortItem) {
     this.playerService.playTrack(item);
     this.router.navigate(['/']); // Go home where full player is visible
+  }
+
+  handleTap(event: any, item: ShortItem) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - this.lastTap;
+    
+    if (tapLength < 300 && tapLength > 0) {
+      // Double tap detected
+      this.triggerLikeAnimation(event, item);
+    }
+    this.lastTap = currentTime;
+  }
+
+  triggerLikeAnimation(event: any, item: ShortItem) {
+    item.isLiked = true;
+    
+    // Get coordinates relative to the container
+    let clientX = 0;
+    let clientY = 0;
+
+    if (event.touches && event.touches.length > 0) {
+      clientX = event.touches[0].clientX;
+      clientY = event.touches[0].clientY;
+    } else {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    }
+
+    const newHeart = { id: this.heartIdCounter++, x: clientX, y: clientY };
+    this.floatingHearts.update(hearts => [...hearts, newHeart]);
+
+    // Remove the heart after animation (1s)
+    setTimeout(() => {
+      this.floatingHearts.update(hearts => hearts.filter(h => h.id !== newHeart.id));
+    }, 1000);
   }
 
   likeTrack(item: ShortItem) {

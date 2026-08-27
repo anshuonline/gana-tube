@@ -10,8 +10,8 @@
         <span class="sidebar-label">Home</span>
       </div>
       <div class="sidebar-item" (click)="openShortsPage()" [class.active]="currentPage() === 'shorts'">
-        <svg lucideFlame [attr.size]="24" [color]="currentPage() === 'shorts' ? '#1ed760' : 'currentColor'"></svg>
-        <span class="sidebar-label" [style.color]="currentPage() === 'shorts' ? '#1ed760' : ''">Shorts</span>
+        <svg lucideFlame [attr.size]="24"></svg>
+        <span class="sidebar-label">Shorts</span>
       </div>
       <div class="sidebar-item" (click)="openSearchPage()" [class.active]="currentPage() === 'search'">
         <svg lucideSearch [attr.size]="24"></svg>
