@@ -1,0 +1,50 @@
+<div class="eq-page-container">
+  <div class="eq-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg lucideChevronLeft [attr.size]="24"></svg>
+    </button>
+    <div class="header-title">
+      <h2>Pro Equalizer</h2>
+      <p class="subtitle">Custom Audio Experience</p>
+    </div>
+    <div class="header-icon">
+      <svg lucideActivity [attr.size]="24"></svg>
+    </div>
+  </div>
+
+  <div class="eq-content">
+    <div class="presets-section">
+      <h3>Presets</h3>
+      <div class="presets-grid">
+        <button class="preset-btn" 
+                *ngFor="let preset of presets" 
+                (click)="selectPreset(preset)"
+                [class.active]="activePreset() === preset.name">
+          {{ preset.name }}
+        </button>
+      </div>
+      <div class="custom-badge" *ngIf="activePreset() === 'Custom'">
+        Custom Profile Active
+      </div>
+    </div>
+
+    <div class="sliders-section">
+      <div class="sliders-container">
+        <div class="slider-group" *ngFor="let band of bands; let i = index">
+          <div class="slider-value">{{ currentValues()[i] > 0 ? '+' : '' }}{{ currentValues()[i] }}db</div>
+          <input type="range" 
+                 class="eq-slider" 
+                 min="-15" max="15" 
+                 [value]="currentValues()[i]"
+                 (input)="onSliderChange(i, $event)"
+                 orient="vertical">
+          <div class="slider-label">{{ band }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="eq-info-panel">
+      <p><span style="color: #ff3b30; font-weight: bold;">Note:</span> Due to browser cross-origin constraints (CORS) on YouTube streams, this Pro Equalizer is currently a visual simulation interface for your preset configurations.</p>
+    </div>
+  </div>
+</div>

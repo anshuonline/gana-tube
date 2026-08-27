@@ -17,7 +17,8 @@ import {
   LucideMoon,
   LucideVolumeX,
   LucideVolume1,
-  LucideVolume2
+  LucideVolume2,
+  LucideSliders
 } from '@lucide/angular';
 import { FormsModule } from '@angular/forms';
 
@@ -38,7 +39,8 @@ import { FormsModule } from '@angular/forms';
     LucideMoon,
     LucideVolumeX,
     LucideVolume1,
-    LucideVolume2
+    LucideVolume2,
+    LucideSliders
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -230,6 +232,12 @@ export class TrackMenuComponent implements OnChanges {
       this.algorithmService.toggleLike(this.track);
     }
     this.close();
+  }
+
+  openEqualizer(event: Event) {
+    event.stopPropagation();
+    this.closeMenu.emit();
+    this.router.navigate(['/equalizer']);
   }
 
   share(event: Event) {
