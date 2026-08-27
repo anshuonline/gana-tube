@@ -36,7 +36,7 @@ import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-br
 import { CarModePlayerComponent } from './components/car-mode-player/car-mode-player.component';
 import { LibraryPageComponent } from './components/library-page/library-page';
 import { FeedbackPopupComponent } from './components/feedback-popup/feedback-popup.component';
-import { EqualizerPageComponent } from './components/equalizer-page/equalizer-page';
+
 export interface SponsoredAd {
   isActive: boolean;
   imageUrl?: string;
@@ -79,8 +79,7 @@ export interface SponsoredAd {
     SavePlaylistModalComponent,
     ToastComponent,
     LibraryPageComponent,
-    FeedbackPopupComponent,
-    EqualizerPageComponent
+    FeedbackPopupComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -723,10 +722,6 @@ export class App implements OnInit {
         return;
       } else if (event.urlAfterRedirects.startsWith('/managegt')) {
         this.currentPage.set('managegt');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      } else if (event.urlAfterRedirects.startsWith('/equalizer')) {
-        this.currentPage.set('equalizer');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       } else if (url === 'language') {
