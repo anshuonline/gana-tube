@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
+import { UserService } from '../../services/user.service';
 import { LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic } from '@lucide/angular';
 
 interface ShortItem extends YouTubeSearchResult {
@@ -43,6 +44,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   constructor(
     private youtubeApi: YoutubeApiService,
     private playerService: PlayerService,
+    private userService: UserService,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location
@@ -144,8 +146,17 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  private getDynamicQueries(): string[] {
+    const langs = this.userService.preferredLanguages();
+    if (langs && langs.length > 0) {
+      return langs.map(l => `${l} trending shorts hit songs`);
+    }
+    return this.backgroundQueries;
+  }
+
   private fetchRandomQueue(limit = 5) {
-    const randomQuery = this.backgroundQueries[Math.floor(Math.random() * this.backgroundQueries.length)];
+    const queries = this.getDynamicQueries();
+    const randomQuery = queries[Math.floor(Math.random() * queries.length)];
     this.youtubeApi.searchMusic(randomQuery, limit).subscribe(res => {
       const items: ShortItem[] = res.map(track => ({
         ...track,
