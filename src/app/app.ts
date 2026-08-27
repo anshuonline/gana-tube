@@ -98,7 +98,7 @@ export class App implements OnInit {
   isCarModeVisible = signal<boolean>(false);
   isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
-  appVersion = 'v1.0.3';
+  appVersion = 'v1.0.2';
   currentYear = new Date().getFullYear();
 
   // Ad Booking State
@@ -728,7 +728,6 @@ export class App implements OnInit {
       } else if (event.urlAfterRedirects.startsWith('/equalizer')) {
         this.currentPage.set('equalizer');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        this.isFullScreenPlayerVisible.set(false);
         return;
       } else if (url === 'language') {
         const langParam = event.urlAfterRedirects.split('/')[2];
