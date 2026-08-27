@@ -28,6 +28,24 @@
 
   <!-- Menu Items (Scrollable on mobile if needed) -->
   <div class="menu-items-scroll">
+    <!-- Volume Control -->
+    <div class="menu-volume-control" (click)="$event.stopPropagation()">
+      <button class="vol-btn" (click)="toggleMute($event)">
+        <svg *ngIf="isMuted() || volume() === 0" lucideVolumeX [attr.size]="20"></svg>
+        <svg *ngIf="!isMuted() && volume() > 0 && volume() <= 50" lucideVolume1 [attr.size]="20"></svg>
+        <svg *ngIf="!isMuted() && volume() > 50" lucideVolume2 [attr.size]="20"></svg>
+      </button>
+      <input type="range" 
+             class="menu-vol-slider" 
+             min="0" max="100" 
+             [ngModel]="isMuted() ? 0 : volume()" 
+             (ngModelChange)="onVolumeChange($event)" 
+             [style.background]="getSliderBackground(isMuted() ? 0 : volume())">
+      <span class="vol-text">{{ isMuted() ? 0 : volume() }}%</span>
+    </div>
+    
+    <hr class="menu-divider">
+    
     <div class="menu-item" (click)="playNext($event)">
       <svg lucideListStart [attr.size]="20"></svg> Play next
     </div>

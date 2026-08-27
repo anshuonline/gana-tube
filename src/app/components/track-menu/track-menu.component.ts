@@ -14,14 +14,19 @@ import {
   LucideDownload,
   LucideRadio,
   LucideTrash2,
-  LucideMoon
+  LucideMoon,
+  LucideVolumeX,
+  LucideVolume1,
+  LucideVolume2
 } from '@lucide/angular';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-track-menu',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     LucideListPlus,
     LucideListStart,
     LucideFolderPlus,
@@ -30,7 +35,10 @@ import {
     LucideDownload,
     LucideRadio,
     LucideTrash2,
-    LucideMoon
+    LucideMoon,
+    LucideVolumeX,
+    LucideVolume1,
+    LucideVolume2
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -258,8 +266,28 @@ export class TrackMenuComponent implements OnChanges {
   }
 
   startRadio(event: Event) {
+    // Disabled
+  }
+
+  // Volume Control Methods
+  volume(): number {
+    return this.playerService.volume();
+  }
+
+  isMuted(): boolean {
+    return this.playerService.isMuted();
+  }
+
+  toggleMute(event: Event): void {
     event.stopPropagation();
-    alert('Radio feature coming soon!');
-    this.close();
+    this.playerService.toggleMute();
+  }
+
+  onVolumeChange(value: number): void {
+    this.playerService.setVolume(value);
+  }
+
+  getSliderBackground(value: number): string {
+    return `linear-gradient(to right, #fff ${value}%, #333 ${value}%)`;
   }
 }
