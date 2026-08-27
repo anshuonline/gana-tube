@@ -97,7 +97,7 @@ export class App implements OnInit {
   isCarModeVisible = signal<boolean>(false);
   isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
-  appVersion = 'v1.0.1';
+  appVersion = 'v1.0.2';
   currentYear = new Date().getFullYear();
 
   // Ad Booking State
@@ -728,7 +728,10 @@ export class App implements OnInit {
         const langParam = event.urlAfterRedirects.split('/')[2];
         if (langParam) {
           const capitalizedLang = langParam.charAt(0).toUpperCase() + langParam.slice(1);
-          this.homeScreenLanguage.set(capitalizedLang);
+          if (this.availableLanguages.includes(capitalizedLang)) {
+            this.homeScreenLanguage.set(capitalizedLang);
+            localStorage.setItem('homeScreenLanguage', capitalizedLang);
+          }
           this.loadInitialShelves(capitalizedLang);
           this.updateSEO(
             `${capitalizedLang} Songs & Trending Playlists - GanaTube`,
@@ -1019,6 +1022,12 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {
+    // Load saved language if available
+    const savedLang = localStorage.getItem('homeScreenLanguage');
+    if (savedLang && this.availableLanguages.includes(savedLang)) {
+      this.homeScreenLanguage.set(savedLang);
+    }
+
     // Dynamic API URL for Localhost vs Live Domain (ganatube.in)
     const host = window.location.hostname;
     const adApiUrl = host === 'localhost' 
