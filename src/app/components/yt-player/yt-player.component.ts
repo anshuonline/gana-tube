@@ -134,8 +134,32 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       getPlayerState: () => this.players[this.activePlayerIndex]?.getPlayerState(),
       getCurrentTime: () => this.players[this.activePlayerIndex]?.getCurrentTime(),
       getDuration: () => this.players[this.activePlayerIndex]?.getDuration(),
-      loadVideoById: (videoId: string) => this.handleLoadVideo(videoId),
-      setPlaybackQuality: (quality: string) => this.players[this.activePlayerIndex]?.setPlaybackQuality(quality)
+      loadVideoById: (args: any) => {
+        if (typeof args === 'string') {
+          this.handleLoadVideo(args, 0);
+        } else {
+          this.handleLoadVideo(args.videoId, args.startSeconds || 0);
+        }
+      },
+      setPlaybackQuality: (quality: string) => {
+        const p = this.players[this.activePlayerIndex];
+        if (p) {
+          p.setPlaybackQuality(quality);
+          const state = p.getPlayerState();
+          // Smartly reload to force quality change if it's currently playing or paused
+          if (state === 1 || state === 2) {
+            const time = p.getCurrentTime();
+            const vid = this.cuedVideoIds[this.activePlayerIndex];
+            if (vid) {
+              p.loadVideoById({
+                videoId: vid,
+                startSeconds: time,
+                suggestedQuality: quality
+              });
+            }
+          }
+        }
+      }
     };
     
     // Unmute the active player initially based on service state
@@ -153,7 +177,7 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     return 'hd720';
   }
 
-  private handleLoadVideo(videoId: string): void {
+  private handleLoadVideo(videoId: string, startSeconds: number = 0): void {
     // Check if the video is already cued in one of the background players
     let foundIndex = -1;
     for (let i = 0; i < this.totalPlayers; i++) {
@@ -182,6 +206,11 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.players[this.activePlayerIndex].setVolume(this.playerService.volume());
       this.players[this.activePlayerIndex].setPlaybackQuality(quality);
+      
+      if (startSeconds > 0) {
+        this.players[this.activePlayerIndex].seekTo(startSeconds, true);
+      }
+      
       this.players[this.activePlayerIndex].playVideo();
     } else {
       // Not preloaded (or it was already active), just load it in the current active player
@@ -191,9 +220,10 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.players[this.activePlayerIndex].setVolume(this.playerService.volume());
       
-      // Use object syntax for loadVideoById to set suggestedQuality
+      // Use object syntax for loadVideoById to set suggestedQuality and startSeconds
       this.players[this.activePlayerIndex].loadVideoById({
         videoId: videoId,
+        startSeconds: startSeconds,
         suggestedQuality: quality
       });
       
