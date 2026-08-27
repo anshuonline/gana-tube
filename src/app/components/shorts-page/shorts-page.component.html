@@ -1,6 +1,6 @@
-<div class="shorts-container" #shortsContainer (scroll)="onScroll($event)">
+<div class="shorts-container">
   <!-- Desktop 9:16 Wrapper -->
-  <div class="desktop-wrapper">
+  <div class="desktop-wrapper" #shortsContainer (scroll)="onScroll($event)">
   <!-- Hidden YouTube players for Dual-Iframe Engine -->
   <div class="hidden-players">
     <div id="shorts-player-a"></div>
