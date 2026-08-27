@@ -36,6 +36,7 @@ import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-br
 import { CarModePlayerComponent } from './components/car-mode-player/car-mode-player.component';
 import { LibraryPageComponent } from './components/library-page/library-page';
 import { FeedbackPopupComponent } from './components/feedback-popup/feedback-popup.component';
+import { ShortsPageComponent } from './components/shorts-page/shorts-page.component';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -79,7 +80,8 @@ export interface SponsoredAd {
     SavePlaylistModalComponent,
     ToastComponent,
     LibraryPageComponent,
-    FeedbackPopupComponent
+    FeedbackPopupComponent,
+    ShortsPageComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -711,6 +713,11 @@ export class App implements OnInit {
             this.router.navigate(['/home']);
           }
         }
+        return;
+      } else if (event.urlAfterRedirects.startsWith('/shorts')) {
+        this.currentPage.set('shorts');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        this.isFullScreenPlayerVisible.set(false);
         return;
       } else if (event.urlAfterRedirects.startsWith('/advertise')) {
         this.currentPage.set('advertise');

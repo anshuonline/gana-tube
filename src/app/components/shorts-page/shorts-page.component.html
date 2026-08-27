@@ -1,0 +1,77 @@
+<div class="shorts-container" #shortsContainer (scroll)="onScroll($event)">
+  <!-- Hidden YouTube players for Dual-Iframe Engine -->
+  <div class="hidden-players">
+    <div id="shorts-player-a"></div>
+    <div id="shorts-player-b"></div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="isLoading()">
+    <div class="spinner"></div>
+    <p>Starting Smart Engine...</p>
+  </div>
+
+  <div class="short-slide" *ngFor="let item of queue(); let i = index">
+    <!-- Immersive Background -->
+    <div class="bg-blur" [style.backgroundImage]="'url(' + item.thumbnailHigh + ')'"></div>
+    <div class="bg-overlay"></div>
+    
+    <!-- Top Nav -->
+    <div class="shorts-header">
+      <button class="icon-btn" (click)="goBack()">
+        <svg lucideChevronLeft [attr.size]="28"></svg>
+      </button>
+      <span class="header-title">Shorts Engine</span>
+    </div>
+
+    <!-- Center Content (Spinning CD) -->
+    <div class="center-content">
+      <div class="spinning-cd" [class.paused]="i !== currentIndex()">
+        <img [src]="item.thumbnailHigh" alt="cover">
+      </div>
+    </div>
+
+    <!-- Bottom Info -->
+    <div class="bottom-info">
+      <h2 class="title">{{ item.title }}</h2>
+      <p class="artist">
+        <svg lucideMusic [attr.size]="14"></svg> {{ item.channelTitle }}
+      </p>
+      <div class="smart-drop-badge">Simulated Drop: 0:{{ item.dropStartTime }}</div>
+    </div>
+
+    <!-- Right Side Actions -->
+    <div class="action-sidebar">
+      <!-- Like -->
+      <button class="action-btn" (click)="likeTrack(item)">
+        <svg lucideHeart [attr.size]="30" color="#fff"></svg>
+        <span>Like</span>
+      </button>
+      
+      <!-- Full Song -->
+      <button class="action-btn play-full" (click)="playFullSong(item)">
+        <div class="icon-circle">
+          <svg lucidePlay [attr.size]="24" color="#000" fill="#000"></svg>
+        </div>
+        <span>Full Song</span>
+      </button>
+      
+      <!-- Share -->
+      <button class="action-btn" (click)="shareTrack(item)">
+        <svg lucideShare2 [attr.size]="30" color="#fff"></svg>
+        <span>Share</span>
+      </button>
+      
+      <!-- More -->
+      <button class="action-btn">
+        <svg lucideMoreVertical [attr.size]="30" color="#fff"></svg>
+      </button>
+      
+      <!-- Animated Equalizer Icon (when playing) -->
+      <div class="playing-eq" *ngIf="i === currentIndex()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </div>
+</div>

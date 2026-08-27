@@ -268,12 +268,17 @@ export class PlayerService {
   togglePlayPause(): void {
     if (!this.ytPlayer) return;
     if (this.playerState() === 'playing') {
-      this.ytPlayer.pauseVideo();
-      this.broadcastPlaybackSync(false);
+      this.pause();
     } else {
       this.ytPlayer.playVideo();
       this.broadcastPlaybackSync(true);
     }
+  }
+
+  pause(): void {
+    if (!this.ytPlayer) return;
+    this.ytPlayer.pauseVideo();
+    this.broadcastPlaybackSync(false);
   }
   
   private broadcastPlaybackSync(isPlaying: boolean) {

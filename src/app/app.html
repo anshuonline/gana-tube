@@ -3,7 +3,7 @@
   <app-yt-player *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin'"></app-yt-player>
 
   <!-- Sidebar -->
-  <nav class="app-sidebar" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
+  <nav class="app-sidebar" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts'">
     <div class="sidebar-items">
       <div class="sidebar-item" (click)="resetSearchState()" [class.active]="currentPage() === 'home'">
         <svg lucideHome [attr.size]="24"></svg>
@@ -32,7 +32,7 @@
   </nav>
 
   <!-- Header -->
-  <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited'">
+  <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts'">
     <div class="header-inner">
       <div style="display: flex; align-items: center; gap: 16px;">
         <div class="logo" routerLink="/" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
@@ -263,6 +263,7 @@
     <app-ad-booking-page *ngIf="currentPage() === 'ad-booking'"></app-ad-booking-page>
     <app-ad-terms-page *ngIf="currentPage() === 'ad-terms'"></app-ad-terms-page>
     <app-ad-prohibited-page *ngIf="currentPage() === 'ad-prohibited'"></app-ad-prohibited-page>
+    <app-shorts-page *ngIf="currentPage() === 'shorts'"></app-shorts-page>
 
     <div *ngIf="currentPage() === 'home' || currentPage() === 'search'" class="home-content">
       <!-- Hero Banner (Hidden in Search Mode) -->
@@ -543,7 +544,7 @@
     </app-playlist-page>
 
     <!-- Modern Footer -->
-    <footer class="app-footer-modern" *ngIf="currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'search' && !isSearchMode()">
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts'">
       <div class="footer-giant-brand">ganatube.in</div>
       <div class="footer-content">
         <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
@@ -604,7 +605,7 @@
 
   <!-- Fixed Music Player -->
   <app-music-player 
-    *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin'"
+    *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin' && currentPage() !== 'shorts'"
     (expand)="openFullScreenPlayer()">
   </app-music-player>
 
