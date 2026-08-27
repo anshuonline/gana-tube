@@ -27,13 +27,14 @@ declare var YT: any;
     `
       .yt-player-container {
         position: fixed;
-        bottom: -9999px;
-        left: -9999px;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
         pointer-events: none;
-        opacity: 0;
+        z-index: -9999;
+        opacity: 0.01;
+        overflow: hidden;
       }
     `,
   ],
@@ -71,10 +72,16 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private initYouTubePlayers(): void {
     const initAll = () => {
+      const q = this.playerService.musicQuality();
+      let initW = '1';
+      let initH = '1';
+      if (q === 'High') { initW = '1920'; initH = '1080'; }
+      else if (q === 'Standard') { initW = '640'; initH = '360'; }
+
       for (let i = 0; i < this.totalPlayers; i++) {
         this.players[i] = new YT.Player(`yt-player-element-${i}`, {
-          height: '1',
-          width: '1',
+          height: initH,
+          width: initW,
           playerVars: {
             autoplay: 1,
             controls: 0,
@@ -143,6 +150,19 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       setPlaybackQuality: (quality: string) => {
         const p = this.players[this.activePlayerIndex];
+        
+        // Force adaptive streaming algorithm by resizing the iframe itself!
+        // YouTube uses IntersectionObserver and element size to throttle quality.
+        let w = 1, h = 1;
+        if (quality === 'hd720') { w = 1920; h = 1080; }
+        else if (quality === 'medium') { w = 640; h = 360; }
+        
+        this.players.forEach(player => {
+          if (player && typeof player.setSize === 'function') {
+            player.setSize(w, h);
+          }
+        });
+
         if (p) {
           p.setPlaybackQuality(quality);
           const state = p.getPlayerState();
