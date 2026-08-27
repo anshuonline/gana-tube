@@ -1,13 +1,22 @@
 <div class="shorts-container" #shortsContainer (scroll)="onScroll($event)">
+  <!-- Desktop 9:16 Wrapper -->
+  <div class="desktop-wrapper">
   <!-- Hidden YouTube players for Dual-Iframe Engine -->
   <div class="hidden-players">
     <div id="shorts-player-a"></div>
     <div id="shorts-player-b"></div>
   </div>
 
-  <div class="loading-overlay" *ngIf="isLoading()">
+  <div class="tap-to-play-overlay" *ngIf="needsInteraction()" (click)="startInteraction()">
+    <div class="play-pulse">
+      <svg lucidePlay [attr.size]="60" color="#fff" [attr.fill]="'#fff'"></svg>
+    </div>
+    <p>Tap to Play</p>
+  </div>
+
+  <div class="loading-overlay" *ngIf="isLoading() && !needsInteraction()">
     <div class="spinner"></div>
-    <p>Starting Smart Engine...</p>
+    <p>Loading...</p>
   </div>
 
   <div class="short-slide" *ngFor="let item of queue(); let i = index">
@@ -20,7 +29,7 @@
       <button class="icon-btn" (click)="goBack()">
         <svg lucideChevronLeft [attr.size]="28"></svg>
       </button>
-      <span class="header-title">Shorts Engine</span>
+      <span class="header-title">Shorts</span>
     </div>
 
     <!-- Center Content (Spinning CD) -->
@@ -36,14 +45,13 @@
       <p class="artist">
         <svg lucideMusic [attr.size]="14"></svg> {{ item.channelTitle }}
       </p>
-      <div class="smart-drop-badge">Simulated Drop: 0:{{ item.dropStartTime }}</div>
     </div>
 
     <!-- Right Side Actions -->
     <div class="action-sidebar">
       <!-- Like -->
       <button class="action-btn" (click)="likeTrack(item)">
-        <svg lucideHeart [attr.size]="30" color="#fff"></svg>
+        <svg lucideHeart [attr.size]="30" [color]="item.isLiked ? '#ff0000' : '#fff'" [attr.fill]="item.isLiked ? '#ff0000' : 'none'"></svg>
         <span>Like</span>
       </button>
       
@@ -74,4 +82,6 @@
       </div>
     </div>
   </div>
+  
+  </div> <!-- end desktop wrapper -->
 </div>

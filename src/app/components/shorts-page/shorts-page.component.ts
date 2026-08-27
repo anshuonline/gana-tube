@@ -6,7 +6,8 @@ import { PlayerService } from '../../services/player.service';
 import { LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic } from '@lucide/angular';
 
 interface ShortItem extends YouTubeSearchResult {
-  dropStartTime: number; // calculated start time
+  dropStartTime: number;
+  isLiked?: boolean;
 }
 
 declare var window: any;
@@ -31,6 +32,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   
   isApiLoaded = false;
   isLoading = signal<boolean>(true);
+  needsInteraction = signal<boolean>(true); // Require tap-to-play
   
   private playbackTimer: any;
   private backgroundQueries = ['trending music', 'latest hit songs', 'party songs', 'lofi beats', 'bollywood hits', 'punjabi hits'];
@@ -173,6 +175,10 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     this.isLoading.set(false);
     this.clearPlaybackTimer();
 
+    if (this.needsInteraction()) {
+      return; // Do not autoplay until user taps
+    }
+
     const currentItem = this.queue()[this.currentIndex()];
     const activePlayer = this.activePlayerId() === 'A' ? this.playerA : this.playerB;
     
@@ -285,22 +291,34 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     this.location.back();
   }
 
+  startInteraction() {
+    this.needsInteraction.set(false);
+    // Unmute players to unlock AudioContext
+    if (this.playerA && this.playerA.unMute) this.playerA.unMute();
+    if (this.playerB && this.playerB.unMute) this.playerB.unMute();
+    this.playCurrent();
+  }
+
   playFullSong(item: ShortItem) {
     this.playerService.playTrack(item);
     this.router.navigate(['/']); // Go home where full player is visible
   }
 
   likeTrack(item: ShortItem) {
-    // Toggle like logic (simplified for UI demonstration)
-    // Normally would call PlayerService or UserService
+    item.isLiked = !item.isLiked;
   }
 
   shareTrack(item: ShortItem) {
+    const shareUrl = `https://ganatube.in/shorts/play?v=${item.videoId}`;
     if (navigator.share) {
       navigator.share({
         title: item.title,
         text: `Listen to ${item.title} on GanaTube!`,
-        url: `https://ganatube.in/shorts/play?v=${item.videoId}`
+        url: shareUrl
+      }).catch(err => console.log('Error sharing', err));
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('Link copied to clipboard!'); // Simple fallback
       });
     }
   }
