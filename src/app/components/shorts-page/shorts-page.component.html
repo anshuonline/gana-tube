@@ -85,9 +85,23 @@
       </button>
       
       <!-- More -->
-      <button class="action-btn" (click)="$event.stopPropagation()">
-        <svg lucideMoreVertical [attr.size]="30" color="#fff"></svg>
-      </button>
+      <div class="more-container">
+        <button class="action-btn" (click)="toggleMenu($event, i)">
+          <svg lucideMoreVertical [attr.size]="30" color="#fff"></svg>
+        </button>
+        
+        <!-- Dropdown Menu -->
+        <div class="menu-dropdown" *ngIf="showMenuId() === i" (click)="$event.stopPropagation()">
+          <button class="menu-item" (click)="markNotInterested($event, i)">
+            <svg lucideX [attr.size]="18"></svg>
+            <span>Not Interested</span>
+          </button>
+          <button class="menu-item" (click)="openCustomQuery($event)">
+            <svg lucideSearch [attr.size]="18"></svg>
+            <span>Custom Query</span>
+          </button>
+        </div>
+      </div>
       
       <!-- Animated Equalizer Icon (when playing) -->
       <div class="playing-eq" *ngIf="i === currentIndex() && !isBuffering()">
@@ -99,4 +113,32 @@
   </div>
   
   </div> <!-- end desktop wrapper -->
+
+  <!-- Custom Query Modal -->
+  <div class="custom-query-modal" *ngIf="showCustomQueryModal()" (click)="closeCustomQuery()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Custom Search</h3>
+        <button class="close-btn" (click)="closeCustomQuery()">
+          <svg lucideX [attr.size]="24"></svg>
+        </button>
+      </div>
+      <p class="modal-desc">Search for a specific mood, genre, or artist (e.g. "Arijit Singh sad songs", "Hindi lofi beats")</p>
+      
+      <div class="input-group">
+        <input type="text" 
+               [ngModel]="customQueryText()" 
+               (ngModelChange)="customQueryText.set($event)"
+               placeholder="Enter your tags here..."
+               (keyup.enter)="submitCustomQuery()"
+               autofocus>
+      </div>
+      
+      <button class="submit-btn" (click)="submitCustomQuery()" [disabled]="!customQueryText().trim()">
+        <svg lucideSearch [attr.size]="18"></svg>
+        Start Shorts
+      </button>
+    </div>
+  </div>
+
 </div>

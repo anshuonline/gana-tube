@@ -6,7 +6,8 @@ import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
-import { LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2 } from '@lucide/angular';
+import { FormsModule } from '@angular/forms';
+import { LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame } from '@lucide/angular';
 
 interface ShortItem extends YouTubeSearchResult {
   dropStartTime: number;
@@ -18,7 +19,7 @@ declare var window: any;
 @Component({
   selector: 'app-shorts-page',
   standalone: true,
-  imports: [CommonModule, LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2],
+  imports: [CommonModule, FormsModule, LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame],
   templateUrl: './shorts-page.component.html',
   styleUrls: ['./shorts-page.component.scss']
 })
@@ -38,6 +39,12 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   isBuffering = signal<boolean>(false); // Shows loading when user scrolls fast
   isFullSongMode = signal<boolean>(false);
   floatingHearts = signal<{id: number, x: number, y: number}[]>([]);
+  
+  // Custom Query & Menu
+  showMenuId = signal<number | null>(null);
+  showCustomQueryModal = signal<boolean>(false);
+  customQueryText = signal<string>('');
+  
   private heartIdCounter = 0;
   private lastTap = 0;
   
@@ -423,6 +430,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   }
 
   handleTap(event: any, item: ShortItem) {
+    this.showMenuId.set(null); // Close menu on any tap
     const currentTime = new Date().getTime();
     const tapLength = currentTime - this.lastTap;
     
@@ -457,6 +465,62 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.floatingHearts.update(hearts => hearts.filter(h => h.id !== newHeart.id));
     }, 1600);
+  }
+
+  // --- Menu and Custom Query Logic ---
+  toggleMenu(event: Event, index: number) {
+    event.stopPropagation();
+    if (this.showMenuId() === index) {
+      this.showMenuId.set(null);
+    } else {
+      this.showMenuId.set(index);
+    }
+  }
+
+  openCustomQuery(event: Event) {
+    event.stopPropagation();
+    this.showMenuId.set(null);
+    this.showCustomQueryModal.set(true);
+  }
+
+  closeCustomQuery() {
+    this.showCustomQueryModal.set(false);
+    this.customQueryText.set('');
+  }
+
+  submitCustomQuery() {
+    const query = this.customQueryText().trim();
+    if (!query) return;
+    
+    this.closeCustomQuery();
+    this.isLoading.set(true);
+    
+    // Stop current players
+    this.clearPlaybackTimer();
+    try {
+      if (this.playerA && this.playerA.stopVideo) this.playerA.stopVideo();
+      if (this.playerB && this.playerB.stopVideo) this.playerB.stopVideo();
+    } catch(e) {}
+
+    // Reset queue and state
+    this.queue.set([]);
+    this.currentIndex.set(0);
+    this.seenVideoIds.clear();
+    this.isFetching = false;
+    
+    // Inject the new query at the front of the pool
+    this.allQueries = [query, ...this.allQueries];
+    this.fetchPageToken = 0;
+
+    // Fetch new shorts immediately
+    this.fetchRandomQueue(10);
+  }
+  
+  markNotInterested(event: Event, index: number) {
+    event.stopPropagation();
+    this.showMenuId.set(null);
+    // For now, just skip to next video
+    this.scrollToNext();
   }
 
   async likeTrack(item: ShortItem) {
