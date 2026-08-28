@@ -41,7 +41,7 @@
     </defs>
   </svg>
 
-  <div class="short-slide" *ngFor="let item of queue(); let i = index" (click)="handleTap($event, item)" (touchstart)="handleTap($event, item)">
+  <div class="short-slide" *ngFor="let item of queue(); let i = index" (click)="handleTap($event, item)">
     <!-- Immersive Background -->
     <div class="bg-blur" [style.backgroundImage]="'url(' + item.thumbnailHigh + ')'"></div>
     <div class="bg-overlay"></div>
@@ -64,13 +64,13 @@
     <!-- Right Side Actions -->
     <div class="action-sidebar">
       <!-- Like -->
-      <button class="action-btn" (click)="likeTrack(item)">
+      <button class="action-btn" (click)="likeTrack(item); $event.stopPropagation()">
         <svg lucideHeart [attr.size]="30" [color]="item.isLiked ? '#ff0000' : '#fff'" [attr.fill]="item.isLiked ? '#ff0000' : 'none'"></svg>
         <span>Like</span>
       </button>
       
       <!-- Full Song -->
-      <button class="action-btn play-full" (click)="playFullSong(item)">
+      <button class="action-btn play-full" (click)="playFullSong(item); $event.stopPropagation()">
         <div class="icon-circle">
           <svg lucidePlay [attr.size]="24" color="#000" fill="#000"></svg>
         </div>
@@ -78,13 +78,13 @@
       </button>
       
       <!-- Share -->
-      <button class="action-btn" (click)="shareTrack(item)">
+      <button class="action-btn" (click)="shareTrack(item); $event.stopPropagation()">
         <svg lucideShare2 [attr.size]="30" color="#fff"></svg>
         <span>Share</span>
       </button>
       
       <!-- More -->
-      <button class="action-btn">
+      <button class="action-btn" (click)="$event.stopPropagation()">
         <svg lucideMoreVertical [attr.size]="30" color="#fff"></svg>
       </button>
       
