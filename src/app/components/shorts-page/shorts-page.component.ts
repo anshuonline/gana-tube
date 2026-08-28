@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
+import { AlgorithmService } from '../../services/algorithm.service';
 import { LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2 } from '@lucide/angular';
 
 interface ShortItem extends YouTubeSearchResult {
@@ -51,6 +52,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     private youtubeApi: YoutubeApiService,
     private playerService: PlayerService,
     private userService: UserService,
+    private algorithmService: AlgorithmService,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
@@ -88,20 +90,15 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
   private buildQueryPool() {
     const langs = this.userService.preferredLanguages();
-    const keywords = ['trending', 'hits', 'top songs', 'popular', 'new release', 'viral', 'best of', 'mashup', 'remix', 'party mix'];
     
-    if (langs && langs.length > 0) {
-      langs.forEach(l => {
-        keywords.forEach(k => {
-          this.allQueries.push(`${l} ${k}`);
-        });
-      });
-    } else {
+    // Get algorithmic queries based on user's listening history and taste profile
+    this.allQueries = this.algorithmService.getAlgorithmicShortsQueries(langs);
+    
+    // Fallback if empty
+    if (!this.allQueries || this.allQueries.length === 0) {
       this.allQueries = [...this.backgroundQueries];
+      this.allQueries.sort(() => Math.random() - 0.5);
     }
-    
-    // Shuffle the pool
-    this.allQueries.sort(() => Math.random() - 0.5);
   }
 
   private initYouTubeApi() {

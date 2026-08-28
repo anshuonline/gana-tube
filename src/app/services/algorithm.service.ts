@@ -383,4 +383,48 @@ export class AlgorithmService {
     const query = currentTrack.channelTitle + " songs like " + currentTrack.title;
     return this.youtubeApi.searchMusic(query, 10);
   }
+
+  public getAlgorithmicShortsQueries(languages: string[] = ['Hindi']): string[] {
+    if (!this.profile.taste_profile) {
+      this.profile.taste_profile = { genre_scores: {}, artist_scores: {} };
+    }
+    
+    const topArtists = Object.entries(this.profile.taste_profile.artist_scores || {})
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(e => e[0]);
+
+    const topGenres = Object.entries(this.profile.taste_profile.genre_scores || {})
+      .filter(([genre]) => genre !== 'general')
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(e => e[0]);
+
+    const queries: string[] = [];
+    
+    languages.forEach(lang => {
+      queries.push(`${lang} trending hit songs`);
+      queries.push(`${lang} new releases songs`);
+      
+      if (topArtists.length > 0) {
+        topArtists.forEach(artist => {
+          queries.push(`${artist} ${lang} hit songs`);
+          queries.push(`${artist} live performance`);
+        });
+      }
+
+      if (topGenres.length > 0) {
+        topGenres.forEach(genre => {
+          queries.push(`${genre} ${lang} trending songs`);
+        });
+      }
+    });
+
+    if (queries.length === 0) {
+       return ['trending music hit songs', 'latest hit songs'];
+    }
+
+    // Shuffle the queries
+    return queries.sort(() => Math.random() - 0.5);
+  }
 }
