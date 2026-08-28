@@ -209,10 +209,16 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   private checkIsLiked(videoId: string): boolean {
     const playlists = this.userService.customPlaylists();
     const likedShorts = playlists.find(p => p.name === 'Liked Shorts');
+    const likedSongs = playlists.find(p => p.name === 'Liked Songs');
+    
+    let isLiked = false;
     if (likedShorts && likedShorts.tracks) {
-      return likedShorts.tracks.some((t: any) => t.videoId === videoId);
+      isLiked = isLiked || likedShorts.tracks.some((t: any) => t.videoId === videoId);
     }
-    return false;
+    if (likedSongs && likedSongs.tracks) {
+      isLiked = isLiked || likedSongs.tracks.some((t: any) => t.videoId === videoId);
+    }
+    return isLiked;
   }
 
   private fetchRandomQueue(limit = 10) {
@@ -564,18 +570,20 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
     item.isLiked = !item.isLiked;
 
+    const targetPlaylist = this.isFullSongMode() ? 'Liked Songs' : 'Liked Shorts';
+
     let playlists = this.userService.customPlaylists();
-    let likedShortsPlaylist = playlists.find(p => p.name === 'Liked Shorts');
+    let playlistObj = playlists.find(p => p.name === targetPlaylist);
     
-    if (!likedShortsPlaylist) {
-      await this.userService.createPlaylist(email, 'Liked Shorts');
+    if (!playlistObj) {
+      await this.userService.createPlaylist(email, targetPlaylist);
       playlists = this.userService.customPlaylists();
-      likedShortsPlaylist = playlists.find(p => p.name === 'Liked Shorts');
+      playlistObj = playlists.find(p => p.name === targetPlaylist);
     }
 
-    if (likedShortsPlaylist) {
+    if (playlistObj) {
       // addToPlaylist inherently toggles (removes if present, adds if not)
-      this.userService.addToPlaylist(email, 'Liked Shorts', item);
+      this.userService.addToPlaylist(email, targetPlaylist, item);
     }
   }
 
