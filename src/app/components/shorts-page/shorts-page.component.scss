@@ -13,7 +13,7 @@
   height: 100%;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
-  background-color: #111;
+  background-color: #000;
   box-shadow: 0 0 50px rgba(0,0,0,0.8);
   
   /* Hide scrollbar */
@@ -22,48 +22,6 @@
   &::-webkit-scrollbar {
     display: none;
   }
-}
-
-.tap-to-play-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  cursor: pointer;
-  
-  .play-pulse {
-    width: 100px;
-    height: 100px;
-    background: #a855f7; /* Purple */
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
-    animation: pulsePlay 2s infinite;
-  }
-  
-  p {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-  }
-}
-
-@keyframes pulsePlay {
-  0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
-  70% { box-shadow: 0 0 0 30px rgba(168, 85, 247, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
 }
 
 .svg-defs {
@@ -118,6 +76,7 @@
   pointer-events: none;
 }
 
+// ---- Full-page Loading Overlay ----
 .loading-overlay {
   position: absolute;
   top: 0;
@@ -135,11 +94,37 @@
   .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(255,255,255,0.3);
+    border: 3px solid rgba(255,255,255,0.15);
     border-radius: 50%;
     border-top-color: #a855f7;
-    animation: spin 1s ease-in-out infinite;
+    animation: spin 0.8s ease-in-out infinite;
     margin-bottom: 16px;
+  }
+  
+  p {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.6);
+  }
+}
+
+// ---- Buffering Indicator (Inline while song loads) ----
+.buffering-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 998;
+  pointer-events: none;
+  
+  .buffering-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    border-top-color: #a855f7;
+    border-right-color: rgba(168, 85, 247, 0.4);
+    animation: spin 0.6s linear infinite;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
   }
 }
 
@@ -258,17 +243,6 @@
     gap: 6px;
     margin: 0 0 12px 0;
   }
-  
-  .smart-drop-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    background: rgba(30, 215, 96, 0.2);
-    border: 1px solid rgba(30, 215, 96, 0.5);
-    color: #1ed760;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
 }
 
 .action-sidebar {
@@ -301,13 +275,13 @@
       .icon-circle {
         width: 48px;
         height: 48px;
-        background: #1ed760;
+        background: #fff;
         border-radius: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
         margin-bottom: 4px;
-        box-shadow: 0 4px 15px rgba(30, 215, 96, 0.4);
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
       }
     }
   }
@@ -322,7 +296,7 @@
   
   .bar {
     width: 4px;
-    background: #1ed760;
+    background: #a855f7;
     animation: eq 1s ease-in-out infinite alternate;
     
     &:nth-child(1) { animation-delay: 0.1s; height: 10px; }

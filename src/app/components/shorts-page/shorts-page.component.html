@@ -15,9 +15,15 @@
     <span class="header-title">Shorts</span>
   </div>
 
-  <div class="loading-overlay" *ngIf="isLoading() && !needsInteraction()">
+  <!-- Initial full-page loading -->
+  <div class="loading-overlay" *ngIf="isLoading() && queue().length === 0">
     <div class="spinner"></div>
     <p>Loading...</p>
+  </div>
+
+  <!-- Buffering overlay (when user scrolls fast or song is loading) -->
+  <div class="buffering-indicator" *ngIf="isBuffering() && !isLoading()">
+    <div class="buffering-spinner"></div>
   </div>
 
   <div class="floating-heart" *ngFor="let heart of floatingHearts()" 
@@ -43,7 +49,7 @@
     <!-- Center Content (Spinning CD) -->
     <div class="center-content">
       <div class="spinning-cd" [class.paused]="i !== currentIndex()">
-        <img [src]="item.thumbnailHigh" alt="cover">
+        <img [src]="item.thumbnailHigh" alt="cover" loading="lazy">
       </div>
     </div>
 
@@ -83,7 +89,7 @@
       </button>
       
       <!-- Animated Equalizer Icon (when playing) -->
-      <div class="playing-eq" *ngIf="i === currentIndex()">
+      <div class="playing-eq" *ngIf="i === currentIndex() && !isBuffering()">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
