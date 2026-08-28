@@ -34,6 +34,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   isApiLoaded = false;
   isLoading = signal<boolean>(true);
   needsInteraction = signal<boolean>(false);
+  firstVideoLoaded = false;
   floatingHearts = signal<{id: number, x: number, y: number}[]>([]);
   private heartIdCounter = 0;
   private lastTap = 0;
@@ -187,8 +188,8 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   }
 
   private calculateDropTime(): number {
-    // Random start time between 45s and 75s to simulate "drop"
-    return Math.floor(Math.random() * 30) + 45;
+    // 45 seconds is usually the most optimal time for a song drop/chorus to start
+    return 45;
   }
 
   private playCurrent() {
@@ -214,12 +215,25 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     }
     
     // Load and play current
-    if (activePlayer && activePlayer.loadVideoById) {
-      activePlayer.loadVideoById({
-        videoId: currentItem.videoId,
-        startSeconds: currentItem.dropStartTime
-      });
+    if (activePlayer && activePlayer.playVideo) {
+      activePlayer.unMute();
       activePlayer.setVolume(100);
+      
+      if (this.currentIndex() === 0 && !this.firstVideoLoaded) {
+        this.firstVideoLoaded = true;
+        activePlayer.loadVideoById({
+          videoId: currentItem.videoId,
+          startSeconds: currentItem.dropStartTime,
+          suggestedQuality: 'default'
+        });
+      } else {
+        // Already pre-buffered in background! Just seek, set auto quality, and play
+        activePlayer.seekTo(currentItem.dropStartTime, true);
+        if (activePlayer.setPlaybackQuality) {
+          activePlayer.setPlaybackQuality('default');
+        }
+        activePlayer.playVideo();
+      }
       
       // Start 30s timer
       this.playbackTimer = setTimeout(() => {
@@ -245,17 +259,27 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const nextItem = this.queue()[nextIndex];
     const idlePlayer = this.activePlayerId() === 'A' ? this.playerB : this.playerA;
 
-    if (idlePlayer && idlePlayer.cueVideoById) {
-      idlePlayer.cueVideoById({
+    if (idlePlayer && idlePlayer.loadVideoById) {
+      idlePlayer.mute(); // Mute background player
+      idlePlayer.loadVideoById({
         videoId: nextItem.videoId,
-        startSeconds: nextItem.dropStartTime
+        startSeconds: nextItem.dropStartTime,
+        suggestedQuality: 'small' // Buffer fast at low quality
       });
     }
   }
 
   private onPlayerStateChange(event: any, playerId: 'A' | 'B') {
+    if (this.activePlayerId() !== playerId) {
+      // It's the background pre-buffering player
+      if (event.data === window.YT.PlayerState.PLAYING) {
+        event.target.pauseVideo(); // Pause instantly to let it buffer silently
+      }
+      return;
+    }
+    
     // If a player ends unexpectedly, scroll to next
-    if (event.data === window.YT.PlayerState.ENDED && this.activePlayerId() === playerId) {
+    if (event.data === window.YT.PlayerState.ENDED) {
       this.scrollToNext();
     }
   }
