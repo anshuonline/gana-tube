@@ -33,7 +33,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   
   isApiLoaded = false;
   isLoading = signal<boolean>(true);
-  needsInteraction = signal<boolean>(true); // Require tap-to-play
+  needsInteraction = signal<boolean>(false);
   floatingHearts = signal<{id: number, x: number, y: number}[]>([]);
   private heartIdCounter = 0;
   private lastTap = 0;
@@ -156,17 +156,24 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
   private fetchRandomQueue(limit = 10) {
     const queries = this.getDynamicQueries();
-    const randomQuery = queries[Math.floor(Math.random() * queries.length)];
+    const baseQuery = queries[Math.floor(Math.random() * queries.length)];
+    const randomKeywords = ['remix', 'lofi', 'slowed', 'bass', 'hits', 'new', 'top', 'viral', 'mashup', 'tiktok'];
+    const randomWord = randomKeywords[Math.floor(Math.random() * randomKeywords.length)];
+    const randomQuery = `${baseQuery} ${randomWord}`;
+    
     this.youtubeApi.searchMusic(randomQuery, limit).subscribe(res => {
       const currentQ = this.queue();
       const existingIds = new Set(currentQ.map(q => q.videoId));
       
-      const items: ShortItem[] = res
+      let items: ShortItem[] = res
         .filter(track => !existingIds.has(track.videoId))
         .map(track => ({
           ...track,
           dropStartTime: this.calculateDropTime()
         }));
+        
+      // Shuffle items for variety
+      items.sort(() => Math.random() - 0.5);
       
       this.queue.set([...currentQ, ...items]);
       

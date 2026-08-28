@@ -7,13 +7,6 @@
     <div id="shorts-player-b"></div>
   </div>
 
-  <div class="tap-to-play-overlay" *ngIf="needsInteraction()" (click)="startInteraction()">
-    <div class="play-pulse">
-      <svg lucidePlay [attr.size]="60" color="#fff" [attr.fill]="'#fff'"></svg>
-    </div>
-    <p>Tap to Play</p>
-  </div>
-
   <!-- Top Nav (Fixed globally) -->
   <div class="shorts-header fixed-header">
     <button class="icon-btn back-btn" (click)="goBack()">

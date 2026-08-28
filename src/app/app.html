@@ -100,7 +100,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
       <div class="profile-page-header">
         <h1>Profile & Settings</h1>

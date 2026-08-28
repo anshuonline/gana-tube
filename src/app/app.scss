@@ -728,6 +728,13 @@
   &.searched {
     padding-top: 140px;
   }
+  
+  &.is-shorts {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .results-container {
