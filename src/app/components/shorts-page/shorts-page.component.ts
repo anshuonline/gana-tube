@@ -197,6 +197,15 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     return query;
   }
 
+  private checkIsLiked(videoId: string): boolean {
+    const playlists = this.userService.customPlaylists();
+    const likedShorts = playlists.find(p => p.name === 'Liked Shorts');
+    if (likedShorts && likedShorts.tracks) {
+      return likedShorts.tracks.some((t: any) => t.videoId === videoId);
+    }
+    return false;
+  }
+
   private fetchRandomQueue(limit = 10) {
     if (this.isFetching) return;
     this.isFetching = true;
@@ -213,7 +222,8 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
             this.seenVideoIds.add(track.videoId); // Mark as seen globally
             return {
               ...track,
-              dropStartTime: 45
+              dropStartTime: 45,
+              isLiked: this.checkIsLiked(track.videoId)
             };
           });
         
@@ -419,7 +429,9 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   }
 
   triggerLikeAnimation(event: any, item: ShortItem) {
-    item.isLiked = true;
+    if (!item.isLiked) {
+      this.likeTrack(item);
+    }
     
     // Get coordinates relative to the container
     let clientX = 0;
@@ -442,8 +454,28 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     }, 1600);
   }
 
-  likeTrack(item: ShortItem) {
+  async likeTrack(item: ShortItem) {
+    const email = localStorage.getItem('userEmail');
+    if (!email) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     item.isLiked = !item.isLiked;
+
+    let playlists = this.userService.customPlaylists();
+    let likedShortsPlaylist = playlists.find(p => p.name === 'Liked Shorts');
+    
+    if (!likedShortsPlaylist) {
+      await this.userService.createPlaylist(email, 'Liked Shorts');
+      playlists = this.userService.customPlaylists();
+      likedShortsPlaylist = playlists.find(p => p.name === 'Liked Shorts');
+    }
+
+    if (likedShortsPlaylist) {
+      // addToPlaylist inherently toggles (removes if present, adds if not)
+      this.userService.addToPlaylist(email, 'Liked Shorts', item);
+    }
   }
 
   shareTrack(item: ShortItem) {
