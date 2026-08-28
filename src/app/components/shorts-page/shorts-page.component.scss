@@ -79,6 +79,16 @@
   transform: translate(-50%, -50%);
   animation: floatUpAndFade 1s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
   filter: drop-shadow(0 10px 20px rgba(255, 0, 85, 0.6));
+  width: 300px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  svg {
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 
 @keyframes floatUpAndFade {
