@@ -36,6 +36,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   isApiLoaded = false;
   isLoading = signal<boolean>(true);
   isBuffering = signal<boolean>(false); // Shows loading when user scrolls fast
+  isFullSongMode = signal<boolean>(false);
   floatingHearts = signal<{id: number, x: number, y: number}[]>([]);
   private heartIdCounter = 0;
   private lastTap = 0;
@@ -281,19 +282,22 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     // The YouTube IFrame API handles buffering internally and starts playing ASAP
     try {
       if (activePlayer && activePlayer.loadVideoById) {
+        const startSecs = this.isFullSongMode() ? 0 : currentItem.dropStartTime;
         activePlayer.loadVideoById({
           videoId: currentItem.videoId,
-          startSeconds: currentItem.dropStartTime
+          startSeconds: startSecs
         });
         activePlayer.unMute();
         activePlayer.setVolume(100);
         
         this.isBuffering.set(false);
         
-        // Start 30s timer for auto-advance
-        this.playbackTimer = setTimeout(() => {
-          this.scrollToNext();
-        }, 30000);
+        if (!this.isFullSongMode()) {
+          // Start 30s timer for auto-advance in Shorts mode
+          this.playbackTimer = setTimeout(() => {
+            this.scrollToNext();
+          }, 30000);
+        }
       }
     } catch(e) {
       console.error('Player error:', e);
@@ -321,9 +325,10 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     // Cue next video (downloads metadata + thumbnail, starts buffering)
     try {
       if (idlePlayer && idlePlayer.cueVideoById) {
+        const startSecs = this.isFullSongMode() ? 0 : nextItem.dropStartTime;
         idlePlayer.cueVideoById({
           videoId: nextItem.videoId,
-          startSeconds: nextItem.dropStartTime
+          startSeconds: startSecs
         });
       }
     } catch(e) { /* ignore */ }
@@ -411,9 +416,10 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     this.playCurrent();
   }
 
-  playFullSong(item: ShortItem) {
-    this.playerService.playTrack(item);
-    this.router.navigate(['/']); // Go home where full player is visible
+  toggleFullSongMode() {
+    this.isFullSongMode.set(!this.isFullSongMode());
+    // Restart current track immediately with the new mode settings
+    this.playCurrent();
   }
 
   handleTap(event: any, item: ShortItem) {

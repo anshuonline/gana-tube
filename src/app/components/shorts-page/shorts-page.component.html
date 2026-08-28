@@ -16,9 +16,9 @@
       <span class="header-title">Shorts</span>
     </div>
     <div class="header-right" *ngIf="queue().length > 0">
-      <button class="full-song-pill" (click)="playFullSong(queue()[currentIndex()]); $event.stopPropagation()">
+      <button class="full-song-pill" [class.active]="isFullSongMode()" (click)="toggleFullSongMode(); $event.stopPropagation()">
         <svg lucidePlay [attr.size]="14" fill="currentColor"></svg>
-        Full Song
+        {{ isFullSongMode() ? 'Full Song: ON' : 'Full Song: OFF' }}
       </button>
     </div>
   </div>
