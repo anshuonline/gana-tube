@@ -170,8 +170,15 @@
   padding: env(safe-area-inset-top, 20px) 20px 20px 20px;
   display: flex;
   align-items: center;
-  z-index: 50; /* Ensure it stays above everything */
+  justify-content: space-between;
+  z-index: 50;
   background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
   
   .back-btn {
     background: none;
@@ -180,12 +187,41 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    justify-content: center;
+    padding: 8px 0; /* Make tap target larger without messing up alignment */
+  }
+  
+  .header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    padding: 10px; /* Make tap target larger */
-    margin-top: 5px;
+    color: #fff;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .full-song-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(168, 85, 247, 0.4);
+      transform: scale(1.05);
+    }
   }
 }
 
@@ -269,20 +305,6 @@
       font-size: 0.75rem;
       font-weight: 500;
       text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-    
-    &.play-full {
-      .icon-circle {
-        width: 48px;
-        height: 48px;
-        background: #fff;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 4px;
-        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
-      }
     }
   }
 }

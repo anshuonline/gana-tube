@@ -9,10 +9,18 @@
 
   <!-- Top Nav (Fixed globally) -->
   <div class="shorts-header fixed-header">
-    <button class="icon-btn back-btn" (click)="goBack()">
-      <svg lucideChevronLeft [attr.size]="28"></svg>
-    </button>
-    <span class="header-title">Shorts</span>
+    <div class="header-left">
+      <button class="icon-btn back-btn" (click)="goBack()">
+        <svg lucideChevronLeft [attr.size]="28"></svg>
+      </button>
+      <span class="header-title">Shorts</span>
+    </div>
+    <div class="header-right" *ngIf="queue().length > 0">
+      <button class="full-song-pill" (click)="playFullSong(queue()[currentIndex()]); $event.stopPropagation()">
+        <svg lucidePlay [attr.size]="14" fill="currentColor"></svg>
+        Full Song
+      </button>
+    </div>
   </div>
 
   <!-- Initial full-page loading -->
@@ -69,14 +77,7 @@
         <span>Like</span>
       </button>
       
-      <!-- Full Song -->
-      <button class="action-btn play-full" (click)="playFullSong(item); $event.stopPropagation()">
-        <div class="icon-circle">
-          <svg lucidePlay [attr.size]="24" color="#000" fill="#000"></svg>
-        </div>
-        <span>Full Song</span>
-      </button>
-      
+
       <!-- Share -->
       <button class="action-btn" (click)="shareTrack(item); $event.stopPropagation()">
         <svg lucideShare2 [attr.size]="30" color="#fff"></svg>
