@@ -141,7 +141,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         };
         this.queue.set([item]);
         this.playCurrent();
-        this.fetchRandomQueue(5); // Fetch 5 in background
+        this.fetchRandomQueue(10); // Fetch 10 in background
       }
     });
   }
@@ -154,16 +154,20 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     return this.backgroundQueries;
   }
 
-  private fetchRandomQueue(limit = 5) {
+  private fetchRandomQueue(limit = 10) {
     const queries = this.getDynamicQueries();
     const randomQuery = queries[Math.floor(Math.random() * queries.length)];
     this.youtubeApi.searchMusic(randomQuery, limit).subscribe(res => {
-      const items: ShortItem[] = res.map(track => ({
-        ...track,
-        dropStartTime: this.calculateDropTime()
-      }));
-      
       const currentQ = this.queue();
+      const existingIds = new Set(currentQ.map(q => q.videoId));
+      
+      const items: ShortItem[] = res
+        .filter(track => !existingIds.has(track.videoId))
+        .map(track => ({
+          ...track,
+          dropStartTime: this.calculateDropTime()
+        }));
+      
       this.queue.set([...currentQ, ...items]);
       
       if (currentQ.length === 0) {
@@ -222,9 +226,9 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   private preloadNext() {
     const nextIndex = this.currentIndex() + 1;
     
-    // Smart optimized fetch: if we are close to end (e.g. 4 items left), fetch 5 more
-    if (this.queue().length - this.currentIndex() <= 4) {
-      this.fetchRandomQueue(5);
+    // Smart optimized fetch: if we are close to end (e.g. 8 items left), fetch 10 more
+    if (this.queue().length - this.currentIndex() <= 8) {
+      this.fetchRandomQueue(10);
     }
 
     if (nextIndex >= this.queue().length) {
@@ -253,9 +257,6 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const nextIndex = this.currentIndex() + 1;
     if (nextIndex < this.queue().length) {
       this.currentIndex.set(nextIndex);
-      // activePlayerId automatically computes from currentIndex
-      
-      this.playCurrent();
       
       // Physically scroll container
       if (this.shortsContainer) {
@@ -265,6 +266,12 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
           behavior: 'smooth'
         });
       }
+      
+      // Delay playCurrent slightly to allow the smooth scroll animation to finish
+      // so the browser thread isn't blocked and the audio starts instantly upon landing.
+      setTimeout(() => {
+        this.playCurrent();
+      }, 400);
     }
   }
 
