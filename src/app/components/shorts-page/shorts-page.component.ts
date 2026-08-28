@@ -7,7 +7,7 @@ import { UserService } from '../../services/user.service';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame } from '@lucide/angular';
+import { LucideHeart, LucideShare2, LucidePlay, LucidePause, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame } from '@lucide/angular';
 
 interface ShortItem extends YouTubeSearchResult {
   dropStartTime: number;
@@ -19,7 +19,7 @@ declare var window: any;
 @Component({
   selector: 'app-shorts-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame],
+  imports: [CommonModule, FormsModule, LucideHeart, LucideShare2, LucidePlay, LucidePause, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame],
   templateUrl: './shorts-page.component.html',
   styleUrls: ['./shorts-page.component.scss']
 })
@@ -38,6 +38,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   isLoading = signal<boolean>(true);
   isBuffering = signal<boolean>(false); // Shows loading when user scrolls fast
   isFullSongMode = signal<boolean>(false);
+  isPaused = signal<boolean>(false);
   floatingHearts = signal<{id: number, x: number, y: number}[]>([]);
   
   // Custom Query & Menu
@@ -47,6 +48,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   
   private heartIdCounter = 0;
   private lastTap = 0;
+  private singleTapTimer: any;
   
   private playbackTimer: any;
   private scrollDebounceTimer: any;
@@ -298,6 +300,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         activePlayer.setVolume(100);
         
         this.isBuffering.set(false);
+        this.isPaused.set(false);
         
         if (!this.isFullSongMode()) {
           // Start 30s timer for auto-advance in Shorts mode
@@ -436,9 +439,36 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     
     if (tapLength < 300 && tapLength > 0) {
       // Double tap detected
+      clearTimeout(this.singleTapTimer);
       this.triggerLikeAnimation(event, item);
+      this.lastTap = 0;
+    } else {
+      this.lastTap = currentTime;
+      this.singleTapTimer = setTimeout(() => {
+        this.togglePause();
+      }, 300);
     }
-    this.lastTap = currentTime;
+  }
+
+  togglePause() {
+    const activePlayer = this.activePlayerId() === 'A' ? this.playerA : this.playerB;
+    if (!activePlayer) return;
+    
+    if (this.isPaused()) {
+      activePlayer.playVideo();
+      this.isPaused.set(false);
+      // Resume timer if not in full song mode
+      if (!this.isFullSongMode()) {
+        this.clearPlaybackTimer();
+        this.playbackTimer = setTimeout(() => {
+          this.scrollToNext();
+        }, 30000);
+      }
+    } else {
+      activePlayer.pauseVideo();
+      this.isPaused.set(true);
+      this.clearPlaybackTimer();
+    }
   }
 
   triggerLikeAnimation(event: any, item: ShortItem) {

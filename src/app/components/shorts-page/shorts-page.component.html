@@ -56,8 +56,15 @@
 
     <!-- Center Content (Spinning CD) -->
     <div class="center-content">
-      <div class="spinning-cd" [class.paused]="i !== currentIndex()">
+      <div class="spinning-cd" [class.paused]="i !== currentIndex() || isPaused()">
         <img [src]="item.thumbnailHigh" alt="cover" loading="lazy">
+      </div>
+      
+      <!-- Pause Overlay Icon (Shows Play icon when paused) -->
+      <div class="pause-overlay" *ngIf="i === currentIndex() && isPaused()">
+        <div class="pause-icon-bg">
+          <svg lucidePlay [attr.size]="64" color="#fff" fill="#fff"></svg>
+        </div>
       </div>
     </div>
 
@@ -104,7 +111,7 @@
       </div>
       
       <!-- Animated Equalizer Icon (when playing) -->
-      <div class="playing-eq" *ngIf="i === currentIndex() && !isBuffering()">
+      <div class="playing-eq" *ngIf="i === currentIndex() && !isBuffering() && !isPaused()">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
