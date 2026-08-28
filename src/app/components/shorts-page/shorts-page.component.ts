@@ -5,6 +5,7 @@ import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-a
 import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { AlgorithmService } from '../../services/algorithm.service';
+import { AuthService } from '../../services/auth.service';
 import { LucideHeart, LucideShare2, LucidePlay, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2 } from '@lucide/angular';
 
 interface ShortItem extends YouTubeSearchResult {
@@ -53,6 +54,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     private playerService: PlayerService,
     private userService: UserService,
     private algorithmService: AlgorithmService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
@@ -452,11 +454,13 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   }
 
   async likeTrack(item: ShortItem) {
-    const email = localStorage.getItem('userEmail');
-    if (!email) {
-      this.router.navigate(['/login']);
+    const user = this.authService.currentUser();
+    if (!user || !user.email) {
+      // Just toggle visually if they aren't logged in, or don't do anything
+      item.isLiked = !item.isLiked;
       return;
     }
+    const email = user.email;
 
     item.isLiked = !item.isLiked;
 
