@@ -431,6 +431,9 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const listenSecs = Math.max(0, Math.floor((Date.now() - this.currentPlayStartTime) / 1000));
     this.shortsAlgorithmService.trackEngagement(currentItem, listenSecs, 30);
     
+    // CONTINUOUS PREDICTION: Rebuild query pool instantly after every single interaction
+    this.buildQueryPool();
+    
     if (listenSecs < 4) {
       this.rapidSkipCount++;
       if (this.rapidSkipCount >= 3) {
@@ -439,7 +442,6 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         this.fetchPageToken += 2;
         
         // Purge upcoming queue (keep only history, current, and the very next one which is already preloading)
-        const q = this.queue();
         const currentIdx = this.currentIndex();
         if (q.length > currentIdx + 2) {
           this.queue.set(q.slice(0, currentIdx + 2));
@@ -449,6 +451,17 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
       }
     } else {
       this.rapidSkipCount = 0;
+      
+      // CONTINUOUS BACKGROUND PRELOAD: 
+      // If user listened to this song deeply (>15s), they like this vibe!
+      // Instantly drop the far-future preloaded queue and fetch MORE of this vibe in the background!
+      if (listenSecs >= 15) {
+         const currentIdx = this.currentIndex();
+         if (q.length > currentIdx + 3) {
+           this.queue.set(q.slice(0, currentIdx + 3));
+           this.fetchRandomQueue(10);
+         }
+      }
     }
     
     this.currentPlayStartTime = 0;
@@ -640,6 +653,16 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
     if (item.isLiked) {
       this.shortsAlgorithmService.rewardLike(item);
+      
+      // CONTINUOUS PREDICTION & BACKGROUND PRELOAD:
+      // Instantly rebuild query pool and fetch new predictive shorts based on this LIKE interaction
+      this.buildQueryPool();
+      const q = this.queue();
+      const currentIdx = this.currentIndex();
+      if (q.length > currentIdx + 3) {
+        this.queue.set(q.slice(0, currentIdx + 3));
+      }
+      this.fetchRandomQueue(10);
     }
 
     const targetPlaylist = this.isFullSongMode() ? 'Liked Songs' : 'Liked Shorts';
