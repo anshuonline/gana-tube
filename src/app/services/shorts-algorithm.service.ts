@@ -1,6 +1,15 @@
 import { Injectable } from '@angular/core';
 import { YouTubeSearchResult } from './youtube-api.service';
 
+export interface EngagementSignal {
+  genre: string;
+  artist: string;
+  completionRatio: number;
+  liked: boolean;
+  skippedFast: boolean;
+  replayed: boolean;
+}
+
 export interface ShortsProfile {
   version: number;
   last_session: number;
@@ -8,6 +17,12 @@ export interface ShortsProfile {
     genre_scores: Record<string, number>;
     artist_scores: Record<string, number>;
   };
+  session_momentum: {
+    genre: string | null;
+    streak: number;
+  };
+  recent_history: string[];   // last shown video ids, for anti-repeat
+  exploration_counter: number;
 }
 
 @Injectable({
@@ -17,8 +32,16 @@ export class ShortsAlgorithmService {
   private profileKey = 'gt_shorts_profile';
   private profile: ShortsProfile;
 
+  // tuning knobs
+  private readonly LEARNING_RATE = 0.28;       // fast in-session adaptation
+  private readonly SESSION_DECAY = 0.985;      // slow taste drift across sessions
+  private readonly HISTORY_LIMIT = 40;
+  private readonly EXPLORE_EVERY = 5;          // 1 in 5 slots is a "discovery" pick
+  private readonly DIVERSITY_WINDOW = 3;       // no same artist/genre within last 3 shown
+
   constructor() {
     this.profile = this.loadProfile();
+    this.maybeDecaySession();
   }
 
   private loadProfile(): ShortsProfile {
@@ -27,20 +50,38 @@ export class ShortsAlgorithmService {
         const stored = localStorage.getItem(this.profileKey);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed.version === 1) return parsed;
+          if (parsed.version === 1) return this.hydrateProfile(parsed);
         }
       }
     } catch (e) {
       console.warn('Failed to parse shorts profile', e);
     }
-    
+    return this.defaultProfile();
+  }
+
+  private defaultProfile(): ShortsProfile {
     return {
       version: 1,
       last_session: Date.now(),
+      taste_profile: { genre_scores: {}, artist_scores: {} },
+      session_momentum: { genre: null, streak: 0 },
+      recent_history: [],
+      exploration_counter: 0
+    };
+  }
+
+  /** Backfills fields for profiles saved before momentum/history/exploration existed. */
+  private hydrateProfile(parsed: any): ShortsProfile {
+    return {
+      version: 1,
+      last_session: parsed.last_session ?? Date.now(),
       taste_profile: {
-        genre_scores: {},
-        artist_scores: {}
-      }
+        genre_scores: parsed.taste_profile?.genre_scores ?? {},
+        artist_scores: parsed.taste_profile?.artist_scores ?? {}
+      },
+      session_momentum: parsed.session_momentum ?? { genre: null, streak: 0 },
+      recent_history: parsed.recent_history ?? [],
+      exploration_counter: parsed.exploration_counter ?? 0
     };
   }
 
@@ -53,50 +94,188 @@ export class ShortsAlgorithmService {
     } catch (e) {}
   }
 
-  public trackEngagement(song: YouTubeSearchResult, listenDurationSec: number, totalDurationSec: number = 30): void {
-    if (!song || !song.videoId) return;
+  /** Gentle decay so old obsessions fade if a new session starts >6h later — keeps taste current instead of stale. */
+  private maybeDecaySession(): void {
+    const gapHrs = (Date.now() - this.profile.last_session) / 3_600_000;
+    if (gapHrs < 6) return;
+    const { genre_scores, artist_scores } = this.profile.taste_profile;
+    for (const k in genre_scores) genre_scores[k] *= this.SESSION_DECAY;
+    for (const k in artist_scores) artist_scores[k] *= this.SESSION_DECAY;
+    this.profile.session_momentum = { genre: null, streak: 0 };
+  }
 
-    let score = 0;
-    
-    // Shorts are typically max 60s, we consider completion if they watch 15-30s
-    if (listenDurationSec < 4) {
-      score = -1.0; // High penalty for fast skip
-    } else if (listenDurationSec < 10) {
-      score = -0.2; // Slight penalty
-    } else if (listenDurationSec >= 15) {
-      score = +1.0; // Good engagement
+  private getGenre(song: YouTubeSearchResult): string {
+    const titleLower = song.title.toLowerCase();
+    if (titleLower.includes('lofi') || titleLower.includes('lo-fi') || titleLower.includes('chill')) return 'lofi';
+    if (titleLower.includes('romantic') || titleLower.includes('love')) return 'romantic';
+    if (titleLower.includes('sad') || titleLower.includes('heartbreak') || titleLower.includes('dard')) return 'sad';
+    if (titleLower.includes('party') || titleLower.includes('dance') || titleLower.includes('remix')) return 'party';
+    if (titleLower.includes('punjabi')) return 'punjabi';
+    if (titleLower.includes('bollywood') || song.channelTitle.toLowerCase().includes('t-series')) return 'bollywood';
+    return 'general';
+  }
+
+  /**
+   * Core signal ingestion. Call this after every short finishes / is skipped / is swiped away.
+   * Weighs completion ratio non-linearly — a full watch or replay is worth far more than
+   * 2x a half watch, because that's the actual "hooked" signal, not just watch time.
+   */
+  public trackEngagement(song: YouTubeSearchResult, listenDurationSec: number, totalDurationSec: number = 30): void {
+    const completionRatio = Math.min(listenDurationSec / Math.max(totalDurationSec, 1), 1);
+    const skippedFast = completionRatio < 0.15 && listenDurationSec < 2.5;
+
+    const signal: EngagementSignal = {
+      genre: this.getGenre(song),
+      artist: song.channelTitle ?? 'unknown',
+      completionRatio,
+      liked: (song as any).isLiked === true,
+      skippedFast,
+      replayed: listenDurationSec > totalDurationSec
+    };
+
+    const weight = this.scoreFromSignal(signal);
+
+    this.applyScore('genre_scores', signal.genre, weight);
+    this.applyScore('artist_scores', signal.artist, weight);
+
+    // Hot streak: 2+ strong positives in a row on the same genre in ONE session
+    // means the user is deep in a scroll hole right now — lean into it hard.
+    if (weight > 0) {
+      if (this.profile.session_momentum.genre === signal.genre) {
+        this.profile.session_momentum.streak++;
+      } else {
+        this.profile.session_momentum = { genre: signal.genre, streak: 1 };
+      }
+      if (this.profile.session_momentum.streak >= 2) {
+        this.applyScore('genre_scores', signal.genre, 1.5); // momentum bonus
+      }
+    } else {
+      this.profile.session_momentum = { genre: null, streak: 0 };
     }
-    
-    this.updateTasteProfile(song, score);
+
+    // anti-repeat memory
+    const id = song.videoId;
+    if (id) {
+      this.profile.recent_history.push(id);
+      if (this.profile.recent_history.length > this.HISTORY_LIMIT) {
+        this.profile.recent_history.shift();
+      }
+    }
+
     this.saveProfile();
   }
   
   public rewardLike(song: YouTubeSearchResult): void {
-    // Super reward when user likes a short
-    this.updateTasteProfile(song, 2.0);
+    const signal: EngagementSignal = {
+      genre: this.getGenre(song),
+      artist: song.channelTitle ?? 'unknown',
+      completionRatio: 1,
+      liked: true,
+      skippedFast: false,
+      replayed: false
+    };
+    
+    // Explicit manual boost for like
+    const weight = 4.0;
+    this.applyScore('genre_scores', signal.genre, weight);
+    this.applyScore('artist_scores', signal.artist, weight);
     this.saveProfile();
   }
 
-  private updateTasteProfile(song: YouTubeSearchResult, score: number): void {
-    const titleLower = song.title.toLowerCase();
-    const tags = [];
-    if (titleLower.includes('lofi') || titleLower.includes('lo-fi') || titleLower.includes('chill')) tags.push('lofi');
-    if (titleLower.includes('romantic') || titleLower.includes('love')) tags.push('romantic');
-    if (titleLower.includes('sad') || titleLower.includes('heartbreak') || titleLower.includes('dard')) tags.push('sad');
-    if (titleLower.includes('party') || titleLower.includes('dance') || titleLower.includes('remix')) tags.push('party');
-    if (titleLower.includes('punjabi')) tags.push('punjabi');
-    if (titleLower.includes('bollywood') || song.channelTitle.toLowerCase().includes('t-series')) tags.push('bollywood');
-    if (tags.length === 0) tags.push('general');
+  private scoreFromSignal(s: EngagementSignal): number {
+    if (s.liked) return 4;
+    if (s.replayed) return 3.5;              // watched it more than once = loved it
+    if (s.skippedFast) return -2.5;          // instant skip = strong dislike, not neutral
+    if (s.completionRatio >= 0.85) return 2;
+    if (s.completionRatio >= 0.5) return 1;
+    if (s.completionRatio >= 0.25) return -0.3;
+    return -1.2;
+  }
 
-    const artist = song.channelTitle;
+  private applyScore(bucket: 'genre_scores' | 'artist_scores', key: string, weight: number): void {
+    if (!key || key === 'unknown') return;
+    const scores = this.profile.taste_profile[bucket];
+    const current = scores[key] ?? 0;
+    // EMA-style update so recent behavior dominates, but history isn't erased
+    scores[key] = current + this.LEARNING_RATE * (weight - current * 0.1);
+  }
 
-    tags.forEach(tag => {
-      this.profile.taste_profile.genre_scores[tag] = (this.profile.taste_profile.genre_scores[tag] || 0) + score;
-    });
+  /**
+   * Ranks a batch of candidate shorts for the next feed page.
+   * Mixes: taste score + diversity penalty + controlled exploration slot.
+   * This is what actually prevents the "same 5 creators on loop" boring feel.
+   */
+  public rankCandidates(candidates: YouTubeSearchResult[], count: number): YouTubeSearchResult[] {
+    const scored = candidates
+      .filter(c => !this.profile.recent_history.includes(c.videoId))
+      .map(c => ({ item: c, score: this.scoreCandidate(c) }));
 
-    if (artist) {
-      this.profile.taste_profile.artist_scores[artist] = (this.profile.taste_profile.artist_scores[artist] || 0) + score;
+    scored.sort((a, b) => b.score - a.score);
+
+    const ranked: YouTubeSearchResult[] = [];
+    const usedGenres: string[] = [];
+    const usedArtists: string[] = [];
+
+    for (const { item } of scored) {
+      if (ranked.length >= count) break;
+      const genre = this.getGenre(item);
+      const artist = item.channelTitle ?? 'unknown';
+
+      // diversity guard: skip if same genre AND same artist shown too recently in THIS batch
+      const recentGenres = usedGenres.slice(-this.DIVERSITY_WINDOW);
+      const recentArtists = usedArtists.slice(-this.DIVERSITY_WINDOW);
+      if (recentGenres.includes(genre) && recentArtists.includes(artist)) continue;
+
+      ranked.push(item);
+      usedGenres.push(genre);
+      usedArtists.push(artist);
     }
+
+    // if diversity guard filtered too aggressively and we're short, top up from leftovers
+    if (ranked.length < count) {
+      for (const { item } of scored) {
+        if (ranked.length >= count) break;
+        if (!ranked.includes(item)) ranked.push(item);
+      }
+    }
+
+    return this.injectExploration(ranked, candidates, count);
+  }
+
+  private scoreCandidate(item: YouTubeSearchResult): number {
+    const genre = this.getGenre(item);
+    const artist = item.channelTitle ?? 'unknown';
+    const g = this.profile.taste_profile.genre_scores[genre] ?? 0;
+    const a = this.profile.taste_profile.artist_scores[artist] ?? 0;
+    const momentumBoost = this.profile.session_momentum.genre === genre
+      ? this.profile.session_momentum.streak * 0.6
+      : 0;
+    return g * 0.6 + a * 0.4 + momentumBoost;
+  }
+
+  /**
+   * Every Nth slot is deliberately a wildcard — a fresh, untasted-genre item slipped in
+   * near the top of the batch instead of buried at the bottom. Keeps the feed from
+   * collapsing into a filter bubble, and occasionally surfaces a new favorite —
+   * which is a big part of what makes a feed feel "smart" instead of repetitive.
+   */
+  private injectExploration(ranked: YouTubeSearchResult[], pool: YouTubeSearchResult[], count: number): YouTubeSearchResult[] {
+    this.profile.exploration_counter++;
+    if (this.profile.exploration_counter % this.EXPLORE_EVERY !== 0 || ranked.length === 0) {
+      return ranked.slice(0, count);
+    }
+    const unseenTaste = pool.find(p => {
+      const genre = this.getGenre(p);
+      const id = p.videoId;
+      return !(genre in this.profile.taste_profile.genre_scores) &&
+             !this.profile.recent_history.includes(id) &&
+             !ranked.includes(p);
+    });
+    if (unseenTaste) {
+      const slot = Math.min(2, ranked.length - 1); // slip it in early-ish, not always #1
+      ranked.splice(slot, 0, unseenTaste);
+    }
+    return ranked.slice(0, count);
   }
 
   public isValidLanguageTrack(title: string, channelTitle: string, allowedLanguages: string[] = ['Hindi']): boolean {
@@ -206,5 +385,16 @@ export class ShortsAlgorithmService {
     }
 
     return queries.sort(() => Math.random() - 0.5);
+  }
+
+  /** Optional: expose a read-only snapshot for a debug/analytics panel. */
+  public getProfileSnapshot(): Readonly<ShortsProfile> {
+    return this.profile;
+  }
+
+  /** Optional: hard reset if you add a "reset my recommendations" setting. */
+  public resetProfile(): void {
+    this.profile = this.defaultProfile();
+    this.saveProfile();
   }
 }
