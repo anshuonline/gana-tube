@@ -238,7 +238,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.isFetching = false;
         
-        const items: ShortItem[] = res
+        let items: ShortItem[] = res
           .filter(track => !this.seenVideoIds.has(track.videoId))
           .filter(track => this.shortsAlgorithmService.isValidLanguageTrack(track.title, track.channelTitle, preferredLangs))
           .map(track => {
@@ -249,6 +249,9 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
               isLiked: this.checkIsLiked(track.videoId)
             };
           });
+        
+        // Use the advanced algorithm to rank and inject wildcards
+        items = this.shortsAlgorithmService.rankCandidates(items, limit) as ShortItem[];
         
         const interleaved = this.interleaveItems(items);
         
@@ -431,10 +434,18 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     if (listenSecs < 4) {
       this.rapidSkipCount++;
       if (this.rapidSkipCount >= 3) {
-        // User skipped 3 shorts quickly — switch query pool vibe
+        // User skipped 3 shorts quickly — switch query pool vibe and purge upcoming preloaded queue
         this.rapidSkipCount = 0;
         this.fetchPageToken += 2;
-        this.fetchRandomQueue(10);
+        
+        // Purge upcoming queue (keep only history, current, and the very next one which is already preloading)
+        const q = this.queue();
+        const currentIdx = this.currentIndex();
+        if (q.length > currentIdx + 2) {
+          this.queue.set(q.slice(0, currentIdx + 2));
+        }
+        
+        this.fetchRandomQueue(15);
       }
     } else {
       this.rapidSkipCount = 0;
