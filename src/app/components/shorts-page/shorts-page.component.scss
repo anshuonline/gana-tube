@@ -31,7 +31,7 @@
 }
 
 // ---- Main heart ------------------------------------------------
-.floating-heart {
+::ng-deep .floating-heart {
   position: fixed;
   pointer-events: none;
   z-index: 9999;
@@ -73,7 +73,7 @@
 }
  
 // ---- Expanding ring — a soft "pulse of love" behind the heart --
-.heart-ring {
+::ng-deep .heart-ring {
   position: fixed;
   pointer-events: none;
   z-index: 9998;
@@ -99,7 +99,7 @@
 }
  
 // ---- Mini hearts flying outward — this sells the "cute" factor -
-.mini-heart {
+::ng-deep .mini-heart {
   position: fixed;
   pointer-events: none;
   z-index: 9997;
@@ -139,7 +139,7 @@
 }
  
 // ---- Tiny sparkle dots — extra shimmer, optional but very cute -
-.mini-spark {
+::ng-deep .mini-spark {
   position: fixed;
   pointer-events: none;
   z-index: 9997;
