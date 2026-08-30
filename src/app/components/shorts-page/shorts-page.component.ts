@@ -614,6 +614,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.showMenuId.set(null);
     this.playerService.playTrack(item);
+    this.router.navigate(['/play'], { queryParams: { v: item.videoId } });
   }
 
   searchArtist(event: Event, artistName: string) {
