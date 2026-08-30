@@ -57,6 +57,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   private scrollDebounceTimer: any;
   private isFetching = false;
   private seenVideoIds = new Set<string>(); // Global dedup across ALL fetches
+  private notInterestedIds = new Set<string>();
   private fetchPageToken = 0; // Rotate queries to avoid repeats
   private backgroundQueries = ['Hindi viral reels songs 2026', 'Trending Hindi shorts audio', 'Bollywood party hit songs', 'Hindi lofi chill beats'];
   private allQueries: string[] = [];
@@ -81,6 +82,12 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     if (this.playerService.isPlaying()) {
       this.playerService.pause();
     }
+    
+    // Load not interested history
+    try {
+      const ni = JSON.parse(localStorage.getItem('gt_not_interested') || '[]');
+      this.notInterestedIds = new Set(ni);
+    } catch(e) {}
     
     // Build query pool once
     this.buildQueryPool();
@@ -240,6 +247,8 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         
         let items: ShortItem[] = res
           .filter(track => !this.seenVideoIds.has(track.videoId))
+          .filter(track => !this.checkIsLiked(track.videoId)) // Skip already liked songs
+          .filter(track => !this.notInterestedIds.has(track.videoId)) // Skip not interested songs
           .filter(track => this.shortsAlgorithmService.isValidLanguageTrack(track.title, track.channelTitle, preferredLangs))
           .map(track => {
             this.seenVideoIds.add(track.videoId); // Mark as seen globally
@@ -624,6 +633,15 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   markNotInterested(event: Event, index: number) {
     event.stopPropagation();
     this.showMenuId.set(null);
+    
+    const item = this.queue()[index];
+    if (item) {
+      this.notInterestedIds.add(item.videoId);
+      try {
+        localStorage.setItem('gt_not_interested', JSON.stringify(Array.from(this.notInterestedIds)));
+      } catch(e) {}
+    }
+    
     // For now, just skip to next video
     this.scrollToNext();
   }
