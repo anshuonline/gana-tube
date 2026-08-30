@@ -34,7 +34,14 @@
     <div class="buffering-spinner"></div>
   </div>
 
-
+  <svg width="0" height="0" style="position:absolute; width:0; height:0;">
+    <defs>
+      <linearGradient id="pink-red-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055" />
+        <stop offset="100%" stop-color="#ff66a3" />
+      </linearGradient>
+    </defs>
+  </svg>
 
   <div class="short-slide" *ngFor="let item of queue(); let i = index" (click)="handleTap($event, item)">
     <!-- Immersive Background -->
@@ -67,7 +74,9 @@
     <div class="action-sidebar">
       <!-- Like -->
       <button class="action-btn" (click)="likeTrack(item); $event.stopPropagation()">
-        <svg lucideHeart [attr.size]="30" [color]="item.isLiked ? '#ff0000' : '#fff'" [attr.fill]="item.isLiked ? '#ff0000' : 'none'"></svg>
+        <svg lucideHeart [attr.size]="30" 
+             [color]="item.isLiked ? 'url(#pink-red-gradient)' : '#fff'" 
+             [attr.fill]="item.isLiked ? 'url(#pink-red-gradient)' : 'none'"></svg>
         <span>Like</span>
       </button>
       
