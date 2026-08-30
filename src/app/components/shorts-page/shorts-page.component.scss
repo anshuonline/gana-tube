@@ -35,10 +35,9 @@
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  animation: floatUpAndFade 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  filter: drop-shadow(0 10px 20px rgba(255, 0, 85, 0.6));
-  width: 160px;
-  height: 160px;
+  animation: floatUpAndFade 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  width: 120px;
+  height: 120px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,19 +50,19 @@
 
 @keyframes floatUpAndFade {
   0% {
-    transform: translate(-50%, -50%) scale(0) rotate(-20deg);
+    transform: translate(-50%, -50%) scale(0) rotate(-10deg);
     opacity: 0;
   }
-  15% {
-    transform: translate(-50%, -50%) scale(1.1) rotate(15deg);
+  40% {
+    transform: translate(-50%, -55%) scale(1.15) rotate(10deg);
     opacity: 1;
   }
-  30% {
+  60% {
     transform: translate(-50%, -60%) scale(1) rotate(-5deg);
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -350%) scale(0.9) rotate(5deg);
+    transform: translate(-50%, -150%) scale(0.9) rotate(0deg);
     opacity: 0;
   }
 }
@@ -177,7 +176,7 @@
   .header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 4px;
   }
   
   .back-btn {
@@ -188,7 +187,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 0; /* Make tap target larger without messing up alignment */
+    padding: 0;
+    margin: 0;
   }
   
   .header-title {
@@ -196,6 +196,7 @@
     font-weight: 700;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     color: #fff;
+    line-height: 1;
   }
   
   .header-right {
@@ -206,20 +207,20 @@
   .full-song-pill {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(168, 85, 247, 0.2);
-    border: 1px solid rgba(168, 85, 247, 0.5);
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 600;
     backdrop-filter: blur(10px);
     cursor: pointer;
     transition: all 0.2s ease;
     
     &:hover {
-      background: rgba(168, 85, 247, 0.4);
+      background: rgba(0, 0, 0, 0.8);
       transform: scale(1.05);
     }
     

@@ -5,6 +5,7 @@ import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-a
 import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { AlgorithmService } from '../../services/algorithm.service';
+import { ShortsAlgorithmService } from '../../services/shorts-algorithm.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { LucideHeart, LucideShare2, LucidePlay, LucidePause, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame } from '@lucide/angular';
@@ -66,6 +67,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     private playerService: PlayerService,
     private userService: UserService,
     private algorithmService: AlgorithmService,
+    private shortsAlgorithmService: ShortsAlgorithmService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
@@ -107,7 +109,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const langs = this.userService.preferredLanguages();
     
     // Get algorithmic queries based on user's listening history and taste profile
-    this.allQueries = this.algorithmService.getAlgorithmicShortsQueries(langs);
+    this.allQueries = this.shortsAlgorithmService.getAlgorithmicShortsQueries(langs);
     
     // Fallback if empty
     if (!this.allQueries || this.allQueries.length === 0) {
@@ -237,7 +239,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         
         const items: ShortItem[] = res
           .filter(track => !this.seenVideoIds.has(track.videoId))
-          .filter(track => this.algorithmService.isValidLanguageTrack(track.title, track.channelTitle, preferredLangs))
+          .filter(track => this.shortsAlgorithmService.isValidLanguageTrack(track.title, track.channelTitle, preferredLangs))
           .map(track => {
             this.seenVideoIds.add(track.videoId); // Mark as seen globally
             return {
@@ -423,7 +425,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     if (!currentItem || this.currentPlayStartTime === 0) return;
     
     const listenSecs = Math.max(0, Math.floor((Date.now() - this.currentPlayStartTime) / 1000));
-    this.algorithmService.trackEngagement(currentItem, listenSecs, 30);
+    this.shortsAlgorithmService.trackEngagement(currentItem, listenSecs, 30);
     
     if (listenSecs < 4) {
       this.rapidSkipCount++;
@@ -608,6 +610,17 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     this.scrollToNext();
   }
 
+  playFullSong(event: Event, item: ShortItem) {
+    event.stopPropagation();
+    this.showMenuId.set(null);
+    this.playerService.playTrack(item);
+  }
+
+  searchArtist(event: Event, artistName: string) {
+    event.stopPropagation();
+    this.router.navigate(['/search'], { queryParams: { q: artistName } });
+  }
+
   async likeTrack(item: ShortItem) {
     const user = this.authService.currentUser();
     if (!user || !user.email) {
@@ -618,6 +631,10 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const email = user.email;
 
     item.isLiked = !item.isLiked;
+
+    if (item.isLiked) {
+      this.shortsAlgorithmService.rewardLike(item);
+    }
 
     const targetPlaylist = this.isFullSongMode() ? 'Liked Songs' : 'Liked Shorts';
 

@@ -36,7 +36,7 @@
 
   <div class="floating-heart" *ngFor="let heart of floatingHearts()" 
        [style.left.px]="heart.x" [style.top.px]="heart.y">
-    <svg lucideHeart [attr.size]="160" [attr.width]="160" [attr.height]="160" color="url(#heart-gradient)" fill="url(#heart-gradient)"></svg>
+    <svg lucideHeart [attr.size]="120" [attr.width]="120" [attr.height]="120" color="url(#heart-gradient)" fill="url(#heart-gradient)"></svg>
   </div>
 
   <!-- SVG Definition for gradient -->
@@ -71,7 +71,7 @@
     <!-- Bottom Info -->
     <div class="bottom-info">
       <h2 class="title">{{ item.title }}</h2>
-      <p class="artist">
+      <p class="artist" (click)="searchArtist($event, item.channelTitle)">
         <svg lucideMusic [attr.size]="14"></svg> {{ item.channelTitle }}
       </p>
     </div>
@@ -99,6 +99,10 @@
         
         <!-- Dropdown Menu -->
         <div class="menu-dropdown" *ngIf="showMenuId() === i" (click)="$event.stopPropagation()">
+          <button class="menu-item" (click)="playFullSong($event, item)">
+            <svg lucidePlay [attr.size]="18"></svg>
+            <span>Play Full Song</span>
+          </button>
           <button class="menu-item" (click)="markNotInterested($event, i)">
             <svg lucideX [attr.size]="18"></svg>
             <span>Not Interested</span>
