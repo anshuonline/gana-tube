@@ -6,6 +6,7 @@ import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { ShortsAlgorithmService } from '../../services/shorts-algorithm.service';
+import { HeartBurstService } from '../../services/heart-burst.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { LucideHeart, LucideShare2, LucidePlay, LucidePause, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame } from '@lucide/angular';
@@ -40,7 +41,6 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   isBuffering = signal<boolean>(false); // Shows loading when user scrolls fast
   isFullSongMode = signal<boolean>(false);
   isPaused = signal<boolean>(false);
-  floatingHearts = signal<{id: number, x: number, y: number}[]>([]);
   
   // Custom Query & Menu
   showMenuId = signal<number | null>(null);
@@ -68,6 +68,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private algorithmService: AlgorithmService,
     private shortsAlgorithmService: ShortsAlgorithmService,
+    private heartBurstService: HeartBurstService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
@@ -533,7 +534,6 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
       this.likeTrack(item);
     }
     
-    // Get coordinates relative to the container
     let clientX = 0;
     let clientY = 0;
 
@@ -545,13 +545,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
       clientY = event.clientY;
     }
 
-    const newHeart = { id: this.heartIdCounter++, x: clientX, y: clientY };
-    this.floatingHearts.update(hearts => [...hearts, newHeart]);
-
-    // Remove the heart after animation (1.6s)
-    setTimeout(() => {
-      this.floatingHearts.update(hearts => hearts.filter(h => h.id !== newHeart.id));
-    }, 1600);
+    this.heartBurstService.trigger({ x: clientX, y: clientY });
   }
 
   // --- Menu and Custom Query Logic ---

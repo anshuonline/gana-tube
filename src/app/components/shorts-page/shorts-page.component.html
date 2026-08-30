@@ -34,20 +34,7 @@
     <div class="buffering-spinner"></div>
   </div>
 
-  <div class="floating-heart" *ngFor="let heart of floatingHearts()" 
-       [style.left.px]="heart.x" [style.top.px]="heart.y">
-    <svg lucideHeart [attr.size]="120" [attr.width]="120" [attr.height]="120" color="url(#heart-gradient)" fill="url(#heart-gradient)"></svg>
-  </div>
 
-  <!-- SVG Definition for gradient -->
-  <svg width="0" height="0" class="svg-defs">
-    <defs>
-      <linearGradient id="heart-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#ff0055" />
-        <stop offset="100%" stop-color="#ff5e00" />
-      </linearGradient>
-    </defs>
-  </svg>
 
   <div class="short-slide" *ngFor="let item of queue(); let i = index" (click)="handleTap($event, item)">
     <!-- Immersive Background -->
