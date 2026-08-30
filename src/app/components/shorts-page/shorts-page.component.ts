@@ -50,12 +50,14 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   private lastTap = 0;
   private singleTapTimer: any;
   
+  private currentPlayStartTime = 0;
+  private rapidSkipCount = 0;
   private playbackTimer: any;
   private scrollDebounceTimer: any;
   private isFetching = false;
   private seenVideoIds = new Set<string>(); // Global dedup across ALL fetches
   private fetchPageToken = 0; // Rotate queries to avoid repeats
-  private backgroundQueries = ['trending music', 'latest hit songs', 'party songs', 'lofi beats', 'bollywood hits', 'punjabi hits'];
+  private backgroundQueries = ['Hindi viral reels songs 2026', 'Trending Hindi shorts audio', 'Bollywood party hit songs', 'Hindi lofi chill beats'];
   private allQueries: string[] = [];
   private playersReady = { A: false, B: false };
   
@@ -94,6 +96,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.recordCurrentEngagement();
     this.clearPlaybackTimer();
     if (this.scrollDebounceTimer) clearTimeout(this.scrollDebounceTimer);
     if (this.playerA) this.playerA.destroy();
@@ -226,6 +229,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     this.isFetching = true;
     
     const randomQuery = this.getNextQuery();
+    const preferredLangs = this.userService.preferredLanguages();
     
     this.youtubeApi.searchMusic(randomQuery, limit).subscribe({
       next: (res) => {
@@ -233,6 +237,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         
         const items: ShortItem[] = res
           .filter(track => !this.seenVideoIds.has(track.videoId))
+          .filter(track => this.algorithmService.isValidLanguageTrack(track.title, track.channelTitle, preferredLangs))
           .map(track => {
             this.seenVideoIds.add(track.videoId); // Mark as seen globally
             return {
@@ -242,20 +247,19 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
             };
           });
         
-        // Shuffle for variety
-        items.sort(() => Math.random() - 0.5);
+        const interleaved = this.interleaveItems(items);
         
         const currentQ = this.queue();
-        this.queue.set([...currentQ, ...items]);
+        this.queue.set([...currentQ, ...interleaved]);
         
-        if (currentQ.length === 0 && items.length > 0) {
+        if (currentQ.length === 0 && interleaved.length > 0) {
           this.tryFirstPlay();
-        } else if (items.length > 0) {
+        } else if (interleaved.length > 0) {
           this.preloadNext();
         }
         
-        // If we got very few new items (most were dupes), fetch again immediately
-        if (items.length < 3) {
+        // If we got very few new items (most were dupes/filtered), fetch again immediately
+        if (interleaved.length < 3) {
           this.fetchRandomQueue(15);
         }
       },
@@ -265,6 +269,25 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         setTimeout(() => this.fetchRandomQueue(limit), 1000);
       }
     });
+  }
+
+  private interleaveItems(items: ShortItem[]): ShortItem[] {
+    if (items.length <= 1) return items;
+    
+    const result: ShortItem[] = [];
+    const remaining = [...items].sort(() => Math.random() - 0.5);
+    let lastArtist = '';
+    
+    while (remaining.length > 0) {
+      let idx = remaining.findIndex(item => item.channelTitle !== lastArtist);
+      if (idx === -1) idx = 0;
+      
+      const picked = remaining.splice(idx, 1)[0];
+      result.push(picked);
+      lastArtist = picked.channelTitle;
+    }
+    
+    return result;
   }
 
   private playCurrent() {
@@ -307,6 +330,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         
         this.isBuffering.set(false);
         this.isPaused.set(false);
+        this.currentPlayStartTime = Date.now();
         
         if (!this.isFullSongMode()) {
           // Start 30s timer for auto-advance in Shorts mode
@@ -374,6 +398,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   }
 
   scrollToNext() {
+    this.recordCurrentEngagement();
     const nextIndex = this.currentIndex() + 1;
     if (nextIndex < this.queue().length) {
       this.currentIndex.set(nextIndex);
@@ -392,6 +417,29 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  private recordCurrentEngagement() {
+    const q = this.queue();
+    const currentItem = q[this.currentIndex()];
+    if (!currentItem || this.currentPlayStartTime === 0) return;
+    
+    const listenSecs = Math.max(0, Math.floor((Date.now() - this.currentPlayStartTime) / 1000));
+    this.algorithmService.trackEngagement(currentItem, listenSecs, 30);
+    
+    if (listenSecs < 4) {
+      this.rapidSkipCount++;
+      if (this.rapidSkipCount >= 3) {
+        // User skipped 3 shorts quickly — switch query pool vibe
+        this.rapidSkipCount = 0;
+        this.fetchPageToken += 2;
+        this.fetchRandomQueue(10);
+      }
+    } else {
+      this.rapidSkipCount = 0;
+    }
+    
+    this.currentPlayStartTime = 0;
+  }
+
   // Handle manual scroll (swipe up/down) with debouncing for fast scrollers
   @HostListener('scroll', ['$event'])
   onScroll(event: any) {
@@ -405,6 +453,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const newIndex = Math.round(scrollPos / itemHeight);
     
     if (newIndex !== this.currentIndex() && newIndex >= 0 && newIndex < this.queue().length) {
+      this.recordCurrentEngagement();
       // Show buffering immediately when user scrolls fast
       this.isBuffering.set(true);
       this.currentIndex.set(newIndex);
