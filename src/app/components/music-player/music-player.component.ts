@@ -147,12 +147,12 @@ import { SyncService } from '../../services/sync.service';
         <button
           class="ctrl-btn secondary"
           [class.active]="showQueue()"
-          (click)="toggleQueue()"
+          (click)="toggleQueue(); $event.stopPropagation()"
           title="Play Queue"
         >
           <svg lucideListMusic [attr.size]="18"></svg>
         </button>
-        <button class="ctrl-btn secondary" (click)="toggleDevices()" title="Devices" [class.active]="showDevices()">
+        <button class="ctrl-btn secondary" (click)="toggleDevices(); $event.stopPropagation()" title="Devices" [class.active]="showDevices()">
           <svg lucideMonitor [attr.size]="18"></svg>
         </button>
         <button class="ctrl-btn secondary" (click)="copyShareLink()" title="Share Link">
@@ -178,7 +178,7 @@ import { SyncService } from '../../services/sync.service';
       </div>
 
       <!-- Devices Drawer Panel -->
-      <div class="devices-drawer" [class.open]="showDevices()">
+      <div class="devices-drawer" [class.open]="showDevices()" (click)="$event.stopPropagation()">
         <div class="devices-header">
           <h3>Connect to a device</h3>
           <button class="close-devices-btn" (click)="showDevices.set(false)">Close</button>
@@ -189,7 +189,7 @@ import { SyncService } from '../../services/sync.service';
             *ngFor="let device of syncService.availableDevices()"
             [class.active]="device.isActive"
             [class.this-device]="device.deviceId === syncService.deviceId"
-            (click)="device.deviceId === syncService.deviceId ? syncService.requestTakeover() : null"
+            (click)="device.deviceId === syncService.deviceId ? syncService.requestTakeover() : syncService.transferPlayback(device.deviceId)"
           >
             <div class="device-icon">
               <svg lucideMonitor *ngIf="!device.isMobile" [attr.size]="24"></svg>
@@ -210,7 +210,7 @@ import { SyncService } from '../../services/sync.service';
       </div>
 
       <!-- Queue Drawer Panel (Standard Bar) -->
-      <div class="queue-drawer" [class.open]="showQueue()">
+      <div class="queue-drawer" [class.open]="showQueue()" (click)="$event.stopPropagation()">
         <div class="queue-header">
           <h3>Play Queue</h3>
           <button class="close-queue-btn" (click)="showQueue.set(false)">Close</button>

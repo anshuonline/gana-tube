@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { YouTubeSearchResult } from './youtube-api.service';
 import { AlgorithmService } from './algorithm.service';
 import { YoutubeApiService } from './youtube-api.service';
@@ -7,6 +8,7 @@ import { RoomService } from './room.service';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { SyncService, SyncState } from './sync.service';
+import { ToastService } from './toast.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -642,6 +644,9 @@ export class PlayerService {
     }
   }
 
+  private http = inject(HttpClient);
+  private listeningSeconds = 0;
+
   private triggerEngagement(): void {
     const current = this.currentTrack();
     if (current && this.trackStartTime > 0) {
@@ -658,11 +663,42 @@ export class PlayerService {
         this.currentTime.set(this.ytPlayer.getCurrentTime() || 0);
         this.duration.set(this.ytPlayer.getDuration() || 0);
         this.broadcastToSync(); // Send to sync service (will be throttled)
+        
+        // Track listening time for spin wheel (120 seconds = 1 chance)
+        if (this.playerState() === 'playing') {
+          this.listeningSeconds += 0.5;
+          if (this.listeningSeconds >= 120) {
+            this.listeningSeconds = 0; // reset
+            this.awardSpinChance();
+          }
+        }
       } else if (this.isRemoteControl() && this.playerState() === 'playing') {
         // Increment locally by 0.5s if acting as remote, to keep UI moving
         this.currentTime.update(t => t + 0.5);
       }
     }, 500);
+  }
+  
+  private toastService = inject(ToastService);
+
+  private awardSpinChance(): void {
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      // Assuming apiUrl is the same as environment or hardcoded
+      const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+        ? 'http://localhost/manageads/wheel-api.php' 
+        : 'https://ganatube.in/manageads/wheel-api.php';
+        
+      this.http.post<any>(`${backendUrl}?action=add_chance`, { email: user.email })
+        .subscribe({
+          next: (res) => {
+            if (res.status === 'success') {
+              this.toastService.show('🎉 You earned a free Spin chance!', 'success');
+            }
+          },
+          error: (err) => console.error('Failed to add chance', err)
+        });
+    }
   }
 
   private stopProgressTracking(): void {

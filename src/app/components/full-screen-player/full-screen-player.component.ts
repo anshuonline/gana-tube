@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService } from '../../services/youtube-api.service';
@@ -13,7 +13,8 @@ import {
   LucideHeart,
   LucideCar,
   LucideRepeat,
-  LucideGripVertical
+  LucideGripVertical,
+  LucideMonitor
 } from '@lucide/angular';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
@@ -21,6 +22,7 @@ import { UserService } from '../../services/user.service';
 import { FormsModule } from '@angular/forms';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { SyncService } from '../../services/sync.service';
 
 @Component({
   selector: 'app-full-screen-player',
@@ -40,6 +42,7 @@ import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-
     LucideCar,
     LucideRepeat,
     LucideGripVertical,
+    LucideMonitor,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
@@ -55,15 +58,17 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   public playerService = inject(PlayerService);
   private youtubeApi = inject(YoutubeApiService);
   public algorithmService = inject(AlgorithmService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
+  public syncService = inject(SyncService);
 
   @Input() playerCoverAd: any = null;
   @Input() safePlayerCoverAdUrl: any = null;
 
   activeView: 'artwork' | 'queue' | 'lyrics' | 'related' = 'artwork';
   showMenu = false;
+  showDevices = signal<boolean>(false);
   menuX = 0;
   menuY = 0;
   lyrics: string | null = null; // Plain text fallback
@@ -211,13 +216,12 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   }
 
   toggleMenu(event: MouseEvent): void {
-    if (!this.showMenu) {
-      const target = event.currentTarget as HTMLElement;
-      const rect = target.getBoundingClientRect();
-      this.menuX = rect.right;
-      this.menuY = rect.bottom;
-    }
+    event.stopPropagation();
     this.showMenu = !this.showMenu;
+  }
+  
+  toggleDevices(): void {
+    this.showDevices.set(!this.showDevices());
   }
 
   onRightClick(event: MouseEvent): void {

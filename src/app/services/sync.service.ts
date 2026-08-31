@@ -184,4 +184,21 @@ export class SyncService {
       });
     }
   }
+
+  // Transfer playback to another device
+  public transferPlayback(targetDeviceId: string) {
+    if (targetDeviceId === this.deviceId) {
+      this.requestTakeover();
+      return;
+    }
+    
+    const user = this.authService.currentUser();
+    if (user && user.email && this.socket && this.socket.connected) {
+      this.socket.emit('takeover_device', {
+        email: user.email,
+        fromDeviceId: this.deviceId,
+        toDeviceId: targetDeviceId
+      });
+    }
+  }
 }

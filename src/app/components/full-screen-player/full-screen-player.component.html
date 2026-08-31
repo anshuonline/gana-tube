@@ -27,6 +27,9 @@
       </div>
 
       <div class="fs-header-right" style="position: relative;">
+        <button class="icon-btn" style="margin-right: 8px;" title="Connect to a device" (click)="toggleDevices()">
+          <svg lucideMonitor [attr.size]="24" [attr.stroke]="showDevices() ? '#8b5cf6' : 'currentColor'"></svg>
+        </button>
         <button class="icon-btn" style="margin-right: 8px;" title="Car Mode" (click)="openCarMode.emit()">
           <svg lucideCar [attr.size]="24"></svg>
         </button>
@@ -282,6 +285,37 @@
       
     </div>
     
+  </div>
+
+  <!-- Devices Drawer Panel -->
+  <div class="fs-devices-drawer" [class.open]="showDevices()">
+    <div class="devices-header">
+      <h3>Connect to a device</h3>
+      <button class="close-devices-btn" (click)="showDevices.set(false)">Close</button>
+    </div>
+    <div class="devices-list">
+      <div
+        class="device-item"
+        *ngFor="let device of syncService.availableDevices()"
+        [class.active]="device.isActive"
+        [class.this-device]="device.deviceId === syncService.deviceId"
+        (click)="device.deviceId === syncService.deviceId ? syncService.requestTakeover() : syncService.transferPlayback(device.deviceId)"
+      >
+        <div class="device-icon">
+          <svg lucideMonitor *ngIf="!device.isMobile" [attr.size]="24"></svg>
+          <svg lucideMonitor *ngIf="device.isMobile" [attr.size]="24"></svg> 
+        </div>
+        <div class="device-meta">
+          <span class="device-name">{{ device.deviceName }} <span *ngIf="device.deviceId === syncService.deviceId">(This Device)</span></span>
+          <span class="device-status" *ngIf="device.isActive">Listening Now</span>
+        </div>
+      </div>
+      
+      <div *ngIf="syncService.availableDevices().length === 0" class="no-devices">
+        <p *ngIf="!authService.currentUser()">Log in to sync with other devices.</p>
+        <p *ngIf="authService.currentUser()">Listening on this device only. Open GanaTube on another device to sync.</p>
+      </div>
+    </div>
   </div>
 
   <!-- Toast Notification -->

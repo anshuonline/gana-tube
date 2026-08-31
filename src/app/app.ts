@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass } from '@lucide/angular';
+import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -38,7 +38,7 @@ import { LibraryPageComponent } from './components/library-page/library-page';
 import { FeedbackPopupComponent } from './components/feedback-popup/feedback-popup.component';
 import { ShortsPageComponent } from './components/shorts-page/shorts-page.component';
 import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
-import { LucideMenu } from '@lucide/angular';
+import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -87,7 +87,9 @@ export interface SponsoredAd {
     LibraryPageComponent,
     FeedbackPopupComponent,
     ShortsPageComponent,
-    DiscoveryPageComponent
+    DiscoveryPageComponent,
+    SpinWheelComponent,
+    LucideGift
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -95,8 +97,13 @@ export interface SponsoredAd {
 })
 export class App implements OnInit {
   @ViewChild(SearchBarComponent) searchBar!: SearchBarComponent;
+  @ViewChild('spinWheel') spinWheel!: SpinWheelComponent;
 
   public pwaService = inject(PwaService);
+
+  openSpinWheel() {
+    this.spinWheel?.open();
+  }
 
   results = signal<YouTubeSearchResult[]>([]);
   isLoading = signal<boolean>(false);

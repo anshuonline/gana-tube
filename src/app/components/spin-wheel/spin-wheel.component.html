@@ -1,0 +1,49 @@
+<div class="wheel-overlay" [class.show]="isVisible()" (click)="close()">
+  <div class="wheel-modal" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="close()" [disabled]="isSpinning()">
+      <svg lucideX [attr.size]="24"></svg>
+    </button>
+    
+    <h2>Spin & Win!</h2>
+    
+    <div class="stats-row" *ngIf="authService.currentUser()">
+      <div class="stat-box">
+        <span class="stat-label">Chances</span>
+        <span class="stat-value highlight">{{ spinsLeft() }}</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">G Coins</span>
+        <span class="stat-value coin-text"><svg lucideCoins [attr.size]="18"></svg> {{ gCoins() }}</span>
+      </div>
+    </div>
+    
+    <div class="wheel-container">
+      <div class="pointer"></div>
+      <img 
+        src="assets/images/wheel.jpg" 
+        alt="Wheel" 
+        class="wheel-image"
+        [style.transform]="'rotate(' + wheelRotation() + 'deg)'"
+      />
+    </div>
+    
+    <div class="action-row">
+      <button class="spin-btn" (click)="spin()" [disabled]="isSpinning() || spinsLeft() <= 0 || !authService.currentUser()">
+        {{ isSpinning() ? 'Spinning...' : 'SPIN NOW' }}
+      </button>
+    </div>
+    
+    <div class="result-text" *ngIf="spinResultText()" [class.win]="spinResultText().includes('won')">
+      {{ spinResultText() }}
+    </div>
+    
+    <div class="info-text">
+      <svg lucideInfo [attr.size]="14"></svg>
+      Listen to music for 2 minutes to earn a free chance!
+    </div>
+    
+    <div class="login-prompt" *ngIf="!authService.currentUser()">
+      Please log in to participate in the Lucky Draw.
+    </div>
+  </div>
+</div>

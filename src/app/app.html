@@ -55,6 +55,9 @@
           <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
           <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif; display: flex; align-items: center;">GanaTube.in</span>
         </div>
+        <button (click)="openSpinWheel()" title="Lucky Draw" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';">
+          <svg lucideGift [attr.size]="18"></svg>
+        </button>
         <button (click)="copyWebsiteLink()" title="Share Website" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';">
           <svg lucideShare2 [attr.size]="18" *ngIf="!linkCopied"></svg>
           <svg lucideCheck [attr.size]="18" *ngIf="linkCopied" style="color: #4ade80; transform: scale(1.1); transition: transform 0.2s ease;"></svg>
@@ -649,6 +652,11 @@
     [safePlayerCoverAdUrl]="safePlayerCoverAdUrl"
     (closeMode)="closeCarMode()">
   </app-car-mode-player>
+
+  <app-listen-together></app-listen-together>
+
+  <!-- Spin Wheel Modal -->
+  <app-spin-wheel #spinWheel></app-spin-wheel>
 
   <!-- Listen Together Modal -->
   <app-listen-together
