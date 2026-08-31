@@ -107,10 +107,12 @@
 
   <!-- Step 2: Loading Animation -->
   <div class="discovery-loading-view" *ngIf="step === 'loading'">
-    <div class="loader-container">
-      <div class="glowing-orb"></div>
-      <div class="glowing-orb-inner"></div>
-      <div class="pulse-ring"></div>
+    <div class="music-loader">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
     </div>
     <h2 class="loading-text">{{ loadingMessage }}</h2>
   </div>
@@ -127,8 +129,14 @@
       <button class="reset-btn" (click)="reset()">Try Again</button>
     </div>
 
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-container text-center mt-10">
+      <p class="text-red-400 text-lg">{{ errorMessage }}</p>
+      <button class="chip outline mt-4" (click)="reset()">Go Back</button>
+    </div>
+
     <!-- We will show playlists first, then songs in a grid -->
-    <div class="results-grid">
+    <div class="results-grid" *ngIf="results.length > 0">
       <div 
         class="result-card" 
         *ngFor="let track of results" 

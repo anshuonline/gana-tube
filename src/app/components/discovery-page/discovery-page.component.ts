@@ -57,6 +57,7 @@ export class DiscoveryPageComponent {
 
   step: 'input' | 'loading' | 'results' = 'input';
   loadingMessage = '';
+  errorMessage = '';
   
   results: YouTubeSearchResult[] = [];
 
@@ -132,6 +133,7 @@ export class DiscoveryPageComponent {
 
     this.step = 'loading';
     this.results = [];
+    this.errorMessage = '';
     
     // Generate query based on user input
     const moodsArray = Array.from(this.selectedMoods);
@@ -148,11 +150,19 @@ export class DiscoveryPageComponent {
       query += ` by ${artistsArray.join(' and ')}`;
     }
 
+    // Wrap API call with a 15 second timeout to prevent infinite loading
+    const safeApiCall = (q: string, limit: number) => {
+      return Promise.race([
+        firstValueFrom(this.youtubeApi.searchMusic(q, limit)),
+        new Promise<YouTubeSearchResult[]>((resolve) => setTimeout(() => resolve([]), 15000))
+      ]).catch(e => {
+        console.error('API error:', e);
+        return [];
+      });
+    };
+
     // Start API request in parallel
-    const apiPromise = firstValueFrom(this.youtubeApi.searchMusic(query, 50)).catch(e => {
-      console.error('Discovery error:', e);
-      return null;
-    });
+    const apiPromise = safeApiCall(query, 50);
 
     // Simulate AI Prediction loading phases (minimum 3 seconds total)
     const loadingMessages = [
@@ -168,17 +178,25 @@ export class DiscoveryPageComponent {
     }
 
     try {
-      const results = await apiPromise;
+      this.loadingMessage = "Finalizing results..."; // Just in case it's still waiting
+      let results = await apiPromise;
+      
+      if (!results || results.length === 0) {
+        // Fallback if no results found for the specific query
+        this.loadingMessage = "Fetching alternative mixes...";
+        results = await safeApiCall(`Trending ${this.selectedLanguage} songs`, 20);
+      }
+      
       if (results && results.length > 0) {
         this.results = results;
       } else {
-        // Fallback if no results found for the specific query
-        this.results = await firstValueFrom(this.youtubeApi.searchMusic(`Trending ${this.selectedLanguage} songs`, 20));
+        this.errorMessage = "Could not fetch songs right now. The server might be busy. Please try again.";
       }
       this.step = 'results';
     } catch (e) {
       console.error('Final fallback error:', e);
-      this.step = 'input';
+      this.errorMessage = "An error occurred while fetching your mix. Please try again.";
+      this.step = 'results';
     }
   }
 
