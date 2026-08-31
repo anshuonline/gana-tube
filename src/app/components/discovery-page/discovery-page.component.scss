@@ -238,7 +238,7 @@
     position: absolute;
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #a855f7, #3b82f6);
+    background: linear-gradient(135deg, #ffffff, #a855f7, #ff3b3b);
     border-radius: 50%;
     filter: blur(20px);
     animation: pulseOrb 2s ease-in-out infinite alternate;
@@ -248,30 +248,30 @@
     position: absolute;
     width: 40px;
     height: 40px;
-    background: #fff;
+    background: #ffffff;
     border-radius: 50%;
-    box-shadow: 0 0 30px #fff;
-    animation: scaleInner 1.5s ease-in-out infinite alternate;
+    box-shadow: 0 0 20px #ffffff, 0 0 40px #a855f7;
+    animation: rotateInner 3s linear infinite;
   }
 
   .pulse-ring {
     position: absolute;
-    width: 150px;
-    height: 150px;
-    border: 2px solid rgba(168, 85, 247, 0.5);
+    width: 120px;
+    height: 120px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
-    animation: expandRing 2s linear infinite;
+    animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
   }
 
   .loading-text {
-    color: #fff;
     font-size: 1.5rem;
     font-weight: 600;
-    text-align: center;
-    background: linear-gradient(to right, #a855f7, #ec4899);
+    color: #ffffff;
+    margin-top: 1rem;
+    background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.7));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: fadeInOut 2.4s ease-in-out infinite;
+    animation: pulseText 1.5s ease-in-out infinite alternate;
   }
 }
 

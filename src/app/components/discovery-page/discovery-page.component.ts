@@ -120,19 +120,6 @@ export class DiscoveryPageComponent {
     this.step = 'loading';
     this.results = [];
     
-    // Simulate AI Prediction loading phases
-    const loadingMessages = [
-      "Analyzing your music taste...",
-      "Matching moods...",
-      "Curating the best playlists...",
-      "Preparing your discovery mix..."
-    ];
-
-    for (let i = 0; i < loadingMessages.length; i++) {
-      this.loadingMessage = loadingMessages[i];
-      await new Promise(r => setTimeout(r, 1200));
-    }
-
     // Generate query based on user input
     const moodsArray = Array.from(this.selectedMoods);
     const artistsArray = Array.from(this.selectedArtists);
@@ -142,12 +129,36 @@ export class DiscoveryPageComponent {
       query += ` by ${artistsArray.join(' and ')}`;
     }
 
+    // Start API request in parallel
+    const apiPromise = firstValueFrom(this.youtubeApi.searchMusic(query, 50)).catch(e => {
+      console.error('Discovery error:', e);
+      return null;
+    });
+
+    // Simulate AI Prediction loading phases (minimum 3 seconds total)
+    const loadingMessages = [
+      "Analyzing your music taste...",
+      "Matching moods...",
+      "Curating the best playlists...",
+      "Preparing your discovery mix..."
+    ];
+
+    for (let i = 0; i < loadingMessages.length; i++) {
+      this.loadingMessage = loadingMessages[i];
+      await new Promise(r => setTimeout(r, 750)); // Faster animation, 3s total
+    }
+
     try {
-      // Fetch results
-      this.results = await firstValueFrom(this.youtubeApi.searchMusic(query, 50));
+      const results = await apiPromise;
+      if (results && results.length > 0) {
+        this.results = results;
+      } else {
+        // Fallback if no results found for the specific query
+        this.results = await firstValueFrom(this.youtubeApi.searchMusic(`Trending ${this.selectedLanguage} songs`, 20));
+      }
       this.step = 'results';
     } catch (e) {
-      console.error('Discovery error:', e);
+      console.error('Final fallback error:', e);
       this.step = 'input';
     }
   }
