@@ -31,10 +31,17 @@
     color: rgba(255, 255, 255, 0.6);
     margin-right: 12px;
     flex-shrink: 0;
+    cursor: pointer;
+    transition: color 0.2s;
+    
+    &:hover {
+      color: #fff;
+    }
   }
 
   .search-input {
     flex: 1;
+    min-width: 0; /* Prevents input from pushing voice button out on mobile */
     background: transparent;
     border: none;
     color: #fff;
@@ -47,6 +54,9 @@
     &::placeholder {
       color: rgba(255, 255, 255, 0.4);
       font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
@@ -62,6 +72,7 @@
     justify-content: center;
     border-radius: 50%;
     transition: all 0.2s;
+    flex-shrink: 0;
 
     &:hover {
       color: #fff;
@@ -74,6 +85,7 @@
     height: 24px;
     background: rgba(255, 255, 255, 0.2);
     margin: 0 8px;
+    flex-shrink: 0;
   }
 
   .voice-btn {
@@ -87,6 +99,7 @@
     justify-content: center;
     border-radius: 50%;
     transition: all 0.2s;
+    flex-shrink: 0;
 
     &:hover {
       background: rgba(255, 255, 255, 0.15);

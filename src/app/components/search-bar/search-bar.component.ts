@@ -17,7 +17,7 @@ declare var webkitSpeechRecognition: any;
   template: `
     <div class="search-wrapper">
       <div class="search-bar" [class.focused]="isFocused">
-        <svg lucideSearch class="search-icon" [attr.size]="24"></svg>
+        <svg lucideSearch class="search-icon" [attr.size]="24" (click)="onSearch()"></svg>
         <input
           #searchInput
           id="music-search-input"
