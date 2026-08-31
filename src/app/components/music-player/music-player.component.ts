@@ -203,7 +203,8 @@ import { SyncService } from '../../services/sync.service';
           </div>
           
           <div *ngIf="syncService.availableDevices().length === 0" class="no-devices">
-            <p>Log in to sync with other devices.</p>
+            <p *ngIf="!authService.currentUser()">Log in to sync with other devices.</p>
+            <p *ngIf="authService.currentUser()">Listening on this device only. Open GanaTube on another device to sync.</p>
           </div>
         </div>
       </div>
@@ -449,7 +450,7 @@ export class MusicPlayerComponent implements OnDestroy {
     public playerService: PlayerService,
     public algorithmService: AlgorithmService,
     private userService: UserService,
-    private authService: AuthService,
+    public authService: AuthService,
     public syncService: SyncService
   ) {}
 

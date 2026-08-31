@@ -1,4 +1,4 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, effect } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -24,7 +24,7 @@ export interface SyncState {
 })
 export class SyncService {
   private socket!: Socket;
-  private authService = inject(AuthService);
+  public authService = inject(AuthService); // changed to public so it can be accessed in template
   
   // Local tab sync
   private bc = typeof window !== 'undefined' ? new BroadcastChannel('ganatube_local_sync') : null;
@@ -44,6 +44,16 @@ export class SyncService {
     this.initDevice();
     this.setupLocalSync();
     this.setupSocket();
+    
+    // Watch for login changes and join sync room if logged in
+    effect(() => {
+      const user = this.authService.currentUser();
+      if (user && user.email && this.socket?.connected) {
+        this.joinDeviceSync(user.email);
+      } else if (!user) {
+        this.availableDevices.set([]);
+      }
+    });
   }
 
   private initDevice() {
