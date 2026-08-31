@@ -63,6 +63,8 @@ export class SpinWheelComponent implements OnInit {
   open() {
     this.isVisible.set(true);
     this.spinResultText.set('');
+    // Ensure we fetch the latest status when opened
+    this.spinService.fetchStatus();
   }
   
   close() {
