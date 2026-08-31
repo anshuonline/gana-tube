@@ -790,7 +790,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'discovery'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {
@@ -817,7 +817,7 @@ export class App implements OnInit {
         this.router.navigate(['/']);
       }
 
-      if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials') {
+      if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials' || url === 'discovery') {
         this.updateSEO(
           'Free Music Online Without Ads | Best Online Music App - GanaTube',
           'Play free music online without ads and without login on GanaTube. Enjoy the best free music app in India for streaming seamless, ad-free online music instantly.'
