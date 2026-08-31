@@ -38,7 +38,15 @@ export class SpinWheelComponent implements OnInit {
   // Base API url
   apiUrl = 'https://ganatube.in/manageads/wheel-api.php';
   
+  // Audio elements
+  private wheelAudio: HTMLAudioElement;
+  private coinAudio: HTMLAudioElement;
+
   constructor() {
+    this.wheelAudio = new Audio('sfx/wheelsound.mp3');
+    this.wheelAudio.loop = true;
+    this.coinAudio = new Audio('sfx/coin drop.mp3');
+    
     effect(() => {
       if (this.isVisible() && this.authService.currentUser()) {
         this.spinService.fetchStatus();
@@ -63,6 +71,26 @@ export class SpinWheelComponent implements OnInit {
     }
   }
 
+  fadeAudio(audio: HTMLAudioElement, targetVolume: number, duration: number) {
+    const steps = 20;
+    const stepTime = duration / steps;
+    const volumeStep = (targetVolume - audio.volume) / steps;
+    
+    let currentStep = 0;
+    const interval = setInterval(() => {
+      currentStep++;
+      let newVol = audio.volume + volumeStep;
+      if (newVol > 1) newVol = 1;
+      if (newVol < 0) newVol = 0;
+      audio.volume = newVol;
+      
+      if (currentStep >= steps) {
+        audio.volume = targetVolume;
+        clearInterval(interval);
+      }
+    }, stepTime);
+  }
+
   // Removed local fetchStatus as it's now in SpinService
 
   spin() {
@@ -80,6 +108,11 @@ export class SpinWheelComponent implements OnInit {
     if (this.isSpinning()) return;
     this.isSpinning.set(true);
     this.spinResultText.set('');
+    
+    // Play wheel sound with fade in
+    this.wheelAudio.volume = 0;
+    this.wheelAudio.play().catch(e => console.log('Audio play failed', e));
+    this.fadeAudio(this.wheelAudio, 1, 300); // fade in 300ms
     
     // Call API
     this.http.post<any>(`${this.apiUrl}?action=spin`, { email: user.email })
@@ -130,19 +163,32 @@ export class SpinWheelComponent implements OnInit {
             setTimeout(() => {
               this.isSpinning.set(false);
               this.spinService.gCoins.set(res.g_coins);
+              
+              // Fade out wheel sound
+              this.fadeAudio(this.wheelAudio, 0, 400);
+              setTimeout(() => this.wheelAudio.pause(), 400);
+              
               if (res.result === 'win') {
                 this.spinResultText.set(`🎉 You won ${res.coins_won} G Coins!`);
+                // Play win sound
+                this.coinAudio.currentTime = 0;
+                this.coinAudio.volume = 1;
+                this.coinAudio.play().catch(e => console.log('Audio play failed', e));
               } else {
                 this.spinResultText.set(`Better luck next time!`);
               }
             }, 4000);
             
           } else {
+            this.fadeAudio(this.wheelAudio, 0, 300);
+            setTimeout(() => this.wheelAudio.pause(), 300);
             this.isSpinning.set(false);
             alert(res.message);
           }
         },
         error: (err) => {
+          this.fadeAudio(this.wheelAudio, 0, 300);
+          setTimeout(() => this.wheelAudio.pause(), 300);
           this.isSpinning.set(false);
           console.error(err);
         }
