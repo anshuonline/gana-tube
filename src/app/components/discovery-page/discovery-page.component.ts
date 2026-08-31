@@ -65,10 +65,11 @@ export class DiscoveryPageComponent implements OnDestroy {
   // Visible results (progressive loading)
   results: YouTubeSearchResult[] = [];
   // How many to show initially and per scroll batch
-  private initialBatch = 8;
-  private scrollBatch = 4;
+  private initialBatch = 10;
+  private scrollBatch = 6;
   private scrollHandler: (() => void) | null = null;
   private isLoadingMore = false;
+  loadingMore = false; // exposed to template
 
   onLanguageChange(lang: string) {
     this.selectedLanguage = lang;
@@ -115,6 +116,9 @@ export class DiscoveryPageComponent implements OnDestroy {
     const currentLen = this.results.length;
     const nextItems = this.allResults.slice(currentLen, currentLen + this.scrollBatch);
     
+    this.loadingMore = true;
+    this.cdr.detectChanges();
+
     // Add items one by one with stagger delay
     let i = 0;
     const addOne = () => {
@@ -127,6 +131,8 @@ export class DiscoveryPageComponent implements OnDestroy {
         setTimeout(addOne, 120); // 120ms stagger between each card
       } else {
         this.isLoadingMore = false;
+        this.loadingMore = false;
+        this.cdr.detectChanges();
       }
     };
     addOne();
@@ -205,21 +211,34 @@ export class DiscoveryPageComponent implements OnDestroy {
     let queryParts = [this.selectedLanguage];
     if (moodsArray.length > 0) queryParts.push(...moodsArray);
     if (genresArray.length > 0) queryParts.push(...genresArray);
-    queryParts.push('songs');
     
-    let query = queryParts.join(' ');
+    let baseQuery = queryParts.join(' ');
     if (artistsArray.length > 0) {
-      query += ` ${artistsArray.join(' ')}`;
+      baseQuery += ` ${artistsArray.join(' ')}`;
     }
 
-    console.log('[Discovery] Query:', query);
+    const songQuery = baseQuery + ' songs';
+    const playlistQuery = baseQuery + ' playlist mix';
 
-    // Start API call immediately (runs in parallel with loading animation)
-    const apiPromise = firstValueFrom(
-      this.youtubeApi.searchMusic(query, 50).pipe(
+    console.log('[Discovery] Song Query:', songQuery);
+    console.log('[Discovery] Playlist Query:', playlistQuery);
+
+    // Start BOTH songs and playlists API calls in parallel with loading animation
+    const songsPromise = firstValueFrom(
+      this.youtubeApi.searchMusic(songQuery, 40).pipe(
         timeout(12000),
         catchError(err => {
-          console.warn('[Discovery] Primary query failed:', err);
+          console.warn('[Discovery] Songs query failed:', err);
+          return of([] as YouTubeSearchResult[]);
+        })
+      )
+    );
+
+    const playlistsPromise = firstValueFrom(
+      this.youtubeApi.searchMusic(playlistQuery, 20, 'playlist').pipe(
+        timeout(12000),
+        catchError(err => {
+          console.warn('[Discovery] Playlists query failed:', err);
           return of([] as YouTubeSearchResult[]);
         })
       )
@@ -238,22 +257,26 @@ export class DiscoveryPageComponent implements OnDestroy {
       await new Promise(r => setTimeout(r, 750));
     }
 
-    // Now await the API result
-    let fetchedResults: YouTubeSearchResult[] = [];
+    // Now await BOTH API results
+    let fetchedSongs: YouTubeSearchResult[] = [];
+    let fetchedPlaylists: YouTubeSearchResult[] = [];
     try {
-      fetchedResults = await apiPromise;
-      console.log('[Discovery] Got results:', fetchedResults?.length);
+      [fetchedSongs, fetchedPlaylists] = await Promise.all([songsPromise, playlistsPromise]);
+      console.log('[Discovery] Songs:', fetchedSongs?.length, 'Playlists:', fetchedPlaylists?.length);
     } catch (e) {
       console.error('[Discovery] API promise error:', e);
     }
 
+    // Merge: playlists first, then songs
+    let fetchedResults = [...(fetchedPlaylists || []), ...(fetchedSongs || [])];
+
     // Fallback if empty
-    if (!fetchedResults || fetchedResults.length === 0) {
+    if (fetchedResults.length === 0) {
       this.loadingMessage = "Trying trending mix...";
       this.cdr.detectChanges();
       try {
         fetchedResults = await firstValueFrom(
-          this.youtubeApi.searchMusic(`${this.selectedLanguage} trending songs`, 20).pipe(
+          this.youtubeApi.searchMusic(`${this.selectedLanguage} trending songs`, 30).pipe(
             timeout(8000),
             catchError(() => of([] as YouTubeSearchResult[]))
           )
