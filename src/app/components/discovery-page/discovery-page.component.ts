@@ -18,6 +18,7 @@ export class DiscoveryPageComponent {
   @Output() toggleMenu = new EventEmitter<{track: YouTubeSearchResult, event: MouseEvent}>();
 
   moods = ['Happy', 'Sad', 'Party', 'Chill', 'Workout', 'Romantic', 'Focus', 'Sleep', 'Drive', 'Nostalgia', 'Motivation', 'Devotional'];
+  genres = ['Pop', 'Hip-Hop', 'Classical', 'Lo-Fi', 'EDM', 'Rock', 'Acoustic', 'Jazz', 'R&B', 'Indie', 'Folk', 'Metal'];
   languages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Tamil', 'Telugu', 'Bengali', 'Gujarati', 'Marathi', 'Assamese'];
   
   artistsByLanguage: Record<string, string[]> = {
@@ -34,6 +35,7 @@ export class DiscoveryPageComponent {
   };
 
   selectedMoods: Set<string> = new Set();
+  selectedGenres: Set<string> = new Set();
   selectedLanguage: string = 'Hindi';
   selectedArtists: Set<string> = new Set();
   customArtist: string = '';
@@ -50,6 +52,7 @@ export class DiscoveryPageComponent {
   }
 
   get selectedMoodsArray() { return Array.from(this.selectedMoods); }
+  get selectedGenresArray() { return Array.from(this.selectedGenres); }
   get selectedArtistsArray() { return Array.from(this.selectedArtists); }
 
   step: 'input' | 'loading' | 'results' = 'input';
@@ -73,6 +76,16 @@ export class DiscoveryPageComponent {
     } else {
       if (this.selectedMoods.size < 3) {
         this.selectedMoods.add(mood);
+      }
+    }
+  }
+
+  toggleGenre(genre: string) {
+    if (this.selectedGenres.has(genre)) {
+      this.selectedGenres.delete(genre);
+    } else {
+      if (this.selectedGenres.size < 3) {
+        this.selectedGenres.add(genre);
       }
     }
   }
@@ -122,9 +135,15 @@ export class DiscoveryPageComponent {
     
     // Generate query based on user input
     const moodsArray = Array.from(this.selectedMoods);
+    const genresArray = Array.from(this.selectedGenres);
     const artistsArray = Array.from(this.selectedArtists);
     
-    let query = `${this.selectedLanguage} ${moodsArray.join(' ')} songs playlists`;
+    let queryParts = [this.selectedLanguage];
+    if (moodsArray.length > 0) queryParts.push(...moodsArray);
+    if (genresArray.length > 0) queryParts.push(...genresArray);
+    queryParts.push('songs playlists');
+    
+    let query = queryParts.join(' ');
     if (artistsArray.length > 0) {
       query += ` by ${artistsArray.join(' and ')}`;
     }

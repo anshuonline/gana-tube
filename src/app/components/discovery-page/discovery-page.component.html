@@ -39,6 +39,22 @@
         </div>
       </div>
 
+      <!-- Genres -->
+      <div class="section">
+        <h3 class="section-title"><svg lucideMic2 [attr.size]="20"></svg> Genres (Max 3)</h3>
+        <div class="chip-group">
+          <button 
+            *ngFor="let genre of genres" 
+            class="chip" 
+            [class.active]="selectedGenres.has(genre)"
+            (click)="toggleGenre(genre)"
+            [disabled]="!selectedGenres.has(genre) && selectedGenres.size >= 3"
+          >
+            {{ genre }}
+          </button>
+        </div>
+      </div>
+
       <!-- Artists -->
       <div class="section">
         <h3 class="section-title"><svg lucideMic2 [attr.size]="20"></svg> Favorite Artists (Max 3)</h3>
