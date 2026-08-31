@@ -57,9 +57,6 @@ export class SpinWheelComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (environment.production === false) {
-      this.apiUrl = 'http://localhost/manageads/wheel-api.php';
-    }
   }
 
   open() {
