@@ -68,7 +68,8 @@ export class SearchResultsComponent implements OnChanges {
     return this.playerService.currentTrack()?.videoId === track.videoId;
   }
 
-  onToggleMenu(track: YouTubeSearchResult, event: MouseEvent): void {
+  onRightClick(event: MouseEvent, track: YouTubeSearchResult): void {
+    event.preventDefault(); // Prevent standard browser context menu
     event.stopPropagation();
     this.toggleMenu.emit({track, event});
   }

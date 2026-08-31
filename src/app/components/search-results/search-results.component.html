@@ -22,7 +22,7 @@
   <!-- "All" Filter View: Top Result + List -->
   <ng-container *ngIf="currentFilter === 'all'">
     <!-- Top Result Section -->
-    <div class="top-result-section" *ngIf="topResult" (click)="onPlay(topResult)">
+    <div class="top-result-section" *ngIf="topResult" (click)="onPlay(topResult)" (contextmenu)="onRightClick($event, topResult)">
       <h2 class="section-heading">Top result</h2>
       <div class="top-result-card" [class.active]="isCurrentTrack(topResult)">
         <div class="top-thumbnail-wrapper">
@@ -62,6 +62,7 @@
           *ngFor="let track of otherResults" 
           [class.active]="isCurrentTrack(track)"
           (click)="onPlay(track)"
+          (contextmenu)="onRightClick($event, track)"
         >
           <div class="item-thumbnail">
             <img 
@@ -80,11 +81,6 @@
           <div class="item-info">
             <h4 class="item-title">{{ track.title }}</h4>
             <p class="item-artist">{{ track.channelTitle }}</p>
-          </div>
-          <div class="item-actions">
-            <button class="track-options-btn" (click)="onToggleMenu(track, $event)">
-              <svg lucideMoreVertical [attr.size]="20"></svg>
-            </button>
           </div>
         </div>
       </div>
@@ -100,6 +96,7 @@
           *ngFor="let track of otherResults" 
           [class.active]="isCurrentTrack(track)"
           (click)="onPlay(track)"
+          (contextmenu)="onRightClick($event, track)"
         >
           <div class="item-thumbnail">
             <img 
@@ -118,11 +115,6 @@
           <div class="item-info">
             <h4 class="item-title">{{ track.title }}</h4>
             <p class="item-artist">{{ track.channelTitle }}</p>
-          </div>
-          <div class="item-actions">
-            <button class="track-options-btn" (click)="onToggleMenu(track, $event)">
-              <svg lucideMoreVertical [attr.size]="20"></svg>
-            </button>
           </div>
         </div>
       </div>
