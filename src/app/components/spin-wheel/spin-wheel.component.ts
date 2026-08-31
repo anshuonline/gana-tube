@@ -11,6 +11,8 @@ export interface WheelStatus {
   spins_left: number;
 }
 
+import { SpinService } from '../../services/spin.service';
+
 @Component({
   selector: 'app-spin-wheel',
   standalone: true,
@@ -21,12 +23,14 @@ export interface WheelStatus {
 export class SpinWheelComponent implements OnInit {
   authService = inject(AuthService);
   http = inject(HttpClient);
+  spinService = inject(SpinService);
 
   isVisible = signal<boolean>(false);
   isSpinning = signal<boolean>(false);
   
-  gCoins = signal<number>(0);
-  spinsLeft = signal<number>(0);
+  // Use signals from service
+  gCoins = this.spinService.gCoins;
+  spinsLeft = this.spinService.spinsLeft;
   
   wheelRotation = signal<number>(0);
   spinResultText = signal<string>('');
@@ -37,9 +41,9 @@ export class SpinWheelComponent implements OnInit {
   constructor() {
     effect(() => {
       if (this.isVisible() && this.authService.currentUser()) {
-        this.fetchStatus();
+        this.spinService.fetchStatus();
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit() {
@@ -59,21 +63,7 @@ export class SpinWheelComponent implements OnInit {
     }
   }
 
-  fetchStatus() {
-    const user = this.authService.currentUser();
-    if (!user || !user.email) return;
-    
-    this.http.get<WheelStatus>(`${this.apiUrl}?action=status&email=${encodeURIComponent(user.email)}`)
-      .subscribe({
-        next: (res) => {
-          if (res.status === 'success') {
-            this.gCoins.set(res.g_coins);
-            this.spinsLeft.set(res.spins_left);
-          }
-        },
-        error: (err) => console.error('Error fetching wheel status', err)
-      });
-  }
+  // Removed local fetchStatus as it's now in SpinService
 
   spin() {
     const user = this.authService.currentUser();
@@ -96,7 +86,7 @@ export class SpinWheelComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
-            this.spinsLeft.set(res.spins_left);
+            this.spinService.spinsLeft.set(res.spins_left);
             
             // Segments based on user image:
             // Top: iPhone (approx 0 deg)
@@ -139,7 +129,7 @@ export class SpinWheelComponent implements OnInit {
             // Wait for animation (which will be 4 seconds via CSS)
             setTimeout(() => {
               this.isSpinning.set(false);
-              this.gCoins.set(res.g_coins);
+              this.spinService.gCoins.set(res.g_coins);
               if (res.result === 'win') {
                 this.spinResultText.set(`🎉 You won ${res.coins_won} G Coins!`);
               } else {

@@ -9,6 +9,7 @@ import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { SyncService, SyncState } from './sync.service';
 import { ToastService } from './toast.service';
+import { SpinService } from './spin.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -24,6 +25,7 @@ export class PlayerService {
   private userService = inject(UserService);
   private authService = inject(AuthService);
   public syncService = inject(SyncService);
+  private spinService = inject(SpinService);
   private trackStartTime: number = 0;
   private isFetchingMore = false;
   private isRemoteUpdate = false;
@@ -665,7 +667,8 @@ export class PlayerService {
         this.broadcastToSync(); // Send to sync service (will be throttled)
         
         // Track listening time for spin wheel (120 seconds = 1 chance)
-        if (this.playerState() === 'playing') {
+        // ONLY if user has exhausted all daily spins (spinsLeft == 0)
+        if (this.playerState() === 'playing' && this.spinService.spinsLeft() === 0) {
           this.listeningSeconds += 0.5;
           if (this.listeningSeconds >= 120) {
             this.listeningSeconds = 0; // reset
@@ -693,6 +696,7 @@ export class PlayerService {
         .subscribe({
           next: (res) => {
             if (res.status === 'success') {
+              this.spinService.spinsLeft.set(res.spins_left);
               this.toastService.show('🎉 You earned a free Spin chance!', 'success');
             }
           },
