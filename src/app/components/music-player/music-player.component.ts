@@ -152,9 +152,9 @@ import { SyncService } from '../../services/sync.service';
         >
           <svg lucideListMusic [attr.size]="18"></svg>
         </button>
-        <button class="ctrl-btn secondary" (click)="toggleDevices(); $event.stopPropagation()" title="Devices" [class.active]="showDevices()">
+        <!-- <button class="ctrl-btn secondary" (click)="toggleDevices(); $event.stopPropagation()" title="Devices" [class.active]="showDevices()">
           <svg lucideMonitor [attr.size]="18"></svg>
-        </button>
+        </button> -->
         <button class="ctrl-btn secondary" (click)="copyShareLink()" title="Share Link">
           <svg lucideShare2 [attr.size]="18"></svg>
         </button>

@@ -27,9 +27,10 @@
       </div>
 
       <div class="fs-header-right" style="position: relative;">
-        <button class="icon-btn" style="margin-right: 8px;" title="Connect to a device" (click)="toggleDevices()">
+        <!-- Hide device button as requested -->
+        <!-- <button class="icon-btn" style="margin-right: 8px;" title="Connect to a device" (click)="toggleDevices()">
           <svg lucideMonitor [attr.size]="24" [attr.stroke]="showDevices() ? '#8b5cf6' : 'currentColor'"></svg>
-        </button>
+        </button> -->
         <button class="icon-btn" style="margin-right: 8px;" title="Car Mode" (click)="openCarMode.emit()">
           <svg lucideCar [attr.size]="24"></svg>
         </button>

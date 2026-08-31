@@ -322,8 +322,9 @@
     display: flex !important;
     flex-direction: row !important;
     height: 68px !important;
-    bottom: 70px !important; /* Sit above the 70px mobile navbar */
+    bottom: 0 !important;
     padding: 0 16px !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
     gap: 12px !important;
     border-radius: 16px 16px 0 0 !important;
     justify-content: space-between !important;

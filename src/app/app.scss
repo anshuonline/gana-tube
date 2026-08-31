@@ -1385,7 +1385,7 @@
   bottom: 100px; /* Pushed up when player is active on desktop */
 
   @media (max-width: 768px) {
-    bottom: 150px; /* 70px nav + 68px player + 12px gap */
+    bottom: calc(80px + env(safe-area-inset-bottom)); /* 68px player + 12px gap */
   }
 }
 
