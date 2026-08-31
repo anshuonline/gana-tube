@@ -165,8 +165,8 @@
     // Drop shadow around wheel
     box-shadow: 0 0 0 8px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.6);
     // Add transition for spinning
-    // Using a longer duration and ease-out for a realistic spin down
-    transition: transform 4s cubic-bezier(0.15, 0.8, 0.1, 1);
+    // 7s duration with smooth deceleration - starts fast, gradually slows to a stop
+    transition: transform 7s cubic-bezier(0.12, 0.75, 0.06, 1);
   }
 }
 

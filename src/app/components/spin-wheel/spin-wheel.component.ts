@@ -43,11 +43,14 @@ export class SpinWheelComponent implements OnInit {
   // Audio elements
   private wheelAudio: HTMLAudioElement;
   private coinAudio: HTMLAudioElement;
+  private fadeInterval: any = null;
 
   constructor() {
     this.wheelAudio = new Audio('sfx/wheelsound.mp3');
     this.wheelAudio.loop = true;
+    this.wheelAudio.preload = 'auto';
     this.coinAudio = new Audio('sfx/coin drop.mp3');
+    this.coinAudio.preload = 'auto';
     
     effect(() => {
       if (this.isVisible() && this.authService.currentUser()) {
@@ -69,30 +72,58 @@ export class SpinWheelComponent implements OnInit {
   close() {
     if (!this.isSpinning()) {
       this.isVisible.set(false);
+      // Ensure audio is fully stopped when closing
+      this.stopWheelAudio();
     }
   }
 
-  fadeAudio(audio: HTMLAudioElement, targetVolume: number, duration: number) {
-    const steps = 20;
+  private stopWheelAudio() {
+    if (this.fadeInterval) {
+      clearInterval(this.fadeInterval);
+      this.fadeInterval = null;
+    }
+    this.wheelAudio.pause();
+    this.wheelAudio.currentTime = 0;
+    this.wheelAudio.volume = 0;
+  }
+
+  fadeAudio(audio: HTMLAudioElement, targetVolume: number, duration: number, callback?: () => void) {
+    // Clear any existing fade on this audio
+    if (audio === this.wheelAudio && this.fadeInterval) {
+      clearInterval(this.fadeInterval);
+      this.fadeInterval = null;
+    }
+    
+    const steps = 25;
     const stepTime = duration / steps;
-    const volumeStep = (targetVolume - audio.volume) / steps;
+    const startVolume = audio.volume;
+    const volumeDiff = targetVolume - startVolume;
     
     let currentStep = 0;
     const interval = setInterval(() => {
       currentStep++;
-      let newVol = audio.volume + volumeStep;
-      if (newVol > 1) newVol = 1;
-      if (newVol < 0) newVol = 0;
+      const progress = currentStep / steps;
+      // Use easeInOut curve for smoother fading
+      const easedProgress = progress < 0.5 
+        ? 2 * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      
+      let newVol = startVolume + volumeDiff * easedProgress;
+      newVol = Math.max(0, Math.min(1, newVol));
       audio.volume = newVol;
       
       if (currentStep >= steps) {
-        audio.volume = targetVolume;
+        audio.volume = Math.max(0, Math.min(1, targetVolume));
         clearInterval(interval);
+        if (audio === this.wheelAudio) this.fadeInterval = null;
+        if (callback) callback();
       }
     }, stepTime);
+    
+    if (audio === this.wheelAudio) {
+      this.fadeInterval = interval;
+    }
   }
-
-  // Removed local fetchStatus as it's now in SpinService
 
   spin() {
     const user = this.authService.currentUser();
@@ -110,10 +141,14 @@ export class SpinWheelComponent implements OnInit {
     this.isSpinning.set(true);
     this.spinResultText.set('');
     
-    // Play wheel sound with fade in
+    // Stop any previous audio cleanly
+    this.stopWheelAudio();
+    
+    // Play wheel sound with smooth fade in
     this.wheelAudio.volume = 0;
+    this.wheelAudio.currentTime = 0;
     this.wheelAudio.play().catch(e => console.log('Audio play failed', e));
-    this.fadeAudio(this.wheelAudio, 1, 300); // fade in 300ms
+    this.fadeAudio(this.wheelAudio, 0.8, 500); // fade in to 80% over 500ms
     
     // Call API
     this.http.post<any>(`${this.apiUrl}?action=spin`, { email: user.email })
@@ -139,57 +174,48 @@ export class SpinWheelComponent implements OnInit {
               targetAngle = 180 + Math.floor(Math.random() * 40 - 20);
             }
             
-            // Calculate total rotation
-            // We want it to spin a few times (e.g. 5 full rotations = 1800 deg)
-            // and end up at targetAngle relative to current.
-            // But CSS rotation is absolute. So we add rotations on top of the current rotation.
-            
             const currentRot = this.wheelRotation();
-            // Calculate how many full rotations we've done so far to keep spinning forward
             const fullRots = Math.floor(currentRot / 360);
-            const baseRot = fullRots * 360 + 1800; // spin 5 times
+            // Spin 8 full rotations for longer, more dramatic spin
+            const baseRot = fullRots * 360 + 2880;
             
-            // The wheel spins clockwise. Wait, to land at 240 degrees at the TOP pointer, 
-            // the wheel itself must be rotated by (360 - 240) = 120 degrees relative to 0.
-            // Let's assume the pointer is at the TOP.
-            // 0 deg: iPhone is at top.
-            // To bring 240 deg (G Coins) to top, we need to rotate by -240 or 360-240 = +120.
             const pointerCorrection = (360 - targetAngle) % 360;
-            
             const finalRotation = baseRot + pointerCorrection;
             
             this.wheelRotation.set(finalRotation);
             
-            // Wait for animation (which will be 4 seconds via CSS)
+            // Start fading out wheel sound at ~5s mark (2s before animation ends at 7s)
+            setTimeout(() => {
+              this.fadeAudio(this.wheelAudio, 0, 2000, () => {
+                this.wheelAudio.pause();
+                this.wheelAudio.currentTime = 0;
+              });
+            }, 5000);
+            
+            // Wait for full 7s animation to complete
             setTimeout(() => {
               this.isSpinning.set(false);
               this.spinService.gCoins.set(res.g_coins);
               
-              // Fade out wheel sound
-              this.fadeAudio(this.wheelAudio, 0, 400);
-              setTimeout(() => this.wheelAudio.pause(), 400);
-              
               if (res.result === 'win') {
                 this.spinResultText.set(`🎉 You won ${res.coins_won} G Coins!`);
-                // Play win sound
+                // Play coin drop sound
                 this.coinAudio.currentTime = 0;
                 this.coinAudio.volume = 1;
                 this.coinAudio.play().catch(e => console.log('Audio play failed', e));
               } else {
                 this.spinResultText.set(`Better luck next time!`);
               }
-            }, 4000);
+            }, 7000);
             
           } else {
-            this.fadeAudio(this.wheelAudio, 0, 300);
-            setTimeout(() => this.wheelAudio.pause(), 300);
+            this.stopWheelAudio();
             this.isSpinning.set(false);
             alert(res.message);
           }
         },
         error: (err) => {
-          this.fadeAudio(this.wheelAudio, 0, 300);
-          setTimeout(() => this.wheelAudio.pause(), 300);
+          this.stopWheelAudio();
           this.isSpinning.set(false);
           console.error(err);
         }
