@@ -265,7 +265,12 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
         this.toastService.show('Failed to remove playlist', 'error');
       }
     } else {
-      const success = await this.userService.savePlaylist(user.email, this.playlist.id);
+      const success = await this.userService.savePlaylist(
+        user.email, 
+        this.playlist.id,
+        this.playlist.title,
+        this.songs()
+      );
       if (success) {
         this.toastService.show('Playlist saved to your library', 'success');
       } else {

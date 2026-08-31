@@ -56,11 +56,16 @@ export class UserService {
     }
   }
 
-  async savePlaylist(email: string, playlistId: string): Promise<boolean> {
+  async savePlaylist(email: string, playlistId: string, playlistName?: string, songs?: any[]): Promise<boolean> {
     if (!email || !playlistId) return false;
     try {
       const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
-      const response: any = await firstValueFrom(this.http.post(`${url}?action=savePlaylist`, { email, playlist_id: playlistId }));
+      const response: any = await firstValueFrom(this.http.post(`${url}?action=savePlaylist`, { 
+        email, 
+        playlist_id: playlistId,
+        playlist_name: playlistName,
+        songs: songs
+      }));
       if (response.status === 'success') {
         this.loadPlaylists(email); // Refresh playlists
         return true;
