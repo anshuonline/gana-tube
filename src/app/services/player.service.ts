@@ -690,7 +690,7 @@ export class PlayerService {
       // Assuming apiUrl is the same as environment or hardcoded
       const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
         ? 'http://localhost/manageads/wheel-api.php' 
-        : 'https://ganatube.in/manageads/wheel-api.php';
+        : 'https://manageads.ganatube.in/wheel-api.php';
         
       this.http.post<any>(`${backendUrl}?action=add_chance`, { email: user.email })
         .subscribe({

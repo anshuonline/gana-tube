@@ -36,7 +36,9 @@ export class SpinWheelComponent implements OnInit {
   spinResultText = signal<string>('');
   
   // Base API url
-  apiUrl = 'https://ganatube.in/manageads/wheel-api.php';
+  apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost/manageads/wheel-api.php'
+    : 'https://manageads.ganatube.in/wheel-api.php';
   
   // Audio elements
   private wheelAudio: HTMLAudioElement;
