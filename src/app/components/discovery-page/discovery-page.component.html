@@ -1,0 +1,134 @@
+<div class="discovery-container">
+  <!-- Step 1: Input -->
+  <div class="discovery-input-view" *ngIf="step === 'input'">
+    <div class="discovery-header text-center">
+      <svg lucideCompass [attr.size]="48" class="text-purple-400 mb-4 mx-auto"></svg>
+      <h1 class="text-3xl font-bold text-white mb-2">Music Discovery</h1>
+      <p class="text-gray-400">Let AI curate the perfect playlist for your current vibe.</p>
+    </div>
+
+    <div class="input-sections">
+      <!-- Moods -->
+      <div class="section">
+        <h3 class="section-title"><svg lucideSparkles [attr.size]="20"></svg> How are you feeling? (Max 3)</h3>
+        <div class="chip-group">
+          <button 
+            *ngFor="let mood of moods" 
+            class="chip" 
+            [class.active]="selectedMoods.has(mood)"
+            (click)="toggleMood(mood)"
+            [disabled]="!selectedMoods.has(mood) && selectedMoods.size >= 3"
+          >
+            {{ mood }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Language -->
+      <div class="section">
+        <h3 class="section-title"><svg lucideGlobe [attr.size]="20"></svg> Preferred Language</h3>
+        <div class="chip-group language-group">
+          <button 
+            *ngFor="let lang of languages" 
+            class="chip outline" 
+            [class.active]="selectedLanguage === lang"
+            (click)="selectedLanguage = lang"
+          >
+            {{ lang }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Artists -->
+      <div class="section">
+        <h3 class="section-title"><svg lucideMic2 [attr.size]="20"></svg> Favorite Artists (Max 3)</h3>
+        
+        <div class="selected-artists mb-3" *ngIf="selectedArtists.size > 0">
+          <div class="artist-tag" *ngFor="let artist of selectedArtistsArray">
+            {{ artist }} <button (click)="removeArtist(artist)" class="remove-btn">&times;</button>
+          </div>
+        </div>
+
+        <div class="chip-group mb-3">
+          <button 
+            *ngFor="let artist of suggestedArtists" 
+            class="chip artist-chip" 
+            [class.active]="selectedArtists.has(artist)"
+            (click)="toggleArtist(artist)"
+            [disabled]="!selectedArtists.has(artist) && selectedArtists.size >= 3"
+          >
+            {{ artist }}
+          </button>
+        </div>
+
+        <div class="custom-artist-input">
+          <input 
+            type="text" 
+            [(ngModel)]="customArtist" 
+            placeholder="Type another artist..." 
+            (keyup.enter)="addCustomArtist()"
+            [disabled]="selectedArtists.size >= 3"
+          />
+          <button class="add-btn" (click)="addCustomArtist()" [disabled]="selectedArtists.size >= 3 || !customArtist.trim()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-footer text-center mt-8">
+      <button class="discover-btn" [disabled]="selectedMoods.size === 0" (click)="discover()">
+        Generate Discovery Mix <svg lucidePlay [attr.size]="20" class="ml-2"></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Loading Animation -->
+  <div class="discovery-loading-view" *ngIf="step === 'loading'">
+    <div class="loader-container">
+      <div class="glowing-orb"></div>
+      <div class="glowing-orb-inner"></div>
+      <div class="pulse-ring"></div>
+    </div>
+    <h2 class="loading-text">{{ loadingMessage }}</h2>
+  </div>
+
+  <!-- Step 3: Results -->
+  <div class="discovery-results-view" *ngIf="step === 'results'">
+    <div class="results-header-bar flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-white flex items-center">
+          <svg lucideSparkles [attr.size]="24" class="text-purple-400 mr-2"></svg> Your AI Curated Mix
+        </h2>
+        <p class="text-gray-400 text-sm mt-1">Based on: {{ selectedLanguage }}, {{ selectedMoodsArray.join(', ') }}</p>
+      </div>
+      <button class="reset-btn" (click)="reset()">Try Again</button>
+    </div>
+
+    <!-- We will show playlists first, then songs in a grid -->
+    <div class="results-grid">
+      <div 
+        class="result-card" 
+        *ngFor="let track of results" 
+        [class.active]="isCurrentTrack(track)"
+        (click)="onPlay(track)"
+        (contextmenu)="onRightClick($event, track)"
+      >
+        <div class="card-thumbnail">
+          <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" referrerpolicy="no-referrer" />
+          
+          <div class="type-badge" *ngIf="track.type === 'playlist' || track.type === 'community-playlist'">Playlist</div>
+
+          <div class="card-overlay">
+            <svg lucidePlay [attr.size]="36" *ngIf="!isCurrentTrack(track)"></svg>
+            <div class="play-ripple" *ngIf="isCurrentTrack(track)">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-info">
+          <h4 class="card-title" [title]="track.title">{{ track.title }}</h4>
+          <p class="card-artist">{{ track.channelTitle }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

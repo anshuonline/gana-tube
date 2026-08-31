@@ -6,6 +6,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', children: [] },
   { path: 'search', children: [] },
+  { path: 'discovery', children: [] },
   { path: 'library', children: [] },
   { path: 'socials', children: [] },
   { path: 'play', children: [] },

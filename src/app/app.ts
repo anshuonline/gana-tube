@@ -37,6 +37,8 @@ import { CarModePlayerComponent } from './components/car-mode-player/car-mode-pl
 import { LibraryPageComponent } from './components/library-page/library-page';
 import { FeedbackPopupComponent } from './components/feedback-popup/feedback-popup.component';
 import { ShortsPageComponent } from './components/shorts-page/shorts-page.component';
+import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
+import { LucideMenu } from '@lucide/angular';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -62,6 +64,7 @@ export interface SponsoredAd {
     LucideShare2,
     LucideCheck,
     LucideFlame,
+    LucideMenu,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -82,7 +85,8 @@ export interface SponsoredAd {
     ToastComponent,
     LibraryPageComponent,
     FeedbackPopupComponent,
-    ShortsPageComponent
+    ShortsPageComponent,
+    DiscoveryPageComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -102,6 +106,7 @@ export class App implements OnInit {
   apiKeyMissing = false;
   appVersion = 'v1.0.4';
   currentYear = new Date().getFullYear();
+  isMobileMenuOpen = signal<boolean>(false);
 
   // Ad Booking State
   bookingState: {
@@ -893,23 +898,19 @@ export class App implements OnInit {
     }
   }
 
-  openProfilePage(): void {
-    this.router.navigate(['/profile']);
-    this.isSearchMode.set(false);
-  }
-
-  openLibraryPage(): void {
+  openLibraryPage() {
+    this.closeMobileMenu();
     this.router.navigate(['/library']);
-    this.isSearchMode.set(false);
   }
 
-  openShortsPage(): void {
-    this.router.navigate(['/shorts/play']);
-  }
-
-  openSocialsPage(): void {
+  openSocialsPage() {
+    this.closeMobileMenu();
     this.router.navigate(['/socials']);
-    this.isSearchMode.set(false);
+  }
+
+  openProfilePage() {
+    this.closeMobileMenu();
+    this.router.navigate(['/profile']);
   }
 
   openAdvertisePage(): void {
@@ -984,6 +985,24 @@ export class App implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  openShortsPage() {
+    this.closeMobileMenu();
+    this.router.navigate(['/shorts/play']);
+  }
+
+  openDiscoveryPage() {
+    this.closeMobileMenu();
+    this.router.navigate(['/discovery']);
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen.update(v => !v);
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen.set(false);
   }
 
   openSearchPage(): void {

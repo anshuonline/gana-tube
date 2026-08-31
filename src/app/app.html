@@ -2,8 +2,11 @@
   <!-- Hidden YouTube Player -->
   <app-yt-player *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin'"></app-yt-player>
 
+  <!-- Mobile Sidebar Backdrop -->
+  <div class="sidebar-backdrop" *ngIf="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
+
   <!-- Sidebar -->
-  <nav class="app-sidebar" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts'">
+  <nav class="app-sidebar" [class.mobile-open]="isMobileMenuOpen()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts'">
     <div class="sidebar-items">
       <div class="sidebar-item" (click)="resetSearchState()" [class.active]="currentPage() === 'home'">
         <svg lucideHome [attr.size]="24"></svg>
@@ -25,6 +28,10 @@
         <svg lucideMessageSquare [attr.size]="24"></svg>
         <span class="sidebar-label">Socials</span>
       </div>
+      <div class="sidebar-item" (click)="openDiscoveryPage()" [class.active]="currentPage() === 'discovery'">
+        <svg lucideCompass [attr.size]="24"></svg>
+        <span class="sidebar-label">Discovery</span>
+      </div>
     </div>
     
     <div class="sidebar-footer">
@@ -39,6 +46,11 @@
   <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts'">
     <div class="header-inner">
       <div style="display: flex; align-items: center; gap: 16px;">
+        <!-- Mobile Hamburger Menu -->
+        <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Toggle Menu">
+          <svg lucideMenu [attr.size]="24"></svg>
+        </button>
+
         <div class="logo" routerLink="/" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;">
           <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
           <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif; display: flex; align-items: center;">GanaTube.in</span>
@@ -534,6 +546,13 @@
     <div class="managegt-wrapper" *ngIf="currentPage() === 'managegt'">
       <router-outlet></router-outlet>
     </div>
+
+    <!-- Discovery Page Section -->
+    <app-discovery-page 
+      *ngIf="currentPage() === 'discovery'"
+      (playTrack)="onPlaySearchTrack($event)"
+      (toggleMenu)="toggleMenu($event.track, $event.event)">
+    </app-discovery-page>
 
     <!-- Static Pages Section -->
     <div class="static-page-container" *ngIf="pageContent[currentPage()]">
