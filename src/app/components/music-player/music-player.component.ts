@@ -19,12 +19,15 @@ import {
   LucideTrash2,
   LucideHeart,
   LucideShare2,
-  LucideMoon
+  LucideMoon,
+  LucideMonitor
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+
+import { SyncService } from '../../services/sync.service';
 
 @Component({
   selector: 'app-music-player',
@@ -49,7 +52,8 @@ import { AuthService } from '../../services/auth.service';
     LucideTrash2,
     LucideHeart,
     LucideShare2,
-    LucideMoon
+    LucideMoon,
+    LucideMonitor
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
@@ -148,6 +152,9 @@ import { AuthService } from '../../services/auth.service';
         >
           <svg lucideListMusic [attr.size]="18"></svg>
         </button>
+        <button class="ctrl-btn secondary" (click)="toggleDevices()" title="Devices" [class.active]="showDevices()">
+          <svg lucideMonitor [attr.size]="18"></svg>
+        </button>
         <button class="ctrl-btn secondary" (click)="copyShareLink()" title="Share Link">
           <svg lucideShare2 [attr.size]="18"></svg>
         </button>
@@ -168,6 +175,37 @@ import { AuthService } from '../../services/auth.service';
         <button class="ctrl-btn secondary maximize-btn" (click)="toggleFullScreen()" title="Expand Player">
           <svg lucideMaximize2 [attr.size]="18"></svg>
         </button>
+      </div>
+
+      <!-- Devices Drawer Panel -->
+      <div class="devices-drawer" [class.open]="showDevices()">
+        <div class="devices-header">
+          <h3>Connect to a device</h3>
+          <button class="close-devices-btn" (click)="showDevices.set(false)">Close</button>
+        </div>
+        <div class="devices-list">
+          <div
+            class="device-item"
+            *ngFor="let device of syncService.availableDevices()"
+            [class.active]="device.isActive"
+            [class.this-device]="device.deviceId === syncService.deviceId"
+            (click)="device.deviceId === syncService.deviceId ? syncService.requestTakeover() : null"
+          >
+            <div class="device-icon">
+              <svg lucideMonitor *ngIf="!device.isMobile" [attr.size]="24"></svg>
+              <!-- fallback for mobile if no LucideSmartphone -->
+              <svg lucideMonitor *ngIf="device.isMobile" [attr.size]="24"></svg> 
+            </div>
+            <div class="device-meta">
+              <span class="device-name">{{ device.deviceName }} <span *ngIf="device.deviceId === syncService.deviceId">(This Device)</span></span>
+              <span class="device-status" *ngIf="device.isActive">Listening Now</span>
+            </div>
+          </div>
+          
+          <div *ngIf="syncService.availableDevices().length === 0" class="no-devices">
+            <p>Log in to sync with other devices.</p>
+          </div>
+        </div>
       </div>
 
       <!-- Queue Drawer Panel (Standard Bar) -->
@@ -402,6 +440,7 @@ export class MusicPlayerComponent implements OnDestroy {
   
   isFullScreen = signal<boolean>(false);
   showQueue = signal<boolean>(false);
+  showDevices = signal<boolean>(false);
   showFSQueue = signal<boolean>(false);
   showToast = signal<boolean>(false);
   customSleepTime = signal<number>(30);
@@ -410,8 +449,23 @@ export class MusicPlayerComponent implements OnDestroy {
     public playerService: PlayerService,
     public algorithmService: AlgorithmService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    public syncService: SyncService
   ) {}
+
+  toggleDevices(): void {
+    this.showDevices.set(!this.showDevices());
+    if (this.showDevices()) {
+      this.showQueue.set(false);
+    }
+  }
+
+  toggleQueue(): void {
+    this.showQueue.set(!this.showQueue());
+    if (this.showQueue()) {
+      this.showDevices.set(false);
+    }
+  }
 
   ngOnDestroy() {
     // Moved to PlayerService
@@ -484,9 +538,6 @@ export class MusicPlayerComponent implements OnDestroy {
     }
   }
 
-  toggleQueue(): void {
-    this.showQueue.set(!this.showQueue());
-  }
 
   toggleFSQueue(): void {
     this.showFSQueue.set(!this.showFSQueue());

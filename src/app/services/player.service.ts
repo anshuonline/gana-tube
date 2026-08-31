@@ -6,6 +6,7 @@ import { YoutubeApiService } from './youtube-api.service';
 import { RoomService } from './room.service';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { SyncService, SyncState } from './sync.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -20,13 +21,64 @@ export class PlayerService {
   private roomService = inject(RoomService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  public syncService = inject(SyncService);
   private trackStartTime: number = 0;
   private isFetchingMore = false;
   private isRemoteUpdate = false;
   private location = inject(Location);
 
+  // When true, this instance of the player is just a remote control for another device
+  public isRemoteControl = signal<boolean>(false);
+
   constructor() {
     this.setupSocketListeners();
+    this.setupDeviceSyncListeners();
+  }
+
+  private setupDeviceSyncListeners() {
+    this.syncService.onRemoteStateReceived = (state: SyncState) => {
+      // If we are acting as a remote control, update our UI state to match
+      if (this.isRemoteControl()) {
+        this.isRemoteUpdate = true;
+        this.playerState.set(state.isPlaying ? 'playing' : 'paused');
+        this.currentTime.set(state.currentTime);
+        if (state.queue && state.currentIndex !== undefined) {
+          this.queue.set(state.queue);
+          this.currentIndex.set(state.currentIndex);
+        }
+        
+        // Pause local ytPlayer to ensure no audio plays
+        if (this.ytPlayer && this.ytPlayer.getPlayerState() === 1) { // 1 = playing
+           this.ytPlayer.pauseVideo();
+        }
+        
+        this.isRemoteUpdate = false;
+      }
+    };
+
+    this.syncService.onTakeoverRequested = (deviceId: string) => {
+      // Someone else took over, we become a remote control
+      if (this.syncService.deviceId !== deviceId) {
+        this.isRemoteControl.set(true);
+        if (this.ytPlayer) {
+          this.ytPlayer.pauseVideo();
+        }
+        this.playerState.set('paused');
+      }
+    };
+  }
+
+  // Helper to broadcast state to SyncService
+  public broadcastToSync(forceRemote: boolean = false) {
+    if (this.isRemoteUpdate || this.isRemoteControl()) return;
+    
+    this.syncService.broadcastState({
+      isPlaying: this.playerState() === 'playing',
+      currentTime: this.currentTime(),
+      currentTrackId: this.currentTrack()?.videoId,
+      queue: this.queue(),
+      currentIndex: this.currentIndex()
+    }, forceRemote);
   }
 
 
@@ -282,6 +334,7 @@ export class PlayerService {
   }
   
   private broadcastPlaybackSync(isPlaying: boolean) {
+    this.broadcastToSync(true); // Broadcast for personal device sync
     if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
       this.roomService.getSocket().emit('sync_playback', {
         roomId: this.roomService.currentRoom(),
@@ -381,6 +434,7 @@ export class PlayerService {
   seekTo(seconds: number): void {
     if (this.ytPlayer) {
       this.ytPlayer.seekTo(seconds, true);
+      this.broadcastToSync(true);
       
       if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
         this.roomService.getSocket().emit('sync_playback', {
@@ -600,9 +654,13 @@ export class PlayerService {
   private startProgressTracking(): void {
     this.stopProgressTracking();
     this.progressInterval = setInterval(() => {
-      if (this.ytPlayer) {
+      if (this.ytPlayer && !this.isRemoteControl()) {
         this.currentTime.set(this.ytPlayer.getCurrentTime() || 0);
         this.duration.set(this.ytPlayer.getDuration() || 0);
+        this.broadcastToSync(); // Send to sync service (will be throttled)
+      } else if (this.isRemoteControl() && this.playerState() === 'playing') {
+        // Increment locally by 0.5s if acting as remote, to keep UI moving
+        this.currentTime.update(t => t + 0.5);
       }
     }, 500);
   }

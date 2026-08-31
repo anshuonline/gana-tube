@@ -958,8 +958,8 @@
   }
 }
 
-// ---- QUEUE DRAWER (Standard Bottom Player) ----
-.queue-drawer {
+// ---- QUEUE DRAWER & DEVICES DRAWER (Standard Bottom Player) ----
+.queue-drawer, .devices-drawer {
   position: absolute;
   bottom: 100px;
   right: 24px;
@@ -989,7 +989,11 @@
   }
 }
 
-.queue-header {
+.devices-drawer {
+  right: 64px; // shifted slightly if both somehow open
+}
+
+.queue-header, .devices-header {
   padding: 16px 20px;
   display: flex;
   align-items: center;
@@ -1004,7 +1008,7 @@
   }
 }
 
-.close-queue-btn {
+.close-queue-btn, .close-devices-btn {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.4);
@@ -1019,11 +1023,73 @@
   }
 }
 
-.queue-list {
+.queue-list, .devices-list {
   flex: 1;
   overflow-y: auto;
   padding: 8px 0;
 }
+
+// -- Devices specific styling --
+.device-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    background: rgba(139, 92, 246, 0.15);
+    border-left: 3px solid #a855f7;
+    
+    .device-icon svg { color: #a855f7; }
+    .device-name { color: #fff; font-weight: 600; }
+  }
+  
+  &.this-device { cursor: default; }
+}
+
+.device-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #a0a0a0;
+}
+
+.device-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-name {
+  font-size: 0.95rem;
+  color: #e5e7eb;
+}
+
+.device-status {
+  font-size: 0.75rem;
+  color: #10b981; // Green for active
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.no-devices {
+  padding: 32px 16px;
+  text-align: center;
+  color: #a0a0a0;
+  font-size: 0.9rem;
+}
+
 
 .queue-item {
   display: flex;
@@ -1444,6 +1510,8 @@
   font-weight: 600;
   margin-bottom: 12px;
 }
+
+
 
 .sleep-slider {
   width: 100%;
