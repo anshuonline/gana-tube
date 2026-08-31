@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame } from '@lucide/angular';
+import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -64,6 +64,7 @@ export interface SponsoredAd {
     LucideShare2,
     LucideCheck,
     LucideFlame,
+    LucideCompass,
     LucideMenu,
     SearchBarComponent,
     SearchResultsComponent,
