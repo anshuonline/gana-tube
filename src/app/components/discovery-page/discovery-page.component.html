@@ -32,7 +32,7 @@
             *ngFor="let lang of languages" 
             class="chip outline" 
             [class.active]="selectedLanguage === lang"
-            (click)="selectedLanguage = lang"
+            (click)="onLanguageChange(lang)"
           >
             {{ lang }}
           </button>
@@ -61,15 +61,23 @@
           </button>
         </div>
 
-        <div class="custom-artist-input">
+        <div class="custom-artist-input" style="position: relative;">
           <input 
             type="text" 
             [(ngModel)]="customArtist" 
-            placeholder="Type another artist..." 
+            placeholder="Search more artists..." 
             (keyup.enter)="addCustomArtist()"
+            (focus)="onSearchFocus()"
+            (blur)="showSuggestions = false"
             [disabled]="selectedArtists.size >= 3"
           />
-          <button class="add-btn" (click)="addCustomArtist()" [disabled]="selectedArtists.size >= 3 || !customArtist.trim()">Add</button>
+          <button class="add-btn" (mousedown)="$event.preventDefault(); addCustomArtist()" [disabled]="selectedArtists.size >= 3 || !customArtist.trim()">Add</button>
+          
+          <div class="suggestions-dropdown" *ngIf="showSuggestions && filteredSuggestions.length > 0">
+            <div class="suggestion-item" *ngFor="let suggestion of filteredSuggestions" (mousedown)="$event.preventDefault(); selectSuggestion(suggestion)">
+              {{ suggestion }}
+            </div>
+          </div>
         </div>
       </div>
     </div>

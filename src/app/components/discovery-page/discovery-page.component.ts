@@ -18,15 +18,36 @@ export class DiscoveryPageComponent {
   @Output() toggleMenu = new EventEmitter<{track: YouTubeSearchResult, event: MouseEvent}>();
 
   moods = ['Happy', 'Sad', 'Party', 'Chill', 'Workout', 'Romantic', 'Focus', 'Sleep', 'Drive', 'Nostalgia', 'Motivation', 'Devotional'];
-  languages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Tamil', 'Telugu', 'Bengali', 'Gujarati', 'Marathi'];
+  languages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Tamil', 'Telugu', 'Bengali', 'Gujarati', 'Marathi', 'Assamese'];
   
-  // A few predefined artists or allow custom typing
-  suggestedArtists = ['Arijit Singh', 'Diljit Dosanjh', 'Shreya Ghoshal', 'Badshah', 'Atif Aslam', 'Sonu Nigam', 'A.R. Rahman', 'Kishore Kumar'];
+  artistsByLanguage: Record<string, string[]> = {
+    'Hindi': ['Arijit Singh', 'Shreya Ghoshal', 'Atif Aslam', 'Sonu Nigam', 'Udit Narayan', 'Kishore Kumar', 'Lata Mangeshkar', 'Kumar Sanu', 'Alka Yagnik', 'Neha Kakkar', 'Badshah', 'Jubin Nautiyal', 'B Praak', 'Darshan Raval', 'Vishal Mishra', 'Armaan Malik', 'Sunidhi Chauhan', 'Mohit Chauhan', 'A.R. Rahman', 'Pritam'],
+    'English': ['Taylor Swift', 'Ed Sheeran', 'Dua Lipa', 'The Weeknd', 'Billie Eilish', 'Ariana Grande', 'Justin Bieber', 'Bruno Mars', 'Eminem', 'Drake', 'Adele', 'Beyonce', 'Coldplay', 'Imagine Dragons', 'Maroon 5', 'Post Malone', 'Shawn Mendes', 'Selena Gomez', 'Harry Styles', 'Rihanna'],
+    'Punjabi': ['Diljit Dosanjh', 'Karan Aujla', 'Sidhu Moose Wala', 'AP Dhillon', 'Guru Randhawa', 'Harrdy Sandhu', 'Ammy Virk', 'Shubh', 'B Praak', 'Mankirt Aulakh', 'Garry Sandhu', 'Jass Manak', 'Parmish Verma', 'Gippy Grewal', 'Babbu Maan', 'Gurdas Maan', 'Ranjit Bawa', 'Nimrat Khaira', 'Sunanda Sharma', 'Jasmine Sandlas'],
+    'Bhojpuri': ['Pawan Singh', 'Khesari Lal Yadav', 'Shilpi Raj', 'Nirahua', 'Manoj Tiwari', 'Priyanka Singh', 'Kalpana Patowary', 'Antra Singh Priyanka', 'Ritesh Pandey', 'Pramod Premi Yadav', 'Gunjan Singh', 'Neelkamal Singh', 'Arvind Akela Kallu', 'Ankush Raja', 'Mohan Rathore', 'Bharat Sharma', 'Indu Sonali', 'Mamta Raut', 'Chhaila Bihari', 'Devi'],
+    'Tamil': ['Anirudh Ravichander', 'A.R. Rahman', 'Sid Sriram', 'Ilayaraja', 'S.P. Balasubrahmanyam', 'Vijay Prakash', 'Karthik', 'Yuvan Shankar Raja', 'Hariharan', 'K.S. Chithra', 'Shweta Mohan', 'Sujatha', 'Chinmayi', 'Jonita Gandhi', 'D. Imman', 'Harris Jayaraj', 'G.V. Prakash', 'Deva', 'Vidyasagar', 'Anuradha Sriram'],
+    'Telugu': ['Devi Sri Prasad', 'Thaman S', 'S.P. Balasubrahmanyam', 'K.S. Chithra', 'Sid Sriram', 'M.M. Keeravani', 'Anurag Kulkarni', 'Mangli', 'Sunitha', 'Geetha Madhuri', 'Ram Miriyala', 'Karthik', 'Armaan Malik', 'Shreya Ghoshal', 'Hariharan', 'Mano', 'P. Susheela', 'S. Janaki', 'Rahul Sipligunj', 'Sri Krishna'],
+    'Bengali': ['Arijit Singh', 'Shreya Ghoshal', 'Anupam Roy', 'Rupam Islam', 'Kishore Kumar', 'Nachiketa', 'Anjan Dutt', 'Hemanta Mukherjee', 'Manna Dey', 'Lata Mangeshkar', 'Asha Bhosle', 'Lopamudra Mitra', 'Srikanto Acharya', 'Iman Chakraborty', 'Somlata Acharyya', 'Shaan', 'Babul Supriyo', 'Jeet Gannguli', 'Fossils', 'Chandrabindoo'],
+    'Gujarati': ['Kinjal Dave', 'Geeta Rabari', 'Kirtidan Gadhvi', 'Osman Mir', 'Aditya Gadhvi', 'Aishwarya Majmudar', 'Jignesh Kaviraj', 'Rakesh Barot', 'Vijay Suvada', 'Gaman Santhal', 'Falguni Pathak', 'Darshan Raval', 'Bhoomi Trivedi', 'Parthiv Gohil', 'Sachin-Jigar', 'Arvind Vegda', 'Praful Dave', 'Diwaliben Bhil', 'Hemant Chauhan', 'Urvashi Radadiya'],
+    'Marathi': ['Ajay-Atul', 'Avadhoot Gupte', 'Bela Shende', 'Shreya Ghoshal', 'Swapnil Bandodkar', 'Suresh Wadkar', 'Lata Mangeshkar', 'Asha Bhosle', 'Anuradha Paudwal', 'Arun Date', 'Sudhir Phadke', 'Vaishali Samant', 'Neha Rajpal', 'Nandesh Umap', 'Adarsh Shinde', 'Pravin Kuwar', 'Jasraj Joshi', 'Rohan-Rohan', 'Salil Kulkarni', 'Sandeep Khare'],
+    'Assamese': ['Zubeen Garg', 'Papon', 'Bhupen Hazarika', 'Dikshu', 'Nilotpal Bora', 'Bidyut Bikash', 'Neel Akash', 'Kusum Kailash', 'Vreegu Kashyap', 'Babu Baruah', 'Nirmali Das', 'Bornali Kalita', 'Deeplina Deka', 'Subasana Dutta', 'Madhusmita', 'Joi Barua', 'Sushmita Baruah', 'Khagen Mahanta', 'Ridip Rankit', 'Tarali Sarma']
+  };
 
   selectedMoods: Set<string> = new Set();
   selectedLanguage: string = 'Hindi';
   selectedArtists: Set<string> = new Set();
   customArtist: string = '';
+  showSuggestions: boolean = false;
+
+  get suggestedArtists() {
+    return this.artistsByLanguage[this.selectedLanguage] || [];
+  }
+
+  get filteredSuggestions() {
+    if (!this.customArtist.trim()) return [];
+    const query = this.customArtist.toLowerCase().trim();
+    return this.suggestedArtists.filter(a => a.toLowerCase().includes(query) && !this.selectedArtists.has(a));
+  }
 
   get selectedMoodsArray() { return Array.from(this.selectedMoods); }
   get selectedArtistsArray() { return Array.from(this.selectedArtists); }
@@ -35,6 +56,11 @@ export class DiscoveryPageComponent {
   loadingMessage = '';
   
   results: YouTubeSearchResult[] = [];
+
+  onLanguageChange(lang: string) {
+    this.selectedLanguage = lang;
+    // Optionally, we can clear selected artists if they change language, but let's keep them
+  }
 
   constructor(
     private youtubeApi: YoutubeApiService,
@@ -65,7 +91,20 @@ export class DiscoveryPageComponent {
     if (this.customArtist.trim() && this.selectedArtists.size < 3) {
       this.selectedArtists.add(this.customArtist.trim());
       this.customArtist = '';
+      this.showSuggestions = false;
     }
+  }
+
+  selectSuggestion(artist: string) {
+    if (this.selectedArtists.size < 3) {
+      this.selectedArtists.add(artist);
+      this.customArtist = '';
+      this.showSuggestions = false;
+    }
+  }
+
+  onSearchFocus() {
+    this.showSuggestions = true;
   }
 
   removeArtist(artist: string) {

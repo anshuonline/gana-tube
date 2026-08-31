@@ -146,17 +146,44 @@
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
     border: none;
+    padding: 0 1.2rem;
     border-radius: 8px;
-    padding: 0 1.5rem;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background 0.2s;
     &:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.2);
     }
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+  }
+
+  .suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 80px; /* leaves room for the Add button */
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-top: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+    .suggestion-item {
+      padding: 10px 15px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: rgba(168, 85, 247, 0.2);
+      }
     }
   }
 }
