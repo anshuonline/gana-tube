@@ -340,9 +340,15 @@ export class App implements OnInit {
     if (this.activeMenuTrack()?.videoId === track.videoId) {
       this.closeMenu();
     } else {
-      const target = event.currentTarget as HTMLElement;
-      const rect = target.getBoundingClientRect();
-      this.activeMenuPosition.set({ x: rect.right, y: rect.bottom });
+      if (event.type === 'contextmenu') {
+        // Right-click: Position at mouse coordinates
+        this.activeMenuPosition.set({ x: event.clientX, y: event.clientY });
+      } else {
+        // Left-click on button: Position relative to button
+        const target = event.currentTarget as HTMLElement;
+        const rect = target.getBoundingClientRect();
+        this.activeMenuPosition.set({ x: rect.right, y: rect.bottom });
+      }
       this.activeMenuTrack.set(track);
     }
   }
