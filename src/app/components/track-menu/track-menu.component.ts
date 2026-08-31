@@ -118,9 +118,17 @@ export class TrackMenuComponent implements OnChanges {
     }
     
     // Prevent going off screen to the bottom (open upwards instead)
-    if (finalY + menuHeight > window.innerHeight) {
+    // Account for the minimized player which is ~90px on desktop
+    const playerOffset = this.playerService.currentTrack() ? 90 : 0;
+    const maxAllowedY = window.innerHeight - playerOffset;
+    
+    if (finalY + menuHeight > maxAllowedY) {
       // open upwards (subtract button height roughly 24px and menu height)
       finalY = Math.max(16, this.yPos - menuHeight - 24);
+      // Ensure it still doesn't overlap the player
+      if (finalY + menuHeight > maxAllowedY) {
+        finalY = maxAllowedY - menuHeight;
+      }
     }
 
     this.calculatedX = finalX;
