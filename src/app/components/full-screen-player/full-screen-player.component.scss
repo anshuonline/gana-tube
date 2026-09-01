@@ -78,48 +78,7 @@
   }
 }
 
-.fs-top-tabs {
-  display: flex;
-  gap: 24px;
-  align-items: center;
-  
-  .tab-btn {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    padding: 8px 0;
-    position: relative;
-    transition: color 0.3s;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 2px;
-      background-color: #fff;
-      transition: width 0.3s ease;
-      border-radius: 2px;
-    }
-
-    &:hover {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    &.active {
-      color: #fff;
-      &::after {
-        width: 100%;
-      }
-    }
-  }
-}
 
 .fs-header-text {
   text-align: center;
@@ -168,7 +127,7 @@
   width: 100%;
   max-width: 500px;
   aspect-ratio: 1 / 1;
-  border-radius: 16px;
+  border-radius: 0; // Fixed "round ho raha" issue to match Spotify's perfectly square cover art
   overflow: hidden;
   box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   transition: transform 0.4s ease;
@@ -385,6 +344,17 @@
   }
 }
 
+.track-transition {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.track-changing {
+  opacity: 0 !important;
+  transform: translateY(10px) !important;
+}
+
 .fs-toggle-btn {
   background: transparent;
   border: none;
@@ -453,6 +423,17 @@
   align-items: center;
   margin-top: 8px;
 
+  .side-controls {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 16px;
+    
+    &.right {
+      justify-content: flex-end;
+    }
+  }
+
   .fs-control-btn {
     background: transparent;
     border: none;
@@ -479,7 +460,22 @@
       color: rgba(255,255,255,0.7);
       padding: 12px;
       &:hover { color: #fff; }
-      &.active { color: #fff; }
+      &.active { color: #1db954; } // Active state color for icons
+    }
+    
+    &.view-toggle {
+      position: relative;
+      &.active::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: #1db954;
+      }
     }
   }
 
@@ -508,25 +504,7 @@
   }
 }
 
-.fs-bottom-nav {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  margin-top: 16px;
-  padding-bottom: 16px;
-  
-  .nav-item {
-    font-size: 1rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.5);
-    cursor: pointer;
-    transition: color 0.2s;
-    
-    &:hover {
-      color: rgba(255,255,255,0.8);
-    }
-  }
-}
+
 
 /* List Views */
 .fs-list-view {

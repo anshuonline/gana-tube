@@ -14,7 +14,11 @@ import {
   LucideCar,
   LucideRepeat,
   LucideGripVertical,
-  LucideMonitor
+  LucideMonitor,
+  LucideListMusic,
+  LucideRadio,
+  LucideMinimize2,
+  LucideMusic2
 } from '@lucide/angular';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
@@ -43,6 +47,10 @@ import { SyncService } from '../../services/sync.service';
     LucideRepeat,
     LucideGripVertical,
     LucideMonitor,
+    LucideListMusic,
+    LucideRadio,
+    LucideMinimize2,
+    LucideMusic2,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
@@ -82,11 +90,27 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   
   showCoverAd = false;
   private adTimers: any[] = [];
+  
+  isChanging = false;
+  private changeTimeout: any;
 
   constructor() {
     // Automatically fetch lyrics when track changes if lyrics view is open
+    // Also trigger track transition animation
     effect(() => {
       const track = this.playerService.currentTrack();
+      
+      // Trigger animation
+      if (track) {
+        this.isChanging = true;
+        this.cdr.detectChanges();
+        
+        clearTimeout(this.changeTimeout);
+        this.changeTimeout = setTimeout(() => {
+          this.isChanging = false;
+          this.cdr.detectChanges();
+        }, 300);
+      }
       if (track && this.activeView === 'lyrics') {
         this.fetchLyrics();
       }
