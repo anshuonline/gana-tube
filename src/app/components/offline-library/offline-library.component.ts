@@ -2,17 +2,24 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OfflineService } from '../../services/offline.service';
 import { PlayerService, Track } from '../../services/player.service';
-import { LucidePlay, LucideTrash2, LucideDownload } from '@lucide/angular';
+import { LucidePlay, LucideTrash2, LucideDownload, LucideInfo } from '@lucide/angular';
 
 @Component({
   selector: 'app-offline-library',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideTrash2, LucideDownload],
+  imports: [CommonModule, LucidePlay, LucideTrash2, LucideDownload, LucideInfo],
   template: `
     <div class="offline-library-container fade-in">
       <div class="header">
         <h1 class="page-title">Offline Library</h1>
         <p class="subtitle">Songs you've downloaded to listen without internet.</p>
+      </div>
+
+      <div class="info-notice">
+        <svg lucideInfo [attr.size]="24" class="info-icon"></svg>
+        <div class="notice-text">
+          <strong>Notice:</strong> We are aware that the download option is currently not working. We are actively working on fixing it and it will be available soon!
+        </div>
       </div>
 
       <div class="empty-state" *ngIf="offlineTracks().length === 0">
@@ -72,6 +79,25 @@ import { LucidePlay, LucideTrash2, LucideDownload } from '@lucide/angular';
       color: #9ca3af;
       font-size: 1.1rem;
       margin: 0;
+    }
+
+    .info-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 32px;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.5;
+    }
+    
+    .info-notice .info-icon {
+      color: #eab308;
+      flex-shrink: 0;
+      margin-top: 2px;
     }
 
     .empty-state {

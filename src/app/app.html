@@ -32,7 +32,7 @@
         <svg lucideMessageSquare [attr.size]="24"></svg>
         <span class="sidebar-label">Socials</span>
       </div>
-      <div class="sidebar-item" (click)="openDiscoveryPage()" [class.active]="currentPage() === 'discovery'">
+      <div class="sidebar-item" (click)="openDiscoveryPage()" [class.active]="currentPage() === 'discovery'" style="display: none !important;">
         <svg lucideCompass [attr.size]="24"></svg>
         <span class="sidebar-label">Discovery</span>
       </div>
