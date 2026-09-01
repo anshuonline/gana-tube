@@ -658,26 +658,33 @@ export class PlayerService {
     }
   }
 
+  private lastTickTime = 0;
+
   private startProgressTracking(): void {
     this.stopProgressTracking();
+    this.lastTickTime = Date.now();
     this.progressInterval = setInterval(() => {
+      const now = Date.now();
+      const deltaSeconds = (now - this.lastTickTime) / 1000;
+      this.lastTickTime = now;
+
       if (this.ytPlayer && !this.isRemoteControl()) {
         this.currentTime.set(this.ytPlayer.getCurrentTime() || 0);
         this.duration.set(this.ytPlayer.getDuration() || 0);
         this.broadcastToSync(); // Send to sync service (will be throttled)
         
         // Track listening time for spin wheel (120 seconds = 1 chance)
-        // ONLY if user has exhausted all daily spins (spinsLeft == 0)
-        if (this.playerState() === 'playing' && this.spinService.spinsLeft() === 0) {
-          this.listeningSeconds += 0.5;
+        // ONLY if user has exhausted all daily spins (spinsLeft <= 0)
+        if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
+          this.listeningSeconds += deltaSeconds;
           if (this.listeningSeconds >= 120) {
             this.listeningSeconds = 0; // reset
             this.awardSpinChance();
           }
         }
       } else if (this.isRemoteControl() && this.playerState() === 'playing') {
-        // Increment locally by 0.5s if acting as remote, to keep UI moving
-        this.currentTime.update(t => t + 0.5);
+        // Increment locally by delta if acting as remote, to keep UI moving
+        this.currentTime.update(t => t + deltaSeconds);
       }
     }, 500);
   }
