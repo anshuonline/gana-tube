@@ -1,8 +1,8 @@
-const CACHE_NAME = 'ganatube-v3';
+const CACHE_NAME = 'ganatube-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/ganatube.png',
+  '/ganatubenewlogo.png',
   '/manifest.json'
 ];
 
