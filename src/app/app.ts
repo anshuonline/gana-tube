@@ -30,7 +30,7 @@ import { AdBookingPageComponent } from './components/ad-booking-page/ad-booking-
 import { AdTermsPageComponent } from './components/ad-terms-page/ad-terms-page.component';
 import { AdProhibitedPageComponent } from './components/ad-prohibited-page/ad-prohibited-page.component';
 import { AdminManageSongsComponent } from './components/admin-manage-songs/admin-manage-songs';
-import { PLAYLISTS, PlaylistMeta } from './data/playlists.data';
+import { ALL_PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 import { PwaService } from './services/pwa.service';
 import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-browser';
 import { CarModePlayerComponent } from './components/car-mode-player/car-mode-player.component';
@@ -146,7 +146,7 @@ export class App implements OnInit {
   displayedVideoIds = new Set<string>();
   
   allPlaylists = computed(() => {
-    return [...this.customPlaylists(), ...PLAYLISTS];
+    return [...this.customPlaylists(), ...ALL_PLAYLISTS];
   });
   
   selectedPlaylist = signal<PlaylistMeta | null>(null);
