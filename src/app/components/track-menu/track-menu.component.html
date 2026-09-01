@@ -88,8 +88,12 @@
       <svg lucideMoon [attr.size]="20"></svg> Sleep Timer
     </div>
     
-    <div class="menu-item disabled-item" (click)="download($event)">
-      <svg lucideDownload [attr.size]="20"></svg> Download
+    <div class="menu-item" (click)="download($event)">
+      <svg *ngIf="!isDownloaded()" lucideDownload [attr.size]="20"></svg>
+      <svg *ngIf="isDownloaded()" lucideCheck [attr.size]="20" style="color: #4ade80;"></svg>
+      <span *ngIf="isDownloaded()">Downloaded</span>
+      <span *ngIf="!isDownloaded()">{{ isDownloading() ? 'Downloading...' : 'Download' }}</span>
+      <div *ngIf="isDownloading()" class="spinner-sm" style="margin-left: auto; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #8b5cf6; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
     </div>
     
     <div class="menu-item disabled-item" (click)="startRadio($event)">

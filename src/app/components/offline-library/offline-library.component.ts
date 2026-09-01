@@ -51,10 +51,9 @@ import { LucidePlay, LucideTrash2, LucideDownload } from '@lucide/angular';
   `,
   styles: [`
     .offline-library-container {
-      padding: 32px 24px;
+      padding: 100px 24px 120px 24px;
       max-width: 1200px;
       margin: 0 auto;
-      padding-bottom: 120px;
     }
     
     .header {

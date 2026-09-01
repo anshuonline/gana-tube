@@ -67,16 +67,38 @@ export class OfflineService {
     return URL.createObjectURL(blob);
   }
 
+  private pipedInstances = [
+    'https://pipedapi.kavin.rocks',
+    'https://pipedapi.smnz.de',
+    'https://api.piped.projectsegfau.lt',
+    'https://piped-api.lunar.icu'
+  ];
+
   public async downloadTrack(track: Track, progressCallback?: (progress: number) => void): Promise<boolean> {
     if (this.isDownloaded(track.videoId)) return true;
 
     try {
-      // 1. Get the Piped stream URL
-      const pipedUrl = `https://pipedapi.kavin.rocks/streams/${track.videoId}`;
-      const streamRes = await fetch(pipedUrl).then(res => res.json());
+      // 1. Get the Piped stream URL with fallback
+      let streamRes: any = null;
+      let lastError: any = null;
+      
+      for (const instance of this.pipedInstances) {
+        try {
+          const pipedUrl = `${instance}/streams/${track.videoId}`;
+          const res = await fetch(pipedUrl);
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+          streamRes = await res.json();
+          if (streamRes && streamRes.audioStreams && streamRes.audioStreams.length > 0) {
+            break; // Success
+          }
+        } catch (e) {
+          lastError = e;
+          console.warn(`Failed to fetch from ${instance}`, e);
+        }
+      }
       
       if (!streamRes || !streamRes.audioStreams || streamRes.audioStreams.length === 0) {
-        throw new Error('No audio streams found');
+        throw new Error('No audio streams found. Last error: ' + (lastError?.message || 'Unknown'));
       }
 
       // Find best audio quality (usually m4a or webm)

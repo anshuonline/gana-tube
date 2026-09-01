@@ -17,9 +17,11 @@ import {
   LucideMoon,
   LucideVolumeX,
   LucideVolume1,
-  LucideVolume2
+  LucideVolume2,
+  LucideCheck
 } from '@lucide/angular';
 import { FormsModule } from '@angular/forms';
+import { OfflineService } from '../../services/offline.service';
 
 @Component({
   selector: 'app-track-menu',
@@ -38,7 +40,8 @@ import { FormsModule } from '@angular/forms';
     LucideMoon,
     LucideVolumeX,
     LucideVolume1,
-    LucideVolume2
+    LucideVolume2,
+    LucideCheck
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -64,6 +67,7 @@ export class TrackMenuComponent implements OnChanges {
   public authService = inject(AuthService);
   public userService = inject(UserService);
   public algorithmService = inject(AlgorithmService);
+  public offlineService = inject(OfflineService);
   private router = inject(Router);
 
   isMobile = false;
@@ -267,10 +271,27 @@ export class TrackMenuComponent implements OnChanges {
     event.target.src = 'ganatubenewlogo.png';
   }
 
-  download(event: Event) {
+  isDownloadingState = false;
+
+  async download(event: Event) {
     event.stopPropagation();
-    alert('Download feature coming soon!');
-    this.close();
+    if (this.track && !this.isDownloaded() && !this.isDownloadingState) {
+      this.isDownloadingState = true;
+      try {
+        await this.offlineService.downloadTrack(this.track);
+      } finally {
+        this.isDownloadingState = false;
+      }
+    }
+  }
+
+  isDownloaded(): boolean {
+    if (!this.track) return false;
+    return !!this.offlineService.downloadedTracks()[this.track.videoId];
+  }
+
+  isDownloading(): boolean {
+    return this.isDownloadingState;
   }
 
   startRadio(event: Event) {
