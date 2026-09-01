@@ -45,9 +45,14 @@
       {{ spinResultText() }}
     </div>
     
-    <div class="info-text">
+    <div class="info-text" *ngIf="spinsLeft() > 0">
       <svg lucideInfo [attr.size]="14"></svg>
       Listen to music for 2 minutes to earn a free chance!
+    </div>
+    
+    <div class="info-text reset-timer" *ngIf="spinsLeft() <= 0 && authService.currentUser()">
+      <svg lucideInfo [attr.size]="14"></svg>
+      Listening... {{ formatTime(120 - playerService.listeningSeconds()) }} left for next chance
     </div>
     
     <div class="login-prompt" *ngIf="!authService.currentUser()">

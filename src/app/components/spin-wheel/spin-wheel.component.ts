@@ -12,6 +12,7 @@ export interface WheelStatus {
 }
 
 import { SpinService } from '../../services/spin.service';
+import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-spin-wheel',
@@ -24,6 +25,7 @@ export class SpinWheelComponent implements OnInit {
   authService = inject(AuthService);
   http = inject(HttpClient);
   spinService = inject(SpinService);
+  playerService = inject(PlayerService);
 
   isVisible = signal<boolean>(false);
   isSpinning = signal<boolean>(false);
@@ -36,6 +38,13 @@ export class SpinWheelComponent implements OnInit {
   spinResultText = signal<string>('');
   showCongratsPopup = signal<boolean>(false);
   wonCoinsAmount = signal<number>(0);
+  
+  formatTime(seconds: number): string {
+    if (seconds <= 0) return '00:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
   
   // Base API url
   apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'

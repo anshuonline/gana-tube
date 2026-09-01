@@ -222,13 +222,23 @@
 }
 
 .info-text {
+  text-align: center;
+  color: #a1a1aa;
+  font-size: 0.85rem;
+  margin-top: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  color: #a0a0a0;
-  font-size: 0.85rem;
-  text-align: center;
+  gap: 6px;
+  
+  &.reset-timer {
+    color: #10b981;
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
 }
 
 .login-prompt {

@@ -647,7 +647,7 @@ export class PlayerService {
   }
 
   private http = inject(HttpClient);
-  private listeningSeconds = 0;
+  listeningSeconds = signal<number>(0);
 
   private triggerEngagement(): void {
     const current = this.currentTrack();
@@ -676,9 +676,9 @@ export class PlayerService {
         // Track listening time for spin wheel (120 seconds = 1 chance)
         // ONLY if user has exhausted all daily spins (spinsLeft <= 0)
         if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
-          this.listeningSeconds += deltaSeconds;
-          if (this.listeningSeconds >= 120) {
-            this.listeningSeconds = 0; // reset
+          this.listeningSeconds.update(v => v + deltaSeconds);
+          if (this.listeningSeconds() >= 120) {
+            this.listeningSeconds.set(0); // reset
             this.awardSpinChance();
           }
         }
