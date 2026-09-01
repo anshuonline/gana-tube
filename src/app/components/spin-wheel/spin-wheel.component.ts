@@ -38,6 +38,8 @@ export class SpinWheelComponent implements OnInit {
   spinResultText = signal<string>('');
   showCongratsPopup = signal<boolean>(false);
   wonCoinsAmount = signal<number>(0);
+  wonItemName = signal<string>('');
+  spinResultType = signal<'coins' | 'item' | 'lose'>('lose');
   
   formatTime(seconds: number): string {
     if (seconds <= 0) return '00:00';
@@ -77,6 +79,7 @@ export class SpinWheelComponent implements OnInit {
     this.isVisible.set(true);
     this.spinResultText.set('');
     this.showCongratsPopup.set(false);
+    this.spinResultType.set('lose');
     // Ensure we fetch the latest status when opened
     this.spinService.fetchStatus();
   }
@@ -174,24 +177,30 @@ export class SpinWheelComponent implements OnInit {
             this.spinService.spinsLeft.set(res.spins_left);
             
             // Segments based on user image:
-            // Wheel segments (clockwise rotation means pointer sweeps counter-clockwise):
-            // 0: iPhone, 300: AirPods, 240: G Coins, 180: Better Luck, 120: Rs 500, 60: Amazon
+            // 0: iPhone (center 0, edge 330-30)
+            // 1: AirPods (center 300, edge 270-330)
+            // 2: Rs 500 (center 120, edge 90-150)
+            // 3: Amazon (center 60, edge 30-90)
+            // 4: G Coins (center 240, edge 210-270)
+            // 5: Better Luck (center 180, edge 150-210)
             
             let targetAngle = 0;
-            if (res.segment === 0) {
-              // G Coins (210 to 270)
-              // 268: Barely ticked over from AirPods
-              // 212: Almost fell into Better Luck
-              targetAngle = Math.random() > 0.5 ? 268 : 212;
-              // add a tiny sub-degree randomness so it doesn't look identical every time
-              targetAngle += (Math.random() * 2 - 1);
-            } else {
-              // Better luck next time (150 to 210)
-              // 208: Barely ticked over from G Coins
-              // 152: Almost fell into Rs 500
-              targetAngle = Math.random() > 0.5 ? 208 : 152;
-              targetAngle += (Math.random() * 2 - 1);
+            switch(res.segment) {
+              case 0: // iPhone
+                targetAngle = Math.random() > 0.5 ? 28 : 332; break;
+              case 1: // AirPods
+                targetAngle = Math.random() > 0.5 ? 328 : 272; break;
+              case 2: // Rs 500
+                targetAngle = Math.random() > 0.5 ? 148 : 92; break;
+              case 3: // Amazon
+                targetAngle = Math.random() > 0.5 ? 88 : 32; break;
+              case 4: // G Coins
+                targetAngle = Math.random() > 0.5 ? 268 : 212; break;
+              case 5: // Better Luck
+                targetAngle = Math.random() > 0.5 ? 208 : 152; break;
             }
+            // add a tiny sub-degree randomness so it doesn't look identical every time
+            targetAngle += (Math.random() * 2 - 1);
             
             const currentRot = this.wheelRotation();
             const fullRots = Math.floor(currentRot / 360);
@@ -216,7 +225,8 @@ export class SpinWheelComponent implements OnInit {
               this.isSpinning.set(false);
               this.spinService.gCoins.set(res.g_coins);
               
-              if (res.result === 'win') {
+              if (res.result === 'win_coins') {
+                this.spinResultType.set('coins');
                 this.spinResultText.set(`🎉 You won ${res.coins_won} G Coins!`);
                 this.wonCoinsAmount.set(res.coins_won);
                 this.showCongratsPopup.set(true);
@@ -224,7 +234,17 @@ export class SpinWheelComponent implements OnInit {
                 this.coinAudio.currentTime = 0;
                 this.coinAudio.volume = 1;
                 this.coinAudio.play().catch(e => console.log('Audio play failed', e));
+              } else if (res.result === 'win_item') {
+                this.spinResultType.set('item');
+                this.spinResultText.set(`🎉 You won ${res.item_name}!`);
+                this.wonItemName.set(res.item_name);
+                this.showCongratsPopup.set(true);
+                // Play coin drop sound as victory fanfare
+                this.coinAudio.currentTime = 0;
+                this.coinAudio.volume = 1;
+                this.coinAudio.play().catch(e => console.log('Audio play failed', e));
               } else {
+                this.spinResultType.set('lose');
                 this.spinResultText.set(`Better luck next time!`);
               }
             }, 9000);

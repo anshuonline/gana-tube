@@ -62,7 +62,7 @@
     <!-- Congratulations Popup Overlay -->
     <div class="congrats-popup-overlay" *ngIf="showCongratsPopup()">
       <div class="congrats-card">
-        <div class="congrats-icon">
+        <div class="congrats-icon" *ngIf="spinResultType() === 'coins'">
           <svg viewBox="0 0 100 100" class="g-coin-svg-large" width="80" height="80">
             <circle cx="50" cy="50" r="45" fill="#10b981" stroke="#059669" stroke-width="5"/>
             <circle cx="50" cy="50" r="38" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="4,4"/>
@@ -70,9 +70,28 @@
             <text x="50" y="63" font-family="Arial, sans-serif" font-size="40" font-weight="900" fill="#fff" text-anchor="middle">G</text>
           </svg>
         </div>
+        <div class="congrats-icon" *ngIf="spinResultType() === 'item'">
+          <!-- Generic Gift Icon for physical items -->
+          <svg viewBox="0 0 100 100" class="gift-icon-svg" width="80" height="80">
+            <rect x="25" y="45" width="50" height="45" fill="#8b5cf6" rx="4"/>
+            <rect x="20" y="30" width="60" height="15" fill="#a78bfa" rx="2"/>
+            <rect x="45" y="30" width="10" height="60" fill="#ddd6fe"/>
+            <!-- Bow -->
+            <path d="M50 30 C30 10 30 25 50 30" fill="none" stroke="#a78bfa" stroke-width="6" stroke-linecap="round"/>
+            <path d="M50 30 C70 10 70 25 50 30" fill="none" stroke="#a78bfa" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        
         <h3 class="congrats-title">CONGRATULATIONS!</h3>
-        <p class="congrats-desc">You won <span class="congrats-amount">{{ wonCoinsAmount() }}</span> G Coins!</p>
-        <button class="congrats-collect-btn" (click)="showCongratsPopup.set(false)">COLLECT NOW</button>
+        
+        <p class="congrats-desc" *ngIf="spinResultType() === 'coins'">
+          You won <span class="congrats-amount">{{ wonCoinsAmount() }}</span> G Coins!
+        </p>
+        <p class="congrats-desc" *ngIf="spinResultType() === 'item'">
+          You won <span class="congrats-amount">{{ wonItemName() }}</span>!
+        </p>
+        
+        <button class="congrats-collect-btn" (click)="showCongratsPopup.set(false)">CLAIM NOW</button>
       </div>
     </div>
   </div>

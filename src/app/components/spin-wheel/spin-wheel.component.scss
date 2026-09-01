@@ -261,10 +261,13 @@
 }
 
 /* Custom G Coin SVG */
-.g-coin-svg, .g-coin-svg-large {
+.g-coin-svg, .g-coin-svg-large, .gift-icon-svg {
   display: inline-block;
   vertical-align: middle;
   filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.4));
+}
+.gift-icon-svg {
+  filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.4));
 }
 
 /* Congratulations Popup Overlay */
