@@ -85,12 +85,9 @@ export class OfflineService {
     if (this.isDownloaded(track.videoId)) return true;
 
     try {
-      // 1. Get the stream URL using our custom Python Backend API (Zero Load on Server)
-      // Change this URL to where you host your python script (e.g. Render.com or VPS IP)
-      const pythonApiUrl = 'https://ganatube-python-api.onrender.com'; 
-      // For local testing: const pythonApiUrl = 'http://127.0.0.1:5000';
-      
-      const proxyUrl = `${pythonApiUrl}/api/extract?videoId=${track.videoId}`;
+      // 1. Get the stream URL using our Hostinger Python-PHP wrapper (Zero Load on Server)
+      const backendUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
+      const proxyUrl = `${backendUrl}/python-proxy.php?videoId=${track.videoId}`;
       
       const res = await fetch(proxyUrl);
       if (!res.ok) throw new Error(`Python API error! status: ${res.status}`);
