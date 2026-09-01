@@ -34,26 +34,22 @@
 
 .ambient-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -150px;
+  left: -150px;
+  right: -150px;
+  bottom: -150px;
   background-size: cover;
   background-position: center;
-  filter: blur(40px) saturate(200%);
-  opacity: 0.4;
-  z-index: -2;
+  filter: blur(120px) brightness(0.6) saturate(1.8);
+  opacity: 0.6;
   pointer-events: none;
+  transition: background-image 0.5s ease-in-out;
 }
 
 .ambient-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.8) 100%);
-  z-index: -1;
   pointer-events: none;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -392,8 +388,10 @@
     .control-buttons {
       button:nth-child(1),
       button:nth-child(2),
-      button:nth-child(5) {
-        display: none !important; // Hide shuffle, prev, repeat on small bar
+      button:nth-child(3),
+      button:nth-child(4),
+      button:nth-child(7) {
+        display: none !important; // Hide everything except play/pause and next on mobile
       }
     }
   }
@@ -404,9 +402,10 @@
     justify-content: flex-end !important;
     gap: 4px !important;
 
-    button:nth-child(2),
+    .time-display,
+    button:not(.maximize-btn),
     input.volume-slider {
-      display: none !important; // Hide mute and volume slider on small bar
+      display: none !important; // Hide mute, share, queue, time on small bar
     }
 
     .maximize-btn {
@@ -464,6 +463,21 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.ambient-bg {
+  position: absolute;
+  top: -100px;
+  left: -100px;
+  right: -100px;
+  bottom: -100px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(80px) brightness(0.6) saturate(1.8);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.6;
+  transition: background-image 0.5s ease-in-out;
 }
 
 .ambient-glow-bg {

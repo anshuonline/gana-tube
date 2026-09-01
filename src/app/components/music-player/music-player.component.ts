@@ -64,9 +64,11 @@ import { SyncService } from '../../services/sync.service';
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
       
-      <!-- Ambient Background -->
-      <div class="ambient-bg" *ngIf="playerService.currentTrack()?.thumbnail" [style.backgroundImage]="'url(' + (playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail) + ')'"></div>
-      <div class="ambient-overlay"></div>
+      <!-- Ambient Background Wrapper to contain blur -->
+      <div class="ambient-bg-wrapper" style="position: absolute; inset: 0; overflow: hidden; z-index: -2; border-radius: inherit;">
+        <div class="ambient-bg" *ngIf="playerService.currentTrack()?.thumbnail" [style.backgroundImage]="'url(' + (playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail) + ')'"></div>
+        <div class="ambient-overlay"></div>
+      </div>
 
       <!-- Full Width Progress Bar at Top -->
       <div class="progress-section full-width-progress">
