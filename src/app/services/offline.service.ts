@@ -86,25 +86,20 @@ export class OfflineService {
 
     try {
       // 1. Get the stream URL using our Hostinger Python-PHP wrapper (Zero Load on Server)
+      // Stream the file directly through PHP to bypass Google's CORS restrictions
       const backendUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
-      const proxyUrl = `${backendUrl}/python-proxy.php?videoId=${track.videoId}`;
+      const proxyUrl = `${backendUrl}/python-proxy.php?videoId=${track.videoId}&download=1`;
       
-      const res = await fetch(proxyUrl);
-      if (!res.ok) throw new Error(`Python API error! status: ${res.status}`);
-      const streamRes = await res.json();
+      const response = await fetch(proxyUrl);
       
-      if (streamRes.error) {
-        throw new Error(streamRes.error);
+      if (!response.ok) {
+        let errorMsg = 'Failed to download audio file';
+        try {
+          const streamRes = await response.json();
+          if (streamRes.error) errorMsg = streamRes.error;
+        } catch (e) {}
+        throw new Error(errorMsg);
       }
-
-      if (!streamRes.streamUrl) {
-        throw new Error('No audio stream URL returned from Python API.');
-      }
-
-      // 2. Download the actual audio file directly from Google Servers
-      const response = await fetch(streamRes.streamUrl);
-      
-      if (!response.ok) throw new Error('Failed to download audio file');
       
       // Simulate progress if content-length is available
       const contentLength = response.headers.get('content-length');
@@ -128,7 +123,7 @@ export class OfflineService {
         }
       }
 
-      const blob = new Blob(chunks as any, { type: streamRes.ext === 'webm' ? 'audio/webm' : 'audio/mp4' });
+      const blob = new Blob(chunks as any, { type: 'audio/mp4' });
 
       // 3. Save to IndexedDB
       await this.audioStore.setItem(track.videoId, blob);
