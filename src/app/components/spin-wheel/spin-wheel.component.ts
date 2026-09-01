@@ -178,30 +178,30 @@ export class SpinWheelComponent implements OnInit {
           if (res.status === 'success') {
             this.spinService.spinsLeft.set(res.spins_left);
             
-            // Segments based on user image:
-            // 0: iPhone (center 0, edge 330-30)
-            // 1: AirPods (center 300, edge 270-330)
-            // 2: Rs 500 (center 120, edge 90-150)
-            // 3: Amazon (center 60, edge 30-90)
-            // 4: G Coins (center 240, edge 210-270)
-            // 5: Better Luck (center 180, edge 150-210)
+            // Segments based on user image (clockwise from top):
+            // 0-60: G Coins (segment 4) -> Center 30
+            // 60-120: AirPods (segment 1) -> Center 90
+            // 120-180: iPhone 17 Pro (segment 0) -> Center 150
+            // 180-240: Amazon (segment 3) -> Center 210
+            // 240-300: Rs 500 (segment 2) -> Center 270
+            // 300-360: Better Luck (segment 5) -> Center 330
             
             let targetAngle = 0;
             switch(res.segment) {
               case 0: // iPhone
-                targetAngle = Math.random() > 0.5 ? 28 : 332; break;
+                targetAngle = Math.random() > 0.5 ? 130 : 170; break;
               case 1: // AirPods
-                targetAngle = Math.random() > 0.5 ? 328 : 272; break;
+                targetAngle = Math.random() > 0.5 ? 70 : 110; break;
               case 2: // Rs 500
-                targetAngle = Math.random() > 0.5 ? 148 : 92; break;
+                targetAngle = Math.random() > 0.5 ? 250 : 290; break;
               case 3: // Amazon
-                targetAngle = Math.random() > 0.5 ? 88 : 32; break;
+                targetAngle = Math.random() > 0.5 ? 190 : 230; break;
               case 4: // G Coins
-                targetAngle = Math.random() > 0.5 ? 268 : 212; break;
+                targetAngle = Math.random() > 0.5 ? 10 : 50; break;
               case 5: // Better Luck
-                targetAngle = Math.random() > 0.5 ? 208 : 152; break;
+                targetAngle = Math.random() > 0.5 ? 310 : 350; break;
             }
-            // add a tiny sub-degree randomness so it doesn't look identical every time
+            // add a tiny sub-degree randomness
             targetAngle += (Math.random() * 2 - 1);
             
             const currentRot = this.wheelRotation();
