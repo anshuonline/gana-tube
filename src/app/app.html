@@ -24,6 +24,10 @@
         <svg lucideLibrary [attr.size]="24"></svg>
         <span class="sidebar-label">Library</span>
       </div>
+      <div class="sidebar-item" (click)="openOfflineLibraryPage()" [class.active]="currentPage() === 'offline'">
+        <svg lucideDownload [attr.size]="24"></svg>
+        <span class="sidebar-label">Downloads</span>
+      </div>
       <div class="sidebar-item" (click)="openSocialsPage()" [class.active]="currentPage() === 'socials'">
         <svg lucideMessageSquare [attr.size]="24"></svg>
         <span class="sidebar-label">Socials</span>
@@ -236,6 +240,10 @@
       (onOpenCustomPlaylist)="openCustomPlaylist($event)" 
       (onTogglePlaylistMenu)="togglePlaylistMenu($event.playlist, $event.event)">
     </app-library-page>
+
+    <app-offline-library 
+      *ngIf="currentPage() === 'offline'">
+    </app-offline-library>
 
     <div *ngIf="currentPage() === 'socials'" class="socials-page">
       <h1 class="socials-title">Follow GanaTube</h1>

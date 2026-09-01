@@ -39,6 +39,7 @@ import { FeedbackPopupComponent } from './components/feedback-popup/feedback-pop
 import { ShortsPageComponent } from './components/shorts-page/shorts-page.component';
 import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
 import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
+import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -89,7 +90,8 @@ export interface SponsoredAd {
     ShortsPageComponent,
     DiscoveryPageComponent,
     SpinWheelComponent,
-    LucideGift
+    LucideGift,
+    OfflineLibraryComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -797,7 +799,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'discovery'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'discovery', 'offline'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {
@@ -824,7 +826,7 @@ export class App implements OnInit {
         this.router.navigate(['/']);
       }
 
-      if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials' || url === 'discovery') {
+      if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials' || url === 'discovery' || url === 'offline') {
         this.updateSEO(
           'Free Music Online Without Ads | Best Online Music App - GanaTube',
           'Play free music online without ads and without login on GanaTube. Enjoy the best free music app in India for streaming seamless, ad-free online music instantly.'
@@ -915,6 +917,11 @@ export class App implements OnInit {
   openLibraryPage() {
     this.closeMobileMenu();
     this.router.navigate(['/library']);
+  }
+
+  openOfflineLibraryPage() {
+    this.closeMobileMenu();
+    this.router.navigate(['/offline']);
   }
 
   openSocialsPage() {

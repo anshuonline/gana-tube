@@ -11,6 +11,8 @@ import { SyncService, SyncState } from './sync.service';
 import { ToastService } from './toast.service';
 import { SpinService } from './spin.service';
 
+import { OfflineService } from './offline.service';
+
 export interface Track extends YouTubeSearchResult {}
 
 export type PlayerState = 'unstarted' | 'loading' | 'playing' | 'paused' | 'ended';
@@ -26,6 +28,7 @@ export class PlayerService {
   private authService = inject(AuthService);
   public syncService = inject(SyncService);
   private spinService = inject(SpinService);
+  public offlineService = inject(OfflineService);
   private trackStartTime: number = 0;
   private isFetchingMore = false;
   private isRemoteUpdate = false;
@@ -118,6 +121,11 @@ export class PlayerService {
   // YouTube Player reference (set by the YT player component)
   private ytPlayer: any = null;
   private progressInterval: any = null;
+
+  // HTML5 Audio for Offline Playback
+  private htmlAudio: HTMLAudioElement | null = null;
+  private isPlayingOffline = signal<boolean>(false);
+  private currentOfflineBlobUrl: string | null = null;
 
   // Sleep Timer State
   showSleepModal = signal<boolean>(false);
@@ -322,6 +330,16 @@ export class PlayerService {
   }
 
   togglePlayPause(): void {
+    if (this.isPlayingOffline()) {
+      if (this.playerState() === 'playing') {
+        this.pause();
+      } else {
+        this.htmlAudio?.play();
+        this.broadcastPlaybackSync(true);
+      }
+      return;
+    }
+    
     if (!this.ytPlayer) return;
     if (this.playerState() === 'playing') {
       this.pause();
@@ -332,6 +350,11 @@ export class PlayerService {
   }
 
   pause(): void {
+    if (this.isPlayingOffline()) {
+      this.htmlAudio?.pause();
+      this.broadcastPlaybackSync(false);
+      return;
+    }
     if (!this.ytPlayer) return;
     this.ytPlayer.pauseVideo();
     this.broadcastPlaybackSync(false);
@@ -424,7 +447,12 @@ export class PlayerService {
       if (newQueue.length === 0) {
         this.currentIndex.set(-1);
         this.playerState.set('unstarted');
-        if (this.ytPlayer) this.ytPlayer.stopVideo();
+        if (this.isPlayingOffline() && this.htmlAudio) {
+          this.htmlAudio.pause();
+          this.htmlAudio.src = '';
+        } else if (this.ytPlayer) {
+          this.ytPlayer.stopVideo();
+        }
       } else {
         const nextIdx = index >= newQueue.length ? newQueue.length - 1 : index;
         this.currentIndex.set(nextIdx);
@@ -436,6 +464,19 @@ export class PlayerService {
   }
 
   seekTo(seconds: number): void {
+    if (this.isPlayingOffline() && this.htmlAudio) {
+      this.htmlAudio.currentTime = seconds;
+      this.broadcastToSync(true);
+      if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
+        this.roomService.getSocket().emit('sync_playback', {
+          roomId: this.roomService.currentRoom(),
+          isPlaying: this.playerState() === 'playing',
+          currentTime: seconds
+        });
+      }
+      return;
+    }
+    
     if (this.ytPlayer) {
       this.ytPlayer.seekTo(seconds, true);
       this.broadcastToSync(true);
@@ -452,6 +493,15 @@ export class PlayerService {
 
   setVolume(value: number): void {
     this.volume.set(value);
+    
+    if (this.isPlayingOffline() && this.htmlAudio) {
+      this.htmlAudio.volume = value / 100;
+      if (value > 0 && this.isMuted()) {
+        this.isMuted.set(false);
+        this.htmlAudio.muted = false;
+      }
+    }
+    
     if (this.ytPlayer) {
       this.ytPlayer.setVolume(value);
       if (value > 0 && this.isMuted()) {
@@ -478,9 +528,14 @@ export class PlayerService {
   }
 
   toggleMute(): void {
-    if (!this.ytPlayer) return;
     const muted = !this.isMuted();
     this.isMuted.set(muted);
+    
+    if (this.isPlayingOffline() && this.htmlAudio) {
+      this.htmlAudio.muted = muted;
+    }
+    
+    if (!this.ytPlayer) return;
     if (muted) {
       this.ytPlayer.mute();
     } else {
@@ -525,34 +580,90 @@ export class PlayerService {
     }
   }
 
-  private loadInPlayer(videoId: string): void {
-    if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
-      this.ytPlayer.loadVideoById(videoId);
-      
-      const current = this.currentTrack();
-      
-      // Add to recent plays (History) whenever a new track loads
-      if (current) {
-        const user = this.authService.currentUser();
-        if (user && user.email) {
-          this.userService.addRecentPlay(user.email, current, this.userService.preferredLanguages());
-        }
-      }
+  private initHtmlAudio(): void {
+    if (this.htmlAudio) return;
+    this.htmlAudio = new Audio();
+    this.htmlAudio.addEventListener('timeupdate', () => {
+      this.currentTime.set(this.htmlAudio!.currentTime);
+    });
+    this.htmlAudio.addEventListener('ended', () => {
+      this.playerState.set('ended');
+      this.currentTime.set(0);
+      this.handleTrackEnd();
+    });
+    this.htmlAudio.addEventListener('play', () => {
+      this.playerState.set('playing');
+      this.duration.set(this.htmlAudio!.duration || 0);
+    });
+    this.htmlAudio.addEventListener('pause', () => {
+      this.playerState.set('paused');
+    });
+    this.htmlAudio.addEventListener('loadedmetadata', () => {
+      this.duration.set(this.htmlAudio!.duration || 0);
+    });
+  }
 
-      if (!this.isRemoteUpdate && current && this.roomService.currentRoom()) {
-        this.roomService.getSocket().emit('play_track', { 
-          roomId: this.roomService.currentRoom(), 
-          track: current
-        });
-        // also sync queue when song auto-changes
-        this.roomService.getSocket().emit('sync_queue', {
-          roomId: this.roomService.currentRoom(),
-          queue: this.queue(),
-          currentIndex: this.currentIndex()
-        });
+  private async loadInPlayer(videoId: string): Promise<void> {
+    const current = this.currentTrack();
+    this.initHtmlAudio();
+
+    if (this.offlineService.isDownloaded(videoId)) {
+      this.isPlayingOffline.set(true);
+      if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
+        this.ytPlayer.stopVideo(); // Stop youtube player
+      }
+      
+      const blobUrl = await this.offlineService.getTrackBlobUrl(videoId);
+      if (blobUrl) {
+        if (this.currentOfflineBlobUrl) URL.revokeObjectURL(this.currentOfflineBlobUrl);
+        this.currentOfflineBlobUrl = blobUrl;
+        this.htmlAudio!.src = blobUrl;
+        this.htmlAudio!.volume = this.volume() / 100;
+        this.htmlAudio!.muted = this.isMuted();
+        
+        try {
+          await this.htmlAudio!.play();
+        } catch(e) {
+          console.error('Failed to play offline audio', e);
+        }
+      } else {
+        // Fallback to youtube if blob loading failed
+        this.isPlayingOffline.set(false);
+        this.loadInYtPlayer(videoId);
+      }
+    } else {
+      this.isPlayingOffline.set(false);
+      this.htmlAudio!.pause();
+      this.htmlAudio!.src = '';
+      this.loadInYtPlayer(videoId);
+    }
+
+    if (current) {
+      const user = this.authService.currentUser();
+      if (user && user.email) {
+        this.userService.addRecentPlay(user.email, current, this.userService.preferredLanguages());
       }
     }
+
+    if (!this.isRemoteUpdate && current && this.roomService.currentRoom()) {
+      this.roomService.getSocket().emit('play_track', { 
+        roomId: this.roomService.currentRoom(), 
+        track: current
+      });
+      // also sync queue when song auto-changes
+      this.roomService.getSocket().emit('sync_queue', {
+        roomId: this.roomService.currentRoom(),
+        queue: this.queue(),
+        currentIndex: this.currentIndex()
+      });
+    }
     this.isRemoteUpdate = false;
+  }
+
+  private loadInYtPlayer(videoId: string): void {
+    if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
+      this.ytPlayer.loadVideoById(videoId);
+    }
   }
 
   private fetchMoreTracksIfNeeded(): void {

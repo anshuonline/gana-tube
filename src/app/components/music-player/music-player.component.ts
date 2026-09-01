@@ -20,12 +20,15 @@ import {
   LucideHeart,
   LucideShare2,
   LucideMoon,
-  LucideMonitor
+  LucideMonitor,
+  LucideDownload,
+  LucideCheck
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { OfflineService } from '../../services/offline.service';
 
 import { SyncService } from '../../services/sync.service';
 
@@ -53,7 +56,9 @@ import { SyncService } from '../../services/sync.service';
     LucideHeart,
     LucideShare2,
     LucideMoon,
-    LucideMonitor
+    LucideMonitor,
+    LucideDownload,
+    LucideCheck
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
@@ -92,6 +97,20 @@ import { SyncService } from '../../services/sync.service';
             *ngIf="playerService.currentTrack() !== null"
           >
             <svg lucideHeart [attr.size]="18" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+          </button>
+          <button
+            class="ctrl-btn secondary"
+            [class.active]="isDownloaded()"
+            [class.loading]="isDownloading()"
+            (click)="toggleDownload($event)"
+            [title]="isDownloaded() ? 'Downloaded (Available Offline)' : 'Download for Offline'"
+            *ngIf="playerService.currentTrack() !== null"
+          >
+            <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;" *ngIf="isDownloading()"></div>
+            <ng-container *ngIf="!isDownloading()">
+              <svg *ngIf="!isDownloaded()" lucideDownload [attr.size]="18"></svg>
+              <svg *ngIf="isDownloaded()" lucideCheck [attr.size]="18" class="text-green-500" stroke="#10b981"></svg>
+            </ng-container>
           </button>
           <button
             class="ctrl-btn secondary"
@@ -340,6 +359,21 @@ import { SyncService } from '../../services/sync.service';
               <svg lucideShuffle [attr.size]="28"></svg>
             </button>
 
+            <button
+              class="fs-ctrl-btn secondary"
+              [class.active]="isDownloaded()"
+              [class.loading]="isDownloading()"
+              (click)="toggleDownload($event)"
+              [title]="isDownloaded() ? 'Downloaded (Available Offline)' : 'Download for Offline'"
+              *ngIf="playerService.currentTrack() !== null"
+            >
+              <div class="spinner" style="width: 20px; height: 20px; border-width: 2px;" *ngIf="isDownloading()"></div>
+              <ng-container *ngIf="!isDownloading()">
+                <svg *ngIf="!isDownloaded()" lucideDownload [attr.size]="28"></svg>
+                <svg *ngIf="isDownloaded()" lucideCheck [attr.size]="28" class="text-green-500" stroke="#10b981"></svg>
+              </ng-container>
+            </button>
+
             <button class="fs-ctrl-btn" (click)="playerService.previous()" title="Previous">
               <svg lucideSkipBack [attr.size]="36"></svg>
             </button>
@@ -445,14 +479,44 @@ export class MusicPlayerComponent implements OnDestroy {
   showFSQueue = signal<boolean>(false);
   showToast = signal<boolean>(false);
   customSleepTime = signal<number>(30);
+  isDownloading = signal<boolean>(false);
 
   constructor(
     public playerService: PlayerService,
     public algorithmService: AlgorithmService,
     private userService: UserService,
     public authService: AuthService,
-    public syncService: SyncService
+    public syncService: SyncService,
+    public offlineService: OfflineService
   ) {}
+
+  isDownloaded(): boolean {
+    const track = this.playerService.currentTrack();
+    if (!track) return false;
+    return this.offlineService.isDownloaded(track.videoId);
+  }
+
+  async toggleDownload(event: Event): Promise<void> {
+    event.stopPropagation();
+    const track = this.playerService.currentTrack();
+    if (!track) return;
+    
+    if (this.isDownloaded()) {
+      // If already downloaded, maybe remove it?
+      if (confirm('Remove this song from offline library?')) {
+        await this.offlineService.removeTrack(track.videoId);
+      }
+    } else {
+      if (this.isDownloading()) return;
+      this.isDownloading.set(true);
+      const success = await this.offlineService.downloadTrack(track);
+      this.isDownloading.set(false);
+      
+      if (!success) {
+        alert('Failed to download song. Please check your internet connection.');
+      }
+    }
+  }
 
   toggleDevices(): void {
     this.showDevices.set(!this.showDevices());
