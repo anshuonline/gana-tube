@@ -106,7 +106,7 @@ import { SyncService } from '../../services/sync.service';
 
       <!-- Center: Controls -->
       <div class="player-center">
-        <div class="main-controls">
+        <div class="control-buttons">
           <button
             class="ctrl-btn secondary"
             [class.active]="isCurrentTrackLiked()"
