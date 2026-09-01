@@ -189,19 +189,19 @@ export class SpinWheelComponent implements OnInit {
             let targetAngle = 0;
             switch(res.segment) {
               case 0: // iPhone
-                targetAngle = Math.random() > 0.5 ? 28 : 332; break;
+                targetAngle = Math.random() > 0.5 ? 24 : 336; break;
               case 1: // AirPods
-                targetAngle = Math.random() > 0.5 ? 328 : 272; break;
+                targetAngle = Math.random() > 0.5 ? 324 : 276; break;
               case 2: // Rs 500
-                targetAngle = Math.random() > 0.5 ? 148 : 92; break;
+                targetAngle = Math.random() > 0.5 ? 144 : 96; break;
               case 3: // Amazon
-                targetAngle = Math.random() > 0.5 ? 88 : 32; break;
+                targetAngle = Math.random() > 0.5 ? 84 : 36; break;
               case 4: // G Coins
-                targetAngle = Math.random() > 0.5 ? 268 : 212; break;
+                targetAngle = Math.random() > 0.5 ? 264 : 216; break;
               case 5: // Better Luck
-                targetAngle = Math.random() > 0.5 ? 208 : 152; break;
+                targetAngle = Math.random() > 0.5 ? 204 : 156; break;
             }
-            // add a tiny sub-degree randomness so it doesn't look identical every time
+            // add a tiny sub-degree randomness
             targetAngle += (Math.random() * 2 - 1);
             
             const currentRot = this.wheelRotation();
