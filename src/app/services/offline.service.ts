@@ -88,17 +88,46 @@ export class OfflineService {
       // 1. Get the stream URL using our Hostinger Python-PHP wrapper (Zero Load on Server)
       // Stream the file directly through PHP to bypass Google's CORS restrictions
       const backendUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
-      const proxyUrl = `${backendUrl}/python-proxy.php?videoId=${track.videoId}&download=1`;
+      
+      // 1. Fetch stream URL from public API directly via frontend browser to bypass Cloudflare
+      const pipedInstances = [
+        'https://pipedapi.kavin.rocks',
+        'https://pipedapi.smnz.de',
+        'https://piapi.ggtyler.dev',
+        'https://pipedapi.in.projectsegfau.lt'
+      ];
+      
+      let streamUrl = null;
+      
+      // Try instances until one works
+      for (const instance of pipedInstances) {
+        try {
+          const apiRes = await fetch(`${instance}/streams/${track.videoId}`);
+          if (apiRes.ok) {
+            const data = await apiRes.json();
+            // Find m4a audio stream
+            const m4aStream = data.audioStreams.find((s: any) => s.format === 'M4A' || s.mimeType?.includes('audio/mp4'));
+            if (m4aStream && m4aStream.url) {
+              streamUrl = m4aStream.url;
+              break;
+            }
+          }
+        } catch (e) {
+          console.warn(`Piped instance ${instance} failed`, e);
+        }
+      }
+      
+      if (!streamUrl) {
+        throw new Error('Failed to extract audio. Servers might be overloaded.');
+      }
+      
+      // 2. Stream the actual audio bytes through our PHP proxy to bypass CORS restrictions
+      const proxyUrl = `${backendUrl}/python-proxy.php?streamUrl=${encodeURIComponent(streamUrl)}`;
       
       const response = await fetch(proxyUrl);
       
       if (!response.ok) {
-        let errorMsg = 'Failed to download audio file';
-        try {
-          const streamRes = await response.json();
-          if (streamRes.error) errorMsg = streamRes.error;
-        } catch (e) {}
-        throw new Error(errorMsg);
+        throw new Error('Failed to download audio file');
       }
       
       // Simulate progress if content-length is available
