@@ -104,12 +104,22 @@ import { SyncService } from '../../services/sync.service';
         </div>
       </div>
 
+      <!-- Hidden SVG Defs for Gradients -->
+      <svg width="0" height="0" style="position: absolute;">
+        <defs>
+          <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff4b4b" />
+            <stop offset="100%" stop-color="#ff007f" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <!-- Center: Controls -->
       <div class="player-center">
         <div class="control-buttons">
           <button
             class="ctrl-btn secondary"
-            [class.active]="isCurrentTrackLiked()"
+            [class.active-heart]="isCurrentTrackLiked()"
             (click)="toggleLike($event)"
             title="Like"
             *ngIf="playerService.currentTrack() !== null"
@@ -277,25 +287,26 @@ import { SyncService } from '../../services/sync.service';
 
       <!-- Header Controls -->
       <div class="fs-header">
-        <div class="logo" style="display: flex; align-items: center; gap: 8px;">
-          <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 32px; width: auto;" />
-          <span class="logo-text" style="font-size: 1.3rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">Tube.in</span>
+        <button class="fs-close-btn" (click)="toggleFullScreen()" title="Minimize">
+          <svg lucideChevronDown [attr.size]="28"></svg>
+        </button>
+        <div class="fs-header-title">
+          <span class="fs-now-playing-label" style="font-size: 0.75rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.7); text-transform: uppercase; font-weight: 700; display: block; text-align: center;">NOW PLAYING</span>
+          <span class="fs-now-playing-artist" style="font-size: 0.9rem; font-weight: 700; color: #fff; display: block; text-align: center;">{{ playerService.currentTrack()?.channelTitle }}</span>
         </div>
         <div style="display: flex; gap: 16px;">
-          <button class="fs-close-btn" [class.active]="showFSQueue()" (click)="toggleFSQueue()" title="Toggle Queue">
+          <!-- Placeholder for Cast/Options if needed -->
+          <button class="fs-close-btn" [class.active]="showFSQueue()" (click)="toggleFSQueue()" title="Up Next / Queue">
             <svg lucideListMusic [attr.size]="24"></svg>
-          </button>
-          <button class="fs-close-btn" (click)="toggleFullScreen()" title="Exit Fullscreen">
-            <svg lucideMinimize2 [attr.size]="24"></svg>
           </button>
         </div>
       </div>
 
-      <!-- Main Content Grid -->
+      <!-- Main Content Container -->
       <div class="fs-container" [class.with-queue]="showFSQueue()">
-        <!-- Left Pane: Large Modern Cover Art (80% size) -->
-        <div class="fs-vinyl-section" *ngIf="!showFSQueue()">
-          <div class="fs-cover-card" *ngIf="playerService.currentTrack() as track" (click)="onCoverClick($event)">
+        <!-- Center Pane: Large Square Cover Art -->
+        <div class="fs-cover-container" *ngIf="!showFSQueue() && playerService.currentTrack() as track" (click)="onCoverClick($event)">
+          <div class="fs-cover-card">
             <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" referrerpolicy="no-referrer" />
             
             <div class="heart-animation-overlay" *ngIf="showLikeAnimation()">
@@ -304,7 +315,7 @@ import { SyncService } from '../../services/sync.service';
           </div>
         </div>
 
-        <!-- Left Pane replacement: Queue list if toggled inside FS -->
+        <!-- Center Pane replacement: Queue list if toggled inside FS -->
         <div class="fs-queue-section" *ngIf="showFSQueue()">
           <div class="fs-queue-header">
             <h2>Queue List</h2>
@@ -329,11 +340,22 @@ import { SyncService } from '../../services/sync.service';
           </div>
         </div>
 
-        <!-- Right Pane: Large Controls & Track Information -->
-        <div class="fs-info-section">
-          <div class="track-header" *ngIf="playerService.currentTrack() as track">
-            <h1 class="track-title-large" [title]="track.title">{{ track.title }}</h1>
-            <p class="track-artist-large">{{ track.channelTitle }}</p>
+        <!-- Controls Section (Below Cover) -->
+        <div class="fs-controls-section" *ngIf="!showFSQueue()">
+          
+          <div class="fs-track-info-row" *ngIf="playerService.currentTrack() as track">
+            <div class="fs-track-text">
+              <h1 class="track-title-large" [title]="track.title">{{ track.title }}</h1>
+              <p class="track-artist-large">{{ track.channelTitle }}</p>
+            </div>
+            <button
+              class="fs-like-btn"
+              [class.active-heart]="isCurrentTrackLiked()"
+              (click)="toggleLike($event)"
+              title="Like"
+            >
+              <svg lucideHeart [attr.size]="28" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+            </button>
           </div>
 
           <!-- Large Progress Scrubber -->
@@ -348,43 +370,19 @@ import { SyncService } from '../../services/sync.service';
             </div>
           </div>
 
-          <!-- Huge Dash Buttons -->
+          <!-- Main Playback Controls -->
           <div class="fs-dashboard-controls">
-            <button
-              class="fs-ctrl-btn secondary"
-              [class.active]="isCurrentTrackLiked()"
-              (click)="toggleLike($event)"
-              title="Like"
-            >
-              <svg lucideHeart [attr.size]="28" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
-            </button>
-
             <button
               class="fs-ctrl-btn secondary"
               [class.active]="playerService.isShuffled()"
               (click)="playerService.toggleShuffle()"
               title="Shuffle"
             >
-              <svg lucideShuffle [attr.size]="28"></svg>
-            </button>
-
-            <button
-              class="fs-ctrl-btn secondary"
-              [class.active]="isDownloaded()"
-              [class.loading]="isDownloading()"
-              (click)="toggleDownload($event)"
-              [title]="isDownloaded() ? 'Downloaded (Available Offline)' : 'Download for Offline'"
-              *ngIf="playerService.currentTrack() !== null"
-            >
-              <div class="spinner" style="width: 20px; height: 20px; border-width: 2px;" *ngIf="isDownloading()"></div>
-              <ng-container *ngIf="!isDownloading()">
-                <svg *ngIf="!isDownloaded()" lucideDownload [attr.size]="28"></svg>
-                <svg *ngIf="isDownloaded()" lucideCheck [attr.size]="28" class="text-green-500" stroke="#10b981"></svg>
-              </ng-container>
+              <svg lucideShuffle [attr.size]="24"></svg>
             </button>
 
             <button class="fs-ctrl-btn" (click)="playerService.previous()" title="Previous">
-              <svg lucideSkipBack [attr.size]="36"></svg>
+              <svg lucideSkipBack [attr.size]="36" fill="currentColor"></svg>
             </button>
 
             <button
@@ -393,15 +391,15 @@ import { SyncService } from '../../services/sync.service';
               (click)="playerService.togglePlayPause()"
               title="Play/Pause"
             >
-              <div class="spinner" style="width: 32px; height: 32px; border-width: 3px;" *ngIf="playerService.playerState() === 'loading'"></div>
+              <div class="spinner dark" style="width: 32px; height: 32px; border-width: 3px;" *ngIf="playerService.playerState() === 'loading'"></div>
               <ng-container *ngIf="playerService.playerState() !== 'loading'">
-                <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="42"></svg>
-                <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="42"></svg>
+                <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="42" fill="#000" color="#000"></svg>
+                <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="42" fill="#000" color="#000" style="margin-left: 4px;"></svg>
               </ng-container>
             </button>
 
             <button class="fs-ctrl-btn" (click)="playerService.next()" title="Next">
-              <svg lucideSkipForward [attr.size]="36"></svg>
+              <svg lucideSkipForward [attr.size]="36" fill="currentColor"></svg>
             </button>
 
             <button
@@ -410,28 +408,18 @@ import { SyncService } from '../../services/sync.service';
               (click)="playerService.toggleRepeat()"
               [title]="'Repeat: ' + playerService.repeatMode()"
             >
-              <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="28"></svg>
-              <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="28"></svg>
+              <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="24"></svg>
+              <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="24"></svg>
             </button>
+          </div>
+          
+          <!-- Bottom Additional Actions -->
+          <div class="fs-bottom-actions" style="display: flex; justify-content: center; gap: 32px; margin-top: 32px; opacity: 0.8;">
+             <button class="fs-text-btn" (click)="toggleFSQueue()" style="background: none; border: none; color: #fff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; letter-spacing: 0.05em;">Up Next</button>
+             <button class="fs-text-btn" style="background: none; border: none; color: #fff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; letter-spacing: 0.05em;">Lyrics</button>
+             <button class="fs-text-btn" style="background: none; border: none; color: #fff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; letter-spacing: 0.05em;">Related</button>
           </div>
 
-          <!-- Large Volume Slider -->
-          <div class="fs-volume-wrap">
-            <button class="fs-ctrl-btn secondary" (click)="playerService.toggleMute()" title="Mute">
-              <svg *ngIf="playerService.isMuted() || playerService.volume() === 0" lucideVolumeX [attr.size]="24"></svg>
-              <svg *ngIf="!playerService.isMuted() && playerService.volume() > 0 && playerService.volume() < 50" lucideVolume1 [attr.size]="24"></svg>
-              <svg *ngIf="!playerService.isMuted() && playerService.volume() >= 50" lucideVolume2 [attr.size]="24"></svg>
-            </button>
-            <input
-              type="range"
-              class="fs-volume-slider"
-              min="0"
-              max="100"
-              [value]="playerService.isMuted() ? 0 : playerService.volume()"
-              (input)="onVolumeChange($event)"
-              title="Volume"
-            />
-          </div>
         </div>
       </div>
       <!-- Toast Notification -->
