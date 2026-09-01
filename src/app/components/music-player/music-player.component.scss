@@ -341,8 +341,8 @@
   }
 }
 
-// Responsive mobile player bar
-@media (max-width: 768px) {
+// Responsive mobile/compact player bar
+@media (max-width: 1024px) {
   .player-bar {
     display: flex !important;
     flex-direction: row !important;
