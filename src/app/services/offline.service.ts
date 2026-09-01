@@ -85,27 +85,20 @@ export class OfflineService {
     if (this.isDownloaded(track.videoId)) return true;
 
     try {
-      // 1. Get the Piped stream URL with fallback
-      let streamRes: any = null;
-      let lastError: any = null;
+      // 1. Get the stream URL using our backend proxy (bypasses CORS & loops internally)
+      const backendUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
+      const proxyUrl = `${backendUrl}/piped-proxy.php?videoId=${track.videoId}`;
       
-      for (const instance of this.pipedInstances) {
-        try {
-          const pipedUrl = `${instance}/streams/${track.videoId}`;
-          const res = await fetch(pipedUrl);
-          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-          streamRes = await res.json();
-          if (streamRes && streamRes.audioStreams && streamRes.audioStreams.length > 0) {
-            break; // Success
-          }
-        } catch (e) {
-          lastError = e;
-          console.warn(`Failed to fetch from ${instance}`, e);
-        }
+      const res = await fetch(proxyUrl);
+      if (!res.ok) throw new Error(`Proxy error! status: ${res.status}`);
+      const streamRes = await res.json();
+      
+      if (streamRes.error) {
+        throw new Error(streamRes.error);
       }
-      
+
       if (!streamRes || !streamRes.audioStreams || streamRes.audioStreams.length === 0) {
-        throw new Error('No audio streams found. Last error: ' + (lastError?.message || 'Unknown'));
+        throw new Error('No audio streams found.');
       }
 
       // Find best audio quality (usually m4a or webm)
