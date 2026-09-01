@@ -44,11 +44,19 @@
   font-family: 'Outfit', sans-serif;
 }
 
+.swiper-wrapper-container {
+  position: relative;
+  width: 100%;
+}
+
 .curated-swiper {
   width: 100%;
   padding-top: 10px;
   padding-bottom: 40px;
   overflow: hidden;
+  --swiper-navigation-color: #ffffff;
+  --swiper-navigation-size: 24px;
+  --swiper-navigation-sides-offset: 10px;
 }
 
 .playlist-slide {
@@ -108,19 +116,25 @@
 }
 
 .modern-title {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: 1.8rem;
+  font-weight: 900;
   color: #fff;
   margin: 0;
   line-height: 1.3;
   font-family: 'Outfit', sans-serif;
   text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 @media (max-width: 768px) {
   .playlist-slide {
     width: 200px;
     height: 280px;
+  }
+  
+  .curated-swiper {
+    --swiper-navigation-size: 20px;
   }
   
   .page-title {
@@ -132,6 +146,7 @@
   }
 
   .modern-title {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
   }
 }
