@@ -363,8 +363,48 @@
 
           <!-- Dynamic Shelves Loop -->
           <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index; trackBy: shelfTrackBy">
+            
+            <!-- Recently Played Swiper Layout -->
+            <ng-container *ngIf="shelf.title === 'Recently Played'">
+              <div class="shelf-header">
+                <h2 class="shelf-title">{{ shelf.title }}</h2>
+              </div>
+              <div class="swiper-recent-wrapper">
+                <swiper-container
+                  effect="coverflow"
+                  grab-cursor="true"
+                  centered-slides="true"
+                  slides-per-view="auto"
+                  coverflow-effect-rotate="30"
+                  coverflow-effect-stretch="0"
+                  coverflow-effect-depth="150"
+                  coverflow-effect-modifier="1"
+                  coverflow-effect-slide-shadows="true"
+                  class="recent-swiper"
+                >
+                  <swiper-slide *ngFor="let track of shelf.songs.slice(0, 15); trackBy: trackByVideoId" class="recent-slide" (click)="onPlayTrack(track, shelf.songs)">
+                    <div class="recent-card-inner" [class.active]="playerService.currentTrack()?.videoId === track.videoId">
+                      <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
+                      <div class="recent-overlay">
+                        <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
+                          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                        </div>
+                        <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
+                          <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                      </div>
+                      <div class="recent-info">
+                        <p class="recent-channel">{{ track.channelTitle | uppercase }}</p>
+                        <h4 class="recent-title" [title]="track.title">{{ track.title }}</h4>
+                      </div>
+                    </div>
+                  </swiper-slide>
+                </swiper-container>
+              </div>
+            </ng-container>
+
             <!-- Standard Shelf Layout -->
-            <ng-container *ngIf="shelf.title !== 'Suggested for You'">
+            <ng-container *ngIf="shelf.title !== 'Suggested for You' && shelf.title !== 'Recently Played'">
               <div class="shelf-header">
                 <h2 class="shelf-title">{{ shelf.title }}</h2>
                 <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">

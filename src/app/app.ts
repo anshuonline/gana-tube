@@ -40,6 +40,10 @@ import { ShortsPageComponent } from './components/shorts-page/shorts-page.compon
 import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
 import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { register as registerSwiperElements } from 'swiper/element/bundle';
+
+registerSwiperElements();
 
 export interface SponsoredAd {
   isActive: boolean;
@@ -96,6 +100,7 @@ export interface SponsoredAd {
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
   encapsulation: ViewEncapsulation.None,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class App implements OnInit {
   @ViewChild(SearchBarComponent) searchBar!: SearchBarComponent;
