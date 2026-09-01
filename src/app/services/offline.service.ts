@@ -71,7 +71,14 @@ export class OfflineService {
     'https://pipedapi.kavin.rocks',
     'https://pipedapi.smnz.de',
     'https://api.piped.projectsegfau.lt',
-    'https://piped-api.lunar.icu'
+    'https://piped-api.lunar.icu',
+    'https://pipedapi.tokhmi.xyz',
+    'https://pipedapi.r4fo.com',
+    'https://pipedapi.privacy.com.de',
+    'https://pipedapi.adminforge.de',
+    'https://piped-api.garudalinux.org',
+    'https://pipedapi.chocoflan.net',
+    'https://pipedapi.astartes.nl'
   ];
 
   public async downloadTrack(track: Track, progressCallback?: (progress: number) => void): Promise<boolean> {
