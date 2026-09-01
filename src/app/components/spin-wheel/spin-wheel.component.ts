@@ -150,6 +150,9 @@ export class SpinWheelComponent implements OnInit {
     this.wheelAudio.play().catch(e => console.log('Audio play failed', e));
     this.fadeAudio(this.wheelAudio, 0.8, 500); // fade in to 80% over 500ms
     
+    // Sync audio speed and pitch with the wheel's deceleration
+    this.syncAudioSpeed(9000);
+    
     // Call API
     this.http.post<any>(`${this.apiUrl}?action=spin`, { email: user.email })
       .subscribe({
@@ -223,5 +226,42 @@ export class SpinWheelComponent implements OnInit {
           console.error(err);
         }
       });
+  }
+
+  private syncAudioSpeed(durationMs: number) {
+    const startTime = performance.now();
+    
+    // Attempt to drop pitch for realistic slowing down effect
+    try {
+      (this.wheelAudio as any).preservesPitch = false;
+      (this.wheelAudio as any).webkitPreservesPitch = false;
+      (this.wheelAudio as any).mozPreservesPitch = false;
+    } catch(e) {}
+
+    const updateRate = () => {
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(elapsed / durationMs, 1);
+      
+      let rate = 3.0;
+      if (progress < 0.2) {
+        // Drop from 3.0 to 1.5 in the first 20%
+        rate = 3.0 - (progress / 0.2) * 1.5;
+      } else {
+        // Drop from 1.5 to 0.4 over the remaining 80% (cubic-bezier approximation)
+        const p2 = (progress - 0.2) / 0.8;
+        // Ease-out curve for the audio slowdown
+        rate = 1.5 - (p2 * 1.1);
+      }
+      
+      this.wheelAudio.playbackRate = Math.max(0.4, rate);
+
+      if (progress < 1 && this.isSpinning()) {
+        requestAnimationFrame(updateRate);
+      } else {
+        this.wheelAudio.playbackRate = 1.0;
+      }
+    };
+    
+    requestAnimationFrame(updateRate);
   }
 }
