@@ -29,6 +29,7 @@ import { AlgorithmService } from '../../services/algorithm.service';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { OfflineService } from '../../services/offline.service';
+import { ToastService } from '../../services/toast.service';
 
 import { SyncService } from '../../services/sync.service';
 
@@ -487,7 +488,8 @@ export class MusicPlayerComponent implements OnDestroy {
     private userService: UserService,
     public authService: AuthService,
     public syncService: SyncService,
-    public offlineService: OfflineService
+    public offlineService: OfflineService,
+    private toastService: ToastService
   ) {}
 
   isDownloaded(): boolean {
@@ -498,6 +500,13 @@ export class MusicPlayerComponent implements OnDestroy {
 
   async toggleDownload(event: Event): Promise<void> {
     event.stopPropagation();
+    
+    if (!this.authService.currentUser()) {
+      this.toastService.info('Please login to download offline');
+      this.authService.loginWithGoogle();
+      return;
+    }
+    
     const track = this.playerService.currentTrack();
     if (!track) return;
     
@@ -513,7 +522,9 @@ export class MusicPlayerComponent implements OnDestroy {
       this.isDownloading.set(false);
       
       if (!success) {
-        alert('Failed to download song. Please check your internet connection.');
+        this.toastService.error('Failed to download song. Please check your internet connection.');
+      } else {
+        this.toastService.success('Song downloaded for offline listening!');
       }
     }
   }
