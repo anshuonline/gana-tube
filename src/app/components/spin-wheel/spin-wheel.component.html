@@ -13,7 +13,15 @@
       </div>
       <div class="stat-box">
         <span class="stat-label">G Coins</span>
-        <span class="stat-value coin-text"><svg lucideCoins [attr.size]="18"></svg> {{ gCoins() }}</span>
+        <span class="stat-value coin-text">
+          <svg viewBox="0 0 100 100" class="g-coin-svg" width="20" height="20">
+            <circle cx="50" cy="50" r="45" fill="#10b981" stroke="#059669" stroke-width="5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="4,4"/>
+            <text x="50" y="65" font-family="Arial, sans-serif" font-size="40" font-weight="900" fill="#059669" text-anchor="middle">G</text>
+            <text x="50" y="63" font-family="Arial, sans-serif" font-size="40" font-weight="900" fill="#fff" text-anchor="middle">G</text>
+          </svg>
+          {{ gCoins() }}
+        </span>
       </div>
     </div>
     
@@ -33,7 +41,7 @@
       </button>
     </div>
     
-    <div class="result-text" *ngIf="spinResultText()" [class.win]="spinResultText().includes('won')">
+    <div class="result-text" *ngIf="spinResultText() && !showCongratsPopup()" [class.win]="spinResultText().includes('won')">
       {{ spinResultText() }}
     </div>
     
@@ -44,6 +52,23 @@
     
     <div class="login-prompt" *ngIf="!authService.currentUser()">
       Please log in to participate in the Lucky Draw.
+    </div>
+
+    <!-- Congratulations Popup Overlay -->
+    <div class="congrats-popup-overlay" *ngIf="showCongratsPopup()">
+      <div class="congrats-card">
+        <div class="congrats-icon">
+          <svg viewBox="0 0 100 100" class="g-coin-svg-large" width="80" height="80">
+            <circle cx="50" cy="50" r="45" fill="#10b981" stroke="#059669" stroke-width="5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="4,4"/>
+            <text x="50" y="65" font-family="Arial, sans-serif" font-size="40" font-weight="900" fill="#059669" text-anchor="middle">G</text>
+            <text x="50" y="63" font-family="Arial, sans-serif" font-size="40" font-weight="900" fill="#fff" text-anchor="middle">G</text>
+          </svg>
+        </div>
+        <h3 class="congrats-title">CONGRATULATIONS!</h3>
+        <p class="congrats-desc">You won <span class="congrats-amount">{{ wonCoinsAmount() }}</span> G Coins!</p>
+        <button class="congrats-collect-btn" (click)="showCongratsPopup.set(false)">COLLECT NOW</button>
+      </div>
     </div>
   </div>
 </div>

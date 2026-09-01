@@ -34,6 +34,8 @@ export class SpinWheelComponent implements OnInit {
   
   wheelRotation = signal<number>(0);
   spinResultText = signal<string>('');
+  showCongratsPopup = signal<boolean>(false);
+  wonCoinsAmount = signal<number>(0);
   
   // Base API url
   apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
@@ -65,6 +67,7 @@ export class SpinWheelComponent implements OnInit {
   open() {
     this.isVisible.set(true);
     this.spinResultText.set('');
+    this.showCongratsPopup.set(false);
     // Ensure we fetch the latest status when opened
     this.spinService.fetchStatus();
   }
@@ -140,6 +143,7 @@ export class SpinWheelComponent implements OnInit {
     if (this.isSpinning()) return;
     this.isSpinning.set(true);
     this.spinResultText.set('');
+    this.showCongratsPopup.set(false);
     
     // Stop any previous audio cleanly
     this.stopWheelAudio();
@@ -205,6 +209,8 @@ export class SpinWheelComponent implements OnInit {
               
               if (res.result === 'win') {
                 this.spinResultText.set(`🎉 You won ${res.coins_won} G Coins!`);
+                this.wonCoinsAmount.set(res.coins_won);
+                this.showCongratsPopup.set(true);
                 // Play coin drop sound
                 this.coinAudio.currentTime = 0;
                 this.coinAudio.volume = 1;
