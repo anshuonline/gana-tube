@@ -10,7 +10,7 @@
     <swiper-container class="curated-swiper" effect="coverflow" grab-cursor="true" centered-slides="true" slides-per-view="auto" coverflow-effect-rotate="0" coverflow-effect-stretch="0" coverflow-effect-depth="100" coverflow-effect-modifier="2.5" coverflow-effect-slide-shadows="true" loop="true">
       <swiper-slide *ngFor="let playlist of hindiPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
         <div class="playlist-card-modern">
-          <img class="card-bg" src="assets/images/playlist-bg.jpg" alt="Playlist Background">
+          <img class="card-bg" src="/images/playlist-bg.jpg" alt="Playlist Background">
           <div class="card-overlay"></div>
           <div class="card-content">
             <h3 class="modern-title">{{ playlist.title }}</h3>
@@ -26,7 +26,7 @@
     <swiper-container class="curated-swiper" effect="coverflow" grab-cursor="true" centered-slides="true" slides-per-view="auto" coverflow-effect-rotate="0" coverflow-effect-stretch="0" coverflow-effect-depth="100" coverflow-effect-modifier="2.5" coverflow-effect-slide-shadows="true" loop="true">
       <swiper-slide *ngFor="let playlist of englishPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
         <div class="playlist-card-modern">
-          <img class="card-bg" src="assets/images/playlist-bg.jpg" alt="Playlist Background">
+          <img class="card-bg" src="/images/playlist-bg.jpg" alt="Playlist Background">
           <div class="card-overlay"></div>
           <div class="card-content">
             <h3 class="modern-title">{{ playlist.title }}</h3>
