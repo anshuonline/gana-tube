@@ -85,27 +85,27 @@ export class OfflineService {
     if (this.isDownloaded(track.videoId)) return true;
 
     try {
-      // 1. Get the stream URL using our backend proxy (bypasses CORS & loops internally)
-      const backendUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
-      const proxyUrl = `${backendUrl}/piped-proxy.php?videoId=${track.videoId}`;
+      // 1. Get the stream URL using our custom Python Backend API (Zero Load on Server)
+      // Change this URL to where you host your python script (e.g. Render.com or VPS IP)
+      const pythonApiUrl = 'https://ganatube-python-api.onrender.com'; 
+      // For local testing: const pythonApiUrl = 'http://127.0.0.1:5000';
+      
+      const proxyUrl = `${pythonApiUrl}/api/extract?videoId=${track.videoId}`;
       
       const res = await fetch(proxyUrl);
-      if (!res.ok) throw new Error(`Proxy error! status: ${res.status}`);
+      if (!res.ok) throw new Error(`Python API error! status: ${res.status}`);
       const streamRes = await res.json();
       
       if (streamRes.error) {
         throw new Error(streamRes.error);
       }
 
-      if (!streamRes || !streamRes.audioStreams || streamRes.audioStreams.length === 0) {
-        throw new Error('No audio streams found.');
+      if (!streamRes.streamUrl) {
+        throw new Error('No audio stream URL returned from Python API.');
       }
 
-      // Find best audio quality (usually m4a or webm)
-      const audioStream = streamRes.audioStreams.sort((a: any, b: any) => b.bitrate - a.bitrate)[0];
-      
-      // 2. Download the actual audio file
-      const response = await fetch(audioStream.url);
+      // 2. Download the actual audio file directly from Google Servers
+      const response = await fetch(streamRes.streamUrl);
       
       if (!response.ok) throw new Error('Failed to download audio file');
       
@@ -131,7 +131,7 @@ export class OfflineService {
         }
       }
 
-      const blob = new Blob(chunks as any, { type: audioStream.mimeType || 'audio/mp4' });
+      const blob = new Blob(chunks as any, { type: streamRes.ext === 'webm' ? 'audio/webm' : 'audio/mp4' });
 
       // 3. Save to IndexedDB
       await this.audioStore.setItem(track.videoId, blob);
