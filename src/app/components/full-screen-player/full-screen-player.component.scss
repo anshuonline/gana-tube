@@ -423,6 +423,12 @@
   align-items: center;
   margin-top: 8px;
 
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+  }
+
   .side-controls {
     display: flex;
     flex: 1;
@@ -431,6 +437,22 @@
     
     &.right {
       justify-content: flex-end;
+    }
+
+    @media (max-width: 768px) {
+      order: 2;
+      flex: 0 0 auto;
+      width: 40%;
+      
+      &.left {
+        justify-content: flex-end;
+        padding-right: 24px;
+      }
+      
+      &.right {
+        justify-content: flex-start;
+        padding-left: 24px;
+      }
     }
   }
 
@@ -483,6 +505,13 @@
     display: flex;
     align-items: center;
     gap: 32px;
+    
+    @media (max-width: 768px) {
+      order: 1;
+      width: 100%;
+      justify-content: center;
+      gap: 24px;
+    }
 
     .play-pause {
       background: #fff;

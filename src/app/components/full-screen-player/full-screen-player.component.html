@@ -18,8 +18,13 @@
         <span class="fs-source">{{ playerService.currentTrack()?.channelTitle }}</span>
       </div>
 
-      <div class="fs-header-right" style="width: 48px;">
-        <!-- Empty to balance the flex layout so the center text stays perfectly centered -->
+      <div class="fs-header-right" style="position: relative;">
+        <button class="icon-btn" style="margin-right: 8px;" title="Car Mode" (click)="openCarMode.emit()">
+          <svg lucideCar [attr.size]="24"></svg>
+        </button>
+        <button class="icon-btn" (click)="toggleMenu($event)" title="More Options">
+          <svg lucideMoreVertical [attr.size]="24"></svg>
+        </button>
       </div>
     </div>
 
@@ -196,16 +201,8 @@
 
       <!-- Playback Controls -->
       <div class="fs-controls-row">
-        <!-- Left Side Controls (Balanced) -->
+        <!-- Left Side Controls -->
         <div class="side-controls left">
-          <button class="fs-control-btn secondary" (click)="toggleMenu($event)" title="More Options">
-            <svg lucideMoreVertical [attr.size]="20"></svg>
-          </button>
-          
-          <button class="fs-control-btn secondary" title="Car Mode" (click)="openCarMode.emit()">
-            <svg lucideCar [attr.size]="20"></svg>
-          </button>
-
           <button class="fs-control-btn secondary" (click)="playerService.toggleMute()" title="Mute">
             <svg *ngIf="!playerService.isMuted()" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -256,7 +253,6 @@
 
         <!-- Right Side Controls (Queue, Lyrics, Related) -->
         <div class="side-controls right">
-
           <button class="fs-control-btn secondary view-toggle" [class.active]="activeView === 'queue'" (click)="toggleView('queue')" title="Up Next">
             <svg lucideListMusic [attr.size]="20"></svg>
           </button>
@@ -271,18 +267,18 @@
         </div>
       </div>
     </div>
-
-    <!-- Reusable Track Menu -->
-    <app-track-menu 
-      [track]="playerService.currentTrack()"
-      [isOpen]="showMenu"
-      [xPos]="menuX"
-      [yPos]="menuY"
-      (closeMenu)="showMenu = false"
-      (openPlaylist)="openPlaylist.emit($event)">
-    </app-track-menu>
     
   </div>
+
+  <!-- Reusable Track Menu (Anchored to More Options in Header) -->
+  <app-track-menu 
+    [track]="playerService.currentTrack()"
+    [isOpen]="showMenu"
+    [xPos]="menuX"
+    [yPos]="menuY"
+    (closeMenu)="showMenu = false"
+    (openPlaylist)="openPlaylist.emit($event)">
+  </app-track-menu>
 
   <!-- Devices Drawer Panel -->
   <div class="fs-devices-drawer" [class.open]="showDevices()">
