@@ -604,6 +604,7 @@ export class PlayerService {
   }
 
   private async loadInPlayer(videoId: string): Promise<void> {
+    this.location.replaceState('/play?v=' + videoId);
     const current = this.currentTrack();
     this.initHtmlAudio();
 
