@@ -1,0 +1,36 @@
+<div class="curated-playlists-container">
+  <div class="page-header">
+    <h1 class="page-title">Curated Playlists</h1>
+    <p class="page-subtitle">Swipe through our exclusive GenZ collections</p>
+  </div>
+
+  <!-- Hindi Playlists Section -->
+  <section class="playlist-section" *ngIf="hindiPlaylists.length > 0">
+    <h2 class="section-title">Hindi Hits & Indie</h2>
+    <swiper-container class="curated-swiper" [effect]="'coverflow'" [grabCursor]="true" [centeredSlides]="true" [slidesPerView]="'auto'" [coverflowEffect]="{ rotate: 0, stretch: 0, depth: 100, modifier: 2.5, slideShadows: true }" [loop]="true">
+      <swiper-slide *ngFor="let playlist of hindiPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
+        <div class="playlist-card-modern">
+          <div class="card-bg"></div>
+          <div class="card-content">
+            <h3 class="modern-title">{{ playlist.title }}</h3>
+          </div>
+        </div>
+      </swiper-slide>
+    </swiper-container>
+  </section>
+
+  <!-- English Playlists Section -->
+  <section class="playlist-section" *ngIf="englishPlaylists.length > 0">
+    <h2 class="section-title">Global Top & GenZ Pop</h2>
+    <swiper-container class="curated-swiper" [effect]="'coverflow'" [grabCursor]="true" [centeredSlides]="true" [slidesPerView]="'auto'" [coverflowEffect]="{ rotate: 0, stretch: 0, depth: 100, modifier: 2.5, slideShadows: true }" [loop]="true">
+      <swiper-slide *ngFor="let playlist of englishPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
+        <div class="playlist-card-modern">
+          <div class="card-bg"></div>
+          <div class="card-content">
+            <h3 class="modern-title">{{ playlist.title }}</h3>
+          </div>
+        </div>
+      </swiper-slide>
+    </swiper-container>
+  </section>
+</div>

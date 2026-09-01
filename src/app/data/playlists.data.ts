@@ -657,3 +657,6 @@ export const PLAYLISTS: PlaylistMeta[] = [
     searchQueries: ['Jagjit Singh Ghazals', 'Best Urdu Ghazals', 'Pankaj Udhas Ghazals']
   }
 ];
+
+import { CURATED_PLAYLISTS } from './curated-playlists.data';
+export const ALL_PLAYLISTS = [...PLAYLISTS, ...CURATED_PLAYLISTS];

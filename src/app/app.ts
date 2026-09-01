@@ -40,6 +40,7 @@ import { ShortsPageComponent } from './components/shorts-page/shorts-page.compon
 import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
 import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
+import { CuratedPlaylistsComponent } from './components/curated-playlists/curated-playlists';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
@@ -95,7 +96,8 @@ export interface SponsoredAd {
     DiscoveryPageComponent,
     SpinWheelComponent,
     LucideGift,
-    OfflineLibraryComponent
+    OfflineLibraryComponent,
+    CuratedPlaylistsComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -804,7 +806,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'discovery', 'offline'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'discovery', 'offline', 'curated-playlists'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {
@@ -831,7 +833,7 @@ export class App implements OnInit {
         this.router.navigate(['/']);
       }
 
-      if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials' || url === 'discovery' || url === 'offline') {
+      if (url === 'home' || url === 'search' || url === 'profile' || url === 'library' || url === 'socials' || url === 'discovery' || url === 'offline' || url === 'curated-playlists') {
         this.updateSEO(
           'Free Music Online Without Ads | Best Online Music App - GanaTube',
           'Play free music online without ads and without login on GanaTube. Enjoy the best free music app in India for streaming seamless, ad-free online music instantly.'
@@ -1022,6 +1024,12 @@ export class App implements OnInit {
     this.closeMobileMenu();
     this.router.navigate(['/discovery']);
   }
+
+  openCuratedPlaylistsPage() {
+    this.closeMobileMenu();
+    this.router.navigate(['/curated-playlists']);
+  }
+
 
   toggleMobileMenu() {
     this.isMobileMenuOpen.update(v => !v);

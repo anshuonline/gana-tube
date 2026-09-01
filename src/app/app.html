@@ -36,6 +36,10 @@
         <svg lucideCompass [attr.size]="24"></svg>
         <span class="sidebar-label">Discovery</span>
       </div>
+      <div class="sidebar-item" (click)="openCuratedPlaylistsPage()" [class.active]="currentPage() === 'curated-playlists'">
+        <svg lucideMusic [attr.size]="24"></svg>
+        <span class="sidebar-label">Curated Playlists</span>
+      </div>
     </div>
     
     <div class="sidebar-footer">
@@ -244,6 +248,11 @@
     <app-offline-library 
       *ngIf="currentPage() === 'offline'">
     </app-offline-library>
+
+    <app-curated-playlists
+      *ngIf="currentPage() === 'curated-playlists'"
+      (onOpenPlaylist)="openPlaylist($event)">
+    </app-curated-playlists>
 
     <div *ngIf="currentPage() === 'socials'" class="socials-page">
       <h1 class="socials-title">Follow GanaTube</h1>
