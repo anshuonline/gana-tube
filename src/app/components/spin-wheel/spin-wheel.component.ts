@@ -53,9 +53,9 @@ export class SpinWheelComponent implements OnInit {
     ? 'http://localhost/manageads/wheel-api.php'
     : 'https://manageads.ganatube.in/wheel-api.php';
   
-  // Audio elements
   private wheelAudio: HTMLAudioElement;
   private coinAudio: HTMLAudioElement;
+  private victoryAudio: HTMLAudioElement;
   private fadeInterval: any = null;
 
   constructor() {
@@ -64,6 +64,8 @@ export class SpinWheelComponent implements OnInit {
     this.wheelAudio.preload = 'auto';
     this.coinAudio = new Audio('sfx/coin drop.mp3');
     this.coinAudio.preload = 'auto';
+    this.victoryAudio = new Audio('sfx/victory sound.mp3');
+    this.victoryAudio.preload = 'auto';
     
     effect(() => {
       if (this.isVisible() && this.authService.currentUser()) {
@@ -239,13 +241,14 @@ export class SpinWheelComponent implements OnInit {
                 this.spinResultText.set(`🎉 You won ${res.item_name}!`);
                 this.wonItemName.set(res.item_name);
                 this.showCongratsPopup.set(true);
-                // Play coin drop sound as victory fanfare
-                this.coinAudio.currentTime = 0;
-                this.coinAudio.volume = 1;
-                this.coinAudio.play().catch(e => console.log('Audio play failed', e));
+                // Play victory sound for items
+                this.victoryAudio.currentTime = 0;
+                this.victoryAudio.volume = 1;
+                this.victoryAudio.play().catch(e => console.log('Audio play failed', e));
               } else {
                 this.spinResultType.set('lose');
                 this.spinResultText.set(`Better luck next time!`);
+                // No sound for Better Luck Next Time
               }
             }, 9000);
             
