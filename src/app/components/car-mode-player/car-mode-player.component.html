@@ -30,7 +30,7 @@
             <div class="cm-artwork" [class.ad-active]="showCoverAd">
               <img 
                 *ngIf="!imageLoadError"
-                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'assets/default-playlist.jpg'" 
+                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatubenewlogo.png'" 
                 [alt]="playerService.currentTrack()?.title"
                 (error)="onImageError()"
                 class="cm-album-art"

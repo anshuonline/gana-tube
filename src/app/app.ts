@@ -1604,8 +1604,8 @@ export class App implements OnInit {
             return data.data.map((pl: any) => ({
               videoId: pl.playlist_id,
               title: pl.playlist_name,
-              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg',
-              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'assets/default-playlist.jpg',
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'ganatubenewlogo.png',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'ganatubenewlogo.png',
               channelTitle: pl.owner,
               publishedAt: pl.created_at,
               type: 'community-playlist'
@@ -1650,8 +1650,8 @@ export class App implements OnInit {
             return {
               videoId: pl.playlist_id,
               title: pl.playlist_name,
-              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg',
-              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'assets/default-playlist.jpg',
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'ganatubenewlogo.png',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'ganatubenewlogo.png',
               channelTitle: pl.owner,
               publishedAt: pl.created_at,
               type: 'community-playlist'
@@ -1884,7 +1884,7 @@ export class App implements OnInit {
       title: pl.name,
       language: this.homeScreenLanguage(),
       coverImage: pl.tracks.length > 0 && pl.tracks[0].thumbnailHigh ? pl.tracks[0].thumbnailHigh : 
-                 (pl.tracks.length > 0 && pl.tracks[0].thumbnail ? pl.tracks[0].thumbnail : 'assets/default-playlist.jpg'),
+                 (pl.tracks.length > 0 && pl.tracks[0].thumbnail ? pl.tracks[0].thumbnail : 'ganatubenewlogo.png'),
       preloadedSongs: pl.tracks,
       searchQueries: [],
       creator: pl.owner || (this.authService.currentUser()?.displayName || username),
@@ -1926,7 +1926,7 @@ export class App implements OnInit {
           title: pl.playlist_name,
           language: this.homeScreenLanguage(),
           coverImage: pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh ? pl.songs[0].thumbnailHigh : 
-                     (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail ? pl.songs[0].thumbnail : 'assets/default-playlist.jpg'),
+                     (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail ? pl.songs[0].thumbnail : 'ganatubenewlogo.png'),
           preloadedSongs: pl.songs || [],
           searchQueries: [],
           creator: (email && pl.owner_email === email) ? (this.authService.currentUser()?.displayName || pl.owner) : pl.owner,
@@ -1984,7 +1984,7 @@ export class App implements OnInit {
       id: 'liked-songs',
       title: 'Liked Songs',
       language: this.homeScreenLanguage(),
-      coverImage: likedSongs.length > 0 && likedSongs[0].thumbnail ? likedSongs[0].thumbnail : 'assets/default-playlist.jpg',
+      coverImage: likedSongs.length > 0 && likedSongs[0].thumbnail ? likedSongs[0].thumbnail : 'ganatubenewlogo.png',
       preloadedSongs: likedSongs,
       searchQueries: []
     };
@@ -2046,7 +2046,7 @@ export class App implements OnInit {
       id: 'recently-played',
       title: 'Recently Played',
       language: this.homeScreenLanguage(),
-      coverImage: recentPlays.length > 0 && recentPlays[0].thumbnail ? recentPlays[0].thumbnail : 'assets/default-playlist.jpg',
+      coverImage: recentPlays.length > 0 && recentPlays[0].thumbnail ? recentPlays[0].thumbnail : 'ganatubenewlogo.png',
       preloadedSongs: recentPlays,
       searchQueries: []
     };
