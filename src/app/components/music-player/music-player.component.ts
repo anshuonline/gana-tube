@@ -63,6 +63,19 @@ import { SyncService } from '../../services/sync.service';
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
+      
+      <!-- Ambient Background -->
+      <div class="ambient-bg" *ngIf="playerService.currentTrack()?.thumbnail" [style.backgroundImage]="'url(' + (playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail) + ')'"></div>
+      <div class="ambient-overlay"></div>
+
+      <!-- Full Width Progress Bar at Top -->
+      <div class="progress-section full-width-progress">
+        <div class="progress-track" (mousedown)="onScrubStart($event)" (touchstart)="onScrubStart($event)">
+          <div class="progress-fill" [style.width.%]="displayProgressPercent"></div>
+          <div class="progress-thumb" [style.left.%]="displayProgressPercent"></div>
+        </div>
+      </div>
+
       <!-- Album Art -->
       <div class="player-left">
         <div class="album-art-wrapper" *ngIf="playerService.currentTrack() as track">
@@ -76,20 +89,24 @@ import { SyncService } from '../../services/sync.service';
         </div>
         <div class="album-art-placeholder" *ngIf="playerService.currentTrack() === null">
           <svg lucideMusic2 [attr.size]="24"></svg>
+          <div class="thumb-placeholder" *ngIf="!playerService.currentTrack()">
+            <svg lucideMusic [attr.size]="24"></svg>
+          </div>
+          <div class="expand-icon">
+            <svg lucideChevronUp [attr.size]="24"></svg>
+          </div>
         </div>
-        <div class="track-meta" *ngIf="playerService.currentTrack() as track">
-          <span class="track-name" [title]="track.title">{{ track.title }}</span>
-          <span class="track-artist">{{ track.channelTitle }}</span>
-        </div>
-        <div class="track-meta" *ngIf="playerService.currentTrack() === null">
-          <span class="track-name">No song playing</span>
-          <span class="track-artist">Search &amp; pick a song</span>
+        <div class="track-info" (click)="toggleFullScreen()">
+          <div class="track-title" [class.marquee]="playerService.currentTrack()?.title?.length! > 25">
+            <span>{{ playerService.currentTrack()?.title || 'Not Playing' }}</span>
+          </div>
+          <div class="track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</div>
         </div>
       </div>
 
-      <!-- Center Controls -->
+      <!-- Center: Controls -->
       <div class="player-center">
-        <div class="control-buttons">
+        <div class="main-controls">
           <button
             class="ctrl-btn secondary"
             [class.active]="isCurrentTrackLiked()"
@@ -97,7 +114,7 @@ import { SyncService } from '../../services/sync.service';
             title="Like"
             *ngIf="playerService.currentTrack() !== null"
           >
-            <svg lucideHeart [attr.size]="18" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+            <svg lucideHeart [attr.size]="20" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
           </button>
           <button
             class="ctrl-btn secondary"
@@ -109,8 +126,8 @@ import { SyncService } from '../../services/sync.service';
           >
             <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;" *ngIf="isDownloading()"></div>
             <ng-container *ngIf="!isDownloading()">
-              <svg *ngIf="!isDownloaded()" lucideDownload [attr.size]="18"></svg>
-              <svg *ngIf="isDownloaded()" lucideCheck [attr.size]="18" class="text-green-500" stroke="#10b981"></svg>
+              <svg *ngIf="!isDownloaded()" lucideDownload [attr.size]="20"></svg>
+              <svg *ngIf="isDownloaded()" lucideCheck [attr.size]="20" class="text-green-500" stroke="#10b981"></svg>
             </ng-container>
           </button>
           <button
@@ -119,26 +136,26 @@ import { SyncService } from '../../services/sync.service';
             (click)="playerService.toggleShuffle()"
             title="Shuffle"
           >
-            <svg lucideShuffle [attr.size]="18"></svg>
+            <svg lucideShuffle [attr.size]="20"></svg>
           </button>
           <button class="ctrl-btn" (click)="playerService.previous()" title="Previous">
-            <svg lucideSkipBack [attr.size]="22"></svg>
+            <svg lucideSkipBack [attr.size]="24"></svg>
           </button>
           <button
-            class="play-pause-btn"
+            class="play-pause-btn prominent"
             [class.loading]="playerService.playerState() === 'loading'"
             (click)="playerService.togglePlayPause()"
             [disabled]="playerService.currentTrack() === null"
             [title]="playerService.playerState() === 'playing' ? 'Pause' : 'Play'"
           >
-            <div class="spinner" *ngIf="playerService.playerState() === 'loading'"></div>
+            <div class="spinner dark" *ngIf="playerService.playerState() === 'loading'"></div>
             <ng-container *ngIf="playerService.playerState() !== 'loading'">
-              <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="24"></svg>
-              <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="24"></svg>
+              <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="28" fill="currentColor"></svg>
+              <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="28" fill="currentColor" style="margin-left: 2px;"></svg>
             </ng-container>
           </button>
           <button class="ctrl-btn" (click)="playerService.next()" title="Next">
-            <svg lucideSkipForward [attr.size]="22"></svg>
+            <svg lucideSkipForward [attr.size]="24"></svg>
           </button>
           <button
             class="ctrl-btn secondary"
@@ -146,24 +163,15 @@ import { SyncService } from '../../services/sync.service';
             (click)="playerService.toggleRepeat()"
             [title]="'Repeat: ' + playerService.repeatMode()"
           >
-            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="18"></svg>
-            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="18"></svg>
+            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="20"></svg>
+            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20"></svg>
           </button>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-section">
-          <span class="time-label">{{ formatTime(playerService.currentTime()) }}</span>
-          <div class="progress-track" (mousedown)="onScrubStart($event)" (touchstart)="onScrubStart($event)">
-            <div class="progress-fill" [style.width.%]="displayProgressPercent"></div>
-            <div class="progress-thumb" [style.left.%]="displayProgressPercent"></div>
-          </div>
-          <span class="time-label">{{ formatTime(playerService.duration()) }}</span>
         </div>
       </div>
 
       <!-- Right Controls -->
       <div class="player-right">
+        <span class="time-display">{{ formatTime(playerService.currentTime()) }} / {{ formatTime(playerService.duration()) }}</span>
         <button
           class="ctrl-btn secondary"
           [class.active]="showQueue()"

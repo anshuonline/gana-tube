@@ -17,26 +17,46 @@
 
   background: rgba(10, 10, 20, 0.85);
   cursor: pointer;
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 
   transform: translateY(100%);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: visible; // Allows hover effects outside, but we might need hidden for bg. Wait, progress bar is absolute so it's fine.
 
   &.visible {
     transform: translateY(0);
   }
 
   &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
+    display: none; // Removed top gradient border
   }
+}
+
+.ambient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) saturate(200%);
+  opacity: 0.4;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.ambient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.8) 100%);
+  z-index: -1;
+  pointer-events: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 // ---- Left: Album Art + Track Info ----
@@ -219,29 +239,26 @@
 }
 
 // Progress bar
-.progress-section {
+// Full Width Progress bar at Top
+.progress-section.full-width-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px; /* Thin line */
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-}
-
-.time-label {
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.4);
-  font-variant-numeric: tabular-nums;
-  min-width: 34px;
-  text-align: center;
+  z-index: 10;
+  transform: translateY(-50%); /* Center vertically on the top edge */
 }
 
 .progress-track {
-  flex: 1;
-  height: 4px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
   cursor: pointer;
   position: relative;
-  transition: height 0.2s;
+  transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     height: 6px;
@@ -255,25 +272,25 @@
 
 .progress-fill {
   height: 100%;
-  background: #ffffff;
-  border-radius: 4px;
+  background: #ff0000; /* YouTube/Ganatube style red/primary color, let's use primary or red. Wait, Ganatube primary is purple #8b5cf6 */
+  background: var(--color-primary, #8b5cf6);
   pointer-events: none;
-  transition: width 0.3s linear;
+  transition: width 0.1s linear;
 }
 
 .progress-thumb {
   position: absolute;
   top: 50%;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background: #fff;
   border-radius: 50%;
   transform: translateX(-50%) scale(0);
   opacity: 0;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
-  margin-top: -6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  margin-top: -7px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
 // ---- Right: Volume ----
@@ -282,6 +299,13 @@
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.time-display {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+  margin-right: 8px;
 }
 
 .volume-slider {
@@ -365,38 +389,6 @@
       button:nth-child(2),
       button:nth-child(5) {
         display: none !important; // Hide shuffle, prev, repeat on small bar
-      }
-    }
-
-    .progress-section {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 0;
-      gap: 0;
-      height: 3px;
-
-      .time-label {
-        display: none !important;
-      }
-
-      .progress-track {
-        height: 3px !important;
-        border-radius: 0 !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-
-        &:hover {
-          height: 3px !important;
-        }
-
-        .progress-fill {
-          border-radius: 0 !important;
-        }
-
-        .progress-thumb {
-          display: none !important;
-        }
       }
     }
   }
