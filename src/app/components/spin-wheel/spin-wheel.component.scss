@@ -160,13 +160,14 @@
   .wheel-image {
     width: 100%;
     height: 100%;
+    position: relative;
     border-radius: 50%;
+    overflow: hidden;
     object-fit: contain;
-    // Drop shadow around wheel
+    /* Agonizingly slow stop: Starts fast (0.1), pushes out (0.9), and takes a long time at the end (0.2, 1) */
+    transition: transform 9s cubic-bezier(0.1, 0.9, 0.2, 1);
+    will-change: transform;
     box-shadow: 0 0 0 8px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.6);
-    // Add transition for spinning
-    // 7s duration with smooth deceleration - starts fast, gradually slows to a stop
-    transition: transform 7s cubic-bezier(0.12, 0.75, 0.06, 1);
   }
 }
 

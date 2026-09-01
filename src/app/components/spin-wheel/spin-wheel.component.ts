@@ -158,41 +158,44 @@ export class SpinWheelComponent implements OnInit {
             this.spinService.spinsLeft.set(res.spins_left);
             
             // Segments based on user image:
-            // Top: iPhone (approx 0 deg)
-            // Top Right: Rs 1000 Amazon (approx 60 deg)
-            // Bottom Right: Rs 500 Gift (approx 120 deg)
-            // Bottom: Better luck next time (approx 180 deg)
-            // Bottom Left: G Coins (approx 240 deg)
-            // Top Left: AirPods (approx 300 deg)
+            // Wheel segments (clockwise rotation means pointer sweeps counter-clockwise):
+            // 0: iPhone, 300: AirPods, 240: G Coins, 180: Better Luck, 120: Rs 500, 60: Amazon
             
             let targetAngle = 0;
             if (res.segment === 0) {
-              // G Coins -> 240 degrees + random offset in the segment
-              targetAngle = 240 + Math.floor(Math.random() * 40 - 20);
+              // G Coins (210 to 270)
+              // 268: Barely ticked over from AirPods
+              // 212: Almost fell into Better Luck
+              targetAngle = Math.random() > 0.5 ? 268 : 212;
+              // add a tiny sub-degree randomness so it doesn't look identical every time
+              targetAngle += (Math.random() * 2 - 1);
             } else {
-              // Better luck next time -> 180 degrees + offset
-              targetAngle = 180 + Math.floor(Math.random() * 40 - 20);
+              // Better luck next time (150 to 210)
+              // 208: Barely ticked over from G Coins
+              // 152: Almost fell into Rs 500
+              targetAngle = Math.random() > 0.5 ? 208 : 152;
+              targetAngle += (Math.random() * 2 - 1);
             }
             
             const currentRot = this.wheelRotation();
             const fullRots = Math.floor(currentRot / 360);
-            // Spin 8 full rotations for longer, more dramatic spin
-            const baseRot = fullRots * 360 + 2880;
+            // Spin 10 full rotations for an intense, long spin
+            const baseRot = fullRots * 360 + 3600;
             
             const pointerCorrection = (360 - targetAngle) % 360;
             const finalRotation = baseRot + pointerCorrection;
             
             this.wheelRotation.set(finalRotation);
             
-            // Start fading out wheel sound at ~5s mark (2s before animation ends at 7s)
+            // Start fading out wheel sound at ~7s mark (2s before animation ends at 9s)
             setTimeout(() => {
               this.fadeAudio(this.wheelAudio, 0, 2000, () => {
                 this.wheelAudio.pause();
                 this.wheelAudio.currentTime = 0;
               });
-            }, 5000);
+            }, 7000);
             
-            // Wait for full 7s animation to complete
+            // Wait for full 9s animation to complete
             setTimeout(() => {
               this.isSpinning.set(false);
               this.spinService.gCoins.set(res.g_coins);
@@ -206,7 +209,7 @@ export class SpinWheelComponent implements OnInit {
               } else {
                 this.spinResultText.set(`Better luck next time!`);
               }
-            }, 7000);
+            }, 9000);
             
           } else {
             this.stopWheelAudio();
