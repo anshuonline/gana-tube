@@ -38,7 +38,7 @@
           <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
         </button>
         
-        <ng-container *ngIf="playlist.id !== 'liked-songs' && playlist.creator && playlist.is_owner === false">
+        <ng-container *ngIf="playlist.id !== 'liked-songs' && !playlist.is_owner">
           <button class="save-playlist-btn" (click)="toggleSavePlaylist()" [class.saved]="isSaved()">
             <svg lucideFolderPlus [attr.size]="20" *ngIf="!isSaved()"></svg>
             <svg lucideCheck [attr.size]="20" *ngIf="isSaved()"></svg>

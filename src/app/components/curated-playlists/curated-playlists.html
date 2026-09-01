@@ -7,12 +7,12 @@
   <!-- Hindi Playlists Section -->
   <section class="playlist-section" *ngIf="hindiPlaylists.length > 0">
     <h2 class="section-title">Hindi Hits & Indie</h2>
-    <swiper-container class="curated-swiper" effect="coverflow" grab-cursor="true" centered-slides="true" slides-per-view="auto" coverflow-effect-rotate="0" coverflow-effect-stretch="0" coverflow-effect-depth="100" coverflow-effect-modifier="2.5" coverflow-effect-slide-shadows="true" loop="true">
+    <swiper-container class="curated-swiper" slides-per-view="auto" space-between="20" grab-cursor="true">
       <swiper-slide *ngFor="let playlist of hindiPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
         <div class="playlist-card-modern">
           <img class="card-bg" src="/images/playlist-bg.jpg" alt="Playlist Background">
           <div class="card-overlay"></div>
-          <div class="card-content">
+          <div class="card-content centered-content">
             <h3 class="modern-title">{{ playlist.title }}</h3>
           </div>
         </div>
@@ -23,12 +23,12 @@
   <!-- English Playlists Section -->
   <section class="playlist-section" *ngIf="englishPlaylists.length > 0">
     <h2 class="section-title">Global Top & GenZ Pop</h2>
-    <swiper-container class="curated-swiper" effect="coverflow" grab-cursor="true" centered-slides="true" slides-per-view="auto" coverflow-effect-rotate="0" coverflow-effect-stretch="0" coverflow-effect-depth="100" coverflow-effect-modifier="2.5" coverflow-effect-slide-shadows="true" loop="true">
+    <swiper-container class="curated-swiper" slides-per-view="auto" space-between="20" grab-cursor="true">
       <swiper-slide *ngFor="let playlist of englishPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
         <div class="playlist-card-modern">
           <img class="card-bg" src="/images/playlist-bg.jpg" alt="Playlist Background">
           <div class="card-overlay"></div>
-          <div class="card-content">
+          <div class="card-content centered-content">
             <h3 class="modern-title">{{ playlist.title }}</h3>
           </div>
         </div>
