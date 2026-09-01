@@ -851,66 +851,54 @@
 }
 
 .song-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: block;
   cursor: pointer;
   position: relative;
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111;
+  aspect-ratio: 3 / 4;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
 .song-card:hover {
   transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
 }
 
 .card-thumbnail {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  position: relative;
-  border-radius: 16px; /* Premium curved corners */
+  height: 100%;
   overflow: hidden;
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-  transition: box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s;
-  
-  /* Add subtle ambient shadow behind the card matching the theme */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: 10%;
-    right: 10%;
-    bottom: 10%;
-    background: inherit;
-    filter: blur(20px);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: -1;
-  }
+  z-index: 0;
 }
 
-.song-card:hover .card-thumbnail {
-  box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-  border-color: rgba(255,255,255,0.15);
-}
-
-.song-card:hover .card-thumbnail::before {
-  opacity: 1;
+.card-thumbnail::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 100%);
+  z-index: 1;
 }
 
 /* New overlay style to make play button pop */
 .thumbnail-overlay {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
-  height: 50%;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  height: 100%;
+  background: rgba(0,0,0,0.4);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .song-card:hover .thumbnail-overlay {
   opacity: 1;
@@ -924,20 +912,26 @@
 }
 
 .song-card:hover .card-thumbnail img {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 .card-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 2px;
+  gap: 4px;
+  padding: 16px 12px;
+  pointer-events: none;
 }
 
 .track-channel {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 500;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -947,14 +941,18 @@
 }
 
 .track-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.9);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
   margin: 0;
-  white-space: nowrap;
+  line-height: 1.25;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.3;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.8);
 }
 
 .artists-grid {
