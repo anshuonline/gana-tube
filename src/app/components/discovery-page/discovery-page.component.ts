@@ -60,7 +60,7 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private youtubeApi: YoutubeApiService,
-    private playerService: PlayerService,
+    public playerService: PlayerService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {}
@@ -147,6 +147,15 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
           })
         )
       );
+
+      // Deduplicate songs by videoId
+      if (fetchedSongs && fetchedSongs.length > 0) {
+        fetchedSongs = fetchedSongs.filter((song, index, self) =>
+          index === self.findIndex((t) => (
+            t.videoId === song.videoId
+          ))
+        );
+      }
 
       clearInterval(loadingInterval);
 
@@ -248,7 +257,7 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
   }
 
   isCurrentTrack(track: YouTubeSearchResult): boolean {
-    return this.playerService.currentTrack()?.videoId === track.videoId;
+    return this.playerService.currentTrack()?.videoId === track.videoId && this.playerService.isPlaying();
   }
 }
 

@@ -93,7 +93,7 @@
   </div>
 
   <!-- Floating Aura Chat Bubble -->
-  <div class="aura-container" [class.minimized]="isAuraMinimized">
+  <div class="aura-container" [class.minimized]="isAuraMinimized" [class.has-player]="playerService.currentTrack() !== null">
     
     <!-- Collapsed FAB -->
     <button class="aura-fab" *ngIf="isAuraMinimized" (click)="toggleAura()">

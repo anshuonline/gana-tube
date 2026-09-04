@@ -402,6 +402,14 @@
   right: 24px;
   z-index: 1000;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  &.has-player {
+    bottom: 110px;
+    
+    @media (max-width: 768px) {
+      bottom: 160px; /* Mobile player is taller usually, or maybe nav bar is there */
+    }
+  }
 }
 
 .aura-fab {

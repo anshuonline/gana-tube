@@ -97,7 +97,7 @@
     </div>
 
     <!-- Header Genre & Mood Chips (Below Navbar) -->
-    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode() && !hasSearched() && currentPage() === 'home'">
+    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode() && currentPage() === 'home'">
       <div class="header-chips-scroll">
         <button 
           *ngFor="let chip of dynamicChips()" 
