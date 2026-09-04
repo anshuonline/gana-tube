@@ -1,175 +1,103 @@
-<div class="discovery-container">
-  <!-- Step 1: Input -->
-  <div class="discovery-input-view" *ngIf="step === 'input'">
-    <div class="discovery-header text-center">
-      <svg lucideCompass [attr.size]="48" class="text-purple-400 mb-4 mx-auto"></svg>
-      <h1 class="text-3xl font-bold text-white mb-2">Music Discovery</h1>
-      <p class="text-gray-400">Let AI curate the perfect playlist for your current vibe.</p>
-    </div>
-
-    <div class="input-sections">
-      <!-- Moods -->
-      <div class="section">
-        <h3 class="section-title"><svg lucideSparkles [attr.size]="20"></svg> How are you feeling? (Max 3)</h3>
-        <div class="chip-group">
-          <button 
-            *ngFor="let mood of moods" 
-            class="chip" 
-            [class.active]="selectedMoods.has(mood)"
-            (click)="toggleMood(mood)"
-            [disabled]="!selectedMoods.has(mood) && selectedMoods.size >= 3"
-          >
-            {{ mood }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Language -->
-      <div class="section">
-        <h3 class="section-title"><svg lucideGlobe [attr.size]="20"></svg> Preferred Language</h3>
-        <div class="chip-group language-group">
-          <button 
-            *ngFor="let lang of languages" 
-            class="chip outline" 
-            [class.active]="selectedLanguage === lang"
-            (click)="onLanguageChange(lang)"
-          >
-            {{ lang }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Genres -->
-      <div class="section">
-        <h3 class="section-title"><svg lucideMic2 [attr.size]="20"></svg> Genres (Max 3)</h3>
-        <div class="chip-group">
-          <button 
-            *ngFor="let genre of genres" 
-            class="chip" 
-            [class.active]="selectedGenres.has(genre)"
-            (click)="toggleGenre(genre)"
-            [disabled]="!selectedGenres.has(genre) && selectedGenres.size >= 3"
-          >
-            {{ genre }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Artists -->
-      <div class="section">
-        <h3 class="section-title"><svg lucideMic2 [attr.size]="20"></svg> Favorite Artists (Max 3)</h3>
-        
-        <div class="selected-artists mb-3" *ngIf="selectedArtists.size > 0">
-          <div class="artist-tag" *ngFor="let artist of selectedArtistsArray">
-            {{ artist }} <button (click)="removeArtist(artist)" class="remove-btn">&times;</button>
-          </div>
-        </div>
-
-        <div class="chip-group mb-3">
-          <button 
-            *ngFor="let artist of suggestedArtists" 
-            class="chip artist-chip" 
-            [class.active]="selectedArtists.has(artist)"
-            (click)="toggleArtist(artist)"
-            [disabled]="!selectedArtists.has(artist) && selectedArtists.size >= 3"
-          >
-            {{ artist }}
-          </button>
-        </div>
-
-        <div class="custom-artist-input" style="position: relative;">
-          <input 
-            type="text" 
-            [(ngModel)]="customArtist" 
-            placeholder="Search more artists..." 
-            (keyup.enter)="addCustomArtist()"
-            (focus)="onSearchFocus()"
-            (blur)="showSuggestions = false"
-            [disabled]="selectedArtists.size >= 3"
-          />
-          <button class="add-btn" (mousedown)="$event.preventDefault(); addCustomArtist()" [disabled]="selectedArtists.size >= 3 || !customArtist.trim()">Add</button>
-          
-          <div class="suggestions-dropdown" *ngIf="showSuggestions && filteredSuggestions.length > 0">
-            <div class="suggestion-item" *ngFor="let suggestion of filteredSuggestions" (mousedown)="$event.preventDefault(); selectSuggestion(suggestion)">
-              {{ suggestion }}
-            </div>
+<div class="discovery-page-wrapper">
+  
+  <div class="discovery-main">
+    
+    <!-- Hero Section -->
+    <div class="discovery-hero">
+      <div class="hero-carousel" [style.transform]="'translateX(-' + currentHeroIndex * 100 + '%)'">
+        <div class="hero-slide" *ngFor="let hero of heroItems; let i = index">
+          <img [src]="hero.image" alt="hero image" class="hero-bg" />
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <h2>{{ hero.title }}</h2>
+            <p>{{ hero.subtitle }}</p>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="action-footer text-center mt-8">
-      <button class="discover-btn" [disabled]="selectedMoods.size === 0" (click)="discover()">
-        Generate Discovery Mix <svg lucidePlay [attr.size]="20" class="ml-2"></svg>
+      <!-- Controls -->
+      <button class="hero-nav prev" (click)="prevHero()">
+        <svg lucideChevronLeft></svg>
       </button>
-    </div>
-  </div>
-
-  <!-- Step 2: Loading Animation -->
-  <div class="discovery-loading-view" *ngIf="step === 'loading'">
-    <div class="music-loader">
-      <div class="bar bar1"></div>
-      <div class="bar bar2"></div>
-      <div class="bar bar3"></div>
-      <div class="bar bar4"></div>
-      <div class="bar bar5"></div>
-    </div>
-    <h2 class="loading-text">{{ loadingMessage }}</h2>
-  </div>
-
-  <!-- Step 3: Results -->
-  <div class="discovery-results-view" *ngIf="step === 'results'">
-    <div class="results-header-bar flex justify-between items-center mb-6">
-      <div>
-        <h2 class="text-2xl font-bold text-white flex items-center">
-          <svg lucideSparkles [attr.size]="24" class="text-purple-400 mr-2"></svg> Your AI Curated Mix
-        </h2>
-        <p class="text-gray-400 text-sm mt-1">Based on: {{ selectedLanguage }}, {{ selectedMoodsArray.join(', ') }}</p>
+      <button class="hero-nav next" (click)="nextHero()">
+        <svg lucideChevronRight></svg>
+      </button>
+      <!-- Dots -->
+      <div class="hero-dots">
+        <span class="dot" *ngFor="let hero of heroItems; let i = index" [class.active]="currentHeroIndex === i" (click)="currentHeroIndex = i"></span>
       </div>
-      <button class="reset-btn" (click)="reset()">Try Again</button>
     </div>
 
-    <!-- Error Message -->
-    <div *ngIf="errorMessage" class="error-container text-center mt-10">
-      <p class="text-red-400 text-lg">{{ errorMessage }}</p>
-      <button class="chip outline mt-4" (click)="reset()">Go Back</button>
-    </div>
+    <!-- Video Feed -->
+    <div class="discovery-feed">
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isSearching">
+        <div class="spinner"></div>
+        <p>{{ loadingMessage }}</p>
+      </div>
+      
+      <!-- Error State -->
+      <div class="error-state" *ngIf="errorMessage">
+        <p>{{ errorMessage }}</p>
+      </div>
 
-    <!-- We will show playlists first, then songs in a grid -->
-    <div class="results-grid" *ngIf="results.length > 0">
-      <div 
-        class="result-card" 
-        *ngFor="let track of results" 
-        [class.active]="isCurrentTrack(track)"
-        (click)="onPlay(track)"
-        (contextmenu)="onRightClick($event, track)"
-      >
-        <div class="card-thumbnail">
-          <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" referrerpolicy="no-referrer" />
-          
-          <div class="type-badge" *ngIf="track.type === 'playlist' || track.type === 'community-playlist'">Playlist</div>
-
-          <div class="card-overlay">
-            <svg lucidePlay [attr.size]="36" *ngIf="!isCurrentTrack(track)"></svg>
-            <div class="play-ripple" *ngIf="isCurrentTrack(track)">
-              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <!-- Results Feed (YouTube Style) -->
+      <div class="feed-grid" *ngIf="results.length > 0 && !isSearching">
+        <div class="video-card" *ngFor="let track of results" (click)="onPlay(track)" (contextmenu)="onRightClick($event, track)">
+          <div class="thumbnail-wrapper">
+            <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
+            <div class="play-overlay">
+              <svg lucidePlay [attr.size]="48" [attr.fill]="'currentColor'"></svg>
             </div>
+            <div class="playing-indicator" *ngIf="isCurrentTrack(track)">
+               <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+
+          </div>
+          <div class="video-info">
+            <h3 class="title" [title]="track.title">{{ track.title }}</h3>
+            <p class="channel">
+              <svg lucideMusic [attr.size]="14"></svg>
+              {{ track.channelTitle }}
+            </p>
           </div>
         </div>
-        <div class="card-info">
-          <h4 class="card-title" [title]="track.title">{{ track.title }}</h4>
-          <p class="card-artist">{{ track.channelTitle }}</p>
-        </div>
       </div>
-    </div>
 
-    <!-- Scroll Loading Spinner -->
-    <div class="scroll-loader text-center mt-8 mb-4" *ngIf="loadingMore">
-      <div class="inline-block relative w-10 h-10">
-        <div class="absolute w-10 h-10 border-4 border-purple-500/30 rounded-full"></div>
-        <div class="absolute w-10 h-10 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
+      <!-- Scroll loader -->
+      <div class="scroll-loader" *ngIf="loadingMore">
+         <div class="spinner-small"></div>
       </div>
-      <p class="text-sm text-gray-400 mt-2">Loading more...</p>
     </div>
   </div>
+
+  <!-- Right Ask Panel -->
+  <div class="discovery-sidebar">
+    <div class="ask-panel">
+      <div class="ask-header">
+        <svg lucideSparkles [attr.size]="24" class="ask-icon"></svg>
+        <h3>Ask AI DJ</h3>
+      </div>
+      <div class="ask-body">
+        <p>Tell me what you're in the mood for. I'll curate the perfect mix instantly.</p>
+        <div class="prompt-examples">
+          <button (click)="askQuery = '90s Bollywood sad songs'; askAI()">"90s Bollywood sad songs"</button>
+          <button (click)="askQuery = 'Lo-Fi beats for studying'; askAI()">"Lo-Fi beats for studying"</button>
+          <button (click)="askQuery = 'High energy gym workout'; askAI()">"High energy gym workout"</button>
+        </div>
+      </div>
+      <div class="ask-input-area">
+        <textarea 
+          [(ngModel)]="askQuery" 
+          placeholder="E.g., Arijit Singh romantic hits..."
+          (keyup.enter)="$event.preventDefault(); askAI()"
+          rows="3"
+        ></textarea>
+        <button class="send-btn" (click)="askAI()" [disabled]="isSearching || !askQuery.trim()">
+          <span *ngIf="!isSearching">Curate</span>
+          <div class="spinner-small" *ngIf="isSearching"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

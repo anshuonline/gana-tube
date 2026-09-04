@@ -1,79 +1,44 @@
-import { Component, EventEmitter, Output, ElementRef, ViewChild, AfterViewChecked, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, EventEmitter, Output, ElementRef, ViewChild, ChangeDetectorRef, NgZone, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom, timeout, catchError, of } from 'rxjs';
-import { LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe } from '@lucide/angular';
+import { LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft } from '@lucide/angular';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-discovery-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe],
+  imports: [CommonModule, FormsModule, LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft],
   templateUrl: './discovery-page.component.html',
   styleUrls: ['./discovery-page.component.scss']
 })
-export class DiscoveryPageComponent implements OnDestroy {
+export class DiscoveryPageComponent implements OnInit, OnDestroy {
   @Output() playTrack = new EventEmitter<YouTubeSearchResult>();
   @Output() toggleMenu = new EventEmitter<{track: YouTubeSearchResult, event: MouseEvent}>();
-  @ViewChild('resultsContainer') resultsContainer!: ElementRef;
-
-  moods = ['Happy', 'Sad', 'Party', 'Chill', 'Workout', 'Romantic', 'Focus', 'Sleep', 'Drive', 'Nostalgia', 'Motivation', 'Devotional'];
-  genres = ['Pop', 'Hip-Hop', 'Classical', 'Lo-Fi', 'EDM', 'Rock', 'Acoustic', 'Jazz', 'R&B', 'Indie', 'Folk', 'Metal'];
-  languages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Tamil', 'Telugu', 'Bengali', 'Gujarati', 'Marathi', 'Assamese'];
   
-  artistsByLanguage: Record<string, string[]> = {
-    'Hindi': ['Arijit Singh', 'Shreya Ghoshal', 'Atif Aslam', 'Sonu Nigam', 'Udit Narayan', 'Kishore Kumar', 'Lata Mangeshkar', 'Kumar Sanu', 'Alka Yagnik', 'Neha Kakkar', 'Badshah', 'Jubin Nautiyal', 'B Praak', 'Darshan Raval', 'Vishal Mishra', 'Armaan Malik', 'Sunidhi Chauhan', 'Mohit Chauhan', 'A.R. Rahman', 'Pritam'],
-    'English': ['Taylor Swift', 'Ed Sheeran', 'Dua Lipa', 'The Weeknd', 'Billie Eilish', 'Ariana Grande', 'Justin Bieber', 'Bruno Mars', 'Eminem', 'Drake', 'Adele', 'Beyonce', 'Coldplay', 'Imagine Dragons', 'Maroon 5', 'Post Malone', 'Shawn Mendes', 'Selena Gomez', 'Harry Styles', 'Rihanna'],
-    'Punjabi': ['Diljit Dosanjh', 'Karan Aujla', 'Sidhu Moose Wala', 'AP Dhillon', 'Guru Randhawa', 'Harrdy Sandhu', 'Ammy Virk', 'Shubh', 'B Praak', 'Mankirt Aulakh', 'Garry Sandhu', 'Jass Manak', 'Parmish Verma', 'Gippy Grewal', 'Babbu Maan', 'Gurdas Maan', 'Ranjit Bawa', 'Nimrat Khaira', 'Sunanda Sharma', 'Jasmine Sandlas'],
-    'Bhojpuri': ['Pawan Singh', 'Khesari Lal Yadav', 'Shilpi Raj', 'Nirahua', 'Manoj Tiwari', 'Priyanka Singh', 'Kalpana Patowary', 'Antra Singh Priyanka', 'Ritesh Pandey', 'Pramod Premi Yadav', 'Gunjan Singh', 'Neelkamal Singh', 'Arvind Akela Kallu', 'Ankush Raja', 'Mohan Rathore', 'Bharat Sharma', 'Indu Sonali', 'Mamta Raut', 'Chhaila Bihari', 'Devi'],
-    'Tamil': ['Anirudh Ravichander', 'A.R. Rahman', 'Sid Sriram', 'Ilayaraja', 'S.P. Balasubrahmanyam', 'Vijay Prakash', 'Karthik', 'Yuvan Shankar Raja', 'Hariharan', 'K.S. Chithra', 'Shweta Mohan', 'Sujatha', 'Chinmayi', 'Jonita Gandhi', 'D. Imman', 'Harris Jayaraj', 'G.V. Prakash', 'Deva', 'Vidyasagar', 'Anuradha Sriram'],
-    'Telugu': ['Devi Sri Prasad', 'Thaman S', 'S.P. Balasubrahmanyam', 'K.S. Chithra', 'Sid Sriram', 'M.M. Keeravani', 'Anurag Kulkarni', 'Mangli', 'Sunitha', 'Geetha Madhuri', 'Ram Miriyala', 'Karthik', 'Armaan Malik', 'Shreya Ghoshal', 'Hariharan', 'Mano', 'P. Susheela', 'S. Janaki', 'Rahul Sipligunj', 'Sri Krishna'],
-    'Bengali': ['Arijit Singh', 'Shreya Ghoshal', 'Anupam Roy', 'Rupam Islam', 'Kishore Kumar', 'Nachiketa', 'Anjan Dutt', 'Hemanta Mukherjee', 'Manna Dey', 'Lata Mangeshkar', 'Asha Bhosle', 'Lopamudra Mitra', 'Srikanto Acharya', 'Iman Chakraborty', 'Somlata Acharyya', 'Shaan', 'Babul Supriyo', 'Jeet Gannguli', 'Fossils', 'Chandrabindoo'],
-    'Gujarati': ['Kinjal Dave', 'Geeta Rabari', 'Kirtidan Gadhvi', 'Osman Mir', 'Aditya Gadhvi', 'Aishwarya Majmudar', 'Jignesh Kaviraj', 'Rakesh Barot', 'Vijay Suvada', 'Gaman Santhal', 'Falguni Pathak', 'Darshan Raval', 'Bhoomi Trivedi', 'Parthiv Gohil', 'Sachin-Jigar', 'Arvind Vegda', 'Praful Dave', 'Diwaliben Bhil', 'Hemant Chauhan', 'Urvashi Radadiya'],
-    'Marathi': ['Ajay-Atul', 'Avadhoot Gupte', 'Bela Shende', 'Shreya Ghoshal', 'Swapnil Bandodkar', 'Suresh Wadkar', 'Lata Mangeshkar', 'Asha Bhosle', 'Anuradha Paudwal', 'Arun Date', 'Sudhir Phadke', 'Vaishali Samant', 'Neha Rajpal', 'Nandesh Umap', 'Adarsh Shinde', 'Pravin Kuwar', 'Jasraj Joshi', 'Rohan-Rohan', 'Salil Kulkarni', 'Sandeep Khare'],
-    'Assamese': ['Zubeen Garg', 'Papon', 'Bhupen Hazarika', 'Dikshu', 'Nilotpal Bora', 'Bidyut Bikash', 'Neel Akash', 'Kusum Kailash', 'Vreegu Kashyap', 'Babu Baruah', 'Nirmali Das', 'Bornali Kalita', 'Deeplina Deka', 'Subasana Dutta', 'Madhusmita', 'Joi Barua', 'Sushmita Baruah', 'Khagen Mahanta', 'Ridip Rankit', 'Tarali Sarma']
-  };
-
-  selectedMoods: Set<string> = new Set();
-  selectedGenres: Set<string> = new Set();
-  selectedLanguage: string = 'Hindi';
-  selectedArtists: Set<string> = new Set();
-  customArtist: string = '';
-  showSuggestions: boolean = false;
-
-  get suggestedArtists() {
-    return this.artistsByLanguage[this.selectedLanguage] || [];
-  }
-
-  get filteredSuggestions() {
-    if (!this.customArtist.trim()) return [];
-    const query = this.customArtist.toLowerCase().trim();
-    return this.suggestedArtists.filter(a => a.toLowerCase().includes(query) && !this.selectedArtists.has(a));
-  }
-
-  get selectedMoodsArray() { return Array.from(this.selectedMoods); }
-  get selectedGenresArray() { return Array.from(this.selectedGenres); }
-  get selectedArtistsArray() { return Array.from(this.selectedArtists); }
-
-  step: 'input' | 'loading' | 'results' = 'input';
-  loadingMessage = '';
-  errorMessage = '';
+  askQuery: string = '';
+  isSearching: boolean = false;
+  loadingMessage: string = '';
+  errorMessage: string = '';
   
-  // All fetched results (hidden)
+  // Hero items (could be hardcoded or dynamically fetched)
+  heroItems = [
+    { title: 'Top Hits 2026', subtitle: 'The most played songs this week', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1200&h=400' },
+    { title: 'Chill Lo-Fi', subtitle: 'Relax and unwind with smooth beats', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1200&h=400' },
+    { title: 'Workout Energy', subtitle: 'Push your limits with high BPM', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200&h=400' }
+  ];
+  currentHeroIndex = 0;
+
+  // Feed results
   private allResults: YouTubeSearchResult[] = [];
-  // Visible results (progressive loading)
   results: YouTubeSearchResult[] = [];
-  // How many to show initially and per scroll batch
+  
   private initialBatch = 10;
   private scrollBatch = 6;
   private scrollHandler: (() => void) | null = null;
   private isLoadingMore = false;
-  loadingMore = false; // exposed to template
-
-  onLanguageChange(lang: string) {
-    this.selectedLanguage = lang;
-  }
+  loadingMore = false;
 
   constructor(
     private youtubeApi: YoutubeApiService,
@@ -82,8 +47,95 @@ export class DiscoveryPageComponent implements OnDestroy {
     private ngZone: NgZone
   ) {}
 
+  ngOnInit() {
+    this.discover('Trending music hits'); // Default initial load
+  }
+
   ngOnDestroy() {
     this.removeScrollListener();
+  }
+
+  nextHero() {
+    this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroItems.length;
+  }
+
+  prevHero() {
+    this.currentHeroIndex = (this.currentHeroIndex - 1 + this.heroItems.length) % this.heroItems.length;
+  }
+
+  async askAI() {
+    const query = this.askQuery.trim();
+    if (!query) return;
+    await this.discover(query);
+    // On mobile we might want to clear or unfocus
+  }
+
+  async discover(intent: string) {
+    this.isSearching = true;
+    this.results = [];
+    this.allResults = [];
+    this.errorMessage = '';
+    this.loadingMessage = 'Curating based on your taste...';
+    this.cdr.detectChanges();
+    
+    // Animate loading text
+    const loadingInterval = setInterval(() => {
+      const msgs = ['Analyzing vibe...', 'Finding best matches...', 'Tuning frequencies...'];
+      this.loadingMessage = msgs[Math.floor(Math.random() * msgs.length)];
+      this.cdr.detectChanges();
+    }, 1000);
+
+    const songQuery = intent + ' songs';
+
+    try {
+      // Fetch 40 songs
+      let fetchedSongs = await firstValueFrom(
+        this.youtubeApi.searchMusic(songQuery, 40).pipe(
+          timeout(12000),
+          catchError(err => {
+            console.warn('[Discovery] Query failed:', err);
+            return of([] as YouTubeSearchResult[]);
+          })
+        )
+      );
+
+      clearInterval(loadingInterval);
+
+      if (fetchedSongs && fetchedSongs.length > 0) {
+        this.allResults = fetchedSongs;
+        
+        // Show first batch immediately with stagger
+        const firstBatch = this.allResults.slice(0, this.initialBatch);
+        this.isSearching = false;
+        this.cdr.detectChanges();
+
+        let i = 0;
+        const addOne = () => {
+          if (i < firstBatch.length) {
+            this.ngZone.run(() => {
+              this.results = [...this.results, firstBatch[i]];
+              this.cdr.detectChanges();
+            });
+            i++;
+            setTimeout(addOne, 100); // 100ms stagger
+          } else {
+            if (this.allResults.length > this.initialBatch) {
+              this.setupScrollListener();
+            }
+          }
+        };
+        addOne();
+      } else {
+        this.isSearching = false;
+        this.errorMessage = "Could not find songs for this taste. Try something else!";
+        this.cdr.detectChanges();
+      }
+    } catch (e) {
+      clearInterval(loadingInterval);
+      this.isSearching = false;
+      this.errorMessage = "An error occurred while finding songs.";
+      this.cdr.detectChanges();
+    }
   }
 
   private setupScrollListener() {
@@ -96,7 +148,6 @@ export class DiscoveryPageComponent implements OnDestroy {
       const windowH = window.innerHeight;
       const docH = document.documentElement.scrollHeight;
 
-      // Load more when user is within 300px of the bottom
       if (scrollY + windowH >= docH - 300) {
         this.isLoadingMore = true;
         this.loadNextBatch();
@@ -119,7 +170,6 @@ export class DiscoveryPageComponent implements OnDestroy {
     this.loadingMore = true;
     this.cdr.detectChanges();
 
-    // Add items one by one with stagger delay
     let i = 0;
     const addOne = () => {
       if (i < nextItems.length) {
@@ -128,7 +178,7 @@ export class DiscoveryPageComponent implements OnDestroy {
           this.cdr.detectChanges();
         });
         i++;
-        setTimeout(addOne, 120); // 120ms stagger between each card
+        setTimeout(addOne, 100);
       } else {
         this.isLoadingMore = false;
         this.loadingMore = false;
@@ -136,187 +186,6 @@ export class DiscoveryPageComponent implements OnDestroy {
       }
     };
     addOne();
-  }
-
-  toggleMood(mood: string) {
-    if (this.selectedMoods.has(mood)) {
-      this.selectedMoods.delete(mood);
-    } else {
-      if (this.selectedMoods.size < 3) {
-        this.selectedMoods.add(mood);
-      }
-    }
-  }
-
-  toggleGenre(genre: string) {
-    if (this.selectedGenres.has(genre)) {
-      this.selectedGenres.delete(genre);
-    } else {
-      if (this.selectedGenres.size < 3) {
-        this.selectedGenres.add(genre);
-      }
-    }
-  }
-
-  toggleArtist(artist: string) {
-    if (this.selectedArtists.has(artist)) {
-      this.selectedArtists.delete(artist);
-    } else {
-      if (this.selectedArtists.size < 3) {
-        this.selectedArtists.add(artist);
-      }
-    }
-  }
-
-  addCustomArtist() {
-    if (this.customArtist.trim() && this.selectedArtists.size < 3) {
-      this.selectedArtists.add(this.customArtist.trim());
-      this.customArtist = '';
-      this.showSuggestions = false;
-    }
-  }
-
-  selectSuggestion(artist: string) {
-    if (this.selectedArtists.size < 3) {
-      this.selectedArtists.add(artist);
-      this.customArtist = '';
-      this.showSuggestions = false;
-    }
-  }
-
-  onSearchFocus() {
-    this.showSuggestions = true;
-  }
-
-  removeArtist(artist: string) {
-    this.selectedArtists.delete(artist);
-  }
-
-  async discover() {
-    if (this.selectedMoods.size === 0) {
-      return;
-    }
-
-    this.step = 'loading';
-    this.results = [];
-    this.allResults = [];
-    this.errorMessage = '';
-    this.cdr.detectChanges();
-    
-    // Generate query
-    const moodsArray = Array.from(this.selectedMoods);
-    const genresArray = Array.from(this.selectedGenres);
-    const artistsArray = Array.from(this.selectedArtists);
-    
-    let queryParts = [this.selectedLanguage];
-    if (moodsArray.length > 0) queryParts.push(...moodsArray);
-    if (genresArray.length > 0) queryParts.push(...genresArray);
-    
-    let baseQuery = queryParts.join(' ');
-    if (artistsArray.length > 0) {
-      baseQuery += ` ${artistsArray.join(' ')}`;
-    }
-
-    const songQuery = baseQuery + ' songs';
-    const playlistQuery = baseQuery + ' playlist mix';
-
-    console.log('[Discovery] Song Query:', songQuery);
-    console.log('[Discovery] Playlist Query:', playlistQuery);
-
-    // Start BOTH songs and playlists API calls in parallel with loading animation
-    const songsPromise = firstValueFrom(
-      this.youtubeApi.searchMusic(songQuery, 40).pipe(
-        timeout(12000),
-        catchError(err => {
-          console.warn('[Discovery] Songs query failed:', err);
-          return of([] as YouTubeSearchResult[]);
-        })
-      )
-    );
-
-    const playlistsPromise = firstValueFrom(
-      this.youtubeApi.searchMusic(playlistQuery, 20, 'playlist').pipe(
-        timeout(12000),
-        catchError(err => {
-          console.warn('[Discovery] Playlists query failed:', err);
-          return of([] as YouTubeSearchResult[]);
-        })
-      )
-    );
-
-    // Loading animation (3 seconds)
-    const msgs = [
-      "Analyzing your music taste...",
-      "Matching moods & genres...",
-      "Curating the best tracks...",
-      "Preparing your discovery mix..."
-    ];
-    for (const msg of msgs) {
-      this.loadingMessage = msg;
-      this.cdr.detectChanges();
-      await new Promise(r => setTimeout(r, 750));
-    }
-
-    // Now await BOTH API results
-    let fetchedSongs: YouTubeSearchResult[] = [];
-    let fetchedPlaylists: YouTubeSearchResult[] = [];
-    try {
-      [fetchedSongs, fetchedPlaylists] = await Promise.all([songsPromise, playlistsPromise]);
-      console.log('[Discovery] Songs:', fetchedSongs?.length, 'Playlists:', fetchedPlaylists?.length);
-    } catch (e) {
-      console.error('[Discovery] API promise error:', e);
-    }
-
-    // Merge: playlists first, then songs
-    let fetchedResults = [...(fetchedPlaylists || []), ...(fetchedSongs || [])];
-
-    // Fallback if empty
-    if (fetchedResults.length === 0) {
-      this.loadingMessage = "Trying trending mix...";
-      this.cdr.detectChanges();
-      try {
-        fetchedResults = await firstValueFrom(
-          this.youtubeApi.searchMusic(`${this.selectedLanguage} trending songs`, 30).pipe(
-            timeout(8000),
-            catchError(() => of([] as YouTubeSearchResult[]))
-          )
-        );
-        console.log('[Discovery] Fallback results:', fetchedResults?.length);
-      } catch (e) {
-        console.error('[Discovery] Fallback error:', e);
-      }
-    }
-
-    // Show results
-    if (fetchedResults && fetchedResults.length > 0) {
-      this.allResults = fetchedResults;
-      // Show first batch immediately with stagger
-      const firstBatch = this.allResults.slice(0, this.initialBatch);
-      this.step = 'results';
-      this.cdr.detectChanges();
-
-      let i = 0;
-      const addOne = () => {
-        if (i < firstBatch.length) {
-          this.ngZone.run(() => {
-            this.results = [...this.results, firstBatch[i]];
-            this.cdr.detectChanges();
-          });
-          i++;
-          setTimeout(addOne, 150);
-        } else {
-          // Setup scroll listener for remaining items
-          if (this.allResults.length > this.initialBatch) {
-            this.setupScrollListener();
-          }
-        }
-      };
-      addOne();
-    } else {
-      this.errorMessage = "Could not fetch songs. The server might be busy. Please try again.";
-      this.step = 'results';
-      this.cdr.detectChanges();
-    }
   }
 
   onPlay(track: YouTubeSearchResult) {
@@ -329,15 +198,9 @@ export class DiscoveryPageComponent implements OnDestroy {
     this.toggleMenu.emit({track, event});
   }
 
-  reset() {
-    this.step = 'input';
-    this.results = [];
-    this.allResults = [];
-    this.errorMessage = '';
-    this.removeScrollListener();
-  }
-
   isCurrentTrack(track: YouTubeSearchResult): boolean {
     return this.playerService.currentTrack()?.videoId === track.videoId;
   }
 }
+
+
