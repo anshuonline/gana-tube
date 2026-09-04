@@ -630,7 +630,7 @@ export class App implements OnInit {
 
     // Dynamic chips effect based on currently playing track
     effect(() => {
-      const track = this.playerService.currentTrack();
+      const track: any = this.playerService.currentTrack();
       if (track) {
         const title = track.title || track.snippet?.title || '';
         let channel = track.channelTitle || track.snippet?.channelTitle || '';
