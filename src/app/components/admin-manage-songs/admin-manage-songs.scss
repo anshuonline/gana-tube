@@ -1,4 +1,4 @@
-.admin-container {
+﻿.admin-container {
   min-height: 100vh;
   padding: 40px 20px;
   background-color: var(--surface);
@@ -6,7 +6,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--primary-font);
 }
 
 .login-screen {

@@ -1,4 +1,4 @@
-.library-page-wrapper {
+﻿.library-page-wrapper {
   justify-content: flex-start;
   padding-left: 40px;
   padding-right: 40px;
@@ -24,7 +24,7 @@
 }
 
 .library-page-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--primary-font);
   font-size: 3rem !important;
   font-weight: 800;
   margin-bottom: 30px !important;
@@ -175,7 +175,7 @@
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--primary-font);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

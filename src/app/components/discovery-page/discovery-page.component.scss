@@ -1,4 +1,4 @@
-.discovery-page-wrapper {
+﻿.discovery-page-wrapper {
   position: relative;
   height: calc(100vh - 64px);
   padding-top: 64px;
@@ -170,7 +170,7 @@
       font-size: 2.2rem;
       font-weight: 800;
       margin: 0;
-      font-family: 'Outfit', sans-serif;
+      font-family: var(--primary-font);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -461,7 +461,7 @@
     margin: 0;
     font-size: 1.3rem;
     font-weight: 700;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--primary-font);
   }
   
   .minimize-btn {

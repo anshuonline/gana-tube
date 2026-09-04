@@ -1,4 +1,4 @@
-.fs-player-overlay {
+﻿.fs-player-overlay {
   position: fixed;
   inset: 0;
   z-index: 2000;
@@ -1013,7 +1013,7 @@
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.4);
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--primary-font);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;

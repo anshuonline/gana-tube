@@ -1,4 +1,4 @@
-.search-wrapper {
+﻿.search-wrapper {
   position: relative;
   width: 100%;
   max-width: 800px;
@@ -47,7 +47,7 @@
     color: #fff;
     font-size: 1.1rem;
     font-weight: 500;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--primary-font);
     outline: none;
     padding: 8px 0;
 

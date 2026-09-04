@@ -1,4 +1,4 @@
-.app-layout {
+﻿.app-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -313,7 +313,7 @@
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.85);
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--primary-font);
   font-size: 0.8rem;
   font-weight: 500;
   padding: 6px 14px;
@@ -1059,7 +1059,7 @@
   background-color: #0c0c0c;
   color: #fff;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--primary-font);
   margin-top: 60px;
 }
 
@@ -1438,7 +1438,7 @@
   transition: all 0.3s ease;
   backdrop-filter: blur(24px);
   outline: none;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--primary-font);
   color: #fff;
 
   &:hover {

@@ -1,4 +1,4 @@
-.shorts-container {
+﻿.shorts-container {
   height: 100dvh;
   width: 100vw;
   background-color: #000;
@@ -72,7 +72,7 @@
   }
 }
  
-// ---- Expanding ring — a soft "pulse of love" behind the heart --
+// ---- Expanding ring â€” a soft "pulse of love" behind the heart --
 ::ng-deep .heart-ring {
   position: fixed;
   pointer-events: none;
@@ -98,7 +98,7 @@
   }
 }
  
-// ---- Mini hearts flying outward — this sells the "cute" factor -
+// ---- Mini hearts flying outward â€” this sells the "cute" factor -
 ::ng-deep .mini-heart {
   position: fixed;
   pointer-events: none;
@@ -138,7 +138,7 @@
   }
 }
  
-// ---- Tiny sparkle dots — extra shimmer, optional but very cute -
+// ---- Tiny sparkle dots â€” extra shimmer, optional but very cute -
 ::ng-deep .mini-spark {
   position: fixed;
   pointer-events: none;
@@ -600,7 +600,7 @@
       padding: 14px 16px;
       color: #fff;
       font-size: 1rem;
-      font-family: 'Outfit', sans-serif;
+      font-family: var(--primary-font);
       transition: all 0.2s;
       outline: none;
       box-sizing: border-box;
