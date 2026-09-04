@@ -322,10 +322,10 @@ export class AlgorithmService {
 
       // "More from {Artist}" — fetch NEW songs by their top artist
       if (topArtists.length > 0) {
-        const artistQueryFormats = ['official songs full audio', 'all songs audio', 'top songs official', 'best songs collection'];
+        const artistQueryFormats = ['official songs', 'all songs', 'top hits', 'best collection'];
         shelves.push({
           title: 'More from ' + topArtists[0],
-          query: topArtists[0] + ' ' + artistQueryFormats[Math.floor(Math.random() * artistQueryFormats.length)]
+          query: `${topArtists[0]} ${artistQueryFormats[Math.floor(Math.random() * artistQueryFormats.length)]} in ${language}`
         });
       }
 
@@ -346,11 +346,11 @@ export class AlgorithmService {
         };
         const genreQuery = genreLabels[topGenres[0]] || topGenres[0];
         const secondArtist = topArtists.length > 1 ? topArtists[1] : '';
-        madeForYouQuery = `${genreQuery} ${language} songs ${secondArtist} ${randomYear}`.trim();
+        madeForYouQuery = `best ${genreQuery} ${language} songs ${secondArtist} ${randomYear}`.trim();
       } else if (topArtists.length > 1) {
         // Moderate mode: use secondary artist
         const madeForYouModifiers = ['hits', 'songs collection', 'best songs', 'jukebox'];
-        madeForYouQuery = topArtists[1] + ' ' + madeForYouModifiers[Math.floor(Math.random() * madeForYouModifiers.length)];
+        madeForYouQuery = `${topArtists[1]} ${madeForYouModifiers[Math.floor(Math.random() * madeForYouModifiers.length)]} in ${language}`;
       } else {
         madeForYouQuery = `trending ${language} songs ${randomYear}`;
       }
@@ -364,7 +364,7 @@ export class AlgorithmService {
       if (topArtists.length > 2) {
         shelves.push({
           title: 'Fans Also Listen To',
-          query: `${topArtists[2]} official songs audio ${randomYear}`
+          query: `${topArtists[2]} official songs audio ${randomYear} in ${language}`
         });
       }
 
