@@ -955,6 +955,7 @@ export class App implements OnInit {
   }
 
   resetSearchState(event?: Event): void {
+    this.cachedHeroEl = null;
     if (event) event.preventDefault();
     this.isSearchMode.set(false);
     this.hasSearched.set(false);
@@ -1762,26 +1763,40 @@ export class App implements OnInit {
     });
   }
 
+  private cachedHeroEl: HTMLElement | null = null;
+  private cachedHeroImgs: HTMLElement[] = [];
+  private lastScrolledState: boolean | null = null;
+
   private handleScroll(): void {
     const scrollOffset = document.documentElement.scrollTop || document.body.scrollTop;
-    this.isScrolled.set(scrollOffset > 50);
+    
+    // Only update signal when value actually changes
+    const isNowScrolled = scrollOffset > 50;
+    if (this.lastScrolledState !== isNowScrolled) {
+      this.lastScrolledState = isNowScrolled;
+      this.isScrolled.set(isNowScrolled);
+    }
 
-    // Parallax: fade out hero and zoom out as user scrolls
-    const heroEl = document.querySelector('.hero-section') as HTMLElement;
-    if (heroEl) {
-      const heroHeight = heroEl.offsetHeight || 500;
+    // Parallax: use cached DOM references
+    if (!this.cachedHeroEl) {
+      this.cachedHeroEl = document.querySelector('.hero-section') as HTMLElement;
+      if (this.cachedHeroEl) {
+        this.cachedHeroImgs = Array.from(document.querySelectorAll('.hero-image-content img')) as HTMLElement[];
+      }
+    }
+    
+    if (this.cachedHeroEl) {
+      const heroHeight = this.cachedHeroEl.offsetHeight || 500;
       const scrollProgress = scrollOffset / heroHeight;
       const ratio = Math.min(scrollProgress * 1.5, 1);
       
-      const imgContents = document.querySelectorAll('.hero-image-content img');
-      imgContents.forEach((img) => {
-        const imgEl = img as HTMLElement;
+      for (let i = 0; i < this.cachedHeroImgs.length; i++) {
         const scale = Math.max(1 - (scrollProgress * 0.2), 0.8);
         const translateY = scrollOffset * 0.4;
-        imgEl.style.transform = `translateY(${translateY}px) scale(${scale})`;
-      });
+        this.cachedHeroImgs[i].style.transform = `translateY(${translateY}px) scale(${scale})`;
+      }
       
-      heroEl.style.opacity = `${1 - ratio}`;
+      this.cachedHeroEl.style.opacity = `${1 - ratio}`;
     }
 
     if (this.isLoading() || this.isLazyLoading() || this.shelfLoading() || this.shelvesLoading()) {
@@ -1802,6 +1817,7 @@ export class App implements OnInit {
   }
 
   setLanguage(lang: string, event?: Event): void {
+    this.cachedHeroEl = null;
     if (event) {
       event.preventDefault();
       event.stopPropagation();
