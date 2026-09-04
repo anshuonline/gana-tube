@@ -70,13 +70,26 @@
     </div>
   </div>
 
-  <!-- Right Ask Panel -->
-  <div class="discovery-sidebar">
-    <div class="ask-panel">
+  <!-- Floating Aura Chat Bubble -->
+  <div class="aura-container" [class.minimized]="isAuraMinimized">
+    
+    <!-- Collapsed FAB -->
+    <button class="aura-fab" *ngIf="isAuraMinimized" (click)="toggleAura()">
+      <svg lucideSparkles [attr.size]="24"></svg>
+    </button>
+
+    <!-- Expanded Chat Window -->
+    <div class="ask-panel" *ngIf="!isAuraMinimized">
       <div class="ask-header">
-        <svg lucideSparkles [attr.size]="24" class="ask-icon"></svg>
-        <h3>Ask AI DJ</h3>
+        <div class="header-left">
+          <svg lucideSparkles [attr.size]="20" class="ask-icon"></svg>
+          <h3>Aura</h3>
+        </div>
+        <button class="minimize-btn" (click)="toggleAura()">
+          <svg lucideMinus [attr.size]="20"></svg>
+        </button>
       </div>
+      
       <div class="ask-body">
         <p>Tell me what you're in the mood for. I'll curate the perfect mix instantly.</p>
         <div class="prompt-examples">
@@ -85,12 +98,13 @@
           <button (click)="askQuery = 'High energy gym workout'; askAI()">"High energy gym workout"</button>
         </div>
       </div>
+      
       <div class="ask-input-area">
         <textarea 
           [(ngModel)]="askQuery" 
           placeholder="E.g., Arijit Singh romantic hits..."
           (keyup.enter)="$event.preventDefault(); askAI()"
-          rows="3"
+          rows="2"
         ></textarea>
         <button class="send-btn" (click)="askAI()" [disabled]="isSearching || !askQuery.trim()">
           <span *ngIf="!isSearching">Curate</span>

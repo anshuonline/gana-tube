@@ -2,14 +2,14 @@ import { Component, EventEmitter, Output, ElementRef, ViewChild, ChangeDetectorR
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom, timeout, catchError, of } from 'rxjs';
-import { LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft } from '@lucide/angular';
+import { LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft, LucideMinus, LucideMessageCircle } from '@lucide/angular';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-discovery-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft],
+  imports: [CommonModule, FormsModule, LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft, LucideMinus, LucideMessageCircle],
   templateUrl: './discovery-page.component.html',
   styleUrls: ['./discovery-page.component.scss']
 })
@@ -21,6 +21,7 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
   isSearching: boolean = false;
   loadingMessage: string = '';
   errorMessage: string = '';
+  isAuraMinimized: boolean = false;
   
   // Hero items (could be hardcoded or dynamically fetched)
   heroItems = [
@@ -68,6 +69,10 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
     if (!query) return;
     await this.discover(query);
     // On mobile we might want to clear or unfocus
+  }
+
+  toggleAura() {
+    this.isAuraMinimized = !this.isAuraMinimized;
   }
 
   async discover(intent: string) {
@@ -148,7 +153,7 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
       const windowH = window.innerHeight;
       const docH = document.documentElement.scrollHeight;
 
-      if (scrollY + windowH >= docH - 300) {
+      if (scrollY + windowH >= docH - 1200) {
         this.isLoadingMore = true;
         this.loadNextBatch();
       }
