@@ -713,11 +713,8 @@
   transition: padding-bottom 0.4s;
   position: relative;
   z-index: 1;
-  /* Ambient dark mesh gradient background */
-  background: 
-    radial-gradient(circle at 15% 50%, rgba(29, 13, 56, 0.5), transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(13, 29, 56, 0.4), transparent 40%),
-    transparent;
+  /* Pure AMOLED Black background */
+  background: var(--color-bg);
   background-attachment: fixed;
 
   &.has-player {
@@ -1218,7 +1215,7 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 64px 16px 48px;
+    display: none;
   }
 
   .main-content {
