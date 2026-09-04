@@ -236,7 +236,10 @@ export class App implements OnInit {
   playerCoverAd = signal<SponsoredAd | null>(null);
   showAd = signal<boolean>(true);
 
-  // Dynamic Hero Header Data (from ManageGT admin)
+  // Home feed dynamic chips
+  dynamicChips = signal<string[]>(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh']);
+
+  // Dynamic Hero Header Data
   heroData = signal<Record<string, { badge: string; title: string; subtitle: string; imageUrl: string; buttonText: string; buttonLink?: string }>>({});
 
   private manageApiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
@@ -622,6 +625,35 @@ export class App implements OnInit {
       if (trackToSave) {
         this.openSaveToPlaylist(trackToSave);
         this.appState.savePlaylistTrack.set(null); // Reset after opening
+      }
+    }, { allowSignalWrites: true });
+
+    // Dynamic chips effect based on currently playing track
+    effect(() => {
+      const track = this.playerService.currentTrack();
+      if (track) {
+        const title = track.title || track.snippet?.title || '';
+        let channel = track.channelTitle || track.snippet?.channelTitle || '';
+        
+        if (channel.toLowerCase().includes('vevo') || channel.toLowerCase().includes('official')) {
+          channel = channel.replace(/vevo/ig, '').replace(/official/ig, '').trim();
+        }
+        if (!channel) channel = 'Artist';
+
+        // Keep 'All' as the first chip for resetting
+        const chips = [
+          'All',
+          `More from ${channel}`,
+          `${channel} Mix`,
+          'Similar Songs',
+          'Indie Pop',
+          'Trending',
+          'Chill Vibes'
+        ];
+        // Deduplicate and set
+        this.dynamicChips.set([...new Set(chips)].slice(0, 8));
+      } else {
+        this.dynamicChips.set(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh']);
       }
     }, { allowSignalWrites: true });
 
@@ -1523,7 +1555,13 @@ export class App implements OnInit {
 
   onSuggestSearch(query: string): void {
     if (!query) return;
-    this.performSearch(query);
+    
+    // If not "All", execute search directly on the home page instead of routing
+    if (query !== 'All') {
+      this.executeSearchApi(query);
+    } else {
+      this.resetSearchState(new Event('click'));
+    }
     
     // Sync listening preference to backend if logged in
     const user = this.authService.currentUser();

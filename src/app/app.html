@@ -1,4 +1,4 @@
-﻿<div class="app-container" [class.player-active]="playerService.currentTrack() !== null">
+<div class="app-container" [class.player-active]="playerService.currentTrack() !== null">
   <!-- Hidden YouTube Player -->
   <app-yt-player *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin'"></app-yt-player>
 
@@ -99,25 +99,13 @@
     <!-- Header Genre & Mood Chips (Below Navbar) -->
     <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode() && !hasSearched() && currentPage() === 'home'">
       <div class="header-chips-scroll">
-        <button class="header-chip" [class.active]="!hasSearched()" (click)="resetSearchState($event)">All</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Romantic Songs 2026'" (click)="onSuggestSearch('Hindi Romantic Songs 2026')">Romantic</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Bollywood Party Hits'" (click)="onSuggestSearch('Bollywood Party Hits')">Party</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'lo-fi chill beats'" (click)="onSuggestSearch('lo-fi chill beats')">Lo-Fi</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Sufi Music Hits'" (click)="onSuggestSearch('Sufi Music Hits')">Sufi</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Hindi Sad Melodies'" (click)="onSuggestSearch('Hindi Sad Melodies')">Sad</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Arijit Singh Hits'" (click)="onSuggestSearch('Arijit Singh Hits')">Arijit Singh</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Latest Punjabi Hits 2026'" (click)="onSuggestSearch('Latest Punjabi Hits 2026')">Punjabi</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Desi Hip Hop Hits'" (click)="onSuggestSearch('Desi Hip Hop Hits')">Hip Hop</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === '90s Bollywood Hits'" (click)="onSuggestSearch('90s Bollywood Hits')">Retro</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Indian Classical Instrumental'" (click)="onSuggestSearch('Indian Classical Instrumental')">Instrumental</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Coke Studio Hits'" (click)="onSuggestSearch('Coke Studio Hits')">Coke Studio</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Devotional Songs'" (click)="onSuggestSearch('Devotional Songs')">Devotional</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Ghazal Classics'" (click)="onSuggestSearch('Ghazal Classics')">Ghazal</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Indian Indie Music'" (click)="onSuggestSearch('Indian Indie Music')">Indie</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'K-Pop Trending'" (click)="onSuggestSearch('K-Pop Trending')">K-Pop</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Electronic Dance Music'" (click)="onSuggestSearch('Electronic Dance Music')">EDM</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Workout Motivation Songs'" (click)="onSuggestSearch('Workout Motivation Songs')">Workout</button>
-        <button class="header-chip" [class.active]="hasSearched() && currentQuery === 'Bhojpuri Hits'" (click)="onSuggestSearch('Bhojpuri Hits')">Bhojpuri</button>
+        <button 
+          *ngFor="let chip of dynamicChips()" 
+          class="header-chip" 
+          [class.active]="currentQuery === chip || (!hasSearched() && chip === 'All')" 
+          (click)="onSuggestSearch(chip)">
+          {{ chip }}
+        </button>
       </div>
     </div>
   </header>
@@ -580,7 +568,7 @@
           </div>
         </div>
         <app-search-results 
-          *ngIf="hasSearched() && isSearchMode()"
+          *ngIf="hasSearched()"
           [results]="results()" 
           [isLoading]="isLoading()"
           [hasSearched]="hasSearched()"
