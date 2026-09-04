@@ -70,6 +70,14 @@ export class YoutubeApiService {
     );
   }
 
+  private isBanned(item: any): boolean {
+    const title = (item.title || item.snippet?.title || '').toLowerCase();
+    const channel = (item.channelTitle || item.snippet?.channelTitle || '').toLowerCase();
+    const bannedKeywords = ['dj remix', 'non stop remix', 'bollywood dj', 'dj jitesh', 'dj dalal', 'remix dj'];
+    
+    return bannedKeywords.some(kw => title.includes(kw) || channel.includes(kw));
+  }
+
   searchMusic(query: string, maxResults = 20, type: 'song' | 'album' | 'playlist' = 'song'): Observable<YouTubeSearchResult[]> {
     const cacheKey = `search_${type}_${query}_${maxResults}`;
     const cached = localStorage.getItem(cacheKey);
@@ -117,6 +125,7 @@ export class YoutubeApiService {
           catchError(() => of([]))
         );
       }),
+      map(results => results.filter(track => !this.isBanned(track))),
       map(results => this.injectCuratedSongs(query, results)),
       map(results => {
         if (results && results.length > 0) {
@@ -182,6 +191,7 @@ export class YoutubeApiService {
               duration: this.parseISO8601Duration(item.contentDetails?.duration)
             })) : []
           ),
+          map(results => results.filter(track => !this.isBanned(track))),
           catchError((err) => {
             console.warn('Backend yt-videos failed, falling back to individual searches', err);
             // Fallback: search for each video ID using yt-search
@@ -207,6 +217,7 @@ export class YoutubeApiService {
                   }
                   return null;
                 }),
+                map(track => track && !this.isBanned(track) ? track : null),
                 catchError(() => of(null))
               );
             });
