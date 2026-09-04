@@ -16,7 +16,7 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
   },
   {
     "id": "2002",
-    "title": "Mitraz & Vibe",
+    "title": "Mitraz Vibe",
     "language": "Hindi",
     "coverImage": "https://yt3.googleusercontent.com/JSwQ_BbPakmEGEZm5B81TRq0GuC4mMfoW76w0vfgpxuy57pH_xiwQzVLUxW5XB3dgoE21w5z8s_q4DyM=w600-h600-l90-rj",
     "searchQueries": [
@@ -57,7 +57,7 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
     "id": "2005",
     "title": "GenZ Heartbreak",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/RD-yCCUYaJs6hXUuIiMZ-JEbJd7o05n_oWBerNxGhibGiLUQ02hrc0EtzzRoqxeQ6sSOUafNtd70yCAH=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/bIAf42UjuKGd7WK3TpdQVJAchrbrlOMj79PGjC592zb9IYFjuicBx-kO-PF3kbY2Lcny7lYQAZWeIpY=w600-h600-l90-rj",
     "searchQueries": [
       "Darshan Raval Sad",
       "Jubin Nautiyal emotional",
@@ -96,7 +96,7 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
     "id": "2008",
     "title": "Aesthetic Lo-Fi",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/5tH3R2ZkUp9WzDaG8c_UNncgeFcnfTniqt_pNMhHQWcSwuUanBULSeA4UJUTgAbP5JMVjp2jgD0uYw56=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/Bx7K_CPa195NNoHTdC18w3oip9PPnt7TMChxTrWk3ZpDEqaQqqUyK-TWM1lmJrIjAL8ILp5-n9FrTc2Y=w600-h600-l90-rj",
     "searchQueries": [
       "Lofi chill bollywood aesthetic",
       "Hindi lofi mashup",
@@ -122,7 +122,7 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
     "id": "2010",
     "title": "Coke Studio Magic",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/tNq-2x_tBPyihS9aMJGChKO6_cnshAiB9Kym8AlQQ7SW1HtuTKFgdYjz0-2MQb4_I3ljCss5_K_Wlsk=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/CH0SThQN0HOk2eV81GGA-Tiftn58G48iy8lEyKNXJjbDSI9ApKKnmt4ncwr5gO_mZoQvFF3HPfHtky1Y=w600-h600-l90-rj",
     "searchQueries": [
       "Ali Sethi Pasoori",
       "Kaifi Khalil Kahani Suno",
@@ -159,12 +159,13 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
   },
   {
     "id": "2013",
-    "title": "Bollywood Romance",
+    "title": "Talwiinder & Vibes",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/TFXzTbP8FEAEgodLKv1XFDG60_ugIobZeE8k4nWI7Cqwev4ByAaGQijzzJrgyMbOkH33OPRSWz8UAfjl=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/NvWDX61hm3gfFqae09LUlHKmzeHMetBijO_b21cmjnaU2i0KJrHHjq_YLiSLZcK6oSTZkeF3JbTAmdQOSg=w600-h600-l90-rj",
     "searchQueries": [
-      "Arijit Singh Romantic hits",
-      "Shreya Ghoshal love songs"
+      "Talwiinder",
+      "Abdul Hannan",
+      "Hasan Raheem"
     ],
     "creator": "GanaTube Curated",
     "is_public": true
@@ -197,24 +198,26 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
   },
   {
     "id": "2016",
-    "title": "Retro Vibes 90s",
+    "title": "Seedhe Maut & Krsna",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/JvgJCrcaDGi89zHXxiipe6K7OPj6pqpUm2evPFxtxWiR81lNgGa2LzxqXsCaUK-CSR7vuDh7rGnOG3zp=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/9-7SPcwOYnLLWG1UEPZU2JSeifw0dzMR4SugQ2Xq3tyanj5-Yrwe4vmNjQKIafvm99uwzOvVq1JL-JOMvA=w600-h600-l90-rj",
     "searchQueries": [
-      "Kumar Sanu 90s hits",
-      "Alka Yagnik romantic hits"
+      "Seedhe Maut",
+      "Krsna Rap",
+      "Raftaar"
     ],
     "creator": "GanaTube Curated",
     "is_public": true
   },
   {
     "id": "2017",
-    "title": "Sufi & Soul",
+    "title": "Zaeden & OAFF",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/se-UaS4uRxaIRrhsoiRE4Cb95HL0alTSckIHigyo-EMcIGoqXICM_5KjB8ifdWm3vheE_RkKg49FruSmCA=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/iXt4801MboAog2g5H-sQCKfaGRRcDzA_rQUW8CgFF2KJ9vNLrcFBJERz_8xocNMwbqJkPQLLq2cshao=w600-h600-l90-rj",
     "searchQueries": [
-      "Nusrat Fateh Ali Khan",
-      "Rahat Fateh Ali Khan sad"
+      "Zaeden",
+      "OAFF",
+      "Savera"
     ],
     "creator": "GanaTube Curated",
     "is_public": true
@@ -236,7 +239,7 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
     "id": "2019",
     "title": "Workout Energy",
     "language": "English",
-    "coverImage": "https://yt3.googleusercontent.com/OHJbRg4Bino9ZrrWAJ24QEfZU6RVNOGPUAF90jtlND472g4FhFu53einDnUM5pEL4Rt26zR2YGSNfqpo=w600-h600-s-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/GJmbTYfaMrWuPSzhOAy7jGCQ70a2UN2-0moTq-uh_Prd73-Au51FDHhGteg543a7iBv1Y9SPm4huMSBS=w600-h600-s-l90-rj",
     "searchQueries": [
       "Eminem Till I Collapse",
       "Skrillex",
@@ -247,26 +250,26 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
   },
   {
     "id": "2020",
-    "title": "Acoustic Covers",
+    "title": "King & Jasleen",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/C0RXFbhNNjk1wP_Duxt05-LZSkQ_Cdly6AL2jcGaFiN3lzekT5h6KtRJHOfJAQrY4Btxsw6F1LCTSR8=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/B8qfmAm8BOtXmSEwYMkcotK6nun-imczlC1r8OyeCxGMJqqfoxFkqCWL38MgFN3dcmYp63PLo4aQYbo=w600-h600-l90-rj",
     "searchQueries": [
-      "Acoustic cover hindi songs",
-      "Unplugged hindi songs",
-      "Raw vocals hindi"
+      "King Maan Meri Jaan",
+      "Jasleen Royal",
+      "Harrdy Sandhu"
     ],
     "creator": "GanaTube Curated",
     "is_public": true
   },
   {
     "id": "2021",
-    "title": "Punjabi Hits",
+    "title": "Punjabi Drip",
     "language": "Hindi",
     "coverImage": "https://yt3.googleusercontent.com/0qFbPaWYZjGP3eW8xeOx42S4nw38dU418iWaGc0W5F3a_It-7cXB880bOGH9me8N0T6pY07iD_3KHg5xJA=w600-h600-l90-rj",
     "searchQueries": [
       "Diljit Dosanjh hits",
-      "Hardy Sandhu",
-      "Guru Randhawa"
+      "Tarn Virk",
+      "Gurinder Gill"
     ],
     "creator": "GanaTube Curated",
     "is_public": true
@@ -299,24 +302,26 @@ export const CURATED_PLAYLISTS: PlaylistMeta[] = [
   },
   {
     "id": "2024",
-    "title": "Ghazal Classics",
+    "title": "Indie Pop Gold",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/YOWW-I-1Y0b_QXbsmAlDhVRtfgIlLWWhaOnaHKwk-Zw36pMFzHe_tljfUkI97pXj9PXpdXdPhAKZU2A=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/MgdgWHqd11NoSUB7M9hhhJvuS7lKYMEdMD_QxWYFDaDwxip5RAt6Z3RuYn95bSTAoTa8noppvjEQ6PrA=w600-h600-l90-rj",
     "searchQueries": [
-      "Jagjit Singh Ghazals",
-      "Pankaj Udhas"
+      "When Chai Met Toast",
+      "The Local Train",
+      "Yellow Diary"
     ],
     "creator": "GanaTube Curated",
     "is_public": true
   },
   {
     "id": "2025",
-    "title": "Atif Aslam Best",
+    "title": "Twin Strings Cover",
     "language": "Hindi",
-    "coverImage": "https://yt3.googleusercontent.com/VuAhNWvcC8T0ogKTnsLwtfxGMzCJYfkjPWEID-jB_gLxSRW4ORlTIUHucyKRJ9ImwPIdH-SJgYczkptO=w600-h600-l90-rj",
+    "coverImage": "https://yt3.googleusercontent.com/q8asNFSeDEDhyVKIr_Y_eZN7ulJnWIRAxUfKg5_b98zvBk-sgvX2TE2E-0bxa8jA25tcyO-SqboXE_GI=w600-h600-l90-rj",
     "searchQueries": [
-      "Atif Aslam best songs",
-      "Atif Aslam sad songs"
+      "Twin Strings",
+      "Sanam",
+      "Acoustic Singh"
     ],
     "creator": "GanaTube Curated",
     "is_public": true
