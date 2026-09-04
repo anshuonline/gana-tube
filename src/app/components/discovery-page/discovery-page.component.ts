@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ElementRef, ViewChild, ChangeDetectorRef, NgZone, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output, ElementRef, ViewChild, ChangeDetectorRef, NgZone, OnInit, OnDestroy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom, timeout, catchError, of } from 'rxjs';
@@ -10,6 +10,7 @@ import { PlayerService } from '../../services/player.service';
   selector: 'app-discovery-page',
   standalone: true,
   imports: [CommonModule, FormsModule, LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft, LucideMinus, LucideMessageCircle],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './discovery-page.component.html',
   styleUrls: ['./discovery-page.component.scss']
 })

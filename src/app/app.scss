@@ -436,7 +436,7 @@
   overflow: visible;
 
   @media (max-width: 992px) {
-    padding: 100px 0 20px;
+    display: none !important;
   }
 }
 
@@ -892,7 +892,7 @@
 }
 
 .song-card:hover .card-thumbnail::after {
-  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
 }
 
 /* New overlay style to make play button pop */
@@ -1219,10 +1219,6 @@
 }
 
 @media (max-width: 768px) {
-  .hero-section {
-    display: none !important;
-  }
-
   .main-content {
     max-width: 100%;
     width: 100%;
@@ -1861,7 +1857,6 @@
   right: 12px;
   top: 12px;
   background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.1);
   color: #fff;
   cursor: pointer;
@@ -1884,8 +1879,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(4px);
+  background: rgba(255,255,255,0.95);
   color: #000;
   border: none;
   display: flex;
