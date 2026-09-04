@@ -91,6 +91,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   showCoverAd = false;
   private adTimers: any[] = [];
   
+  displayTrack = signal<Track | null>(null);
   isChanging = false;
   private changeTimeout: any;
 
@@ -101,15 +102,24 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
       const track = this.playerService.currentTrack();
       
       // Trigger animation
-      if (track) {
-        this.isChanging = true;
-        this.cdr.detectChanges();
-        
-        clearTimeout(this.changeTimeout);
-        this.changeTimeout = setTimeout(() => {
-          this.isChanging = false;
+      if (track && track.videoId !== this.displayTrack()?.videoId) {
+        if (!this.displayTrack()) {
+          // First load, don't animate, just set it
+          this.displayTrack.set(track);
+        } else {
+          // Fade out old track
+          this.isChanging = true;
           this.cdr.detectChanges();
-        }, 300);
+          
+          clearTimeout(this.changeTimeout);
+          this.changeTimeout = setTimeout(() => {
+            // Swap data while opacity is 0
+            this.displayTrack.set(track);
+            // Fade in new track
+            this.isChanging = false;
+            this.cdr.detectChanges();
+          }, 300); // 300ms matches the CSS transition time
+        }
       }
       if (track && this.activeView === 'lyrics') {
         this.fetchLyrics();

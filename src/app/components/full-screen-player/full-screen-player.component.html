@@ -1,7 +1,7 @@
 <div class="fs-player-overlay" [class.visible]="isVisible">
   
   <!-- Ambient blurred background -->
-  <div class="fs-bg-ambient" [style.background-image]="'url(' + playerService.currentTrack()?.thumbnailHigh + ')'"></div>
+  <div class="fs-bg-ambient" [style.background-image]="'url(' + displayTrack()?.thumbnailHigh + ')'"></div>
   <div class="fs-bg-overlay"></div>
 
   <div class="fs-container">
@@ -15,7 +15,7 @@
       <!-- Playing From text for Artwork View -->
       <div class="fs-header-text">
         <span class="fs-now-playing">NOW PLAYING</span>
-        <span class="fs-source">{{ playerService.currentTrack()?.channelTitle }}</span>
+        <span class="fs-source">{{ displayTrack()?.channelTitle }}</span>
       </div>
 
       <div class="fs-header-right" style="position: relative;">
@@ -35,8 +35,8 @@
       <div class="fs-player-view" *ngIf="activeView === 'artwork'">
         <div class="fs-artwork-container" (click)="onCoverClick($event)" (contextmenu)="onRightClick($event)">
           <img 
-            [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail" 
-            [alt]="playerService.currentTrack()?.title"
+            [src]="displayTrack()?.thumbnailHigh || displayTrack()?.thumbnail" 
+            [alt]="displayTrack()?.title"
             class="fs-album-art track-transition"
             [class.ad-active]="showCoverAd"
             [class.track-changing]="isChanging"
@@ -176,9 +176,9 @@
       <div class="fs-track-info-row">
         <div class="fs-track-text">
           <div class="fs-title-wrapper">
-            <h2 class="fs-title track-transition" [title]="playerService.currentTrack()?.title" [class.track-changing]="isChanging">{{ playerService.currentTrack()?.title }}</h2>
+            <h2 class="fs-title track-transition" [title]="displayTrack()?.title" [class.track-changing]="isChanging">{{ displayTrack()?.title }}</h2>
           </div>
-          <p class="fs-artist track-transition" [class.track-changing]="isChanging">{{ playerService.currentTrack()?.channelTitle }}</p>
+          <p class="fs-artist track-transition" [class.track-changing]="isChanging">{{ displayTrack()?.channelTitle }}</p>
         </div>
         <button class="fs-toggle-btn like-btn" [class.active]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
           <svg lucideHeart [attr.size]="28" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
@@ -272,7 +272,7 @@
 
   <!-- Reusable Track Menu (Anchored to More Options in Header) -->
   <app-track-menu 
-    [track]="playerService.currentTrack()"
+    [track]="displayTrack()"
     [isOpen]="showMenu"
     [xPos]="menuX"
     [yPos]="menuY"
