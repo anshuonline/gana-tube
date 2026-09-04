@@ -312,14 +312,14 @@
 }
 
 .header-chip {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
   font-family: var(--primary-font);
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 8px 20px;
-  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
@@ -892,7 +892,7 @@
 }
 
 .song-card:hover .card-thumbnail::after {
-  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
 }
 
 /* New overlay style to make play button pop */
@@ -912,7 +912,7 @@
   justify-content: center;
 }
 .song-card:hover .thumbnail-overlay {
-  opacity: 1;
+  opacity: 0;
 }
 
 .card-thumbnail img {
@@ -924,7 +924,7 @@
 }
 
 .song-card:hover .card-thumbnail img {
-  transform: scale(1.1) rotate(1deg);
+  transform: none;
 }
 
 .card-info {
@@ -1220,7 +1220,7 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    display: none;
+    display: none !important;
   }
 
   .main-content {
