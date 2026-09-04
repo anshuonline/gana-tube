@@ -125,7 +125,7 @@ export class YoutubeApiService {
           catchError(() => of([]))
         );
       }),
-      map(results => results.filter(track => !this.isBanned(track))),
+      map(results => results.filter((track: YouTubeSearchResult) => !this.isBanned(track))),
       map(results => this.injectCuratedSongs(query, results)),
       map(results => {
         if (results && results.length > 0) {
@@ -191,7 +191,7 @@ export class YoutubeApiService {
               duration: this.parseISO8601Duration(item.contentDetails?.duration)
             })) : []
           ),
-          map(results => results.filter(track => !this.isBanned(track))),
+          map(results => results.filter((track: YouTubeSearchResult) => !this.isBanned(track))),
           catchError((err) => {
             console.warn('Backend yt-videos failed, falling back to individual searches', err);
             // Fallback: search for each video ID using yt-search
