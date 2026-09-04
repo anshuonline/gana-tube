@@ -400,7 +400,7 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 1000;
+  z-index: 2000;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
   &.has-player {

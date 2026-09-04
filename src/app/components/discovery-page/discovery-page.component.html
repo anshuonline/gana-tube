@@ -10,7 +10,10 @@
         <div class="skeleton-bg skeleton-pulse"></div>
       </div>
       
-      <div class="hero-carousel" *ngIf="!isHeroLoading" [style.transform]="'translateX(-' + currentHeroIndex * 100 + '%)'">
+      <div class="hero-carousel" *ngIf="!isHeroLoading" 
+           [style.transform]="'translateX(-' + currentHeroIndex * 100 + '%)'"
+           (touchstart)="onTouchStart($event)" 
+           (touchend)="onTouchEnd($event)">
         <div class="hero-slide" *ngFor="let hero of heroItems; let i = index">
           <img [src]="hero.thumbnailHigh || hero.thumbnail" alt="hero image" class="hero-bg" />
           <div class="hero-glass-overlay"></div>

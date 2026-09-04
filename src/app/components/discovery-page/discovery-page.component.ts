@@ -108,6 +108,28 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
     this.currentHeroIndex = (this.currentHeroIndex - 1 + this.heroItems.length) % this.heroItems.length;
   }
 
+  // Mobile Swipe Support
+  touchStartX = 0;
+  touchEndX = 0;
+
+  onTouchStart(e: TouchEvent) {
+    this.touchStartX = e.changedTouches[0].screenX;
+  }
+
+  onTouchEnd(e: TouchEvent) {
+    this.touchEndX = e.changedTouches[0].screenX;
+    this.handleSwipe();
+  }
+
+  handleSwipe() {
+    if (this.touchEndX < this.touchStartX - 50) {
+      this.nextHero(); // swipe left
+    }
+    if (this.touchEndX > this.touchStartX + 50) {
+      this.prevHero(); // swipe right
+    }
+  }
+
   async askAI() {
     const query = this.askQuery.trim();
     if (!query) return;

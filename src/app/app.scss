@@ -286,7 +286,9 @@
   }
 
   @media (max-width: 768px) {
-    display: none;
+    /* Previously display: none, now keep it visible */
+    margin-top: 4px;
+    margin-bottom: -4px;
   }
 }
 
