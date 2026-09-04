@@ -248,6 +248,44 @@ export class App implements OnInit {
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
+
+  private hoverPreviewAudio: HTMLAudioElement | null = null;
+  private hoverPreviewTimeout: any = null;
+
+  onCardHover(track: YouTubeSearchResult | undefined, isHovering: boolean) {
+    if (!track || typeof window === 'undefined') return;
+    
+    if (isHovering) {
+      this.hoverPreviewTimeout = setTimeout(() => {
+        if (this.hoverPreviewAudio) {
+          this.hoverPreviewAudio.pause();
+        }
+        this.hoverPreviewAudio = new Audio();
+        
+        const apiUrl = window.location.hostname === 'localhost'
+          ? 'http://localhost/manageads/stream.php'
+          : 'https://manageads.ganatube.in/stream.php';
+          
+        this.hoverPreviewAudio.src = `${apiUrl}?id=${track.videoId}`;
+        // Random start time between 30 and 80 seconds
+        this.hoverPreviewAudio.currentTime = Math.floor(Math.random() * 50) + 30;
+        this.hoverPreviewAudio.volume = 0.3; // Low volume for preview
+        this.hoverPreviewAudio.play().catch(e => console.log('Hover preview play failed', e));
+        
+        setTimeout(() => {
+          if (this.hoverPreviewAudio && this.hoverPreviewAudio.src.includes(track.videoId)) {
+            this.hoverPreviewAudio.pause();
+          }
+        }, 5000); // 5 seconds preview limit
+      }, 500); // 500ms delay to prevent triggering on quick swipes
+    } else {
+      clearTimeout(this.hoverPreviewTimeout);
+      if (this.hoverPreviewAudio) {
+        this.hoverPreviewAudio.pause();
+        this.hoverPreviewAudio = null;
+      }
+    }
+  }
   private location = inject(Location);
   private sanitizer = inject(DomSanitizer);
   private titleService = inject(Title);
