@@ -149,9 +149,18 @@ export class SpinWheelComponent implements OnInit {
       return;
     }
     
+    let useCoins = false;
     if (this.spinsLeft() <= 0) {
-      alert("No chances left today! Listen to music for 2 minutes to earn a chance.");
-      return;
+      if (this.gCoins() >= 20) {
+        if (confirm("You have 0 free spins. Do you want to use 20 G Coins for an extra spin?")) {
+           useCoins = true;
+        } else {
+           return;
+        }
+      } else {
+        alert("No free chances left today! Listen to music for 2 minutes to earn a chance, or collect 20 G Coins for an extra spin.");
+        return;
+      }
     }
     
     if (this.isSpinning()) return;
@@ -172,7 +181,7 @@ export class SpinWheelComponent implements OnInit {
     this.syncAudioSpeed(9000);
     
     // Call API
-    this.http.post<any>(`${this.apiUrl}?action=spin`, { email: user.email })
+    this.http.post<any>(`${this.apiUrl}?action=spin`, { email: user.email, use_coins: useCoins })
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {

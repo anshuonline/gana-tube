@@ -36,7 +36,7 @@
     </div>
     
     <div class="action-row">
-      <button class="spin-btn" (click)="spin()" [disabled]="isSpinning() || spinsLeft() <= 0 || !authService.currentUser()">
+      <button class="spin-btn" (click)="spin()" [disabled]="isSpinning() || (spinsLeft() <= 0 && gCoins() < 20) || !authService.currentUser()">
         {{ isSpinning() ? 'Spinning...' : 'SPIN NOW' }}
       </button>
     </div>

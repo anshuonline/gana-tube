@@ -4,25 +4,47 @@
     
     <!-- Hero Section -->
     <div class="discovery-hero">
-      <div class="hero-carousel" [style.transform]="'translateX(-' + currentHeroIndex * 100 + '%)'">
+      
+      <!-- Loading Skeleton -->
+      <div class="hero-skeleton" *ngIf="isHeroLoading">
+        <div class="skeleton-bg skeleton-pulse"></div>
+      </div>
+      
+      <div class="hero-carousel" *ngIf="!isHeroLoading" [style.transform]="'translateX(-' + currentHeroIndex * 100 + '%)'">
         <div class="hero-slide" *ngFor="let hero of heroItems; let i = index">
-          <img [src]="hero.image" alt="hero image" class="hero-bg" />
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <h2>{{ hero.title }}</h2>
-            <p>{{ hero.subtitle }}</p>
+          <img [src]="hero.thumbnailHigh || hero.thumbnail" alt="hero image" class="hero-bg" />
+          <div class="hero-glass-overlay"></div>
+          
+          <div class="hero-content-wrapper">
+            <div class="hero-thumb-glass" (click)="onPlay(hero)">
+              <img [src]="hero.thumbnailHigh || hero.thumbnail" [alt]="hero.title" />
+              <div class="play-glass-btn">
+                <svg lucidePlay [attr.size]="36" [attr.fill]="'currentColor'"></svg>
+              </div>
+            </div>
+            
+            <div class="hero-text-glass">
+              <span class="genz-badge">TRENDING NOW</span>
+              <h2 [title]="hero.title">{{ hero.title }}</h2>
+              <p>
+                <svg lucideMusic [attr.size]="14"></svg>
+                {{ hero.channelTitle }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
+      
       <!-- Controls -->
-      <button class="hero-nav prev" (click)="prevHero()">
+      <button class="hero-nav prev" *ngIf="!isHeroLoading && heroItems.length > 1" (click)="prevHero()">
         <svg lucideChevronLeft></svg>
       </button>
-      <button class="hero-nav next" (click)="nextHero()">
+      <button class="hero-nav next" *ngIf="!isHeroLoading && heroItems.length > 1" (click)="nextHero()">
         <svg lucideChevronRight></svg>
       </button>
+      
       <!-- Dots -->
-      <div class="hero-dots">
+      <div class="hero-dots" *ngIf="!isHeroLoading && heroItems.length > 1">
         <span class="dot" *ngFor="let hero of heroItems; let i = index" [class.active]="currentHeroIndex === i" (click)="currentHeroIndex = i"></span>
       </div>
     </div>

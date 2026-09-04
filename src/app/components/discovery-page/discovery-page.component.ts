@@ -23,13 +23,30 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
   errorMessage: string = '';
   isAuraMinimized: boolean = false;
   
-  // Hero items (could be hardcoded or dynamically fetched)
-  heroItems = [
-    { title: 'Top Hits 2026', subtitle: 'The most played songs this week', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1200&h=400' },
-    { title: 'Chill Lo-Fi', subtitle: 'Relax and unwind with smooth beats', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1200&h=400' },
-    { title: 'Workout Energy', subtitle: 'Push your limits with high BPM', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200&h=400' }
-  ];
+  // Hero items dynamically fetched
+  heroItems: YouTubeSearchResult[] = [];
   currentHeroIndex = 0;
+  isHeroLoading = true;
+  
+  // Gen Z Artist/Song Pool
+  private genZQueries = [
+    'Anuv Jain best songs',
+    'Prateek Kuhad top hits',
+    'AP Dhillon trending',
+    'The Weeknd top hits',
+    'Dua Lipa best songs',
+    'Darshan Raval top hits',
+    'King (Indian) top hits',
+    'Mitraz top hits',
+    'Karan Aujla latest',
+    'Taylor Swift trending',
+    'Osho Jain songs',
+    'Mismatched web series songs',
+    'Bateya Anuv Jain',
+    'Starboy The Weeknd',
+    'Diljit Dosanjh hits',
+    'Arijit Singh romantic hits'
+  ];
 
   // Feed results
   private allResults: YouTubeSearchResult[] = [];
@@ -50,6 +67,32 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.discover('Trending music hits'); // Default initial load
+    this.loadHeroItems();
+  }
+
+  async loadHeroItems() {
+    this.isHeroLoading = true;
+    this.heroItems = [];
+    
+    // Shuffle and pick 5 unique queries
+    const shuffled = [...this.genZQueries].sort(() => 0.5 - Math.random());
+    const selectedQueries = shuffled.slice(0, 5);
+    
+    try {
+      const promises = selectedQueries.map(query => 
+        firstValueFrom(this.youtubeApi.searchMusic(query, 1).pipe(
+          catchError(() => of([] as YouTubeSearchResult[]))
+        ))
+      );
+      
+      const results = await Promise.all(promises);
+      this.heroItems = results.map(r => r[0]).filter(track => !!track);
+    } catch(e) {
+      console.error('Failed to load hero items', e);
+    } finally {
+      this.isHeroLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
   ngOnDestroy() {
