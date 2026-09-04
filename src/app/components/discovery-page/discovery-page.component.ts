@@ -66,7 +66,8 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.discover('Trending music hits'); // Default initial load
+    // Load Gen-Z aesthetic Indie / Modern hits by default instead of generic trending
+    this.discover('Anuv Jain, Mitraz, indie pop trending hits'); 
     this.loadHeroItems();
   }
 
