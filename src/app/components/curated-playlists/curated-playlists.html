@@ -11,9 +11,9 @@
       <swiper-container class="curated-swiper" slides-per-view="auto" space-between="20" grab-cursor="true" autoplay-delay="2500" autoplay-disable-on-interaction="false" navigation="true" loop="true">
         <swiper-slide *ngFor="let playlist of hindiPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
           <div class="playlist-card-modern">
-            <img class="card-bg" src="/images/playlist-bg.jpg" alt="Playlist Background">
+            <img class="card-bg" [src]="playlist.coverImage" alt="Playlist Background" loading="lazy">
             <div class="card-overlay"></div>
-            <div class="card-content centered-content">
+            <div class="card-content">
               <h3 class="modern-title">{{ playlist.title }}</h3>
             </div>
           </div>
@@ -29,9 +29,9 @@
       <swiper-container class="curated-swiper" slides-per-view="auto" space-between="20" grab-cursor="true" autoplay-delay="3000" autoplay-disable-on-interaction="false" autoplay-reverse-direction="true" navigation="true" loop="true">
         <swiper-slide *ngFor="let playlist of englishPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
           <div class="playlist-card-modern">
-            <img class="card-bg" src="/images/playlist-bg.jpg" alt="Playlist Background">
+            <img class="card-bg" [src]="playlist.coverImage" alt="Playlist Background" loading="lazy">
             <div class="card-overlay"></div>
-            <div class="card-content centered-content">
+            <div class="card-content">
               <h3 class="modern-title">{{ playlist.title }}</h3>
             </div>
           </div>
