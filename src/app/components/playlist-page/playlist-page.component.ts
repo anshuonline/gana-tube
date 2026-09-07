@@ -7,7 +7,7 @@ import { UserService } from '../../services/user.service';
 import { PlaylistMeta } from '../../data/playlists.data';
 import { SponsoredAd } from '../../app';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical } from '@lucide/angular';
+import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical, LucideShuffle } from '@lucide/angular';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
 
 import { ToastService } from '../../services/toast.service';
@@ -17,7 +17,7 @@ import { AppStateService } from '../../services/app-state.service';
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, DragDropModule, TrackMenuComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical],
+  imports: [CommonModule, DragDropModule, TrackMenuComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical, LucideShuffle],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -176,6 +176,27 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     });
   }
 
+  getFormattedPlayCount(): string {
+    if (this.playlist.playCount && this.playlist.playCount > 0) {
+      return this.playlist.playCount.toLocaleString('en-IN') + ' Plays';
+    }
+    
+    let hash = 0;
+    const str = this.playlist.id + this.playlist.title;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    
+    const min = 150000;
+    const max = 50000000;
+    
+    const random = Math.abs(hash) / 2147483647; 
+    const fakePlays = Math.floor(random * (max - min + 1)) + min;
+    
+    return fakePlays.toLocaleString('en-IN') + ' Plays';
+  }
+
   getEstimatedDuration(): string {
     const totalSongs = this.songs().length;
     if (totalSongs === 0) return '0 min';
@@ -212,6 +233,15 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     if (this.songs().length > 0) {
       this.playerService.isPlaylistContext.set(true);
       this.playerService.setQueue([...this.songs()]);
+      this.incrementPlayCount();
+    }
+  }
+
+  shufflePlay(): void {
+    if (this.songs().length > 0) {
+      const shuffled = [...this.songs()].sort(() => Math.random() - 0.5);
+      this.playerService.isPlaylistContext.set(true);
+      this.playerService.setQueue(shuffled);
       this.incrementPlayCount();
     }
   }

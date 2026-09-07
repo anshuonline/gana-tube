@@ -275,11 +275,6 @@ export class AlgorithmService {
 
     const shelves: ShelfDefinition[] = [
       {
-        title: `Trending in ${language}`,
-        query: `Trending ${language} Songs`,
-        type: 'trending'
-      },
-      {
         title: 'Suggested for You',
         query: finalQuery
       }

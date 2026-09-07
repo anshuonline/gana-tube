@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import * as localforage from 'localforage';
+import localforage from 'localforage';
 import { Track } from './player.service';
 
 @Injectable({

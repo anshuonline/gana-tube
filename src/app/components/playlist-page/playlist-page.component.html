@@ -22,34 +22,32 @@
       </p>
 
       <div class="playlist-stats" *ngIf="playlist.id !== 'liked-songs'">
-        <div class="stat-item" title="Total Plays">
-          <svg lucideBarChart2 [attr.size]="18" fill="currentColor"></svg>
-          <span>{{ playlist.playCount || 0 }} Plays</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item" title="Estimated Duration">
-          <svg lucideTimer [attr.size]="18" fill="currentColor"></svg>
-          <span>{{ getEstimatedDuration() }}</span>
-        </div>
+        <span>{{ getFormattedPlayCount() }}</span>
+        <span class="dot-separator">•</span>
+        <span>{{ getEstimatedDuration() }}</span>
       </div>
 
       <div class="playlist-actions">
-        <button class="play-all-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
-          <svg lucidePlay [attr.size]="24" fill="currentColor"></svg> Play All
+        <button class="pl-action-btn pl-play-all" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
+          <svg lucidePlay [attr.size]="18" fill="currentColor"></svg> Play all
         </button>
         
+        <button class="pl-action-btn pl-outline" (click)="shufflePlay()" [disabled]="isLoading() || songs().length === 0">
+          <svg lucideShuffle [attr.size]="18"></svg> Shuffle
+        </button>
+
         <ng-container *ngIf="playlist.id !== 'liked-songs' && !playlist.is_owner">
-          <button class="save-playlist-btn" (click)="toggleSavePlaylist()" [class.saved]="isSaved()">
-            <svg lucideFolderPlus [attr.size]="20" *ngIf="!isSaved()"></svg>
-            <svg lucideCheck [attr.size]="20" *ngIf="isSaved()"></svg>
+          <button class="pl-action-btn pl-outline" (click)="toggleSavePlaylist()" [class.active]="isSaved()">
+            <svg lucideFolderPlus [attr.size]="18" *ngIf="!isSaved()"></svg>
+            <svg lucideCheck [attr.size]="18" *ngIf="isSaved()"></svg>
             {{ isSaved() ? 'Saved' : 'Save Playlist' }}
           </button>
         </ng-container>
 
-        <button *ngIf="playlist.id !== 'liked-songs'" class="share-btn" (click)="sharePlaylist()" [class.copied]="isCopied()">
-          <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="20"></svg>
-          <svg *ngIf="isCopied()" lucideCheck [attr.size]="20"></svg>
-          {{ isCopied() ? 'Copied!' : 'Share' }}
+        <button *ngIf="playlist.id !== 'liked-songs'" class="pl-action-btn pl-outline" (click)="sharePlaylist()" [class.active]="isCopied()">
+          <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="18"></svg>
+          <svg *ngIf="isCopied()" lucideCheck [attr.size]="18"></svg>
+          {{ isCopied() ? 'Copied' : 'Share' }}
         </button>
       </div>
     </div>
@@ -68,10 +66,9 @@
     <div *ngIf="!isLoading() && songs().length > 0" class="songs-list-container">
       <div class="song-header-row">
         <div class="col-index">#</div>
-        <div class="col-title">Title</div>
-        <div class="col-duration" style="text-align: right; padding-right: 16px;"><svg lucideTimer [attr.size]="16"></svg></div>
-        <div class="col-artist">Artist</div>
-        <div class="col-time">Published</div>
+        <div class="col-title">NAME</div>
+        <div class="col-artist">ARTISTS</div>
+        <div class="col-duration" style="text-align: right; padding-right: 16px;">TIME</div>
         <div class="col-actions"></div>
       </div>
       
@@ -96,13 +93,12 @@
             <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
             <span class="song-title" [title]="song.title">{{ song.title }}</span>
           </div>
-          <div class="col-duration song-duration-col" style="font-variant-numeric: tabular-nums; text-align: right; padding-right: 16px; opacity: 0.7; font-size: 0.9em;">
-            {{ song.duration ? formatTime(song.duration) : '' }}
-          </div>
           <div class="col-artist song-artist-col" [title]="song.channelTitle">
             {{ song.channelTitle }}
           </div>
-          <div class="col-time song-time-col">{{ song.publishedAt | date:'mediumDate' }}</div>
+          <div class="col-duration song-duration-col" style="font-variant-numeric: tabular-nums; text-align: right; padding-right: 16px; font-size: 0.9em;">
+            {{ song.duration ? formatTime(song.duration) : '' }}
+          </div>
           <div class="col-actions">
             <button class="track-menu-trigger" (click)="openTrackMenu(song, $event)">
               <svg lucideMoreVertical [attr.size]="20"></svg>
