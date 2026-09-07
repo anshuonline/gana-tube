@@ -275,7 +275,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
       } else {
         // 3. Create Playlist Object
         const newPlaylist: CustomPlaylist = {
-          id: 'cp-' + Date.now() + Math.floor(Math.random() * 1000),
+          id: 'pl_' + Date.now() + Math.floor(Math.random() * 1000),
           title: this.newPlaylistTitle,
           language: this.selectedLang,
           coverImage: imageUrl,

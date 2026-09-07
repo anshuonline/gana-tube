@@ -2004,10 +2004,11 @@ export class App implements OnInit {
   openCustomPlaylist(pl: any): void {
     const email = this.authService.currentUser()?.email || 'user';
     const username = email.split('@')[0];
+    const playlistId = pl.playlist_id || pl.id;
     
     // Create temporary PlaylistMeta
     const playlistMeta: PlaylistMeta = {
-      id: pl.playlist_id,
+      id: playlistId,
       title: pl.name,
       language: this.homeScreenLanguage(),
       coverImage: pl.tracks.length > 0 && pl.tracks[0].thumbnailHigh ? pl.tracks[0].thumbnailHigh : 
@@ -2018,16 +2019,16 @@ export class App implements OnInit {
       is_public: pl.is_public,
       is_owner: pl.is_owner !== undefined ? pl.is_owner : true,
       is_saved: pl.is_saved,
-      playCount: pl.playCount || 0
+      playCount: pl.play_count || 0
     };
     
     this.selectedPlaylist.set(playlistMeta);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
     
-    const targetUrl = `/${pl.playlist_id}`;
+    const targetUrl = `/playlist/${playlistId}`;
     if (!this.router.url.includes(targetUrl)) {
-      this.router.navigate(['/', pl.playlist_id]);
+      this.router.navigate(['/playlist', playlistId]);
     }
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
