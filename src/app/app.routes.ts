@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { App } from './app';
 import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
+import { managegtAuthGuard } from './guards/managegt-auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -18,17 +19,17 @@ export const routes: Routes = [
   { path: 'playlist/:id', children: [] },
   { path: 'user/:username/:id', children: [] },
   { path: ':id', children: [] },
-  { path: 'admin/manage-songs', loadComponent: () => import('./components/admin-manage-songs/admin-manage-songs').then(m => m.AdminManageSongsComponent) },
+
   { 
     path: 'managegt', 
     loadComponent: () => import('./components/managegt-layout/managegt-layout').then(m => m.ManagegtLayoutComponent),
     children: [
       { path: '', redirectTo: 'sections', pathMatch: 'full' },
       { path: 'login', loadComponent: () => import('./components/managegt-login/managegt-login').then(m => m.ManagegtLoginComponent) },
-      { path: 'sections', loadComponent: () => import('./components/managegt-sections/managegt-sections').then(m => m.ManagegtSectionsComponent) },
-      { path: 'playlists', loadComponent: () => import('./components/managegt-playlists/managegt-playlists').then(m => m.ManagegtPlaylistsComponent) },
-      { path: 'header', loadComponent: () => import('./components/managegt-header/managegt-header').then(m => m.ManagegtHeaderComponent) },
-      { path: 'users', loadComponent: () => import('./components/managegt-users/managegt-users').then(m => m.ManagegtUsersComponent) }
+      { path: 'sections', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-sections/managegt-sections').then(m => m.ManagegtSectionsComponent) },
+      { path: 'playlists', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-playlists/managegt-playlists').then(m => m.ManagegtPlaylistsComponent) },
+      { path: 'header', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-header/managegt-header').then(m => m.ManagegtHeaderComponent) },
+      { path: 'users', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-users/managegt-users').then(m => m.ManagegtUsersComponent) }
     ]
   },
   { path: '**', children: [] } // Catch all for static pages like /terms, /privacy

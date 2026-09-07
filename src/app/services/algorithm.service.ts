@@ -363,12 +363,6 @@ export class AlgorithmService {
         });
       }
 
-      // "Fresh Picks" — new releases in their language
-      const freshModifiers = ['new release', 'latest', 'brand new'];
-      shelves.push({
-        title: 'Fresh Picks',
-        query: `${freshModifiers[Math.floor(Math.random() * freshModifiers.length)]} ${language} songs ${randomYear}`
-      });
     }
 
     return of(shelves);

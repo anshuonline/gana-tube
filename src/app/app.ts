@@ -29,7 +29,7 @@ import { AdvertisePageComponent } from './components/advertise-page/advertise-pa
 import { AdBookingPageComponent } from './components/ad-booking-page/ad-booking-page.component';
 import { AdTermsPageComponent } from './components/ad-terms-page/ad-terms-page.component';
 import { AdProhibitedPageComponent } from './components/ad-prohibited-page/ad-prohibited-page.component';
-import { AdminManageSongsComponent } from './components/admin-manage-songs/admin-manage-songs';
+
 import { ALL_PLAYLISTS, PlaylistMeta } from './data/playlists.data';
 import { PwaService } from './services/pwa.service';
 import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-browser';
@@ -86,7 +86,7 @@ export interface SponsoredAd {
     AdTermsPageComponent,
     AdProhibitedPageComponent,
     RouterModule,
-    AdminManageSongsComponent,
+
     PlaylistMenuComponent,
     SavePlaylistModalComponent,
     ToastComponent,
@@ -822,10 +822,7 @@ export class App implements OnInit {
         this.currentPage.set('advertise');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
-      } else if (event.urlAfterRedirects.startsWith('/admin/manage-songs')) {
-        this.currentPage.set('admin');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
+
       } else if (event.urlAfterRedirects.startsWith('/managegt')) {
         this.currentPage.set('managegt');
         window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -560,15 +560,18 @@ export class PlayerService {
         if (this.trackStartTime === 0) {
           this.trackStartTime = Date.now();
         }
+        this.clearLoadTimeout();
         this.playerState.set('playing');
         this.duration.set(this.ytPlayer?.getDuration() || 0);
         this.startProgressTracking();
         break;
       case 2: // paused
+        this.clearLoadTimeout();
         this.playerState.set('paused');
         this.stopProgressTracking();
         break;
       case 0: // ended
+        this.clearLoadTimeout();
         this.playerState.set('ended');
         this.stopProgressTracking();
         this.currentTime.set(0);
@@ -603,10 +606,29 @@ export class PlayerService {
     });
   }
 
+  private loadTimeoutTimer: any = null;
+
+  private startLoadTimeout(): void {
+    this.clearLoadTimeout();
+    this.loadTimeoutTimer = setTimeout(() => {
+      if (this.playerState() === 'loading') {
+        this.toastService.show('Taking longer than usual to load...', 'info', 4000);
+      }
+    }, 4000);
+  }
+
+  private clearLoadTimeout(): void {
+    if (this.loadTimeoutTimer) {
+      clearTimeout(this.loadTimeoutTimer);
+      this.loadTimeoutTimer = null;
+    }
+  }
+
   private async loadInPlayer(videoId: string): Promise<void> {
     this.location.replaceState('/play?v=' + videoId);
     const current = this.currentTrack();
     this.initHtmlAudio();
+    this.startLoadTimeout();
 
     if (this.offlineService.isDownloaded(videoId)) {
       this.isPlayingOffline.set(true);

@@ -235,6 +235,9 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       // Not preloaded (or it was already active), just load it in the current active player
       this.cuedVideoIds[this.activePlayerIndex] = videoId;
+      if (typeof this.players[this.activePlayerIndex].stopVideo === 'function') {
+        this.players[this.activePlayerIndex].stopVideo();
+      }
       if (!this.playerService.isMuted()) {
         this.players[this.activePlayerIndex].unMute();
       }
