@@ -24,17 +24,17 @@
 }
 
 /* Hero Section */
-.discovery-hero {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 32px;
-
-  @media (max-width: 768px) {
-    height: 380px;
-  }
+  .discovery-hero {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    margin-bottom: 24px;
+    border-radius: 20px;
+    overflow: hidden;
+    
+    @media (max-width: 768px) {
+      display: none !important;
+    }
 
   .hero-skeleton {
     width: 100%;
@@ -110,8 +110,8 @@
 
   .hero-thumb-glass {
     position: relative;
-    width: 180px;
-    height: 180px;
+    width: 240px;
+    height: 240px;
     flex-shrink: 0;
     border-radius: 16px;
     overflow: hidden;
@@ -278,8 +278,13 @@
 
 .feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 24px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
 }
 
 .video-card {
@@ -636,4 +641,97 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.modern-discovery-card { 
+  position: relative; 
+  border-radius: 16px; 
+  overflow: hidden; 
+  cursor: pointer; 
+  aspect-ratio: 3/4; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: flex-end; 
+  animation: fadeInUp 0.5s ease backwards; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+} 
+.modern-discovery-card:hover { 
+  transform: translateY(-8px); 
+  box-shadow: 0 12px 24px rgba(168, 85, 247, 0.2); 
+} 
+.card-bg { 
+  position: absolute; 
+  inset: 0; 
+  z-index: 0; 
+} 
+.card-bg img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); 
+} 
+.modern-discovery-card:hover .card-bg img { 
+  transform: scale(1.05); 
+} 
+.glass-content { 
+  position: relative; 
+  z-index: 1; 
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%); 
+  padding: 24px 16px 16px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+} 
+.play-glass-overlay { 
+  position: absolute; 
+  inset: 0; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 2; 
+  background: rgba(0,0,0,0.4); 
+  opacity: 0; 
+  transition: opacity 0.3s ease; 
+  color: white; 
+} 
+.modern-discovery-card:hover .play-glass-overlay { 
+  opacity: 1; 
+} 
+.info-container { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; 
+} 
+.rank-badge { 
+  align-self: flex-start; 
+  background: rgba(255,255,255,0.1); 
+  padding: 4px 8px; 
+  border-radius: 4px; 
+  font-size: 12px; 
+  font-weight: 700; 
+  color: #a855f7; 
+  border: 1px solid rgba(168, 85, 247, 0.3); 
+} 
+.title { 
+  margin: 0; 
+  font-size: 16px; 
+  font-weight: 700; 
+  color: white; 
+  display: -webkit-box; 
+  -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical; 
+  overflow: hidden; 
+  line-height: 1.3; 
+} 
+.channel { 
+  margin: 0; 
+  font-size: 13px; 
+  color: rgba(255,255,255,0.7); 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+} 
+@keyframes fadeInUp { 
+  from { opacity: 0; transform: translateY(20px); } 
+  to { opacity: 1; transform: translateY(0); } 
 }

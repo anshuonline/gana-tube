@@ -32,11 +32,11 @@
             </div>
             
             <div class="hero-text-glass">
-              <span class="genz-badge">TRENDING NOW</span>
+              <span class="genz-badge">{{ $any(hero).badge || 'TRENDING NOW' }}</span>
               <h2 [title]="hero.title">{{ hero.title }}</h2>
               <p>
                 <svg lucideMusic [attr.size]="14"></svg>
-                {{ hero.channelTitle }}
+                {{ hero.channelTitle || $any(hero).artist }}
               </p>
             </div>
           </div>
@@ -61,23 +61,25 @@
 
       <!-- Results Feed (YouTube Style) -->
       <div class="feed-grid" *ngIf="results.length > 0 && !isSearching">
-        <div class="video-card" *ngFor="let track of results" (click)="onPlay(track)" (contextmenu)="onRightClick($event, track)">
-          <div class="thumbnail-wrapper">
-            <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" />
-            <div class="play-overlay">
-              <svg lucidePlay [attr.size]="48" [attr.fill]="'currentColor'"></svg>
-            </div>
-            <div class="playing-indicator" *ngIf="isCurrentTrack(track)">
-               <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-            </div>
-
+        <div class="modern-discovery-card" *ngFor="let track of results; let i = index" (click)="onPlay(track)" (contextmenu)="onRightClick($event, track)" [style.animation-delay]="i * 0.05 + 's'">
+          <div class="card-bg">
+            <img [src]="track.thumbnailHigh || track.thumbnail" alt="bg" />
+            <div class="bg-blur"></div>
           </div>
-          <div class="video-info">
-            <h3 class="title" [title]="track.title">{{ track.title }}</h3>
-            <p class="channel">
-              <svg lucideMusic [attr.size]="14"></svg>
-              {{ track.channelTitle }}
-            </p>
+          
+          <div class="glass-content">
+            <div class="play-glass-overlay">
+              <svg lucidePlay [attr.size]="40" [attr.fill]="'currentColor'"></svg>
+            </div>
+            
+            <div class="info-container">
+              <span class="rank-badge" *ngIf="i < 10">#{{ i + 1 }}</span>
+              <h3 class="title" [title]="track.title">{{ track.title }}</h3>
+              <p class="channel">
+                <svg lucideMusic [attr.size]="14"></svg>
+                {{ track.channelTitle }}
+              </p>
+            </div>
           </div>
         </div>
       </div>

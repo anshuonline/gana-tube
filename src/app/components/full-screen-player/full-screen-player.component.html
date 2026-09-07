@@ -35,11 +35,13 @@
       <div class="fs-player-view" *ngIf="activeView === 'artwork'">
         <div class="fs-artwork-container" (click)="onCoverClick($event)" (contextmenu)="onRightClick($event)">
           <img 
-            [src]="displayTrack()?.thumbnailHigh || displayTrack()?.thumbnail" 
+            [src]="useLowQualityCover ? displayTrack()?.thumbnail : (displayTrack()?.thumbnailHigh || displayTrack()?.thumbnail)" 
             [alt]="displayTrack()?.title"
             class="fs-album-art track-transition"
             [class.ad-active]="showCoverAd"
             [class.track-changing]="isChanging"
+            (load)="onCoverLoad()"
+            (error)="onCoverError()"
           />
           
           <!-- Animated Ad Overlay -->

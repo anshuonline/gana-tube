@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, View
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService } from '../../services/youtube-api.service';
+import { ToastService } from '../../services/toast.service';
 import { 
   LucideChevronDown, 
   LucidePlay, 
@@ -70,6 +71,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
   public syncService = inject(SyncService);
+  private toastService = inject(ToastService);
 
   @Input() playerCoverAd: any = null;
   @Input() safePlayerCoverAdUrl: any = null;
@@ -95,14 +97,25 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   isChanging = false;
   private changeTimeout: any;
 
+  useLowQualityCover: boolean = false;
+  coverLoadingTimeout: any;
+
   constructor() {
     // Automatically fetch lyrics when track changes if lyrics view is open
     // Also trigger track transition animation
     effect(() => {
       const track = this.playerService.currentTrack();
       
-      // Trigger animation
       if (track && track.videoId !== this.displayTrack()?.videoId) {
+        // Reset quality fallback for new track
+        this.useLowQualityCover = false;
+        clearTimeout(this.coverLoadingTimeout);
+        this.coverLoadingTimeout = setTimeout(() => {
+          this.toastService.show('Taking longer time than usual...', 'info');
+          this.useLowQualityCover = true;
+          this.cdr.detectChanges();
+        }, 4000);
+
         if (!this.displayTrack()) {
           // First load, don't animate, just set it
           this.displayTrack.set(track);
@@ -211,6 +224,18 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     if (this.showDoubleTapGuide) {
       this.showDoubleTapGuide = false;
       localStorage.setItem('ganatube_has_seen_double_tap_guide', 'true');
+    }
+  }
+
+  onCoverLoad() {
+    clearTimeout(this.coverLoadingTimeout);
+  }
+
+  onCoverError() {
+    clearTimeout(this.coverLoadingTimeout);
+    if (!this.useLowQualityCover) {
+      this.useLowQualityCover = true;
+      this.cdr.detectChanges();
     }
   }
 

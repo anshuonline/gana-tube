@@ -679,6 +679,7 @@
   </app-music-player>
 
   <!-- Full Screen Player Overlay -->
+  <div class="top-loading-bar" [class.loading]="isRouteLoading()" [class.done]="isRouteDone()"></div>
   <app-full-screen-player 
     [isVisible]="isFullScreenPlayerVisible()"
     [playerCoverAd]="playerCoverAd()"

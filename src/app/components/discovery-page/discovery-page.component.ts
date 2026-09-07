@@ -5,6 +5,7 @@ import { firstValueFrom, timeout, catchError, of } from 'rxjs';
 import { LucidePlay, LucideSparkles, LucideCompass, LucideMic2, LucideGlobe, LucideSearch, LucideMessageSquare, LucideMusic, LucideChevronRight, LucideChevronLeft, LucideMinus, LucideMessageCircle } from '@lucide/angular';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-discovery-page',
@@ -63,13 +64,52 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
     private youtubeApi: YoutubeApiService,
     public playerService: PlayerService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private http: HttpClient
   ) {}
 
+  private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') 
+    ? 'http://localhost/manageads/managegt-api.php' 
+    : 'https://manageads.ganatube.in/managegt-api.php';
+
   ngOnInit() {
-    // Load Gen-Z aesthetic Indie / Modern hits by default instead of generic trending
-    this.discover('Anuv Jain, Mitraz, indie pop trending hits'); 
-    this.loadHeroItems();
+    this.loadDiscoverySongs();
+  }
+
+  loadDiscoverySongs() {
+    this.isSearching = true;
+    this.loadingMessage = 'Curating special discoveries...';
+    this.http.get<any>(`${this.apiUrl}?action=get_discovery`).subscribe({
+      next: (data) => {
+        if (data) {
+          if (Array.isArray(data)) {
+            this.allResults = data;
+            this.results = data;
+            this.loadHeroItems(); // Fallback to random if old array structure
+          } else if (data.heroItems || data.feedItems) {
+            if (data.heroItems && Array.isArray(data.heroItems)) {
+              this.heroItems = data.heroItems;
+              this.isHeroLoading = false;
+            } else {
+              this.loadHeroItems(); // Fallback
+            }
+            if (data.feedItems && Array.isArray(data.feedItems)) {
+              this.allResults = data.feedItems;
+              this.results = data.feedItems;
+            }
+          }
+        } else {
+          this.loadHeroItems(); // Fallback
+        }
+        this.isSearching = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load discoveries. Please try again.';
+        this.isSearching = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   async loadHeroItems() {

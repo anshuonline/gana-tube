@@ -576,6 +576,7 @@ export class MusicPlayerComponent implements OnDestroy {
   }
 
   onScrubStart(event: MouseEvent | TouchEvent): void {
+    event.stopPropagation();
     const target = event.currentTarget as HTMLElement;
     this.scrubTarget = target;
     this.isScrubbing.set(true);

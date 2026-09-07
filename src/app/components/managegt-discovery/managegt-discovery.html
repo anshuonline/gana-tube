@@ -1,0 +1,32 @@
+<div class="gt-admin-header">
+  <div class="header-left">
+    <h1 class="gt-admin-title">Manage Discovery</h1>
+    <p class="gt-admin-subtitle">Update the dynamic songs shown on the Discovery page.</p>
+  </div>
+  <button class="gt-btn-primary" (click)="save()" [disabled]="isSaving">
+    <svg lucideSave [attr.size]="18" *ngIf="!isSaving"></svg>
+    <div class="spinner-small" *ngIf="isSaving"></div>
+    <span>{{ isSaving ? 'Saving...' : 'Save JSON' }}</span>
+  </button>
+</div>
+
+<div class="gt-admin-content">
+  <div class="alert success-alert" *ngIf="saveSuccess">
+    <svg lucideCheckCircle [attr.size]="20"></svg>
+    <span>Discovery songs saved successfully!</span>
+  </div>
+
+  <div class="alert error-alert" *ngIf="saveError">
+    <svg lucideXCircle [attr.size]="20"></svg>
+    <span>{{ saveError }}</span>
+  </div>
+
+  <div class="json-editor-card">
+    <div class="card-header">
+      <h3>JSON Array of Songs</h3>
+      <p class="helper-text">Must be a valid JSON array of objects with videoId, title, channelTitle, thumbnail, and thumbnailHigh.</p>
+    </div>
+    
+    <textarea class="json-textarea" [(ngModel)]="jsonInput" spellcheck="false" placeholder="Enter JSON here..."></textarea>
+  </div>
+</div>

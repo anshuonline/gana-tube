@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift } from '@lucide/angular';
 
@@ -22,7 +22,7 @@ import { AppStateService } from './services/app-state.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
-import { Router, NavigationEnd, RouterModule, ActivatedRoute } from '@angular/router';
+import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, RouterModule, ActivatedRoute } from '@angular/router';
 import { PAGE_CONTENT } from './data/static-pages';
 import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
 import { AdvertisePageComponent } from './components/advertise-page/advertise-page.component';
@@ -121,9 +121,11 @@ export class App implements OnInit {
   isCarModeVisible = signal<boolean>(false);
   isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
-  appVersion = 'v1.0.5';
+  appVersion = 'v1.0.6';
   currentYear = new Date().getFullYear();
   isMobileMenuOpen = signal<boolean>(false);
+  isRouteLoading = signal<boolean>(false);
+  isRouteDone = signal<boolean>(false);
 
   // Ad Booking State
   bookingState: {
@@ -291,7 +293,6 @@ export class App implements OnInit {
   }
   private location = inject(Location);
   private sanitizer = inject(DomSanitizer);
-  private titleService = inject(Title);
   public toastService = inject(ToastService);
 
   private readonly SEARCH_HISTORY_KEY = 'ganatube_search_history';
@@ -617,9 +618,33 @@ export class App implements OnInit {
     private meta: Meta,
     private title: Title,
     public authService: AuthService,
+    private cdr: ChangeDetectorRef,
     public userService: UserService,
-    private appState: AppStateService
+    public appState: AppStateService,
+    private domSanitizer: DomSanitizer
   ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.isRouteLoading.set(true);
+        this.isRouteDone.set(false);
+      } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
+        this.isRouteLoading.set(false);
+        this.isRouteDone.set(true);
+        setTimeout(() => {
+          if (this.isRouteDone()) this.isRouteDone.set(false);
+        }, 500);
+      }
+    });
+
+    effect(() => {
+      const track = this.playerService.currentTrack();
+      if (track && track.title) {
+        this.title.setTitle(`${track.title} - GanaTube`);
+      } else {
+        this.title.setTitle('GanaTube - Free Music Streaming');
+      }
+    });
+
     effect(() => {
       const trackToSave = this.appState.savePlaylistTrack();
       if (trackToSave) {
