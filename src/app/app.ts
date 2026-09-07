@@ -797,7 +797,7 @@ export class App implements OnInit {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (playlistId) {
           this.currentLoadingPlaylistId = playlistId; // Set tracking ID
-          if (playlistId.startsWith('pl_')) {
+          if (playlistId.startsWith('pl_') || playlistId.startsWith('cp-')) {
             this.fetchPublicPlaylist(playlistId, '');
           } else if (playlistId.startsWith('MPREb_')) {
             this.isLoading.set(true);
