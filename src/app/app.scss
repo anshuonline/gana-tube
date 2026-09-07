@@ -834,7 +834,7 @@
   flex-direction: row;
   overflow-x: auto;
   scroll-behavior: smooth;
-  gap: 12px;
+  gap: 8px;
   padding: 4px 0 16px;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
@@ -856,21 +856,18 @@
   display: block;
   cursor: pointer;
   position: relative;
-  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.3s ease-out;
   border-radius: 14px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   aspect-ratio: 3 / 4;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  will-change: transform, opacity;
+  will-change: transform;
   contain: layout style paint;
 }
 
 .song-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
 }
 
 .card-thumbnail {
@@ -892,7 +889,7 @@
 }
 
 .song-card:hover .card-thumbnail::after {
-  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+  /* No change on hover - keep same gradient */
 }
 
 /* New overlay style to make play button pop */
@@ -902,9 +899,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8));
+  background: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
   pointer-events: none;
   z-index: 2;
   display: flex;
@@ -941,8 +937,8 @@
 }
 
 .track-channel {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 700;
   margin: 0;
   white-space: nowrap;
@@ -953,7 +949,7 @@
 }
 
 .track-title {
-  font-size: 1.05rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: #fff;
   margin: 0;
@@ -965,6 +961,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+  
+  @media (max-width: 768px) {
+    font-size: 1.15rem;
+  }
 }
 
 .artists-grid {
@@ -1222,14 +1222,14 @@
   .main-content {
     max-width: 100%;
     width: 100%;
-    padding: 0 16px 24px;
+    padding: 110px 16px 24px;
     
     &.has-player {
       padding-bottom: 88px; // 72px mobile player + padding gap
     }
 
     &.searched {
-      padding-top: 90px;
+      padding-top: 110px;
     }
   }
 
@@ -1903,8 +1903,8 @@
   transform: scale(1.05) translateY(0);
 }
 .song-card:hover .play-btn-overlay {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* For suggested section: button is static, not absolute */
@@ -2123,7 +2123,6 @@
 
 .recent-card-inner .play-btn-overlay {
   background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(5px);
   border: none;
   border-radius: 50%;
   width: 70px;
