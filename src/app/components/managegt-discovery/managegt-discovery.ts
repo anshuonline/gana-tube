@@ -45,6 +45,9 @@ export class ManagegtDiscoveryComponent implements OnInit {
   saveSuccess: boolean = false;
   saveError: string = '';
 
+  editMode: 'visual' | 'json' = 'visual';
+  jsonInput: string = '';
+
   activeTab: 'hero' | 'feed' = 'hero';
 
   constructor(
@@ -61,6 +64,7 @@ export class ManagegtDiscoveryComponent implements OnInit {
     this.http.get<any>(`${this.apiUrl}?action=get_discovery`).subscribe({
       next: (data) => {
         if (data) {
+          this.jsonInput = JSON.stringify(data, null, 2);
           if (Array.isArray(data)) {
             // Legacy flat array: default to feed items
             this.feedItems = data;
@@ -76,6 +80,39 @@ export class ManagegtDiscoveryComponent implements OnInit {
         this.saveError = 'Failed to load discovery songs.';
       }
     });
+  }
+
+  setMode(mode: 'visual' | 'json') {
+    if (mode === 'json') {
+      this.syncVisualToJson();
+    } else {
+      this.syncJsonToVisual();
+    }
+    this.editMode = mode;
+  }
+
+  syncVisualToJson() {
+    const payload = {
+      heroItems: this.heroItems,
+      feedItems: this.feedItems
+    };
+    this.jsonInput = JSON.stringify(payload, null, 2);
+  }
+
+  syncJsonToVisual() {
+    try {
+      const parsed = JSON.parse(this.jsonInput);
+      if (Array.isArray(parsed)) {
+        this.feedItems = parsed;
+        this.heroItems = [];
+      } else if (parsed && typeof parsed === 'object') {
+        this.heroItems = parsed.heroItems || [];
+        this.feedItems = parsed.feedItems || [];
+      }
+      this.saveError = '';
+    } catch (e: any) {
+      this.saveError = 'Invalid JSON: ' + e.message;
+    }
   }
 
   performSearch() {
@@ -133,6 +170,11 @@ export class ManagegtDiscoveryComponent implements OnInit {
   }
 
   save() {
+    if (this.editMode === 'json') {
+      this.syncJsonToVisual();
+      if (this.saveError) return; // JSON parsing failed
+    }
+
     this.isSaving = true;
     this.saveError = '';
     this.saveSuccess = false;

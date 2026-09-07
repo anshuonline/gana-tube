@@ -1,149 +1,249 @@
-<div class="page-container">
-  <header class="page-header">
-    <div class="header-content">
-      <h2>Manage Discovery Page</h2>
-      <p>Curate the Hero Section and the main Discovery Feed.</p>
+<div class="min-h-screen p-6 md:p-8 bg-[#050505] text-white max-w-[1400px] mx-auto">
+  
+  <!-- Header Section -->
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-6 border-b border-white/10">
+    <div>
+      <h2 class="text-3xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-500 mb-2">
+        Manage Discovery Page
+      </h2>
+      <p class="text-white/60 text-sm font-medium">Curate the Hero Section and the main Discovery Feed for your users.</p>
     </div>
     
-    <div class="header-actions">
-      <button class="save-btn" [disabled]="isSaving" (click)="save()">
-        <span *ngIf="!isSaving && !saveSuccess"><svg lucideSave [attr.size]="18"></svg> Save Changes</span>
-        <span *ngIf="isSaving">Saving...</span>
-        <span *ngIf="saveSuccess" class="success-text"><svg lucideCheckCircle [attr.size]="18"></svg> Saved!</span>
+    <div class="flex items-center gap-3">
+      <!-- Mode Toggle -->
+      <div class="flex bg-white/5 p-1 rounded-lg border border-white/10">
+        <button 
+          (click)="setMode('visual')"
+          [class.bg-white_10]="editMode === 'visual'"
+          [class.text-white]="editMode === 'visual'"
+          [class.text-white_50]="editMode !== 'visual'"
+          class="px-4 py-1.5 rounded-md text-sm font-semibold transition-all hover:text-white"
+          [style.background]="editMode === 'visual' ? 'rgba(255,255,255,0.1)' : 'transparent'">
+          Visual Builder
+        </button>
+        <button 
+          (click)="setMode('json')"
+          [class.bg-white_10]="editMode === 'json'"
+          [class.text-white]="editMode === 'json'"
+          [class.text-white_50]="editMode !== 'json'"
+          class="px-4 py-1.5 rounded-md text-sm font-semibold transition-all hover:text-white"
+          [style.background]="editMode === 'json' ? 'rgba(255,255,255,0.1)' : 'transparent'">
+          JSON Editor
+        </button>
+      </div>
+
+      <button 
+        class="flex items-center gap-2 px-6 py-2 rounded-lg font-bold text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all shadow-[0_4px_14px_0_rgba(168,85,247,0.39)] disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="isSaving" 
+        (click)="save()">
+        <ng-container *ngIf="!isSaving && !saveSuccess">
+          <svg lucideSave [attr.size]="18"></svg> Save Changes
+        </ng-container>
+        <ng-container *ngIf="isSaving">
+          <svg lucideSearch [attr.size]="18" class="animate-spin"></svg> Saving...
+        </ng-container>
+        <ng-container *ngIf="saveSuccess">
+          <svg lucideCheckCircle [attr.size]="18"></svg> Saved!
+        </ng-container>
       </button>
     </div>
   </header>
 
-  <div *ngIf="saveError" class="error-box">
+  <div *ngIf="saveError" class="flex items-center gap-2 p-4 mb-8 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium">
     <svg lucideXCircle [attr.size]="18"></svg>
     {{ saveError }}
   </div>
 
-  <!-- Search Panel -->
-  <div class="search-panel">
-    <div class="search-input-group">
-      <svg lucideSearch [attr.size]="20" class="search-icon"></svg>
-      <input 
-        type="text" 
-        [(ngModel)]="searchQuery" 
-        (keyup.enter)="performSearch()"
-        placeholder="Search for a song, artist, or album to add..." 
-        class="search-input" />
-      <button class="btn-primary" (click)="performSearch()" [disabled]="isSearching || !searchQuery.trim()">
-        {{ isSearching ? 'Searching...' : 'Search' }}
-      </button>
-    </div>
+  <!-- JSON EDITOR MODE -->
+  <div *ngIf="editMode === 'json'" class="animate-fade-in">
+    <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
+      <div class="mb-4">
+        <h3 class="text-lg font-bold text-white mb-1">Raw JSON Editor</h3>
+        <p class="text-xs text-white/50">Edit the discovery payload directly. Ensure the format matches the exact structure.</p>
+      </div>
+      
+      <div class="p-4 bg-black/50 border border-white/10 rounded-xl mb-6">
+        <p class="text-xs text-purple-300 font-mono mb-2">Example Structure:</p>
+        <pre class="text-xs text-white/60 font-mono overflow-x-auto whitespace-pre-wrap">
+{{ '{' }}
+  "heroItems": [
+    {{ '{' }} "videoId": "ID", "title": "...", "artist": "...", "badge": "TRENDING", "thumbnail": "...", "thumbnailHigh": "..." {{ '}' }}
+  ],
+  "feedItems": [
+    {{ '{' }} "videoId": "ID", "title": "...", "channelTitle": "...", "thumbnail": "...", "thumbnailHigh": "..." {{ '}' }}
+  ]
+{{ '}' }}</pre>
+      </div>
 
-    <!-- Search Results -->
-    <div class="search-results-container" *ngIf="hasSearched">
-      <div class="results-header">
-        <h4>Search Results</h4>
-        <button class="btn-icon" (click)="hasSearched = false; searchResults = []" title="Clear Search">
-          <svg lucideX [attr.size]="18"></svg>
-        </button>
-      </div>
-      
-      <div class="results-list" *ngIf="searchResults.length > 0">
-        <div class="result-item" *ngFor="let result of searchResults">
-          <img [src]="result.thumbnail" [alt]="result.title" class="result-thumb" />
-          <div class="result-info">
-            <h5 [title]="result.title">{{ result.title }}</h5>
-            <p>{{ result.channelTitle }}</p>
-          </div>
-          <div class="result-actions">
-            <button class="btn-add hero-add" (click)="addToHero(result)" title="Add to Hero">
-              <svg lucidePlus [attr.size]="16"></svg> Hero
-            </button>
-            <button class="btn-add feed-add" (click)="addToFeed(result)" title="Add to Feed">
-              <svg lucidePlus [attr.size]="16"></svg> Feed
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="empty-state" *ngIf="!isSearching && searchResults.length === 0">
-        No results found for "{{ searchQuery }}".
-      </div>
+      <textarea 
+        [(ngModel)]="jsonInput" 
+        class="w-full h-[500px] bg-black/60 border border-white/10 rounded-xl p-4 text-sm font-mono text-emerald-400 focus:outline-none focus:border-purple-500 transition-colors"
+        spellcheck="false"
+      ></textarea>
     </div>
   </div>
 
-  <!-- Main Management Area -->
-  <div class="management-area">
+  <!-- VISUAL BUILDER MODE -->
+  <div *ngIf="editMode === 'visual'" class="animate-fade-in space-y-8">
     
-    <!-- Hero Section Management -->
-    <div class="section-card hero-section-card">
-      <div class="section-header">
-        <h3>Hero Items (Top Carousel)</h3>
-        <span class="count-badge">{{ heroItems.length }} / 5</span>
-      </div>
+    <!-- Search Panel -->
+    <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-6 backdrop-blur-xl relative overflow-hidden">
+      <!-- Glow effect -->
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none"></div>
       
-      <div class="drag-list" cdkDropList (cdkDropListDropped)="dropHero($event)">
-        <div class="drag-item hero-item" *ngFor="let item of heroItems; let i = index" cdkDrag>
-          <div class="item-drag-handle" cdkDragHandle>
-            <svg lucideGripVertical [attr.size]="20"></svg>
+      <div class="relative z-10">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <svg lucideSearch [attr.size]="20" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40"></svg>
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              (keyup.enter)="performSearch()"
+              placeholder="Search YouTube for songs, artists, or playlists..." 
+              class="w-full bg-black/40 border border-white/10 text-white pl-12 pr-4 py-3.5 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder:text-white/30 font-medium" />
           </div>
-          
-          <img [src]="item.thumbnail" class="item-thumb" />
-          
-          <div class="item-details">
-            <div class="detail-row">
-              <h4 [title]="item.title">{{ item.title }}</h4>
-            </div>
-            <div class="detail-row inputs-row">
-              <div class="input-group">
-                <label>Badge</label>
-                <input type="text" [(ngModel)]="item.badge" placeholder="e.g. TRENDING NOW" />
-              </div>
-              <div class="input-group">
-                <label>Artist / Subtitle</label>
-                <input type="text" [(ngModel)]="item.artist" placeholder="e.g. Arijit Singh" />
-              </div>
-            </div>
-          </div>
-          
-          <button class="btn-icon danger" (click)="removeFromHero(i)" title="Remove">
-            <svg lucideTrash2 [attr.size]="18"></svg>
+          <button 
+            class="px-8 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            (click)="performSearch()" 
+            [disabled]="isSearching || !searchQuery.trim()">
+            {{ isSearching ? 'Searching...' : 'Search' }}
           </button>
         </div>
-        
-        <div class="empty-state" *ngIf="heroItems.length === 0">
-          <svg lucideImage [attr.size]="32"></svg>
-          <p>No hero items added yet. Search and add items above.</p>
+
+        <!-- Search Results -->
+        <div *ngIf="hasSearched" class="mt-6 pt-6 border-t border-white/10">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="text-sm font-bold text-white/80">Search Results for "{{ searchQuery }}"</h4>
+            <button (click)="hasSearched = false; searchResults = []" class="text-xs text-white/50 hover:text-white transition-colors flex items-center gap-1">
+              <svg lucideX [attr.size]="14"></svg> Clear
+            </button>
+          </div>
+          
+          <div *ngIf="searchResults.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div *ngFor="let result of searchResults" class="group flex gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/30 rounded-xl transition-all cursor-default">
+              <img [src]="result.thumbnail" [alt]="result.title" class="w-16 h-16 rounded-lg object-cover shadow-md" />
+              
+              <div class="flex-1 min-w-0 flex flex-col justify-center">
+                <h5 class="text-sm font-semibold text-white truncate mb-1" [title]="result.title">{{ result.title }}</h5>
+                <p class="text-xs text-white/50 truncate">{{ result.channelTitle }}</p>
+                
+                <div class="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button (click)="addToHero(result)" class="flex-1 py-1 px-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 rounded text-[10px] font-bold uppercase tracking-wider transition-colors flex justify-center items-center gap-1">
+                    <svg lucidePlus [attr.size]="10"></svg> Hero
+                  </button>
+                  <button (click)="addToFeed(result)" class="flex-1 py-1 px-2 bg-white/10 hover:bg-white/20 text-white rounded text-[10px] font-bold uppercase tracking-wider transition-colors flex justify-center items-center gap-1">
+                    <svg lucidePlus [attr.size]="10"></svg> Feed
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="!isSearching && searchResults.length === 0" class="py-12 text-center text-white/40 text-sm border border-dashed border-white/10 rounded-xl">
+            No results found. Try a different search term.
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Feed Section Management -->
-    <div class="section-card feed-section-card">
-      <div class="section-header">
-        <h3>Discovery Feed (Grid)</h3>
-        <span class="count-badge">{{ feedItems.length }} songs</span>
-      </div>
+    <!-- Management Grids -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       
-      <div class="drag-list" cdkDropList (cdkDropListDropped)="dropFeed($event)">
-        <div class="drag-item feed-item" *ngFor="let item of feedItems; let i = index" cdkDrag>
-          <div class="item-drag-handle" cdkDragHandle>
-            <svg lucideGripVertical [attr.size]="20"></svg>
+      <!-- HERO ITEMS -->
+      <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-6 flex flex-col h-[600px]">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-purple-500"></span> Hero Section
+            </h3>
+            <p class="text-xs text-white/50 mt-1">Top carousel items. Max 5 recommended.</p>
           </div>
-          
-          <img [src]="item.thumbnail" class="item-thumb" />
-          
-          <div class="item-details simple-details">
-            <h4 [title]="item.title">{{ item.title }}</h4>
-            <p>{{ item.channelTitle }}</p>
-          </div>
-          
-          <button class="btn-icon danger" (click)="removeFromFeed(i)" title="Remove">
-            <svg lucideTrash2 [attr.size]="18"></svg>
-          </button>
+          <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">{{ heroItems.length }} items</span>
         </div>
         
-        <div class="empty-state" *ngIf="feedItems.length === 0">
-          <svg lucideImage [attr.size]="32"></svg>
-          <p>No feed items added yet. Search and add items above.</p>
+        <div class="flex-1 overflow-y-auto custom-scrollbar pr-2" cdkDropList (cdkDropListDropped)="dropHero($event)">
+          <div class="space-y-3">
+            <div *ngFor="let item of heroItems; let i = index" cdkDrag class="group bg-black/40 border border-white/5 hover:border-white/20 rounded-xl p-3 flex gap-4 items-center transition-all">
+              
+              <!-- Drag Handle -->
+              <div cdkDragHandle class="cursor-grab active:cursor-grabbing text-white/20 group-hover:text-white/50 transition-colors p-1">
+                <svg lucideGripVertical [attr.size]="18"></svg>
+              </div>
+              
+              <img [src]="item.thumbnail" class="w-16 h-16 rounded-lg object-cover shadow-sm" />
+              
+              <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-semibold truncate mb-2" [title]="item.title">{{ item.title }}</h4>
+                <div class="flex gap-2">
+                  <div class="flex-1">
+                    <label class="block text-[9px] uppercase tracking-wider text-white/40 mb-1 font-bold">Badge</label>
+                    <input type="text" [(ngModel)]="item.badge" placeholder="TRENDING" class="w-full bg-black/60 border border-white/10 rounded px-2 py-1 text-xs focus:outline-none focus:border-purple-500 text-purple-200 font-medium" />
+                  </div>
+                  <div class="flex-1">
+                    <label class="block text-[9px] uppercase tracking-wider text-white/40 mb-1 font-bold">Artist/Channel</label>
+                    <input type="text" [(ngModel)]="item.artist" placeholder="Artist Name" class="w-full bg-black/60 border border-white/10 rounded px-2 py-1 text-xs focus:outline-none focus:border-purple-500 text-white/80" />
+                  </div>
+                </div>
+              </div>
+              
+              <button (click)="removeFromHero(i)" class="p-2 text-white/20 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Remove">
+                <svg lucideTrash2 [attr.size]="16"></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div *ngIf="heroItems.length === 0" class="h-full flex flex-col items-center justify-center text-white/30 border-2 border-dashed border-white/5 rounded-xl py-12">
+            <svg lucideImage [attr.size]="48" class="mb-4 opacity-50"></svg>
+            <p class="text-sm font-medium">No Hero Items</p>
+            <p class="text-xs mt-1">Search and click "+ Hero" to add</p>
+          </div>
         </div>
       </div>
-    </div>
 
+      <!-- FEED ITEMS -->
+      <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-6 flex flex-col h-[600px]">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Discovery Feed
+            </h3>
+            <p class="text-xs text-white/50 mt-1">The main grid of songs below the hero.</p>
+          </div>
+          <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">{{ feedItems.length }} items</span>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto custom-scrollbar pr-2" cdkDropList (cdkDropListDropped)="dropFeed($event)">
+          <div class="space-y-3">
+            <div *ngFor="let item of feedItems; let i = index" cdkDrag class="group bg-black/40 border border-white/5 hover:border-white/20 rounded-xl p-3 flex gap-4 items-center transition-all">
+              
+              <div cdkDragHandle class="cursor-grab active:cursor-grabbing text-white/20 group-hover:text-white/50 transition-colors p-1">
+                <svg lucideGripVertical [attr.size]="18"></svg>
+              </div>
+              
+              <div class="relative">
+                <img [src]="item.thumbnail" class="w-20 h-14 rounded-lg object-cover shadow-sm" />
+                <div class="absolute bottom-1 right-1 bg-black/80 px-1 rounded text-[9px] font-bold">{{ i + 1 }}</div>
+              </div>
+              
+              <div class="flex-1 min-w-0 flex flex-col justify-center">
+                <h4 class="text-sm font-semibold truncate text-white/90" [title]="item.title">{{ item.title }}</h4>
+                <p class="text-xs text-white/50 truncate mt-1">{{ item.channelTitle }}</p>
+              </div>
+              
+              <button (click)="removeFromFeed(i)" class="p-2 text-white/20 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Remove">
+                <svg lucideTrash2 [attr.size]="16"></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div *ngIf="feedItems.length === 0" class="h-full flex flex-col items-center justify-center text-white/30 border-2 border-dashed border-white/5 rounded-xl py-12">
+            <svg lucideImage [attr.size]="48" class="mb-4 opacity-50"></svg>
+            <p class="text-sm font-medium">No Feed Items</p>
+            <p class="text-xs mt-1">Search and click "+ Feed" to add</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
