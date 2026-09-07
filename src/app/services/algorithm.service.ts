@@ -330,7 +330,7 @@ export class AlgorithmService {
       let madeForYouQuery = '';
       
       if (likedCount >= 20 && topGenres.length > 0) {
-        // Smart mode: combine top genre + secondary artist for cross-discovery
+        // Smart mode: combine top genre + language
         const genreLabels: Record<string, string> = {
           'lofi': 'lofi chill',
           'romantic': 'romantic love',
@@ -339,15 +339,19 @@ export class AlgorithmService {
           'punjabi': 'punjabi',
           'bollywood': 'bollywood'
         };
-        const genreQuery = genreLabels[topGenres[0]] || topGenres[0];
-        const secondArtist = topArtists.length > 1 ? topArtists[1] : '';
-        madeForYouQuery = `best ${genreQuery} ${language} songs ${secondArtist} ${randomYear}`.trim();
-      } else if (topArtists.length > 1) {
-        // Moderate mode: use secondary artist
-        const madeForYouModifiers = ['hits', 'songs collection', 'best songs', 'jukebox'];
-        madeForYouQuery = `${topArtists[1]} ${madeForYouModifiers[Math.floor(Math.random() * madeForYouModifiers.length)]} in ${language}`;
+        
+        let genreQuery = topGenres[0];
+        // Prevent regional genres from bleeding into English
+        if (language.toLowerCase() === 'english' && (genreQuery === 'bollywood' || genreQuery === 'punjabi')) {
+           genreQuery = 'pop'; 
+        } else {
+           genreQuery = genreLabels[genreQuery] || genreQuery;
+        }
+        
+        madeForYouQuery = `best ${genreQuery} ${language} songs ${randomYear}`;
       } else {
-        madeForYouQuery = `trending ${language} songs ${randomYear}`;
+        const genericModifiers = ['top', 'trending', 'popular', 'best hits'];
+        madeForYouQuery = `${genericModifiers[Math.floor(Math.random() * genericModifiers.length)]} ${language} songs ${randomYear}`;
       }
 
       shelves.push({
@@ -355,14 +359,12 @@ export class AlgorithmService {
         query: madeForYouQuery
       });
 
-      // "Fans Also Listen To" — third artist if available
-      if (topArtists.length > 2) {
-        shelves.push({
-          title: 'Fans Also Listen To',
-          query: `${topArtists[2]} official songs audio ${randomYear} in ${language}`
-        });
-      }
-
+      // "Fans Also Listen To" — strict language dynamic
+      const moodQueries = ['viral hits', 'chartbusters', 'new releases', 'unplugged', 'acoustic', 'mashup'];
+      shelves.push({
+        title: 'Fans Also Listen To',
+        query: `${language} ${moodQueries[Math.floor(Math.random() * moodQueries.length)]} songs ${randomYear}`
+      });
     }
 
     return of(shelves);
