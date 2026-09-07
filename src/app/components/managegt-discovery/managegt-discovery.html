@@ -1,32 +1,149 @@
-<div class="gt-admin-header">
-  <div class="header-left">
-    <h1 class="gt-admin-title">Manage Discovery</h1>
-    <p class="gt-admin-subtitle">Update the dynamic songs shown on the Discovery page.</p>
-  </div>
-  <button class="gt-btn-primary" (click)="save()" [disabled]="isSaving">
-    <svg lucideSave [attr.size]="18" *ngIf="!isSaving"></svg>
-    <div class="spinner-small" *ngIf="isSaving"></div>
-    <span>{{ isSaving ? 'Saving...' : 'Save JSON' }}</span>
-  </button>
-</div>
-
-<div class="gt-admin-content">
-  <div class="alert success-alert" *ngIf="saveSuccess">
-    <svg lucideCheckCircle [attr.size]="20"></svg>
-    <span>Discovery songs saved successfully!</span>
-  </div>
-
-  <div class="alert error-alert" *ngIf="saveError">
-    <svg lucideXCircle [attr.size]="20"></svg>
-    <span>{{ saveError }}</span>
-  </div>
-
-  <div class="json-editor-card">
-    <div class="card-header">
-      <h3>JSON Array of Songs</h3>
-      <p class="helper-text">Must be a valid JSON array of objects with videoId, title, channelTitle, thumbnail, and thumbnailHigh.</p>
+<div class="page-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h2>Manage Discovery Page</h2>
+      <p>Curate the Hero Section and the main Discovery Feed.</p>
     </div>
     
-    <textarea class="json-textarea" [(ngModel)]="jsonInput" spellcheck="false" placeholder="Enter JSON here..."></textarea>
+    <div class="header-actions">
+      <button class="save-btn" [disabled]="isSaving" (click)="save()">
+        <span *ngIf="!isSaving && !saveSuccess"><svg lucideSave [attr.size]="18"></svg> Save Changes</span>
+        <span *ngIf="isSaving">Saving...</span>
+        <span *ngIf="saveSuccess" class="success-text"><svg lucideCheckCircle [attr.size]="18"></svg> Saved!</span>
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="saveError" class="error-box">
+    <svg lucideXCircle [attr.size]="18"></svg>
+    {{ saveError }}
+  </div>
+
+  <!-- Search Panel -->
+  <div class="search-panel">
+    <div class="search-input-group">
+      <svg lucideSearch [attr.size]="20" class="search-icon"></svg>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (keyup.enter)="performSearch()"
+        placeholder="Search for a song, artist, or album to add..." 
+        class="search-input" />
+      <button class="btn-primary" (click)="performSearch()" [disabled]="isSearching || !searchQuery.trim()">
+        {{ isSearching ? 'Searching...' : 'Search' }}
+      </button>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results-container" *ngIf="hasSearched">
+      <div class="results-header">
+        <h4>Search Results</h4>
+        <button class="btn-icon" (click)="hasSearched = false; searchResults = []" title="Clear Search">
+          <svg lucideX [attr.size]="18"></svg>
+        </button>
+      </div>
+      
+      <div class="results-list" *ngIf="searchResults.length > 0">
+        <div class="result-item" *ngFor="let result of searchResults">
+          <img [src]="result.thumbnail" [alt]="result.title" class="result-thumb" />
+          <div class="result-info">
+            <h5 [title]="result.title">{{ result.title }}</h5>
+            <p>{{ result.channelTitle }}</p>
+          </div>
+          <div class="result-actions">
+            <button class="btn-add hero-add" (click)="addToHero(result)" title="Add to Hero">
+              <svg lucidePlus [attr.size]="16"></svg> Hero
+            </button>
+            <button class="btn-add feed-add" (click)="addToFeed(result)" title="Add to Feed">
+              <svg lucidePlus [attr.size]="16"></svg> Feed
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="!isSearching && searchResults.length === 0">
+        No results found for "{{ searchQuery }}".
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Management Area -->
+  <div class="management-area">
+    
+    <!-- Hero Section Management -->
+    <div class="section-card hero-section-card">
+      <div class="section-header">
+        <h3>Hero Items (Top Carousel)</h3>
+        <span class="count-badge">{{ heroItems.length }} / 5</span>
+      </div>
+      
+      <div class="drag-list" cdkDropList (cdkDropListDropped)="dropHero($event)">
+        <div class="drag-item hero-item" *ngFor="let item of heroItems; let i = index" cdkDrag>
+          <div class="item-drag-handle" cdkDragHandle>
+            <svg lucideGripVertical [attr.size]="20"></svg>
+          </div>
+          
+          <img [src]="item.thumbnail" class="item-thumb" />
+          
+          <div class="item-details">
+            <div class="detail-row">
+              <h4 [title]="item.title">{{ item.title }}</h4>
+            </div>
+            <div class="detail-row inputs-row">
+              <div class="input-group">
+                <label>Badge</label>
+                <input type="text" [(ngModel)]="item.badge" placeholder="e.g. TRENDING NOW" />
+              </div>
+              <div class="input-group">
+                <label>Artist / Subtitle</label>
+                <input type="text" [(ngModel)]="item.artist" placeholder="e.g. Arijit Singh" />
+              </div>
+            </div>
+          </div>
+          
+          <button class="btn-icon danger" (click)="removeFromHero(i)" title="Remove">
+            <svg lucideTrash2 [attr.size]="18"></svg>
+          </button>
+        </div>
+        
+        <div class="empty-state" *ngIf="heroItems.length === 0">
+          <svg lucideImage [attr.size]="32"></svg>
+          <p>No hero items added yet. Search and add items above.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed Section Management -->
+    <div class="section-card feed-section-card">
+      <div class="section-header">
+        <h3>Discovery Feed (Grid)</h3>
+        <span class="count-badge">{{ feedItems.length }} songs</span>
+      </div>
+      
+      <div class="drag-list" cdkDropList (cdkDropListDropped)="dropFeed($event)">
+        <div class="drag-item feed-item" *ngFor="let item of feedItems; let i = index" cdkDrag>
+          <div class="item-drag-handle" cdkDragHandle>
+            <svg lucideGripVertical [attr.size]="20"></svg>
+          </div>
+          
+          <img [src]="item.thumbnail" class="item-thumb" />
+          
+          <div class="item-details simple-details">
+            <h4 [title]="item.title">{{ item.title }}</h4>
+            <p>{{ item.channelTitle }}</p>
+          </div>
+          
+          <button class="btn-icon danger" (click)="removeFromFeed(i)" title="Remove">
+            <svg lucideTrash2 [attr.size]="18"></svg>
+          </button>
+        </div>
+        
+        <div class="empty-state" *ngIf="feedItems.length === 0">
+          <svg lucideImage [attr.size]="32"></svg>
+          <p>No feed items added yet. Search and add items above.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
