@@ -1039,10 +1039,6 @@
     .artist-bento-overlay {
       background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%);
     }
-    .play-btn-overlay-artist {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
   }
 
   .artist-img-wrapper {
@@ -1091,26 +1087,6 @@
     @media (max-width: 768px) {
       font-size: 1.1rem;
     }
-  }
-  
-  .play-btn-overlay-artist {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    opacity: 0;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(168, 85, 247, 0.9);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    border: none;
-    pointer-events: none;
   }
 }
 
