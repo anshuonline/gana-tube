@@ -1,4 +1,4 @@
-﻿:host {
+:host {
   display: block;
 }
 
@@ -185,9 +185,11 @@
   }
   
   &.active-heart {
-    color: transparent !important;
-    fill: url(#heartGradient) !important;
-    stroke: none !important;
+    svg {
+      color: transparent !important;
+      fill: url(#heartGradient) !important;
+      stroke: none !important;
+    }
   }
 }
 
@@ -652,9 +654,11 @@
   &:active { transform: scale(0.9); }
   
   &.active-heart {
-    color: transparent !important;
-    fill: url(#heartGradient) !important;
-    stroke: none !important;
+    svg {
+      color: transparent !important;
+      fill: url(#heartGradient) !important;
+      stroke: none !important;
+    }
   }
 }
 
@@ -1301,15 +1305,36 @@
   border: 1px solid rgba(255,255,255,0.1);
   h3 {
     margin: 0 0 16px;
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 500;
   }
-  .sleep-active-text {
-    color: #4CAF50;
-    font-weight: 600;
-    margin-bottom: 16px;
-  }
-  .sleep-options {
+}
+
+.desktop-only {
+  display: flex !important;
+}
+.mobile-only {
+  display: none !important;
+}
+
+.options-dropdown {
+  position: absolute;
+  bottom: 80px; /* Above the player bar */
+  right: 16px;
+  background: #1f2937;
+  border-radius: 8px;
+  padding: 8px 0;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+
+  .dropdown-item {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 12px 20px;
+    width: 100%;
+    text-align: left;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -1504,3 +1529,10 @@
     transform: scale(1.2);
   }
 }
+
+.desktop-only { display: flex !important; }
+.mobile-only { display: none !important; }
+.options-dropdown { position: absolute; bottom: 80px; right: 16px; background: #1f2937; border-radius: 8px; padding: 8px 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+.options-dropdown .dropdown-item { background: none; border: none; color: #fff; padding: 12px 20px; width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 14px; white-space: nowrap; }
+.options-dropdown .dropdown-item:hover { background: rgba(255,255,255,0.1); }
+@media (max-width: 768px) { .desktop-only { display: none !important; } .mobile-only { display: flex !important; } }

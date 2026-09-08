@@ -22,7 +22,9 @@ import {
   LucideMoon,
   LucideMonitor,
   LucideDownload,
-  LucideCheck
+  LucideCheck,
+  LucideActivity,
+  LucideMoreVertical
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
@@ -59,7 +61,9 @@ import { SyncService } from '../../services/sync.service';
     LucideMoon,
     LucideMonitor,
     LucideDownload,
-    LucideCheck
+    LucideCheck,
+    LucideActivity,
+    LucideMoreVertical
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
@@ -184,6 +188,16 @@ import { SyncService } from '../../services/sync.service';
       <!-- Right Controls -->
       <div class="player-right">
         <span class="time-display">{{ formatTime(playerService.currentTime()) }} / {{ formatTime(playerService.duration()) }}</span>
+        
+        <button
+          class="ctrl-btn secondary desktop-only"
+          [class.active]="playerService.isCrossfadeEnabled()"
+          (click)="playerService.toggleCrossfade()"
+          title="Crossfade: Smoothly transition between songs"
+        >
+          <svg lucideActivity [attr.size]="18"></svg>
+        </button>
+
         <button
           class="ctrl-btn secondary"
           [class.active]="showQueue()"
@@ -215,6 +229,22 @@ import { SyncService } from '../../services/sync.service';
         <button class="ctrl-btn secondary maximize-btn" (click)="toggleFullScreen()" title="Expand Player">
           <svg lucideMaximize2 [attr.size]="18"></svg>
         </button>
+        
+        <!-- Mobile Options Trigger -->
+        <button class="ctrl-btn secondary mobile-only options-btn" (click)="toggleOptions(); $event.stopPropagation()" title="More Options">
+          <svg lucideMoreVertical [attr.size]="18"></svg>
+        </button>
+        
+        <!-- Mobile Options Dropdown -->
+        <div class="options-dropdown" *ngIf="showOptionsMenu()" (click)="$event.stopPropagation()">
+          <button class="dropdown-item" (click)="playerService.toggleCrossfade()">
+            <svg lucideActivity [attr.size]="16" [attr.color]="playerService.isCrossfadeEnabled() ? '#3b82f6' : 'currentColor'"></svg> 
+            Crossfade: {{ playerService.isCrossfadeEnabled() ? 'On' : 'Off' }}
+          </button>
+          <button class="dropdown-item" (click)="copyShareLink(); toggleOptions()">
+            <svg lucideShare2 [attr.size]="16"></svg> Share Track
+          </button>
+        </div>
       </div>
 
       <!-- Devices Drawer Panel -->
@@ -477,6 +507,7 @@ export class MusicPlayerComponent implements OnDestroy {
   showDevices = signal<boolean>(false);
   showFSQueue = signal<boolean>(false);
   showToast = signal<boolean>(false);
+  showOptionsMenu = signal<boolean>(false);
   customSleepTime = signal<number>(30);
   isDownloading = signal<boolean>(false);
 
@@ -538,7 +569,21 @@ export class MusicPlayerComponent implements OnDestroy {
     this.showQueue.set(!this.showQueue());
     if (this.showQueue()) {
       this.showDevices.set(false);
+      this.showOptionsMenu.set(false);
     }
+  }
+
+  toggleOptions(): void {
+    this.showOptionsMenu.set(!this.showOptionsMenu());
+    if (this.showOptionsMenu()) {
+      this.showQueue.set(false);
+      this.showDevices.set(false);
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    this.showOptionsMenu.set(false);
   }
 
   ngOnDestroy() {

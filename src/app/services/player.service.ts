@@ -103,6 +103,9 @@ export class PlayerService {
   repeatMode = signal<'none' | 'one' | 'all'>('none');
   currentLanguage = signal<string>('Hindi');
   isPlaylistContext = signal<boolean>(false);
+  isCrossfadeEnabled = signal<boolean>(
+    typeof localStorage !== 'undefined' ? localStorage.getItem('gt_crossfade') === 'true' : false
+  );
   
   // Audio Quality
   musicQuality = signal<'High' | 'Standard' | 'Data Saver'>(
@@ -555,6 +558,14 @@ export class PlayerService {
     this.repeatMode.set(modes[(curr + 1) % modes.length]);
   }
 
+  toggleCrossfade(): void {
+    const newVal = !this.isCrossfadeEnabled();
+    this.isCrossfadeEnabled.set(newVal);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_crossfade', newVal ? 'true' : 'false');
+    }
+  }
+
   onPlayerStateChange(event: any): void {
     // YT.PlayerState: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
     switch (event.data) {
@@ -809,9 +820,26 @@ export class PlayerService {
       this.lastTickTime = now;
 
       if (this.ytPlayer && !this.isRemoteControl()) {
-        this.currentTime.set(this.ytPlayer.getCurrentTime() || 0);
-        this.duration.set(this.ytPlayer.getDuration() || 0);
+        const cTime = this.ytPlayer.getCurrentTime() || 0;
+        const dur = this.ytPlayer.getDuration() || 0;
+        this.currentTime.set(cTime);
+        this.duration.set(dur);
         this.broadcastToSync(); // Send to sync service (will be throttled)
+        
+        // Fake crossfade logic (fade in/out volume)
+        if (this.isCrossfadeEnabled() && dur > 10) {
+          const timeLeft = dur - cTime;
+          if (timeLeft <= 5 && timeLeft > 0) {
+            const fadeRatio = Math.max(0, timeLeft / 5);
+            this.ytPlayer.setVolume(this.volume() * fadeRatio);
+          } else if (cTime <= 5) {
+            const fadeRatio = Math.min(1, cTime / 5);
+            this.ytPlayer.setVolume(this.volume() * fadeRatio);
+          } else {
+            // Restore normal volume if user scrubs to middle
+            this.ytPlayer.setVolume(this.volume());
+          }
+        }
         
         // Track listening time for spin wheel (120 seconds = 1 chance)
         // ONLY if user has exhausted all daily spins (spinsLeft <= 0)

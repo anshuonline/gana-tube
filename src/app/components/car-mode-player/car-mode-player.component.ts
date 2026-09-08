@@ -13,7 +13,8 @@ import {
   LucideHeart,
   LucideX,
   LucideRefreshCw,
-  LucideRepeat
+  LucideRepeat,
+  LucideRepeat2
 } from '@lucide/angular';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
@@ -34,7 +35,8 @@ import { FormsModule } from '@angular/forms';
     LucideHeart,
     LucideX,
     LucideRefreshCw,
-    LucideRepeat
+    LucideRepeat,
+    LucideRepeat2
   ],
   templateUrl: './car-mode-player.component.html',
   styleUrls: ['./car-mode-player.component.scss']
