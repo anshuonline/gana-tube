@@ -100,7 +100,7 @@
       <div class="chart-card">
         <h3 class="chart-title"><div class="dot purple"></div> Most Active Users</h3>
         
-        <div>
+        <div class="scrollable-list">
           <div *ngIf="!analyticsData.top_users || analyticsData.top_users.length === 0" class="empty-text">No data yet</div>
           
           <div *ngFor="let user of analyticsData.top_users; let i = index" class="list-item">
@@ -115,6 +115,41 @@
               <p>mins</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Users Table Row -->
+    <div class="charts-grid" style="grid-template-columns: 1fr; margin-top: 2rem;">
+      <div class="chart-card">
+        <h3 class="chart-title"><div class="dot blue"></div> Detailed User Activity Logs</h3>
+        
+        <div class="table-container">
+          <div *ngIf="!analyticsData.detailed_users || analyticsData.detailed_users.length === 0" class="empty-text">No data yet</div>
+          
+          <table class="detailed-table" *ngIf="analyticsData.detailed_users?.length > 0">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Joined Date</th>
+                <th>Last Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of analyticsData.detailed_users">
+                <td>
+                  <div class="user-cell">
+                    <div class="list-avatar small">{{ user.display_name ? user.display_name.charAt(0).toUpperCase() : 'U' }}</div>
+                    <span>{{ user.display_name || 'Anonymous' }}</span>
+                  </div>
+                </td>
+                <td style="color: #9ca3af;">{{ user.email }}</td>
+                <td>{{ user.created_at ? (user.created_at | date:'mediumDate') : 'N/A' }}</td>
+                <td>{{ user.updated_at ? (user.updated_at | date:'medium') : 'N/A' }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

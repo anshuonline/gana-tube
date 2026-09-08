@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AnalyticsService } from '../../services/analytics.service';
@@ -14,6 +14,7 @@ import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2
 })
 export class AnalyticsPageComponent implements OnInit {
   analyticsService = inject(AnalyticsService);
+  cdr = inject(ChangeDetectorRef);
 
   isAuthenticated = false;
   password = '';
@@ -69,13 +70,16 @@ export class AnalyticsPageComponent implements OnInit {
           sessionStorage.setItem('gtanalytic_pwd', this.password);
           this.analyticsData = res.data;
           this.prepareCharts();
+          this.cdr.detectChanges(); // Fix sticking issue on reload
         } else {
           this.loginError = res.message || 'Invalid password';
+          this.cdr.detectChanges();
         }
       },
       error: (err) => {
         this.loading = false;
         this.loginError = 'Error connecting to analytics server';
+        this.cdr.detectChanges();
       }
     });
   }
