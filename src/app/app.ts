@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift } from '@lucide/angular';
+import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -73,6 +73,10 @@ export interface SponsoredAd {
     LucideFlame,
     LucideCompass,
     LucideMenu,
+    LucideGift,
+    LucideImage,
+    LucideEdit3,
+    LucideLogOut,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -386,6 +390,18 @@ export class App implements OnInit {
   isSavingUsername = signal<boolean>(false);
   newUsername = signal<string>('');
   currentAmbientBg = signal<string>('');
+  
+  profileBannerIndex = signal<number>(
+    typeof localStorage !== 'undefined' ? parseInt(localStorage.getItem('gt_profile_banner') || '1', 10) : 1
+  );
+
+  changeProfileBanner() {
+    const nextIndex = this.profileBannerIndex() === 1 ? 2 : 1;
+    this.profileBannerIndex.set(nextIndex);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_profile_banner', nextIndex.toString());
+    }
+  }
   
   activeMenuTrack = signal<any | null>(null);
   activeMenuPosition = signal<{x: number, y: number} | null>(null);

@@ -113,114 +113,128 @@
   <!-- Main Content -->
   <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
-      <div class="profile-page-header">
-        <h1>Profile & Settings</h1>
-      </div>
       
-      <div class="profile-page-grid">
-        <!-- User Card -->
-        <div class="profile-card modern-user-card">
-          <div class="user-content">
-            <!-- Loading State -->
-            <ng-container *ngIf="authService.currentUser() === undefined">
-              <div class="avatar-wrapper">
-                <div class="avatar-placeholder skeleton-pulse"></div>
-              </div>
-              <div class="skeleton-text skeleton-pulse"></div>
-              <div class="skeleton-text-sm skeleton-pulse"></div>
-            </ng-container>
-
-            <!-- Logged Out State -->
-            <ng-container *ngIf="authService.currentUser() === null">
-              <div class="avatar-wrapper">
-                <div class="avatar-placeholder">
-                  <svg lucideUser [attr.size]="40"></svg>
-                </div>
-              </div>
-              <h2 class="username">Guest User</h2>
-              <span class="user-email">Free Account</span>
-              <button class="login-action-btn" (click)="login()">Login with Google</button>
-            </ng-container>
-
-            <!-- Logged In State -->
-            <ng-container *ngIf="authService.currentUser()">
-              <button class="edit-username-btn" (click)="toggleEditUsername()" title="Edit Username">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              
-              <div class="avatar-wrapper">
-                <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" />
-              </div>
-              
-              <div *ngIf="!isEditingUsername()" class="username-display">
-                <h2 class="username">{{ getDisplayUsername() }}</h2>
-              </div>
-              <div *ngIf="isEditingUsername()" class="edit-username-row">
-                <input type="text" maxlength="20" [value]="newUsername()" (input)="newUsername.set($any($event.target).value)" [disabled]="isSavingUsername()" placeholder="New username" class="edit-input">
-                <button (click)="saveUsername()" [disabled]="isSavingUsername()" class="save-btn">
-                  {{ isSavingUsername() ? '...' : 'Save' }}
-                </button>
-                <button (click)="toggleEditUsername()" [disabled]="isSavingUsername()" class="cancel-btn">âœ•</button>
-              </div>
-              <span class="user-email">{{ authService.currentUser()?.email }}</span>
-              <button class="login-action-btn logout-btn" (click)="logout()">Logout</button>
-            </ng-container>
-          </div>
-        </div>
-
-        <!-- Login Help Card -->
-        <div class="profile-card settings-card login-help-card" *ngIf="authService.currentUser() === null">
-          <div class="help-content">
-            <h3 style="color: #ff4d4d; margin-top: 0; display: flex; align-items: center; gap: 8px;">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-              Login Not Working?
-            </h3>
-            <p style="font-size: 0.9rem; color: #a0a0a0; line-height: 1.5; margin-bottom: 12px;">
-              If clicking the login button doesn't do anything, your browser's Adblocker or Privacy Shield is blocking the login window.
-            </p>
-            <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 0.85rem; color: #e0e0e0; line-height: 1.6;">
-              <strong style="color: #fff;">How to fix:</strong><br>
-              â€¢ <strong>Brave Browser:</strong> Click the Lion ðŸ¦ icon in the URL bar and turn <b>Shields DOWN</b> for this site.<br>
-              â€¢ <strong>Adblockers:</strong> Click your extension icon (uBlock, AdBlock) and <b>whitelist</b> or <b>pause</b> it for ganatube.in.
-            </div>
-          </div>
-        </div>
-        <!-- Music Quality Card -->
-        <div class="profile-card settings-card music-quality-card">
-          <h3>Music Quality</h3>
-          <p>Choose audio quality for playback.</p>
-          <div class="quality-selector">
-            <button class="q-btn" [class.active]="musicQuality() === 'High'" (click)="setMusicQuality('High')">High Quality</button>
-            <button class="q-btn" [class.active]="musicQuality() === 'Standard'" (click)="setMusicQuality('Standard')">Standard</button>
-            <button class="q-btn" [class.active]="musicQuality() === 'Data Saver'" (click)="setMusicQuality('Data Saver')">Data Saver</button>
-          </div>
-        </div>
-
-
-
-        <!-- Listen Together Card -->
-        <div class="profile-card social-card listen-together-card disabled-card">
-          <h3>Listen Together <span class="coming-soon-badge">Coming Soon</span></h3>
-          <p>Create a room and listen to music synced with friends.</p>
-          <button class="action-btn" disabled>
-            <svg lucideUsers [attr.size]="18"></svg>
-            Create Room
+      <!-- New Banner Layout -->
+      <div class="profile-banner-wrapper">
+        <div class="profile-banner" [style.backgroundImage]="'url(assets/images/profile-bg-' + profileBannerIndex() + '.jpg)'">
+          <button class="change-banner-btn" (click)="changeProfileBanner()" title="Change Banner">
+            <svg lucideImage [attr.size]="18"></svg>
           </button>
         </div>
 
-        <!-- Languages Card -->
-        <div class="profile-card settings-card languages-card">
-          <h3>Preferred Languages</h3>
-          <p>Select languages for your home screen.</p>
-          <div class="lang-chips">
-            <button *ngFor="let lang of availableLanguages" 
-                    class="q-btn lang-chip" 
-                    [class.active]="preferredLanguages().includes(lang)"
-                    (click)="togglePreferredLanguage(lang)">
-              {{ lang }}
-            </button>
+        <div class="profile-header-content">
+          <!-- Avatar -->
+          <div class="avatar-wrapper">
+            <ng-container *ngIf="authService.currentUser() === undefined">
+               <div class="avatar-placeholder skeleton-pulse"></div>
+            </ng-container>
+            <ng-container *ngIf="authService.currentUser() === null">
+               <div class="avatar-placeholder">
+                 <svg lucideUser [attr.size]="40"></svg>
+               </div>
+            </ng-container>
+            <ng-container *ngIf="authService.currentUser()">
+               <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" />
+            </ng-container>
+          </div>
+
+          <!-- User Info & Edit -->
+          <div class="user-info-section">
+            <ng-container *ngIf="authService.currentUser() === null">
+              <h1 class="username">Guest User</h1>
+              <p class="user-email">Free Account</p>
+              <button class="login-action-btn primary-btn" (click)="login()">Login with Google</button>
+            </ng-container>
+
+            <ng-container *ngIf="authService.currentUser()">
+              <div class="username-row">
+                <div *ngIf="!isEditingUsername()" class="username-display">
+                  <h1 class="username">{{ getDisplayUsername() }}</h1>
+                  <button class="edit-username-btn" (click)="toggleEditUsername()" title="Edit Username">
+                    <svg lucideEdit3 [attr.size]="16"></svg>
+                  </button>
+                </div>
+                <div *ngIf="isEditingUsername()" class="edit-username-row">
+                  <input type="text" maxlength="20" [value]="newUsername()" (input)="newUsername.set($any($event.target).value)" [disabled]="isSavingUsername()" placeholder="New username" class="edit-input">
+                  <button (click)="saveUsername()" [disabled]="isSavingUsername()" class="save-btn">
+                    {{ isSavingUsername() ? '...' : 'Save' }}
+                  </button>
+                  <button (click)="toggleEditUsername()" [disabled]="isSavingUsername()" class="cancel-btn">✕</button>
+                </div>
+              </div>
+              <p class="user-email">{{ authService.currentUser()?.email }}</p>
+            </ng-container>
           </div>
         </div>
+      </div>
+      
+      <!-- Settings List Layout -->
+      <div class="profile-settings-container">
+        
+        <!-- Login Help (Only if guest) -->
+        <div class="settings-group" *ngIf="authService.currentUser() === null">
+          <h2 class="group-title">Troubleshooting</h2>
+          <div class="setting-item warning-item">
+            <div class="setting-info">
+              <h3>Login Not Working?</h3>
+              <p>Your browser's Adblocker or Privacy Shield is blocking the login window.</p>
+              <div class="fix-box">
+                <strong>How to fix:</strong><br>
+                • <strong>Brave Browser:</strong> Click Lion 🦁 icon & turn <b>Shields DOWN</b><br>
+                • <strong>Adblockers:</strong> Whitelist or pause for ganatube.in
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Music Quality -->
+        <div class="settings-group">
+          <h2 class="group-title">Audio</h2>
+          <div class="setting-item">
+            <div class="setting-info">
+              <h3>Music Quality</h3>
+              <p>Choose audio quality for playback.</p>
+            </div>
+            <div class="setting-actions quality-selector">
+              <button class="q-btn" [class.active]="musicQuality() === 'High'" (click)="setMusicQuality('High')">High</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Standard'" (click)="setMusicQuality('Standard')">Standard</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Data Saver'" (click)="setMusicQuality('Data Saver')">Data Saver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Languages -->
+        <div class="settings-group">
+          <h2 class="group-title">Preferences</h2>
+          <div class="setting-item borderless">
+            <div class="setting-info">
+              <h3>Preferred Languages</h3>
+              <p>Select languages for your home screen.</p>
+            </div>
+          </div>
+          <div class="setting-item-full">
+            <div class="lang-chips">
+              <button *ngFor="let lang of availableLanguages" 
+                      class="q-btn lang-chip" 
+                      [class.active]="preferredLanguages().includes(lang)"
+                      (click)="togglePreferredLanguage(lang)">
+                {{ lang }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logout (Only if logged in) -->
+        <div class="settings-group" *ngIf="authService.currentUser()">
+          <div class="setting-item logout-item" (click)="logout()">
+            <div class="setting-info">
+              <h3 class="text-danger">Logout</h3>
+              <p>Sign out of your account on this device.</p>
+            </div>
+            <svg lucideLogOut [attr.size]="20" class="text-danger"></svg>
+          </div>
+        </div>
+
       </div>
     </div>
 
