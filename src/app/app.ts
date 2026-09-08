@@ -1415,7 +1415,9 @@ export class App implements OnInit {
           
           // Save new batch to recent
           const newRecent = [...recentSuggested, ...shuffledPool.map(s => s.videoId)].slice(-50); // Keep last 50
-          localStorage.setItem('gt_recent_suggested', JSON.stringify(newRecent));
+          try {
+            localStorage.setItem('gt_recent_suggested', JSON.stringify(newRecent));
+          } catch(e) { console.warn('localStorage full'); }
 
           suggestedShelf[0].songs = shuffledPool;
           suggestedShelf[0].type = 'custom'; // Mark as custom so it doesn't fetch
