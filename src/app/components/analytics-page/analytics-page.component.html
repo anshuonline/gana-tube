@@ -42,28 +42,30 @@
     <div class="stats-grid">
       <div class="stat-card blue">
         <h3 class="stat-title">Total Plays</h3>
-        <p class="stat-value">{{ analyticsData.total_plays | number }}</p>
+        <p class="stat-value">{{ analyticsData.summary?.total_plays || 0 | number }}</p>
       </div>
       <div class="stat-card pink">
         <h3 class="stat-title">Total Likes</h3>
-        <p class="stat-value">{{ analyticsData.total_likes | number }}</p>
+        <p class="stat-value">{{ analyticsData.summary?.total_likes || 0 | number }}</p>
       </div>
       <div class="stat-card purple">
-        <h3 class="stat-title">Total Shares</h3>
-        <p class="stat-value">{{ analyticsData.total_shares | number }}</p>
+        <h3 class="stat-title">Total Time Spent (Hrs)</h3>
+        <p class="stat-value">{{ ((analyticsData.summary?.total_time_seconds || 0) / 3600) | number:'1.0-1' }}</p>
       </div>
     </div>
 
     <!-- Charts Row -->
     <div class="charts-grid">
-      <!-- Plays by Day Chart -->
+      <!-- Most Played Songs Chart -->
       <div class="chart-card">
-        <h3 class="chart-title"><div class="dot blue"></div> Activity (Last 7 Days)</h3>
-        <div style="height: 300px;">
+        <h3 class="chart-title"><div class="dot blue"></div> Top 10 Most Played Songs</h3>
+        <div style="height: 300px; position: relative;">
           <canvas baseChart
-            [data]="playsChartData"
-            [options]="lineChartOptions"
-            [type]="'line'">
+            [datasets]="mostPlayedData"
+            [labels]="mostPlayedLabels"
+            [options]="mostPlayedOptions"
+            [legend]="false"
+            [type]="'bar'">
           </canvas>
         </div>
       </div>
@@ -73,12 +75,12 @@
     <div class="charts-grid">
       <!-- Top Songs -->
       <div class="chart-card">
-        <h3 class="chart-title"><div class="dot pink"></div> Top Played Songs</h3>
+        <h3 class="chart-title"><div class="dot pink"></div> Top Played Songs Details</h3>
         
         <div>
-          <div *ngIf="!analyticsData.top_songs || analyticsData.top_songs.length === 0" class="empty-text">No data yet</div>
+          <div *ngIf="!analyticsData.most_played || analyticsData.most_played.length === 0" class="empty-text">No data yet</div>
           
-          <div *ngFor="let song of analyticsData.top_songs; let i = index" class="list-item">
+          <div *ngFor="let song of analyticsData.most_played; let i = index" class="list-item">
             <div class="list-rank">{{ i + 1 }}</div>
             <img [src]="song.thumbnail" alt="Thumbnail" class="list-img" *ngIf="song.thumbnail">
             <div class="list-avatar" *ngIf="!song.thumbnail"><span style="font-size: 1rem;">🎵</span></div>
@@ -87,7 +89,7 @@
               <p>{{ song.artist || song.video_id }}</p>
             </div>
             <div class="list-score green">
-              <span>{{ song.plays | number }}</span>
+              <span>{{ song.play_count | number }}</span>
               <p>plays</p>
             </div>
           </div>
@@ -109,7 +111,7 @@
               <p>{{ user.email || 'No Email' }}</p>
             </div>
             <div class="list-score purple">
-              <span>{{ (user.total_time_spent / 60) | number:'1.0-0' }}</span>
+              <span>{{ (user.total_time_spent_seconds / 60) | number:'1.0-0' }}</span>
               <p>mins</p>
             </div>
           </div>
