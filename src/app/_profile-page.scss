@@ -23,16 +23,16 @@
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-    pointer-events: none;
-  }
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+}
+
+.banner-bg-1 {
+  background-image: url('../assets/images/profile-bg-1.jpg');
+}
+
+.banner-bg-2 {
+  background-image: url('../assets/images/profile-bg-2.jpg');
 }
 
 .change-banner-btn {

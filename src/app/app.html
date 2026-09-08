@@ -116,7 +116,7 @@
       
       <!-- New Banner Layout -->
       <div class="profile-banner-wrapper">
-        <div class="profile-banner" [style.backgroundImage]="'url(assets/images/profile-bg-' + profileBannerIndex() + '.jpg)'">
+        <div class="profile-banner" [ngClass]="'banner-bg-' + profileBannerIndex()">
           <button class="change-banner-btn" (click)="changeProfileBanner()" title="Change Banner">
             <svg lucideImage [attr.size]="18"></svg>
           </button>
