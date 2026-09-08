@@ -26,16 +26,22 @@
   </div>
 
   <!-- Dashboard -->
-  <div *ngIf="isAuthenticated && analyticsData" class="dashboard">
+  <div class="dashboard" *ngIf="isAuthenticated && analyticsData">
     <!-- Header -->
     <div class="header">
       <div>
         <h1 class="header-title">Analytics Overview</h1>
         <p class="header-subtitle">Real-time performance metrics for GanaTube</p>
       </div>
-      <button (click)="logout()" class="logout-btn">
-        Logout
-      </button>
+      <div class="header-actions" style="display: flex; gap: 1rem; align-items: center;">
+        <div class="filter-group">
+          <button class="filter-btn" [class.active]="currentFilter === 'today'" (click)="setFilter('today')">Today</button>
+          <button class="filter-btn" [class.active]="currentFilter === 'yesterday'" (click)="setFilter('yesterday')">Yesterday</button>
+          <button class="filter-btn" [class.active]="currentFilter === 'last_7_days'" (click)="setFilter('last_7_days')">7 Days</button>
+          <button class="filter-btn" [class.active]="currentFilter === 'all_time'" (click)="setFilter('all_time')">All Time</button>
+        </div>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
     </div>
 
     <!-- Stats Row -->

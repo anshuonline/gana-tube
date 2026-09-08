@@ -22,6 +22,7 @@ export class AnalyticsPageComponent implements OnInit {
   loading = false;
 
   analyticsData: any = null;
+  public currentFilter: string = 'all_time';
 
   // Chart configuration
   public mostPlayedOptions: any = { 
@@ -77,26 +78,34 @@ export class AnalyticsPageComponent implements OnInit {
     this.loading = true;
     this.loginError = '';
     
-    this.analyticsService.getAnalytics(this.password).subscribe({
+    this.analyticsService.getAnalytics(this.password, this.currentFilter).subscribe({
       next: (res) => {
-        this.loading = false;
         if (res.status === 'success') {
           this.isAuthenticated = true;
-          sessionStorage.setItem('gtanalytic_pwd', this.password);
           this.analyticsData = res.data;
           this.prepareCharts();
-          this.cdr.detectChanges(); // Fix sticking issue on reload
+          sessionStorage.setItem('gtanalytic_pwd', this.password);
         } else {
           this.loginError = res.message || 'Invalid password';
-          this.cdr.detectChanges();
+          this.isAuthenticated = false;
         }
+        this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
+        this.loginError = 'Connection failed';
         this.loading = false;
-        this.loginError = 'Error connecting to analytics server';
+        this.isAuthenticated = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  setFilter(filter: string) {
+    this.currentFilter = filter;
+    if (this.isAuthenticated) {
+      this.login(); // Refetch data
+    }
   }
 
   prepareCharts() {

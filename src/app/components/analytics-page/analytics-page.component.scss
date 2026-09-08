@@ -361,3 +361,37 @@
     font-weight: 500;
   }
 }
+
+.filter-group {
+  display: flex;
+  background-color: #111;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.filter-btn {
+  background: transparent;
+  color: #9ca3af;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-right: 1px solid #1f2937;
+}
+
+.filter-btn:last-child {
+  border-right: none;
+}
+
+.filter-btn:hover {
+  background-color: #1f2937;
+  color: #fff;
+}
+
+.filter-btn.active {
+  background-color: #3b82f6;
+  color: #fff;
+}
