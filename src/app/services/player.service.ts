@@ -853,15 +853,21 @@ export class PlayerService {
           // Fake crossfade logic (fade in/out volume)
           if (this.isCrossfadeEnabled() && dur > 10 && typeof this.ytPlayer.setVolume === 'function') {
             const timeLeft = dur - cTime;
+            let targetVol = this.volume();
+            
             if (timeLeft <= 5 && timeLeft > 0) {
               const fadeRatio = Math.max(0, timeLeft / 5);
-              this.ytPlayer.setVolume(Math.round(this.volume() * fadeRatio));
+              targetVol = Math.round(this.volume() * fadeRatio);
             } else if (cTime <= 5) {
               const fadeRatio = Math.min(1, cTime / 5);
-              this.ytPlayer.setVolume(Math.round(this.volume() * fadeRatio));
+              targetVol = Math.round(this.volume() * fadeRatio);
             } else {
-              // Restore normal volume if user scrubs to middle
-              this.ytPlayer.setVolume(Math.round(this.volume()));
+              targetVol = Math.round(this.volume());
+            }
+
+            if ((this as any)._lastSetVolume !== targetVol) {
+              this.ytPlayer.setVolume(targetVol);
+              (this as any)._lastSetVolume = targetVol;
             }
           }
           
