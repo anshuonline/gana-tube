@@ -18,6 +18,7 @@ import { PlayerService } from './services/player.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
+import { AnalyticsService } from './services/analytics.service';
 import { AppStateService } from './services/app-state.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
@@ -109,6 +110,7 @@ export class App implements OnInit {
   @ViewChild('spinWheel') spinWheel!: SpinWheelComponent;
 
   public pwaService = inject(PwaService);
+  public analyticsService = inject(AnalyticsService);
 
   openSpinWheel() {
     this.spinWheel?.open();
@@ -451,6 +453,7 @@ export class App implements OnInit {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
       this.toastService.success('Link copied to clipboard!');
+      this.analyticsService.recordShare(track);
     }
     this.closeMenu();
   }
@@ -633,6 +636,15 @@ export class App implements OnInit {
         setTimeout(() => {
           if (this.isRouteDone()) this.isRouteDone.set(false);
         }, 500);
+      }
+    });
+
+    effect(() => {
+      const user = this.authService.currentUser();
+      if (user && user.email) {
+        this.analyticsService.startTrackingTime(user.email, user.displayName || user.email);
+      } else {
+        this.analyticsService.stopTrackingTime();
       }
     });
 
@@ -848,8 +860,8 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
 
-      } else if (event.urlAfterRedirects.startsWith('/managegt')) {
-        this.currentPage.set('managegt');
+      } else if (event.urlAfterRedirects.startsWith('/managegt') || event.urlAfterRedirects.startsWith('/gtanalytic')) {
+        this.currentPage.set(event.urlAfterRedirects.split('/')[1]);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       } else if (url === 'language') {
@@ -918,7 +930,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'discovery', 'offline', 'curated-playlists'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'discovery', 'offline', 'curated-playlists'].includes(url) || this.pageContent[url]) {
         this.currentPage.set(url);
         
         if (url === 'search') {

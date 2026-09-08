@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { SyncService, SyncState } from './sync.service';
 import { ToastService } from './toast.service';
 import { SpinService } from './spin.service';
+import { AnalyticsService } from './analytics.service';
 
 import { OfflineService } from './offline.service';
 
@@ -25,6 +26,7 @@ export class PlayerService {
   private youtubeApi = inject(YoutubeApiService);
   private roomService = inject(RoomService);
   private userService = inject(UserService);
+  private analyticsService = inject(AnalyticsService);
   private authService = inject(AuthService);
   public syncService = inject(SyncService);
   private spinService = inject(SpinService);
@@ -629,6 +631,10 @@ export class PlayerService {
     const current = this.currentTrack();
     this.initHtmlAudio();
     this.startLoadTimeout();
+    
+    if (current) {
+      this.analyticsService.recordPlay(current);
+    }
 
     if (this.offlineService.isDownloaded(videoId)) {
       this.isPlayingOffline.set(true);

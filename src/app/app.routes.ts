@@ -19,6 +19,7 @@ export const routes: Routes = [
   { path: 'playlist/:id', children: [] },
   { path: 'user/:username/:id', children: [] },
   { path: ':id', children: [] },
+  { path: 'gtanalytic', loadComponent: () => import('./components/analytics-page/analytics-page.component').then(m => m.AnalyticsPageComponent) },
 
   { 
     path: 'managegt', 

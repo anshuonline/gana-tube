@@ -590,8 +590,8 @@
     </div>
 
 
-    <!-- ManageGT Section (New Router Outlet) -->
-    <div class="managegt-wrapper" *ngIf="currentPage() === 'managegt'">
+    <!-- ManageGT & GTAnalytic Sections (Router Outlet) -->
+    <div class="managegt-wrapper" *ngIf="currentPage() === 'managegt' || currentPage() === 'gtanalytic'">
       <router-outlet></router-outlet>
     </div>
 

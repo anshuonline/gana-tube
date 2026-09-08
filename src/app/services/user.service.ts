@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { AnalyticsService } from './analytics.service';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -15,6 +16,7 @@ export interface UserProfileData {
   providedIn: 'root'
 })
 export class UserService {
+  private analyticsService = inject(AnalyticsService);
   private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/user-api.php' : 'https://manageads.ganatube.in/user-api.php';
   
   // State for the logged-in user
@@ -161,6 +163,7 @@ export class UserService {
       currentLikes = currentLikes.filter(song => typeof song === 'string' ? song !== songObj.videoId : song.videoId !== songObj.videoId);
     } else {
       currentLikes.push(songObj);
+      this.analyticsService.recordLike(songObj);
     }
     
     this.likedSongs.set(currentLikes);

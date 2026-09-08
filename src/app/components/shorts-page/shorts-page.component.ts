@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, computed, ElementRef, ViewChild, HostListener, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, ElementRef, ViewChild, HostListener, NgZone, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
@@ -8,6 +8,7 @@ import { AlgorithmService } from '../../services/algorithm.service';
 import { ShortsAlgorithmService } from '../../services/shorts-algorithm.service';
 import { HeartBurstService } from '../../services/heart-burst.service';
 import { AuthService } from '../../services/auth.service';
+import { AnalyticsService } from '../../services/analytics.service';
 import { FormsModule } from '@angular/forms';
 import { LucideHeart, LucideShare2, LucidePlay, LucidePause, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame } from '@lucide/angular';
 
@@ -63,19 +64,20 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   private allQueries: string[] = [];
   private playersReady = { A: false, B: false };
   
-  constructor(
-    private youtubeApi: YoutubeApiService,
-    private playerService: PlayerService,
-    private userService: UserService,
-    private algorithmService: AlgorithmService,
-    private shortsAlgorithmService: ShortsAlgorithmService,
-    private heartBurstService: HeartBurstService,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private location: Location,
-    private ngZone: NgZone
-  ) {}
+  private youtubeApi = inject(YoutubeApiService);
+  private playerService = inject(PlayerService);
+  private userService = inject(UserService);
+  private algorithmService = inject(AlgorithmService);
+  private shortsAlgorithmService = inject(ShortsAlgorithmService);
+  private heartBurstService = inject(HeartBurstService);
+  private authService = inject(AuthService);
+  private analyticsService = inject(AnalyticsService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private location = inject(Location);
+  private ngZone = inject(NgZone);
+
+  constructor() {}
 
   ngOnInit() {
     // Pause main player if it's playing
@@ -93,7 +95,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     this.buildQueryPool();
     this.initYouTubeApi();
     
-    this.route.queryParamMap.subscribe(params => {
+    this.route.queryParamMap.subscribe((params: any) => {
       const videoId = params.get('v');
       if (videoId) {
         this.fetchSpecificAndQueue(videoId);
@@ -198,7 +200,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
   private fetchSpecificAndQueue(videoId: string) {
     this.seenVideoIds.add(videoId);
-    this.youtubeApi.searchMusic(videoId, 1).subscribe(res => {
+    this.youtubeApi.searchMusic(videoId, 1).subscribe((res: any) => {
       if (res && res.length > 0) {
         const item: ShortItem = {
           ...res[0],
@@ -221,9 +223,8 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
 
   private checkIsLiked(videoId: string): boolean {
     const playlists = this.userService.customPlaylists();
-    const likedShorts = playlists.find(p => p.name === 'Liked Shorts');
-    const likedSongs = playlists.find(p => p.name === 'Liked Songs');
-    
+    const likedShorts = playlists.find((p: any) => p.name === 'Liked Shorts');
+    const likedSongs = playlists.find((p: any) => p.name === 'Liked Songs');
     let isLiked = false;
     if (likedShorts && likedShorts.tracks) {
       isLiked = isLiked || likedShorts.tracks.some((t: any) => t.videoId === videoId);
@@ -242,40 +243,41 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const preferredLangs = this.userService.preferredLanguages();
     
     this.youtubeApi.searchMusic(randomQuery, limit).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isFetching = false;
-        
-        let items: ShortItem[] = res
-          .filter(track => !this.seenVideoIds.has(track.videoId))
-          .filter(track => !this.checkIsLiked(track.videoId)) // Skip already liked songs
-          .filter(track => !this.notInterestedIds.has(track.videoId)) // Skip not interested songs
-          .filter(track => this.shortsAlgorithmService.isValidLanguageTrack(track.title, track.channelTitle, preferredLangs))
-          .map(track => {
-            this.seenVideoIds.add(track.videoId); // Mark as seen globally
-            return {
-              ...track,
-              dropStartTime: 45,
-              isLiked: this.checkIsLiked(track.videoId)
-            };
-          });
-        
-        // Use the advanced algorithm to rank and inject wildcards
-        items = this.shortsAlgorithmService.rankCandidates(items, limit) as ShortItem[];
-        
-        const interleaved = this.interleaveItems(items);
-        
-        const currentQ = this.queue();
-        this.queue.set([...currentQ, ...interleaved]);
-        
-        if (currentQ.length === 0 && interleaved.length > 0) {
-          this.tryFirstPlay();
-        } else if (interleaved.length > 0) {
-          this.preloadNext();
-        }
-        
-        // If we got very few new items (most were dupes/filtered), fetch again immediately
-        if (interleaved.length < 3) {
-          this.fetchRandomQueue(15);
+        if (res && res.length > 0) {
+          const items: ShortItem[] = res
+            .filter((track: any) => !this.seenVideoIds.has(track.videoId))
+            .filter((track: any) => !this.checkIsLiked(track.videoId)) // Skip already liked songs
+            .filter((track: any) => !this.notInterestedIds.has(track.videoId)) // Skip not interested songs
+            .filter((track: any) => this.shortsAlgorithmService.isValidLanguageTrack(track.title, track.channelTitle, preferredLangs))
+            .map((track: any) => {
+              this.seenVideoIds.add(track.videoId); // Mark as seen globally
+              return {
+                ...track,
+                dropStartTime: 45,
+                isLiked: this.checkIsLiked(track.videoId)
+              };
+            });
+          
+          // Use the advanced algorithm to rank and inject wildcards
+          const rankedItems = this.shortsAlgorithmService.rankCandidates(items, limit) as ShortItem[];
+          
+          const interleaved = this.interleaveItems(rankedItems);
+          
+          const currentQ = this.queue();
+          this.queue.set([...currentQ, ...interleaved]);
+          
+          if (currentQ.length === 0 && interleaved.length > 0) {
+            this.tryFirstPlay();
+          } else if (interleaved.length > 0) {
+            this.preloadNext();
+          }
+          
+          // If we got very few new items (most were dupes/filtered), fetch again immediately
+          if (interleaved.length < 3) {
+            this.fetchRandomQueue(15);
+          }
         }
       },
       error: () => {
@@ -686,12 +688,12 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
     const targetPlaylist = this.isFullSongMode() ? 'Liked Songs' : 'Liked Shorts';
 
     let playlists = this.userService.customPlaylists();
-    let playlistObj = playlists.find(p => p.name === targetPlaylist);
+    let playlistObj = playlists.find((p: any) => p.name === targetPlaylist);
     
     if (!playlistObj) {
       await this.userService.createPlaylist(email, targetPlaylist);
       playlists = this.userService.customPlaylists();
-      playlistObj = playlists.find(p => p.name === targetPlaylist);
+      playlistObj = playlists.find((p: any) => p.name === targetPlaylist);
     }
 
     if (playlistObj) {
@@ -707,10 +709,10 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
         title: item.title,
         text: `Listen to ${item.title} on GanaTube!`,
         url: shareUrl
-      }).catch(err => console.log('Error sharing', err));
+      }).then(() => this.analyticsService.recordShare(item)).catch(err => console.log('Error sharing', err));
     } else {
       navigator.clipboard.writeText(shareUrl).then(() => {
-        // Silently copied
+        this.analyticsService.recordShare(item);
       });
     }
   }
