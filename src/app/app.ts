@@ -139,7 +139,7 @@ export class App implements OnInit {
 
   // Language filter
   availableLanguages = ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi', 'Tamil'];
-  homeScreenLanguage = signal<string>('Hindi');
+  homeScreenLanguage = signal<string>('English');
 
   // Playlists State
   customPlaylists = signal<PlaylistMeta[]>([]);
@@ -378,7 +378,7 @@ export class App implements OnInit {
   get musicQuality() {
     return this.playerService.musicQuality;
   }
-  preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
+  preferredLanguages = signal<string[]>(['English', 'Hindi', 'Tamil', 'Punjabi']);
   
   isEditingUsername = signal<boolean>(false);
   isSavingUsername = signal<boolean>(false);
@@ -859,6 +859,26 @@ export class App implements OnInit {
           if (this.availableLanguages.includes(capitalizedLang)) {
             this.homeScreenLanguage.set(capitalizedLang);
             localStorage.setItem('homeScreenLanguage', capitalizedLang);
+
+            // Put the selected language at the front of preferredLanguages
+            let currentPrefs = [...this.preferredLanguages()];
+            if (currentPrefs.includes(capitalizedLang)) {
+              currentPrefs = currentPrefs.filter(l => l !== capitalizedLang);
+            }
+            currentPrefs.unshift(capitalizedLang);
+            this.preferredLanguages.set(currentPrefs);
+
+            // Save to Database if user is logged in
+            const userEmail = this.authService.getCurrentUserEmail();
+            if (userEmail) {
+              this.userService.syncProfile({
+                email: userEmail,
+                preferred_languages: currentPrefs,
+                liked_songs: this.userService.likedSongs(),
+                recent_plays: this.userService.recentPlays(),
+                listening_preferences: this.userService.listeningPreferences()
+              });
+            }
           }
           this.loadInitialShelves(capitalizedLang);
           this.updateSEO(

@@ -19,7 +19,7 @@ export class UserService {
   
   // State for the logged-in user
   displayName = signal<string | null>(null);
-  preferredLanguages = signal<string[]>(['Hindi', 'English', 'Tamil', 'Punjabi']);
+  preferredLanguages = signal<string[]>(['English', 'Hindi', 'Tamil', 'Punjabi']);
   likedSongs = signal<any[]>([]);
   recentPlays = signal<any[]>([]);
   listeningPreferences = signal<string[]>([]);
