@@ -188,7 +188,7 @@
         </div>
 
         <!-- Music Quality -->
-        <div class="settings-group">
+        <div class="settings-group group-audio">
           <h2 class="group-title">Audio</h2>
           <div class="setting-item">
             <div class="setting-info">
@@ -204,7 +204,7 @@
         </div>
 
         <!-- Languages -->
-        <div class="settings-group">
+        <div class="settings-group group-preferences">
           <h2 class="group-title">Preferences</h2>
           <div class="setting-item borderless">
             <div class="setting-info">
@@ -225,7 +225,7 @@
         </div>
 
         <!-- Logout (Only if logged in) -->
-        <div class="settings-group" *ngIf="authService.currentUser()">
+        <div class="settings-group group-logout" *ngIf="authService.currentUser()">
           <div class="setting-item logout-item" (click)="logout()">
             <div class="setting-info">
               <h3 class="text-danger">Logout</h3>

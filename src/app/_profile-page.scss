@@ -1,7 +1,7 @@
 /* --- PROFILE PAGE (New Banner Layout) --- */
 .profile-page-container {
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
   padding: 60px 0 40px; /* Reduced top padding to let banner hit near top if possible */
   animation: fadeIn 0.4s ease;
 }
@@ -19,7 +19,6 @@
   background-size: cover;
   background-position: center;
   position: relative;
-  border-radius: 0 0 24px 24px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   
@@ -70,11 +69,9 @@
   padding: 0 24px;
   
   @media (min-width: 768px) {
-    flex-direction: row;
-    align-items: flex-end;
-    margin-top: -50px;
+    margin-top: -100px;
     padding: 0 40px;
-    gap: 24px;
+    /* Removed flex-direction: row and align-items: flex-end to keep it centered */
   }
 }
 
@@ -108,12 +105,10 @@
   width: 100%;
   
   @media (min-width: 768px) {
-    text-align: left;
-    margin-top: 0;
-    margin-bottom: 8px; /* Align with avatar baseline */
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
   }
 
   .username-row {
@@ -122,7 +117,7 @@
     justify-content: center;
     
     @media (min-width: 768px) {
-      justify-content: flex-start;
+      justify-content: center;
     }
   }
 
@@ -291,6 +286,22 @@
   background: #111;
   padding: 0 20px 20px;
   border-radius: 0 0 12px 12px;
+}
+
+/* --- Colorful Backgrounds for Groups --- */
+.group-audio .setting-item, .group-audio .setting-item-full {
+  background: linear-gradient(145deg, #07132e 0%, #000000 100%);
+  border-color: rgba(0, 102, 255, 0.1);
+}
+
+.group-preferences .setting-item, .group-preferences .setting-item-full {
+  background: linear-gradient(145deg, #052627 0%, #000000 100%);
+  border-color: rgba(0, 204, 204, 0.1);
+}
+
+.group-logout .setting-item {
+  background: linear-gradient(145deg, #2b0c0c 0%, #000000 100%);
+  border-color: rgba(255, 51, 51, 0.1);
 }
 
 .setting-info {
