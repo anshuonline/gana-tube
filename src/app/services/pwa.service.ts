@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,8 +32,11 @@ export class PwaService {
     }
   }
 
+  private toastService = inject(ToastService);
+
   public async installApp() {
     if (!this.deferredPrompt) {
+      this.toastService.show('To install: open browser menu and select "Add to Home Screen" or "Install App".', 'info');
       return;
     }
     // Show the install prompt

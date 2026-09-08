@@ -576,6 +576,12 @@ export class PlayerService {
         this.clearLoadTimeout();
         this.playerState.set('playing');
         this.duration.set(this.ytPlayer?.getDuration() || 0);
+        
+        // Fix sudden blast of volume at the beginning of a crossfade
+        if (this.isCrossfadeEnabled() && this.ytPlayer && (this.ytPlayer.getCurrentTime() || 0) < 1) {
+          this.ytPlayer.setVolume(0);
+        }
+        
         this.startProgressTracking();
         break;
       case 2: // paused
@@ -831,13 +837,13 @@ export class PlayerService {
           const timeLeft = dur - cTime;
           if (timeLeft <= 5 && timeLeft > 0) {
             const fadeRatio = Math.max(0, timeLeft / 5);
-            this.ytPlayer.setVolume(this.volume() * fadeRatio);
+            this.ytPlayer.setVolume(Math.round(this.volume() * fadeRatio));
           } else if (cTime <= 5) {
             const fadeRatio = Math.min(1, cTime / 5);
-            this.ytPlayer.setVolume(this.volume() * fadeRatio);
+            this.ytPlayer.setVolume(Math.round(this.volume() * fadeRatio));
           } else {
             // Restore normal volume if user scrubs to middle
-            this.ytPlayer.setVolume(this.volume());
+            this.ytPlayer.setVolume(Math.round(this.volume()));
           }
         }
         
