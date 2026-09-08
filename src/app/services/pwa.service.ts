@@ -7,6 +7,7 @@ import { ToastService } from './toast.service';
 export class PwaService {
   private deferredPrompt: any = null;
   public canInstall = signal<boolean>(false);
+  public isInstalledPWA = signal<boolean>(false);
 
   constructor() {
     this.init();
@@ -14,6 +15,11 @@ export class PwaService {
 
   private init() {
     if (typeof window !== 'undefined') {
+      // Check if already running as installed PWA
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || (window.navigator as any).standalone === true;
+      this.isInstalledPWA.set(isStandalone);
+
       window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
@@ -27,6 +33,7 @@ export class PwaService {
         // Clear the deferredPrompt so it can be garbage collected
         this.deferredPrompt = null;
         this.canInstall.set(false);
+        this.isInstalledPWA.set(true);
         console.log('PWA was installed');
       });
     }
@@ -35,17 +42,17 @@ export class PwaService {
   private toastService = inject(ToastService);
 
   public async installApp() {
-    if (!this.deferredPrompt) {
-      this.toastService.show('To install: open browser menu and select "Add to Home Screen" or "Install App".', 'info');
-      return;
+    if (this.deferredPrompt) {
+      // Show the install prompt
+      this.deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await this.deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      // We've used the prompt, and can't use it again, throw it away
+      this.deferredPrompt = null;
+      this.canInstall.set(false);
+    } else {
+      this.toastService.show('To install: open browser menu → "Add to Home Screen" or "Install App".', 'info');
     }
-    // Show the install prompt
-    this.deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    const { outcome } = await this.deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-    // We've used the prompt, and can't use it again, throw it away
-    this.deferredPrompt = null;
-    this.canInstall.set(false);
   }
 }

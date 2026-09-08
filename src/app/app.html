@@ -76,6 +76,7 @@
       <div class="header-actions">
         <button 
           class="install-app-btn" 
+          *ngIf="!pwaService.isInstalledPWA()"
           (click)="pwaService.installApp()"
         >
           <svg lucideDownload [attr.size]="16"></svg>

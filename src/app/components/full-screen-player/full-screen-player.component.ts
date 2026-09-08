@@ -471,9 +471,9 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   }
 
   onSeek(event: any): void {
-    const time = event.target.value;
-    if ((this.playerService as any).ytPlayer) {
-      (this.playerService as any).ytPlayer.seekTo(time, true);
+    const time = parseFloat(event.target.value);
+    if (!isNaN(time)) {
+      this.playerService.seekTo(time);
     }
   }
 
