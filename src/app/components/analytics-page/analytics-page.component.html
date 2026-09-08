@@ -1,148 +1,120 @@
-<div class="min-h-screen bg-black text-white font-sans p-6 overflow-y-auto">
+<div class="analytics-container">
   
   <!-- Login Screen -->
-  <div *ngIf="!isAuthenticated" class="flex flex-col items-center justify-center min-h-[80vh]">
-    <div class="bg-[#111] p-8 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.05)] border border-gray-800 w-full max-w-md text-center">
-      <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">GanaTube Analytics</h1>
-      <p class="text-gray-400 mb-8 text-sm">Enter the secret password to view analytics</p>
+  <div *ngIf="!isAuthenticated" class="login-screen">
+    <div class="login-box">
+      <h1 class="login-title">GanaTube Analytics</h1>
+      <p class="login-subtitle">Enter admin password to access the dashboard</p>
       
-      <div class="space-y-4">
-        <input 
-          type="password" 
-          [(ngModel)]="password" 
-          placeholder="Password" 
-          (keyup.enter)="login()"
-          class="w-full bg-[#222] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-        />
-        <button 
-          (click)="login()" 
-          [disabled]="loading || !password"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
-        >
-          <span *ngIf="!loading">Unlock Dashboard</span>
-          <span *ngIf="loading" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-        </button>
-        
-        <p *ngIf="loginError" class="text-red-400 text-sm mt-2">{{ loginError }}</p>
-      </div>
+      <input 
+        type="password" 
+        [(ngModel)]="password" 
+        (keyup.enter)="login()"
+        placeholder="Password"
+        class="login-input"
+      />
+      
+      <button 
+        (click)="login()" 
+        [disabled]="loading || !password"
+        class="login-btn">
+        {{ loading ? 'Authenticating...' : 'Login' }}
+      </button>
+      
+      <p *ngIf="loginError" class="error-text">{{ loginError }}</p>
     </div>
   </div>
 
   <!-- Dashboard -->
-  <div *ngIf="isAuthenticated" class="max-w-7xl mx-auto space-y-8 pb-10">
-    
+  <div *ngIf="isAuthenticated && analyticsData" class="dashboard">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="header">
       <div>
-        <h1 class="text-3xl font-bold">Analytics Dashboard</h1>
-        <p class="text-gray-400 text-sm mt-1">Real-time GanaTube statistics</p>
+        <h1 class="header-title">Analytics Overview</h1>
+        <p class="header-subtitle">Real-time performance metrics for GanaTube</p>
       </div>
-      <button (click)="logout()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors border border-gray-700">
+      <button (click)="logout()" class="logout-btn">
         Logout
       </button>
     </div>
 
-    <!-- Summary Cards -->
-    <div *ngIf="analyticsData" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-gradient-to-br from-blue-900/40 to-blue-800/10 p-6 rounded-2xl border border-blue-900/50">
-        <h3 class="text-blue-400 text-sm font-medium uppercase tracking-wider mb-2">Total Plays</h3>
-        <p class="text-4xl font-bold">{{ analyticsData.summary?.total_plays | number }}</p>
+    <!-- Stats Row -->
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <h3 class="stat-title">Total Plays</h3>
+        <p class="stat-value">{{ analyticsData.total_plays | number }}</p>
       </div>
-      
-      <div class="bg-gradient-to-br from-pink-900/40 to-pink-800/10 p-6 rounded-2xl border border-pink-900/50">
-        <h3 class="text-pink-400 text-sm font-medium uppercase tracking-wider mb-2">Total Likes</h3>
-        <p class="text-4xl font-bold">{{ analyticsData.summary?.total_likes | number }}</p>
+      <div class="stat-card pink">
+        <h3 class="stat-title">Total Likes</h3>
+        <p class="stat-value">{{ analyticsData.total_likes | number }}</p>
       </div>
-      
-      <div class="bg-gradient-to-br from-purple-900/40 to-purple-800/10 p-6 rounded-2xl border border-purple-900/50">
-        <h3 class="text-purple-400 text-sm font-medium uppercase tracking-wider mb-2">Total Listening Time</h3>
-        <p class="text-4xl font-bold">{{ formatTime(analyticsData.summary?.total_time_seconds || 0) }}</p>
+      <div class="stat-card purple">
+        <h3 class="stat-title">Total Shares</h3>
+        <p class="stat-value">{{ analyticsData.total_shares | number }}</p>
       </div>
     </div>
 
-    <!-- Charts Section -->
-    <div *ngIf="analyticsData" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Most Played Chart -->
-      <div class="bg-[#111] border border-gray-800 rounded-2xl p-6">
-        <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full bg-blue-500"></span> Top 10 Most Played Songs
-        </h3>
-        <div class="w-full h-[300px]" *ngIf="mostPlayedData.length">
+    <!-- Charts Row -->
+    <div class="charts-grid">
+      <!-- Plays by Day Chart -->
+      <div class="chart-card">
+        <h3 class="chart-title"><div class="dot blue"></div> Activity (Last 7 Days)</h3>
+        <div style="height: 300px;">
           <canvas baseChart
-            [datasets]="mostPlayedData"
-            [labels]="mostPlayedLabels"
-            [options]="mostPlayedOptions"
-            [legend]="false"
-            type="bar">
+            [data]="playsChartData"
+            [options]="lineChartOptions"
+            [type]="'line'">
           </canvas>
         </div>
-        <div *ngIf="!mostPlayedData.length" class="h-[300px] flex items-center justify-center text-gray-500">No data available</div>
-      </div>
-
-      <!-- Most Liked Chart -->
-      <div class="bg-[#111] border border-gray-800 rounded-2xl p-6">
-        <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full bg-pink-500"></span> Top 10 Most Liked Songs
-        </h3>
-        <div class="w-full h-[300px]" *ngIf="mostLikedData.length">
-          <canvas baseChart
-            [datasets]="mostLikedData"
-            [labels]="mostLikedLabels"
-            [options]="mostLikedOptions"
-            [legend]="false"
-            type="bar">
-          </canvas>
-        </div>
-        <div *ngIf="!mostLikedData.length" class="h-[300px] flex items-center justify-center text-gray-500">No data available</div>
       </div>
     </div>
 
-    <!-- Leaderboards Section -->
-    <div *ngIf="analyticsData" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Most Shared List -->
-      <div class="bg-[#111] border border-gray-800 rounded-2xl p-6">
-        <h3 class="text-lg font-semibold mb-4">Most Shared Songs</h3>
-        <div class="space-y-4">
-          <div *ngFor="let song of analyticsData.most_shared; let i = index" class="flex items-center gap-4 p-3 rounded-xl hover:bg-[#222] transition-colors border border-transparent hover:border-gray-800">
-            <div class="w-8 h-8 flex items-center justify-center bg-gray-800 text-gray-400 rounded-lg font-medium text-sm">
-              {{ i + 1 }}
+    <!-- Top Lists Row -->
+    <div class="charts-grid">
+      <!-- Top Songs -->
+      <div class="chart-card">
+        <h3 class="chart-title"><div class="dot pink"></div> Top Played Songs</h3>
+        
+        <div>
+          <div *ngIf="!analyticsData.top_songs || analyticsData.top_songs.length === 0" class="empty-text">No data yet</div>
+          
+          <div *ngFor="let song of analyticsData.top_songs; let i = index" class="list-item">
+            <div class="list-rank">{{ i + 1 }}</div>
+            <img [src]="song.thumbnail" alt="Thumbnail" class="list-img" *ngIf="song.thumbnail">
+            <div class="list-avatar" *ngIf="!song.thumbnail"><span style="font-size: 1rem;">🎵</span></div>
+            <div class="list-info">
+              <h4>{{ song.title || 'Unknown Song' }}</h4>
+              <p>{{ song.artist || song.video_id }}</p>
             </div>
-            <img [src]="song.thumbnail" class="w-12 h-12 rounded-md object-cover" />
-            <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-medium truncate">{{ song.title }}</h4>
-            </div>
-            <div class="text-right">
-              <span class="text-sm font-bold text-green-400">{{ song.share_count }}</span>
-              <p class="text-xs text-gray-500">shares</p>
+            <div class="list-score green">
+              <span>{{ song.plays | number }}</span>
+              <p>plays</p>
             </div>
           </div>
-          <div *ngIf="!analyticsData.most_shared?.length" class="text-gray-500 text-center py-4">No shares yet</div>
         </div>
       </div>
 
-      <!-- Top Users by Time List -->
-      <div class="bg-[#111] border border-gray-800 rounded-2xl p-6">
-        <h3 class="text-lg font-semibold mb-4">Most Active Users (Time Spent)</h3>
-        <div class="space-y-4">
-          <div *ngFor="let user of analyticsData.top_users; let i = index" class="flex items-center gap-4 p-3 rounded-xl hover:bg-[#222] transition-colors border border-transparent hover:border-gray-800">
-            <div class="w-8 h-8 flex items-center justify-center bg-gray-800 text-gray-400 rounded-lg font-medium text-sm">
-              {{ i + 1 }}
+      <!-- Top Users -->
+      <div class="chart-card">
+        <h3 class="chart-title"><div class="dot purple"></div> Most Active Users</h3>
+        
+        <div>
+          <div *ngIf="!analyticsData.top_users || analyticsData.top_users.length === 0" class="empty-text">No data yet</div>
+          
+          <div *ngFor="let user of analyticsData.top_users; let i = index" class="list-item">
+            <div class="list-rank">{{ i + 1 }}</div>
+            <div class="list-avatar">{{ user.display_name ? user.display_name.charAt(0).toUpperCase() : 'U' }}</div>
+            <div class="list-info">
+              <h4>{{ user.display_name || 'Anonymous User' }}</h4>
+              <p>{{ user.email || 'No Email' }}</p>
             </div>
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
-              {{ (user.display_name || user.email).charAt(0).toUpperCase() }}
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-medium truncate">{{ user.display_name || user.email }}</h4>
-              <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
-            </div>
-            <div class="text-right">
-              <span class="text-sm font-bold text-purple-400">{{ formatTime(user.total_time_spent_seconds) }}</span>
+            <div class="list-score purple">
+              <span>{{ (user.total_time_spent / 60) | number:'1.0-0' }}</span>
+              <p>mins</p>
             </div>
           </div>
-          <div *ngIf="!analyticsData.top_users?.length" class="text-gray-500 text-center py-4">No users tracked yet</div>
         </div>
       </div>
     </div>
-
   </div>
 </div>
