@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 })
 export class AnalyticsService {
   private http = inject(HttpClient);
-  private apiUrl = environment.backendUrl ? environment.backendUrl.replace('managegt-api.php', 'analytic-api.php') : 'https://manageads.ganatube.in/analytic-api.php';
+  private apiUrl = 'https://manageads.ganatube.in/analytic-api.php';
   
   private timeTrackingInterval: any;
   private currentUserEmail: string | null = null;
