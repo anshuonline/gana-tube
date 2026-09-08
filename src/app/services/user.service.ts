@@ -24,6 +24,7 @@ export class UserService {
   recentPlays = signal<any[]>([]);
   listeningPreferences = signal<string[]>([]);
   customPlaylists = signal<any[]>([]);
+  private _creatingPlaylists = new Set<string>();
   
   constructor(private http: HttpClient) {
     if (!environment.production) {
@@ -184,9 +185,6 @@ export class UserService {
     plays = plays.filter(song => typeof song === 'string' ? song !== songObj.videoId : song.videoId !== songObj.videoId);
     
     plays.unshift(songObj);
-    if (plays.length > 100) {
-      plays = plays.slice(0, 100); // Keep max 100 recent plays
-    }
     
     this.recentPlays.set(plays);
     
@@ -229,6 +227,9 @@ export class UserService {
     const current = this.customPlaylists();
     if (current.find(p => p.name === name)) return false; // Prevent duplicate names locally for quick check
     
+    if (this._creatingPlaylists.has(name)) return false;
+    this._creatingPlaylists.add(name);
+    
     try {
       const url = this.apiUrl.replace('user-api.php', 'playlist-api.php');
       const response: any = await firstValueFrom(this.http.post(`${url}?action=createPlaylist`, {
@@ -237,6 +238,8 @@ export class UserService {
         is_public: isPublic ? 1 : 0,
         songs: []
       }));
+      
+      this._creatingPlaylists.delete(name);
       
       if (response.status === 'success' && response.data) {
         const p = response.data;
@@ -251,6 +254,7 @@ export class UserService {
       }
     } catch (e) {
       console.error('Error creating playlist', e);
+      this._creatingPlaylists.delete(name);
     }
     return false;
   }

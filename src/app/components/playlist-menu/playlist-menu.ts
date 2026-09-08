@@ -120,7 +120,7 @@ export class PlaylistMenuComponent implements OnChanges {
 
   editPlaylist(event: Event) {
     event.stopPropagation();
-    if (this.playlist?.playlist_id) {
+    if (this.playlist?.playlist_id && this.playlist.name !== 'Liked Shorts' && this.playlist.name !== 'Liked Songs') {
       this.showEditModal = true;
     } else {
       this.toastService.info("Cannot edit this playlist");
@@ -238,6 +238,10 @@ export class PlaylistMenuComponent implements OnChanges {
 
   async deletePlaylist(event: Event) {
     event.stopPropagation();
+    if (this.playlist?.name === 'Liked Shorts' || this.playlist?.name === 'Liked Songs') {
+      this.toastService.info("Cannot delete this playlist");
+      return;
+    }
     this.showDeleteConfirm = true;
   }
 

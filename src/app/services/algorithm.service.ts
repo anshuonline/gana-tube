@@ -359,13 +359,7 @@ export class AlgorithmService {
         query: madeForYouQuery
       });
 
-      // "Fans Also Listen To" — strict language dynamic
-      const moodQueries = ['viral hits', 'chartbusters', 'new releases', 'unplugged', 'acoustic', 'mashup'];
-      shelves.push({
-        title: 'Fans Also Listen To',
-        query: `${language} ${moodQueries[Math.floor(Math.random() * moodQueries.length)]} songs ${randomYear}`
-      });
-    }
+      }
 
     return of(shelves);
   }

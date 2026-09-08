@@ -869,7 +869,7 @@ export class App implements OnInit {
             this.preferredLanguages.set(currentPrefs);
 
             // Save to Database if user is logged in
-            const userEmail = this.authService.getCurrentUserEmail();
+            const userEmail = this.authService.currentUser()?.email;
             if (userEmail) {
               this.userService.syncProfile({
                 email: userEmail,
