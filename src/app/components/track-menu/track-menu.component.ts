@@ -247,7 +247,7 @@ export class TrackMenuComponent implements OnChanges {
   share(event: Event) {
     event.stopPropagation();
     if (this.track) {
-      const url = `https://manageads.ganatube.in/share.php?v=${this.track.videoId}`;
+      const url = `https://ganatube.in/share.php?v=${this.track.videoId}`;
       navigator.clipboard.writeText(url).then(() => {
         alert('Link copied to clipboard!');
       });

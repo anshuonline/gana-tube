@@ -479,7 +479,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     const track = this.playerService.currentTrack();
     if (!track) return;
     
-    const url = `https://manageads.ganatube.in/share.php?v=${track.videoId}`;
+    const url = `https://ganatube.in/share.php?v=${track.videoId}`;
     navigator.clipboard.writeText(url).then(() => {
       this.showToast = true;
       setTimeout(() => this.showToast = false, 3000);

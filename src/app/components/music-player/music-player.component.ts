@@ -666,7 +666,7 @@ export class MusicPlayerComponent implements OnDestroy {
     const track = this.playerService.currentTrack();
     if (!track) return;
     
-    const url = `https://manageads.ganatube.in/share.php?v=${track.videoId}`;
+    const url = `https://ganatube.in/share.php?v=${track.videoId}`;
     navigator.clipboard.writeText(url).then(() => {
       this.showToast.set(true);
       setTimeout(() => this.showToast.set(false), 3000);
