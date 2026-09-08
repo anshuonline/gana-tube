@@ -52,6 +52,14 @@
         <h3 class="stat-title">Total Time Spent (Hrs)</h3>
         <p class="stat-value">{{ ((analyticsData.summary?.total_time_seconds || 0) / 3600) | number:'1.0-1' }}</p>
       </div>
+      <div class="stat-card blue" style="background: linear-gradient(to bottom right, rgba(52, 211, 153, 0.4), rgba(52, 211, 153, 0.1)); border-color: rgba(52, 211, 153, 0.5);">
+        <h3 class="stat-title" style="color: #34d399;">Total Users</h3>
+        <p class="stat-value">{{ analyticsData.summary?.total_users || 0 | number }}</p>
+      </div>
+      <div class="stat-card pink" style="background: linear-gradient(to bottom right, rgba(251, 191, 36, 0.4), rgba(251, 191, 36, 0.1)); border-color: rgba(251, 191, 36, 0.5);">
+        <h3 class="stat-title" style="color: #fbbf24;">Active Today</h3>
+        <p class="stat-value">{{ analyticsData.summary?.daily_active_users || 0 | number }}</p>
+      </div>
     </div>
 
     <!-- Charts Row -->
@@ -66,6 +74,20 @@
             [options]="mostPlayedOptions"
             [legend]="false"
             [type]="'bar'">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- User Growth Chart -->
+      <div class="chart-card">
+        <h3 class="chart-title"><div class="dot purple"></div> User Signups (Growth)</h3>
+        <div style="height: 300px; position: relative;">
+          <canvas baseChart
+            [datasets]="userGrowthData"
+            [labels]="userGrowthLabels"
+            [options]="userGrowthOptions"
+            [legend]="false"
+            [type]="'line'">
           </canvas>
         </div>
       </div>
