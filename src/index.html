@@ -42,7 +42,10 @@
       "url": "https://ganatube.in/",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://ganatube.in/?q={search_term_string}",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://ganatube.in/search?q={search_term_string}"
+        },
         "query-input": "required name=search_term_string"
       }
     }
@@ -114,6 +117,9 @@
       <img src="https://ganatube.in/ganatubenewlogo.png" alt="GanaTube - Free Music Online Without Ads" />
       <nav>
         <a href="https://ganatube.in/">Home</a>
+        <a href="https://ganatube.in/search">GanaTube Search</a>
+        <a href="https://ganatube.in/curated-playlists">Trending Music & Playlists</a>
+        <a href="https://ganatube.in/discovery">Explore Languages</a>
         <a href="https://ganatube.in/library">Library</a>
       </nav>
     </div>
