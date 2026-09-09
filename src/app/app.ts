@@ -506,7 +506,7 @@ export class App implements OnInit {
     }
   }
 
-  newPlaylistIsPublic = signal<boolean>(false);
+  newPlaylistIsPublic = signal<boolean>(true);
 
   async createAndAddToPlaylist() {
     const name = this.newPlaylistName().trim();
@@ -2074,6 +2074,23 @@ export class App implements OnInit {
   }
 
   async fetchPublicPlaylist(playlistId: string, username: string) {
+    // Wait for auth to initialize if it's currently undefined (loading)
+    if (this.authService.currentUser() === undefined) {
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          if (this.authService.currentUser() !== undefined) {
+            clearInterval(interval);
+            resolve(true);
+          }
+        }, 50);
+        // Timeout after 3 seconds just in case
+        setTimeout(() => {
+          clearInterval(interval);
+          resolve(false);
+        }, 3000);
+      });
+    }
+
     const email = this.authService.currentUser()?.email || '';
     // Ensure we track this load
     this.currentLoadingPlaylistId = playlistId;

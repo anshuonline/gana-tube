@@ -94,7 +94,7 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
       if (created) {
         await this.userService.addToPlaylist(user.email as string, name, this.track);
         this.newPlaylistName.set('');
-        this.newPlaylistIsPublic.set(false);
+        this.newPlaylistIsPublic.set(true);
         this.toastService.success(`Playlist "${name}" created successfully`);
       } else {
         this.toastService.error("Failed to create playlist.");
