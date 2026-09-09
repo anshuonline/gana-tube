@@ -2,14 +2,14 @@
   
   <div class="discovery-main">
     
-    <!-- Top 100 Header -->
+    <!-- Discovery Header -->
     <div class="top-header-section" *ngIf="!isSearching">
       <div class="header-icon-box">
-        <svg lucideSparkles [attr.size]="24"></svg>
+        <svg lucideCompass [attr.size]="24"></svg>
       </div>
       <div class="header-text-content">
-        <h2>Top 100 Streamed Tracks</h2>
-        <p>The most played songs right now on GanaTube</p>
+        <h2>Discover the Vibe</h2>
+        <p>Curated tracks that everyone is listening to</p>
       </div>
     </div>
 
@@ -26,31 +26,23 @@
         <p>{{ errorMessage }}</p>
       </div>
 
-      <!-- Results List (Premium Style) -->
-      <div class="top-100-list" *ngIf="results.length > 0 && !isSearching">
-        <div class="premium-track-card" *ngFor="let track of results; let i = index" (click)="onPlay(track)" (contextmenu)="onRightClick($event, track)" [style.animation-delay]="i * 0.05 + 's'">
+      <!-- Results Grid (Premium Gradient Style) -->
+      <div class="discovery-gradient-grid" *ngIf="results.length > 0 && !isSearching">
+        <div class="gradient-track-card" *ngFor="let track of results; let i = index" (click)="onPlay(track)" (contextmenu)="onRightClick($event, track)" [style.animation-delay]="i * 0.05 + 's'">
           
-          <div class="rank-column">
-            <span class="rank-number" [class.top-3]="i < 3">#{{ i + 1 }}</span>
-          </div>
-
-          <div class="thumbnail-column">
+          <div class="thumbnail-wrapper">
             <img [src]="track.thumbnailHigh || track.thumbnail" alt="thumbnail" />
             <div class="play-overlay">
-              <svg lucidePlay [attr.size]="20" [attr.fill]="'currentColor'"></svg>
+              <svg lucidePlay [attr.size]="32" [attr.fill]="'currentColor'"></svg>
             </div>
           </div>
           
-          <div class="info-column">
+          <div class="info-container">
             <h3 class="title" [title]="track.title">{{ track.title }}</h3>
-            <p class="channel">{{ track.channelTitle }}</p>
-          </div>
-
-          <div class="stats-column">
-            <span class="stream-badge">
-              <svg lucidePlay [attr.size]="12"></svg>
-              {{ track.play_count || 0 }} Streams
-            </span>
+            <p class="channel">
+              <svg lucideMusic [attr.size]="12"></svg>
+              {{ track.channelTitle }}
+            </p>
           </div>
           
         </div>
