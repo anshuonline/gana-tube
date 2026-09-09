@@ -241,7 +241,7 @@
   align-items: center;
   margin-left: auto;
 
-  .install-app-btn, .listen-together-btn {
+  .install-app-btn {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1316,7 +1316,6 @@
 // Reusing card and image styles since they are global imports or scoped
 @import './components/search-results/search-results.component.scss';
 @import 'search-page';
-@import './components/listen-together/listen-together.component.scss';
 @import './components/playlist-page/playlist-page.component.scss';
 @import 'profile-page';
 

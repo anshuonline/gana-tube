@@ -4,6 +4,7 @@ import { PlayerService, Track } from '../../services/player.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { AlgorithmService } from '../../services/algorithm.service';
+import { ToastService } from '../../services/toast.service';
 import { Router } from '@angular/router';
 import { 
   LucideListPlus,
@@ -68,6 +69,7 @@ export class TrackMenuComponent implements OnChanges {
   public userService = inject(UserService);
   public algorithmService = inject(AlgorithmService);
   public offlineService = inject(OfflineService);
+  public toastService = inject(ToastService);
   private router = inject(Router);
 
   isMobile = false;
@@ -249,7 +251,7 @@ export class TrackMenuComponent implements OnChanges {
     if (this.track) {
       const url = `https://ganatube.in/share.php?v=${this.track.videoId}`;
       navigator.clipboard.writeText(url).then(() => {
-        alert('Link copied to clipboard!');
+        this.toastService.success('Link copied to clipboard!');
       });
     }
     this.close();

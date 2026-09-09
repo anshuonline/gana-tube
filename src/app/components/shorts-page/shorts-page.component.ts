@@ -9,6 +9,7 @@ import { ShortsAlgorithmService } from '../../services/shorts-algorithm.service'
 import { HeartBurstService } from '../../services/heart-burst.service';
 import { AuthService } from '../../services/auth.service';
 import { AnalyticsService } from '../../services/analytics.service';
+import { ToastService } from '../../services/toast.service';
 import { FormsModule } from '@angular/forms';
 import { LucideHeart, LucideShare2, LucidePlay, LucidePause, LucideMoreVertical, LucideChevronLeft, LucideMusic, LucideLoader2, LucideSearch, LucideX, LucideFlame } from '@lucide/angular';
 
@@ -76,6 +77,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private location = inject(Location);
   private ngZone = inject(NgZone);
+  private toastService = inject(ToastService);
 
   constructor() {}
 
@@ -712,6 +714,7 @@ export class ShortsPageComponent implements OnInit, OnDestroy {
       }).then(() => this.analyticsService.recordShare(item)).catch(err => console.log('Error sharing', err));
     } else {
       navigator.clipboard.writeText(shareUrl).then(() => {
+        this.toastService.success('Link copied to clipboard!');
         this.analyticsService.recordShare(item);
       });
     }

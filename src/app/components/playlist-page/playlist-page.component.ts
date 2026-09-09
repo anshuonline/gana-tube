@@ -261,6 +261,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
     const url = `${baseUrl}/playlist/${this.playlist.id}`;
     navigator.clipboard.writeText(url).then(() => {
       this.isCopied.set(true);
+      this.toastService.success('Link copied to clipboard!');
       setTimeout(() => {
         this.isCopied.set(false);
       }, 2000);

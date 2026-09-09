@@ -18,101 +18,17 @@ const io = new Server(server, {
 });
 const PORT = process.env.PORT || 3000;
 
-// Room State Management
-const rooms = new Map(); // roomId -> { hostId, users: [{id, nickname}], currentTrack, currentTime, isPlaying, queue }
+
 const userDevices = new Map(); // email -> [{socketId, deviceId, deviceName, isMobile, isActive}]
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  socket.on('join_room', ({ roomId, nickname }) => {
-    socket.join(roomId);
-    
-    if (!rooms.has(roomId)) {
-      rooms.set(roomId, {
-        hostId: socket.id,
-        users: [],
-        currentTrack: null,
-        currentTime: 0,
-        isPlaying: false,
-        queue: []
-      });
-    }
-    
-    const room = rooms.get(roomId);
-    room.users.push({ id: socket.id, nickname });
-    
-    // Send current state to the new user
-    socket.emit('room_state', room);
-    
-    // Notify others
-    io.to(roomId).emit('users_updated', { users: room.users, hostId: room.hostId });
-    io.to(roomId).emit('notification', `${nickname} joined the room`);
-  });
 
-  socket.on('leave_room', (roomId) => {
-    socket.leave(roomId);
-    const room = rooms.get(roomId);
-    if (room) {
-      const user = room.users.find(u => u.id === socket.id);
-      room.users = room.users.filter(u => u.id !== socket.id);
-      if (room.users.length === 0) {
-        rooms.delete(roomId);
-      } else {
-        if (room.hostId === socket.id) {
-          room.hostId = room.users[0].id; // Assign new host
-        }
-        io.to(roomId).emit('users_updated', { users: room.users, hostId: room.hostId });
-        if (user) io.to(roomId).emit('notification', `${user.nickname} left the room`);
-      }
-    }
-  });
-
-  socket.on('play_track', ({ roomId, track }) => {
-    const room = rooms.get(roomId);
-    if (room && room.hostId === socket.id) {
-      room.currentTrack = track;
-      room.currentTime = 0;
-      room.isPlaying = true;
-      socket.to(roomId).emit('track_changed', track);
-    }
-  });
-
-  socket.on('sync_playback', ({ roomId, isPlaying, currentTime }) => {
-    const room = rooms.get(roomId);
-    if (room && room.hostId === socket.id) {
-      room.isPlaying = isPlaying;
-      if (currentTime !== undefined) room.currentTime = currentTime;
-      socket.to(roomId).emit('playback_synced', { isPlaying, currentTime });
-    }
-  });
-  
-  socket.on('sync_queue', ({ roomId, queue, currentIndex }) => {
-    const room = rooms.get(roomId);
-    if (room && room.hostId === socket.id) {
-      room.queue = queue;
-      socket.to(roomId).emit('queue_synced', { queue, currentIndex });
-    }
-  });
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
-    // Find rooms this user was in and remove them
-    for (const [roomId, room] of rooms.entries()) {
-      const user = room.users.find(u => u.id === socket.id);
-      if (user) {
-        room.users = room.users.filter(u => u.id !== socket.id);
-        if (room.users.length === 0) {
-          rooms.delete(roomId);
-        } else {
-          if (room.hostId === socket.id) {
-            room.hostId = room.users[0].id;
-          }
-          io.to(roomId).emit('users_updated', { users: room.users, hostId: room.hostId });
-          io.to(roomId).emit('notification', `${user.nickname} left the room`);
-        }
-      }
-    }
+
     
     // Remove from device sync rooms
     for (const [email, devices] of userDevices.entries()) {

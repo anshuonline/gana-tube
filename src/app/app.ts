@@ -7,7 +7,6 @@ import { SearchResultsComponent } from './components/search-results/search-resul
 import { MusicPlayerComponent } from './components/music-player/music-player.component';
 import { YtPlayerComponent } from './components/yt-player/yt-player.component';
 import { FullScreenPlayerComponent } from './components/full-screen-player/full-screen-player.component';
-import { ListenTogetherComponent } from './components/listen-together/listen-together.component';
 import { TrackMenuComponent } from './components/track-menu/track-menu.component';
 import { PlaylistMenuComponent } from './components/playlist-menu/playlist-menu';
 import { SavePlaylistModalComponent } from './components/save-playlist-modal/save-playlist-modal';
@@ -83,7 +82,6 @@ export interface SponsoredAd {
     YtPlayerComponent,
     FullScreenPlayerComponent,
     CarModePlayerComponent,
-    ListenTogetherComponent,
     TrackMenuComponent,
     PlaylistPageComponent,
     AdvertisePageComponent,
@@ -125,7 +123,6 @@ export class App implements OnInit {
   hasSearched = signal<boolean>(false);
   isFullScreenPlayerVisible = signal<boolean>(false);
   isCarModeVisible = signal<boolean>(false);
-  isListenTogetherVisible = signal<boolean>(false);
   apiKeyMissing = false;
   appVersion = 'v1.0.6';
   currentYear = new Date().getFullYear();
@@ -1217,14 +1214,6 @@ export class App implements OnInit {
 
   closeCarMode() {
     this.isCarModeVisible.set(false);
-  }
-
-  openListenTogether(): void {
-    this.isListenTogetherVisible.set(true);
-  }
-
-  closeListenTogether(): void {
-    this.isListenTogetherVisible.set(false);
   }
 
   ngOnInit(): void {

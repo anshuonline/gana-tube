@@ -724,8 +724,7 @@ export class MusicPlayerComponent implements OnDestroy {
     
     const url = `https://ganatube.in/share.php?v=${track.videoId}`;
     navigator.clipboard.writeText(url).then(() => {
-      this.showToast.set(true);
-      setTimeout(() => this.showToast.set(false), 3000);
+      this.toastService.success('Link copied to clipboard!');
     });
   }
 
