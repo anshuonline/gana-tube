@@ -16,7 +16,7 @@
       <div class="fs-header-search" *ngIf="isDesktop">
         <div class="search-input-wrapper">
           <svg lucideSearch [attr.size]="18"></svg>
-          <input type="text" placeholder="Search for songs, artists, or podcasts..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" />
+          <input type="text" placeholder="Search for songs, artists, or podcasts..." [(ngModel)]="searchQuery" (keyup.enter)="onSearchInPlayer()" />
         </div>
       </div>
 
@@ -37,7 +37,7 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="fs-main" [class.desktop-layout]="isDesktop">
+    <div class="fs-main" [class.desktop-layout]="isDesktop && isSidebarVisible">
       
       <!-- Artwork View -->
       <div class="fs-player-view" *ngIf="activeView === 'artwork' || isDesktop">
@@ -90,7 +90,7 @@
       </div>
 
       <!-- Lists View Container -->
-      <div class="fs-list-view" *ngIf="activeView !== 'artwork' || isDesktop">
+      <div class="fs-list-view" *ngIf="activeView !== 'artwork' || (isDesktop && isSidebarVisible)">
         
         <!-- Queue View (Up Next) -->
         <div class="fs-queue-view" *ngIf="activeView === 'queue' || (isDesktop && activeView === 'artwork')">
@@ -100,7 +100,7 @@
               <h4>Auto-play</h4>
               <p>Add similar content to the end of the queue</p>
             </div>
-            <label class="gt-switch">
+            <label class="gt-switch purple">
               <input type="checkbox" [checked]="playerService.isAutoplayEnabled()" (change)="playerService.toggleAutoplay()">
               <span class="gt-slider round"></span>
             </label>
@@ -130,6 +130,9 @@
                 <div class="queue-title">{{ track.title }}</div>
                 <div class="queue-artist">{{ track.channelTitle }}</div>
               </div>
+              <button class="queue-more-btn icon-btn" (click)="openItemMenu($event, track)" title="More Options">
+                <svg lucideMoreVertical [attr.size]="20"></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -178,17 +181,51 @@
               class="related-item" 
               *ngFor="let track of relatedTracks"
               (click)="playRelatedTrack(track)"
+              (contextmenu)="openItemMenu($event, track)"
             >
               <img [src]="track.thumbnail" [alt]="track.title" class="related-thumb" />
               <div class="related-info">
                 <div class="related-title">{{ track.title }}</div>
                 <div class="related-artist">{{ track.channelTitle }}</div>
               </div>
+              <button class="queue-more-btn icon-btn" (click)="openItemMenu($event, track)" title="More Options">
+                <svg lucideMoreVertical [attr.size]="20"></svg>
+              </button>
             </div>
           </div>
 
           <div *ngIf="!relatedLoading && relatedTracks.length === 0" class="related-not-found">
             <p>No related songs found.</p>
+          </div>
+        </div>
+
+        <!-- Search View -->
+        <div class="fs-related-view" *ngIf="activeView === 'search'">
+          <div *ngIf="searchLoading" class="related-loading">
+            <div class="spinner"></div>
+            <span>Searching...</span>
+          </div>
+
+          <div *ngIf="!searchLoading && searchResults.length > 0" class="related-list">
+            <div 
+              class="related-item" 
+              *ngFor="let track of searchResults"
+              (click)="playRelatedTrack(track)"
+              (contextmenu)="openItemMenu($event, track)"
+            >
+              <img [src]="track.thumbnail" [alt]="track.title" class="related-thumb" />
+              <div class="related-info">
+                <div class="related-title">{{ track.title }}</div>
+                <div class="related-artist">{{ track.channelTitle }}</div>
+              </div>
+              <button class="queue-more-btn icon-btn" (click)="openItemMenu($event, track)" title="More Options">
+                <svg lucideMoreVertical [attr.size]="20"></svg>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="!searchLoading && searchResults.length === 0 && !searchQuery" class="related-not-found">
+            <p>No search results.</p>
           </div>
         </div>
 
@@ -292,13 +329,13 @@
     
   </div>
 
-  <!-- Reusable Track Menu (Anchored to More Options in Header) -->
+  <!-- Reusable Track Menu (Anchored to More Options in Header or Items) -->
   <app-track-menu 
-    [track]="displayTrack()"
+    [track]="menuTrack || displayTrack()"
     [isOpen]="showMenu"
     [xPos]="menuX"
     [yPos]="menuY"
-    (closeMenu)="showMenu = false"
+    (closeMenu)="showMenu = false; menuTrack = null"
     (openPlaylist)="openPlaylist.emit($event)">
   </app-track-menu>
 

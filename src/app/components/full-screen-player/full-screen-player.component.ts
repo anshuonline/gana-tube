@@ -87,8 +87,10 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   @Input() playerCoverAd: any = null;
   @Input() safePlayerCoverAdUrl: any = null;
 
-  activeView: 'artwork' | 'queue' | 'lyrics' | 'related' = 'artwork';
+  activeView: 'artwork' | 'queue' | 'lyrics' | 'related' | 'search' = 'artwork';
+  isSidebarVisible = true;
   showMenu = false;
+  menuTrack: Track | null = null;
   showDevices = signal<boolean>(false);
   menuX = 0;
   menuY = 0;
@@ -100,6 +102,9 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   
   relatedTracks: Track[] = [];
   relatedLoading = false;
+  
+  searchResults: Track[] = [];
+  searchLoading = false;
   
   showCoverAd = false;
   private adTimers: any[] = [];
@@ -231,13 +236,32 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.isDesktop = typeof window !== 'undefined' && window.innerWidth >= 992;
   }
 
-  onSearch(): void {
+  onSearchInPlayer(): void {
     const q = this.searchQuery.trim();
     if (q) {
-      this.close();
-      this.router.navigate(['/search'], { queryParams: { q } });
-      this.searchQuery = '';
+      if (!this.isDesktop) {
+        this.close();
+        this.router.navigate(['/search'], { queryParams: { q } });
+      } else {
+        this.toggleView('search');
+        this.fetchSearch(q);
+      }
     }
+  }
+
+  fetchSearch(query: string): void {
+    this.searchLoading = true;
+    this.searchResults = [];
+    
+    this.youtubeApi.searchMusic(query).subscribe(res => {
+      this.searchResults = res || [];
+      this.searchLoading = false;
+      this.cdr.detectChanges();
+    }, err => {
+      console.error('Error fetching search results', err);
+      this.searchLoading = false;
+      this.cdr.detectChanges();
+    });
   }
 
   // Double Tap & Guide Logic
@@ -306,7 +330,17 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
 
   toggleMenu(event: MouseEvent): void {
     event.stopPropagation();
+    this.menuTrack = null;
     this.showMenu = !this.showMenu;
+  }
+  
+  openItemMenu(event: MouseEvent, track: Track): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.menuTrack = track;
+    this.menuX = event.clientX;
+    this.menuY = event.clientY;
+    this.showMenu = true;
   }
   
   toggleDevices(): void {
@@ -316,6 +350,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   onRightClick(event: MouseEvent): void {
     event.preventDefault(); // Prevent default browser context menu
     // Open menu at mouse coordinates instead of element rect if we want
+    this.menuTrack = null;
     this.menuX = event.clientX;
     this.menuY = event.clientY;
     this.showMenu = true;
@@ -344,15 +379,29 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.showMenu = false;
   }
 
-  toggleView(view: 'artwork' | 'queue' | 'lyrics' | 'related'): void {
-    if (this.activeView === view) {
-      this.activeView = 'artwork';
+  toggleView(view: 'artwork' | 'queue' | 'lyrics' | 'related' | 'search'): void {
+    if (this.isDesktop) {
+      if (this.activeView === view && this.isSidebarVisible) {
+        this.isSidebarVisible = false;
+      } else {
+        this.activeView = view;
+        this.isSidebarVisible = true;
+        if (view === 'lyrics') {
+          this.fetchLyrics();
+        } else if (view === 'related') {
+          this.fetchRelated();
+        }
+      }
     } else {
-      this.activeView = view;
-      if (view === 'lyrics') {
-        this.fetchLyrics();
-      } else if (view === 'related') {
-        this.fetchRelated();
+      if (this.activeView === view) {
+        this.activeView = 'artwork';
+      } else {
+        this.activeView = view;
+        if (view === 'lyrics') {
+          this.fetchLyrics();
+        } else if (view === 'related') {
+          this.fetchRelated();
+        }
       }
     }
   }

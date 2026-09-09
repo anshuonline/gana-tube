@@ -469,7 +469,7 @@
       color: rgba(255,255,255,0.7);
       padding: 12px;
       &:hover { color: #fff; }
-      &.active { color: #1db954; } // Active state color for icons
+      &.active { color: #9333ea; } // Active state color for icons
     }
     
     &.view-toggle {
@@ -483,7 +483,7 @@
         width: 4px;
         height: 4px;
         border-radius: 50%;
-        background-color: #1db954;
+        background-color: #9333ea;
       }
     }
   }
@@ -1218,7 +1218,7 @@
   }
 
   input:checked + .gt-slider {
-    background-color: #1db954; // standard green for autoplay/active
+    background-color: #9333ea; // Purple for autoplay/active
   }
 
   input:checked + .gt-slider:before {

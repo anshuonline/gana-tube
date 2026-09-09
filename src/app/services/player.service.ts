@@ -296,7 +296,6 @@ export class PlayerService {
     this.playerState.set('loading');
     this.location.replaceState('/play?v=' + track.videoId);
     this.loadInPlayer(track.videoId);
-    this.fetchMoreTracksIfNeeded();
   }
 
   setQueue(tracks: Track[], startIndex = 0): void {
@@ -322,7 +321,6 @@ export class PlayerService {
       this.location.replaceState('/play?v=' + tracks[startIndex].videoId);
       this.loadInPlayer(tracks[startIndex].videoId);
     }
-    this.fetchMoreTracksIfNeeded();
   }
 
   updateQueueOrder(newQueue: Track[], newCurrentIndex: number): void {
@@ -388,13 +386,18 @@ export class PlayerService {
     if (this.isShuffled()) {
       nextIdx = Math.floor(Math.random() * q.length);
     } else if (nextIdx >= q.length) {
-      if (this.repeatMode() === 'all' || this.isPlaylistContext()) nextIdx = 0;
-      else return;
+      if (this.repeatMode() === 'all' || this.isPlaylistContext()) {
+        nextIdx = 0;
+      } else if (this.isAutoplayEnabled()) {
+        this.handleTrackEnd();
+        return;
+      } else {
+        return;
+      }
     }
     this.currentIndex.set(nextIdx);
     this.playerState.set('loading');
     this.loadInPlayer(q[nextIdx].videoId);
-    this.fetchMoreTracksIfNeeded();
   }
 
   previous(): void {
@@ -730,59 +733,6 @@ export class PlayerService {
     }
   }
 
-  private fetchMoreTracksIfNeeded(): void {
-    const q = this.queue();
-    const idx = this.currentIndex();
-    // Fetch more if we have 3 or fewer tracks left to play, and not repeating all, and NOT in playlist context
-    if (idx >= q.length - 3 && !this.isFetchingMore && this.repeatMode() !== 'all' && !this.isPlaylistContext() && this.isAutoplayEnabled()) {
-      this.isFetchingMore = true;
-      const lang = this.currentLanguage();
-      
-      // Use the current language to find trending/popular songs for the infinite loop
-      // If we had a direct "getRelatedVideos" API, we would use that, but since we are
-      // using searchMusic, we will use a diverse language-specific query.
-      const queryOptions = [
-        `trending ${lang} songs`,
-        `latest ${lang} hits`,
-        `best ${lang} music`,
-        `popular ${lang} songs`,
-        `new release ${lang}`
-      ];
-      const randomQuery = queryOptions[Math.floor(Math.random() * queryOptions.length)];
-      
-      const current = this.currentTrack();
-      let query = randomQuery;
-      
-      // If we have a current track, use its title and artist to get highly relevant continuous music
-      if (current) {
-        query = `${current.channelTitle} ${current.title} similar hit songs`;
-      }
-      
-      this.youtubeApi.searchMusic(query, 25).subscribe({
-        next: (songs) => {
-          if (songs && songs.length > 0) {
-            // Filter out songs already in the queue to avoid immediate duplicates
-            const currentVideoIds = new Set(this.queue().map(t => t.videoId));
-            const newSongs = songs.filter(s => !currentVideoIds.has(s.videoId));
-            
-            if (newSongs.length > 0) {
-              this.queue.set([...this.queue(), ...newSongs]);
-            } else {
-              // If all were duplicates, just append them anyway to keep the loop going!
-              // But shuffle them slightly so it doesn't feel repetitive
-              this.queue.set([...this.queue(), ...songs.sort(() => 0.5 - Math.random())]);
-            }
-          }
-          this.isFetchingMore = false;
-        },
-        error: (err) => {
-          console.error('Failed to fetch more tracks for queue', err);
-          this.isFetchingMore = false;
-        }
-      });
-    }
-  }
-
   private handleTrackEnd(): void {
     this.triggerEngagement();
 
@@ -798,25 +748,52 @@ export class PlayerService {
     } else {
       const q = this.queue();
       // Auto-generate queue if we reach the end and not in playlist context
-      if (this.currentIndex() === q.length - 1 && !this.isPlaylistContext() && this.repeatMode() !== 'all' && this.isAutoplayEnabled()) {
+      if (this.currentIndex() >= q.length - 1 && !this.isPlaylistContext() && this.repeatMode() !== 'all' && this.isAutoplayEnabled()) {
+        if (this.isFetchingMore) return;
+        this.isFetchingMore = true;
+        
         const current = this.currentTrack();
         if (current) {
-          this.algorithmService.getAutoplayQueue(current).subscribe(newTracks => {
-            if (newTracks && newTracks.length > 0) {
-              const currentVideoIds = new Set(this.queue().map(t => t.videoId));
-              let uniqueNew = newTracks.filter(s => !currentVideoIds.has(s.videoId));
-              
-              if (uniqueNew.length === 0) {
-                // If we ran out of unique tracks, just loop the related tracks infinitely
-                uniqueNew = newTracks;
+          const query = `${current.channelTitle} ${current.title} similar hit songs`;
+          this.youtubeApi.searchMusic(query, 20).subscribe({
+            next: (newTracks) => {
+              if (newTracks && newTracks.length > 0) {
+                const currentVideoIds = new Set(this.queue().map(t => t.videoId));
+                let uniqueNew = newTracks.filter(s => !currentVideoIds.has(s.videoId));
+                
+                if (uniqueNew.length === 0) {
+                  // If we ran out of unique tracks, just loop the related tracks infinitely
+                  uniqueNew = newTracks.sort(() => 0.5 - Math.random());
+                }
+                this.queue.set([...q, ...uniqueNew]);
+                
+                // Now advance index and play
+                const nextIdx = this.currentIndex() + 1;
+                if (nextIdx < this.queue().length) {
+                  this.currentIndex.set(nextIdx);
+                  this.playerState.set('loading');
+                  this.loadInPlayer(this.queue()[nextIdx].videoId);
+                }
               }
-              this.queue.set([...q, ...uniqueNew]);
+              this.isFetchingMore = false;
+            },
+            error: (err) => {
+              console.error('Autoplay generation failed', err);
+              this.isFetchingMore = false;
             }
-            this.next();
           });
+        } else {
+          this.isFetchingMore = false;
         }
       } else {
-        this.next();
+        // Safe to call next manually since it won't trigger handleTrackEnd
+        this.currentIndex.set(this.currentIndex() + 1);
+        if (this.currentIndex() < this.queue().length) {
+          this.playerState.set('loading');
+          this.loadInPlayer(this.queue()[this.currentIndex()].videoId);
+        } else {
+          this.currentIndex.set(0); // fallback
+        }
       }
     }
   }

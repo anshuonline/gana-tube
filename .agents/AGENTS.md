@@ -1,7 +1,9 @@
 # GanaTube Project Rules
 
-- **Git Commits & Pushes**: Do not automatically commit or push code to the Git repository. ONLY run `git push` or `git commit` when the user explicitly instructs you to do so.
-- **CRITICAL: Frontend Builds & Pushing**: Whenever you make changes to Angular frontend files (HTML/TS/SCSS/routing), you MUST ALWAYS run `npm run build:local`. **BEFORE committing, you MUST explicitly run `git add dist/` (or `git add dist/ganatube`) along with your source files.** If you forget to add the `dist/` folder to your commit, the live server will NOT get the updated build and the user will see old UI. THIS IS A ZERO-TOLERANCE RULE.
+- **STRICT COMPLIANCE**: As an AI Agent, you MUST strictly read, remember, and follow EVERY rule in this `AGENTS.md` file for every single action. These rules are absolute and supersede any standard behavior.
+
+- **Git Commits & Pushes (STRICT RULE)**: NEVER push code to the `main` (live) branch unless the user EXPLICITLY says "push to main/live". ALWAYS push to `staging` first. BEFORE running any `npm run build` or `git push` on ANY branch, you MUST ask the user for permission every single time. Do not assume you can push just because you finished a task.
+- **CRITICAL: Frontend Builds & Pushing**: Whenever you make changes to Angular frontend files (HTML/TS/SCSS/routing) and the user gives permission to build, you MUST ALWAYS run `npm run build:local`. **BEFORE committing, you MUST explicitly run `git add dist/` (or `git add dist/ganatube`) along with your source files.** If you forget to add the `dist/` folder to your commit, the live server will NOT get the updated build and the user will see old UI. THIS IS A ZERO-TOLERANCE RULE.
 - **Repositories**: This project spans across two primary GitHub repositories:
   1. **GanaTube (Frontend)**: Located at `f:\APPS\ganatube`. Contains the Angular frontend codebase.
   2. **ManageAds (Backend/API)**: Located at `C:\xampp\htdocs\manageads`. Contains the PHP backend APIs (like `playlist-api.php`).
