@@ -2208,3 +2208,119 @@
     font-size: 1.1rem;
   }
 }
+/* Install Modal ASMR Styling */
+.gt-install-modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 99998;
+  animation: fadeIn 0.3s ease;
+}
+
+.gt-install-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 400px;
+  background: linear-gradient(145deg, #1a1a2e, #16213e, #0f3460);
+  border-radius: 24px;
+  padding: 32px 24px;
+  text-align: center;
+  color: white;
+  z-index: 99999;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.05);
+  animation: slideUpFade 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gt-install-modal .close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gt-install-modal .close-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
+}
+
+.gt-install-modal .icon-wrapper {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #9333ea, #1db954);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(147, 51, 234, 0.3);
+}
+
+.gt-install-modal h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(to right, #fff, #b3b3b3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gt-install-modal p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #a0a0a0;
+  margin-bottom: 28px;
+}
+
+.asmr-install-btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(45deg, #1db954, #9333ea);
+  background-size: 200% 200%;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(29, 185, 84, 0.3);
+  animation: gradientShift 3s ease infinite;
+}
+
+.asmr-install-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(147, 51, 234, 0.4);
+}
+
+.asmr-install-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(147, 51, 234, 0.4);
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translate(-50%, -40%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}

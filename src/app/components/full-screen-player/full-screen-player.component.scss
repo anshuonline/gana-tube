@@ -46,6 +46,28 @@
   width: 100%;
 }
 
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s, color 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
 .fs-header {
   display: flex;
   justify-content: space-between;
@@ -54,31 +76,10 @@
   height: 48px;
 
   .icon-btn {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    border-radius: 50%;
     width: 48px;
     height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, transform 0.2s, color 0.2s;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      transform: scale(1.05);
-    }
-    
-    &:active {
-      transform: scale(0.95);
-    }
   }
 }
-
-
 
 .fs-header-text {
   text-align: center;
@@ -579,10 +580,12 @@
     cursor: grab;
     display: flex;
     align-items: center;
-    justify-content: center;
+    color: rgba(255, 255, 255, 0.3);
     padding: 4px;
-    margin-left: -8px;
-    margin-right: -4px;
+    
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
     
     &:active {
       cursor: grabbing;
@@ -1224,4 +1227,8 @@
   input:checked + .gt-slider:before {
     transform: translateX(24px);
   }
+}
+.queue-more-btn {
+  width: 36px;
+  height: 36px;
 }

@@ -130,6 +130,17 @@ export class App implements OnInit {
   isRouteLoading = signal<boolean>(false);
   isRouteDone = signal<boolean>(false);
 
+  showInstallModal = false;
+
+  closeInstallModal() {
+    this.showInstallModal = false;
+  }
+
+  triggerInstall() {
+    this.pwaService.installApp();
+    this.showInstallModal = false;
+  }
+
   // Ad Booking State
   bookingState: {
     placementId?: string;
@@ -1217,6 +1228,19 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check PWA Install Prompt every 2 hours
+    if (!this.pwaService.isInstalledPWA()) {
+      const lastPrompt = localStorage.getItem('lastInstallPromptShown');
+      const now = Date.now();
+      if (!lastPrompt || (now - parseInt(lastPrompt, 10)) > 2 * 60 * 60 * 1000) {
+        // Show the prompt
+        setTimeout(() => {
+          this.showInstallModal = true;
+          localStorage.setItem('lastInstallPromptShown', now.toString());
+        }, 3000); // Wait 3 seconds after reload to show it so it's not jarring
+      }
+    }
+
     // Load saved language if available
     const savedLang = localStorage.getItem('homeScreenLanguage');
     if (savedLang && this.availableLanguages.includes(savedLang)) {

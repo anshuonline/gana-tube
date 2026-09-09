@@ -74,15 +74,6 @@
 
       <!-- Compact Fake Search Button in Header -->
       <div class="header-actions">
-        <button 
-          class="install-app-btn" 
-          *ngIf="!pwaService.isInstalledPWA()"
-          (click)="pwaService.installApp()"
-        >
-          <svg lucideDownload [attr.size]="16"></svg>
-          <span class="btn-text">Install App</span>
-        </button>
-
         <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">
           <svg lucideSearch class="trigger-icon" style="color: #fff; display: block;" [attr.size]="18"></svg>
           <span class="trigger-text">Search for songs, artists...</span>
@@ -92,7 +83,7 @@
 
       <!-- API Key Warning Banner -->
       <div class="api-notice" *ngIf="apiKeyMissing">
-        <span>ðŸ”‘ Demo mode â€” Add your <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">YouTube API Key</a> in <code>environment.ts</code> to enable real search</span>
+        <span>🔑 Demo mode — Add your <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">YouTube API Key</a> in <code>environment.ts</code> to enable real search</span>
       </div>
     </div>
 
@@ -753,3 +744,20 @@
 <!-- Feedback Popup -->
 <app-feedback-popup *ngIf="showFeedbackPopup()" (close)="showFeedbackPopup.set(false)"></app-feedback-popup>
 
+<!-- Install PWA Modal -->
+<div class="gt-install-modal-backdrop" *ngIf="showInstallModal" (click)="closeInstallModal()"></div>
+<div class="gt-install-modal" *ngIf="showInstallModal">
+  <button class="close-btn" (click)="closeInstallModal()">
+    <svg lucideX [attr.size]="20"></svg>
+  </button>
+  <div class="modal-content">
+    <div class="icon-wrapper">
+      <svg lucideDownload [attr.size]="32"></svg>
+    </div>
+    <h3>Install GanaTube</h3>
+    <p>Get the best music experience right on your device. Faster loading, offline library access, and ad-free listening.</p>
+    <button class="asmr-install-btn" (click)="triggerInstall()">
+      <span>Install App Now</span>
+    </button>
+  </div>
+</div>

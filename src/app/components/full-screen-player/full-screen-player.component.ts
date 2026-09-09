@@ -383,6 +383,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     if (this.isDesktop) {
       if (this.activeView === view && this.isSidebarVisible) {
         this.isSidebarVisible = false;
+        this.activeView = 'artwork';
       } else {
         this.activeView = view;
         this.isSidebarVisible = true;

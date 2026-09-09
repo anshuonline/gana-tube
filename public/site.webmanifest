@@ -1,21 +1,22 @@
 {
   "name": "ganatube.in",
   "short_name": "ganatube.in",
+  "start_url": "/",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png?v=1",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "/web-app-manifest-512x512.png?v=1",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "background_color": "#000000",
   "display": "standalone"
 }
