@@ -25,37 +25,12 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
   errorMessage: string = '';
   isAuraMinimized: boolean = false;
   
-  // Hero items dynamically fetched
-  heroItems: YouTubeSearchResult[] = [];
-  currentHeroIndex = 0;
-  isHeroLoading = true;
-  
-  // Gen Z Artist/Song Pool
-  private genZQueries = [
-    'Anuv Jain best songs',
-    'Prateek Kuhad top hits',
-    'AP Dhillon trending',
-    'The Weeknd top hits',
-    'Dua Lipa best songs',
-    'Darshan Raval top hits',
-    'King (Indian) top hits',
-    'Mitraz top hits',
-    'Karan Aujla latest',
-    'Taylor Swift trending',
-    'Osho Jain songs',
-    'Mismatched web series songs',
-    'Bateya Anuv Jain',
-    'Starboy The Weeknd',
-    'Diljit Dosanjh hits',
-    'Arijit Singh romantic hits'
-  ];
-
   // Feed results
-  private allResults: YouTubeSearchResult[] = [];
-  results: YouTubeSearchResult[] = [];
+  private allResults: any[] = [];
+  results: any[] = [];
   
-  private initialBatch = 10;
-  private scrollBatch = 6;
+  private initialBatch = 15;
+  private scrollBatch = 10;
   private scrollHandler: (() => void) | null = null;
   private isLoadingMore = false;
   loadingMore = false;
@@ -69,8 +44,8 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
   ) {}
 
   private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') 
-    ? 'http://localhost/manageads/managegt-api.php' 
-    : 'https://manageads.ganatube.in/managegt-api.php';
+    ? 'http://localhost/manageads/analytic-api.php' 
+    : 'https://manageads.ganatube.in/analytic-api.php';
 
   ngOnInit() {
     this.loadDiscoverySongs();
@@ -78,97 +53,58 @@ export class DiscoveryPageComponent implements OnInit, OnDestroy {
 
   loadDiscoverySongs() {
     this.isSearching = true;
-    this.loadingMessage = 'Curating special discoveries...';
-    this.http.get<any>(`${this.apiUrl}?action=get_discovery`).subscribe({
-      next: (data) => {
-        if (data) {
-          if (Array.isArray(data)) {
-            this.allResults = data;
-            this.results = data;
-            this.loadHeroItems(); // Fallback to random if old array structure
-          } else if (data.heroItems || data.feedItems) {
-            if (data.heroItems && Array.isArray(data.heroItems)) {
-              this.heroItems = data.heroItems;
-              this.isHeroLoading = false;
+    this.loadingMessage = 'Loading top streamed tracks...';
+    this.http.get<any>(`${this.apiUrl}?action=getTop100Songs`).subscribe({
+      next: (res) => {
+        if (res && res.status === 'success' && res.data) {
+          // Map backend format to YouTubeSearchResult format for the player
+          const mappedData = res.data.map((song: any) => ({
+            videoId: song.video_id,
+            title: song.title,
+            thumbnail: song.thumbnail,
+            thumbnailHigh: song.thumbnail,
+            channelTitle: 'GanaTube Top 100', // Default channel title
+            play_count: song.play_count // Keep play_count for UI
+          }));
+          this.allResults = mappedData;
+          this.results = [];
+          this.isSearching = false;
+          this.cdr.detectChanges();
+          
+          // Stagger load the first batch
+          const firstBatch = this.allResults.slice(0, this.initialBatch);
+          let i = 0;
+          const addOne = () => {
+            if (i < firstBatch.length) {
+              this.ngZone.run(() => {
+                this.results = [...this.results, firstBatch[i]];
+                this.cdr.detectChanges();
+              });
+              i++;
+              setTimeout(addOne, 50); // Faster stagger
             } else {
-              this.loadHeroItems(); // Fallback
+              if (this.allResults.length > this.initialBatch) {
+                this.setupScrollListener();
+              }
             }
-            if (data.feedItems && Array.isArray(data.feedItems)) {
-              this.allResults = data.feedItems;
-              this.results = data.feedItems;
-            }
-          }
+          };
+          addOne();
         } else {
-          this.loadHeroItems(); // Fallback
+          this.errorMessage = 'Failed to load top songs.';
+          this.isSearching = false;
+          this.cdr.detectChanges();
         }
-        this.isSearching = false;
-        this.cdr.detectChanges();
       },
       error: () => {
-        this.errorMessage = 'Failed to load discoveries. Please try again.';
+        this.errorMessage = 'Network error. Please try again.';
         this.isSearching = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  async loadHeroItems() {
-    this.isHeroLoading = true;
-    this.heroItems = [];
-    
-    // Shuffle and pick 5 unique queries
-    const shuffled = [...this.genZQueries].sort(() => 0.5 - Math.random());
-    const selectedQueries = shuffled.slice(0, 5);
-    
-    try {
-      const promises = selectedQueries.map(query => 
-        firstValueFrom(this.youtubeApi.searchMusic(query, 1).pipe(
-          catchError(() => of([] as YouTubeSearchResult[]))
-        ))
-      );
-      
-      const results = await Promise.all(promises);
-      this.heroItems = results.map(r => r[0]).filter(track => !!track);
-    } catch(e) {
-      console.error('Failed to load hero items', e);
-    } finally {
-      this.isHeroLoading = false;
-      this.cdr.detectChanges();
-    }
-  }
-
   ngOnDestroy() {
     this.removeScrollListener();
-  }
-
-  nextHero() {
-    this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroItems.length;
-  }
-
-  prevHero() {
-    this.currentHeroIndex = (this.currentHeroIndex - 1 + this.heroItems.length) % this.heroItems.length;
-  }
-
-  // Mobile Swipe Support
-  touchStartX = 0;
-  touchEndX = 0;
-
-  onTouchStart(e: TouchEvent) {
-    this.touchStartX = e.changedTouches[0].screenX;
-  }
-
-  onTouchEnd(e: TouchEvent) {
-    this.touchEndX = e.changedTouches[0].screenX;
-    this.handleSwipe();
-  }
-
-  handleSwipe() {
-    if (this.touchEndX < this.touchStartX - 50) {
-      this.nextHero(); // swipe left
-    }
-    if (this.touchEndX > this.touchStartX + 50) {
-      this.prevHero(); // swipe right
-    }
   }
 
   async askAI() {
