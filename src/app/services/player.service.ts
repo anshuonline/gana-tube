@@ -672,6 +672,11 @@ export class PlayerService {
     
     if (current) {
       this.analyticsService.recordPlay(current);
+      // Proactively fetch more tracks if we are near the end of the queue
+      const q = this.queue();
+      if (this.isAutoplayEnabled() && !this.isPlaylistContext() && this.repeatMode() !== 'all' && this.currentIndex() >= q.length - 2) {
+        this.fetchMoreAutoplayTracks(current);
+      }
     }
 
     if (this.offlineService.isDownloaded(videoId)) {
@@ -733,6 +738,43 @@ export class PlayerService {
     }
   }
 
+  private fetchMoreAutoplayTracks(current: Track, playNextOnSuccess: boolean = false): void {
+    if (this.isFetchingMore) return;
+    this.isFetchingMore = true;
+    
+    const query = `${current.channelTitle} ${current.title} similar hit songs`;
+    this.youtubeApi.searchMusic(query, 20).subscribe({
+      next: (newTracks) => {
+        if (newTracks && newTracks.length > 0) {
+          const q = this.queue();
+          const currentVideoIds = new Set(q.map(t => t.videoId));
+          let uniqueNew = newTracks.filter(s => !currentVideoIds.has(s.videoId));
+          
+          if (uniqueNew.length === 0) {
+            // If we ran out of unique tracks, just loop the related tracks infinitely
+            uniqueNew = newTracks.sort(() => 0.5 - Math.random());
+          }
+          this.queue.set([...q, ...uniqueNew]);
+          
+          if (playNextOnSuccess) {
+            // Now advance index and play
+            const nextIdx = this.currentIndex() + 1;
+            if (nextIdx < this.queue().length) {
+              this.currentIndex.set(nextIdx);
+              this.playerState.set('loading');
+              this.loadInPlayer(this.queue()[nextIdx].videoId);
+            }
+          }
+        }
+        this.isFetchingMore = false;
+      },
+      error: (err) => {
+        console.error('Autoplay generation failed', err);
+        this.isFetchingMore = false;
+      }
+    });
+  }
+
   private handleTrackEnd(): void {
     this.triggerEngagement();
 
@@ -749,39 +791,9 @@ export class PlayerService {
       const q = this.queue();
       // Auto-generate queue if we reach the end and not in playlist context
       if (this.currentIndex() >= q.length - 1 && !this.isPlaylistContext() && this.repeatMode() !== 'all' && this.isAutoplayEnabled()) {
-        if (this.isFetchingMore) return;
-        this.isFetchingMore = true;
-        
         const current = this.currentTrack();
         if (current) {
-          const query = `${current.channelTitle} ${current.title} similar hit songs`;
-          this.youtubeApi.searchMusic(query, 20).subscribe({
-            next: (newTracks) => {
-              if (newTracks && newTracks.length > 0) {
-                const currentVideoIds = new Set(this.queue().map(t => t.videoId));
-                let uniqueNew = newTracks.filter(s => !currentVideoIds.has(s.videoId));
-                
-                if (uniqueNew.length === 0) {
-                  // If we ran out of unique tracks, just loop the related tracks infinitely
-                  uniqueNew = newTracks.sort(() => 0.5 - Math.random());
-                }
-                this.queue.set([...q, ...uniqueNew]);
-                
-                // Now advance index and play
-                const nextIdx = this.currentIndex() + 1;
-                if (nextIdx < this.queue().length) {
-                  this.currentIndex.set(nextIdx);
-                  this.playerState.set('loading');
-                  this.loadInPlayer(this.queue()[nextIdx].videoId);
-                }
-              }
-              this.isFetchingMore = false;
-            },
-            error: (err) => {
-              console.error('Autoplay generation failed', err);
-              this.isFetchingMore = false;
-            }
-          });
+          this.fetchMoreAutoplayTracks(current, true);
         } else {
           this.isFetchingMore = false;
         }
