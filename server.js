@@ -646,6 +646,11 @@ app.get('/api/yt-videos', async (req, res) => {
   }
 });
 
+// Redirect share.php requests to the PHP backend so the script executes correctly
+app.get('/share.php', (req, res) => {
+  res.redirect(301, 'https://manageads.ganatube.in' + req.originalUrl);
+});
+
 // Serve Angular static frontend files from 'browser' folder
 app.use(express.static(path.join(__dirname, 'dist', 'ganatube', 'browser')));
 
