@@ -94,9 +94,9 @@
               </button>
 
               <button class="cm-btn cm-btn-secondary" (click)="playerService.toggleRepeat()">
-                <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="28" stroke="currentColor"></svg>
+                <svg *ngIf="playerService.repeatMode() === 'none'" lucideRepeat [attr.size]="28" stroke="rgba(255,255,255,0.4)"></svg>
                 <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="28" stroke="#fff"></svg>
-                <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="28" stroke="#fff"></svg>
+                <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="28" stroke="#fff"></svg>
               </button>
             </div>
           </div>

@@ -1,4 +1,4 @@
-﻿.fs-player-overlay {
+.fs-player-overlay {
   position: fixed;
   inset: 0;
   z-index: 2000;
@@ -129,7 +129,6 @@
   aspect-ratio: 1 / 1;
   border-radius: 0; // Fixed "round ho raha" issue to match Spotify's perfectly square cover art
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   transition: transform 0.4s ease;
 
   .fs-album-art {
@@ -1088,4 +1087,141 @@
   text-align: center;
   color: #a0a0a0;
   font-size: 0.9rem;
+}
+
+// Desktop Layout Modifiers
+.fs-main.desktop-layout {
+  flex-direction: row;
+  gap: 48px;
+  align-items: stretch;
+  padding: 0 40px;
+
+  .fs-player-view {
+    flex: 1;
+    max-width: 50%;
+    justify-content: flex-end;
+  }
+
+  .fs-list-view {
+    flex: 1;
+    max-width: 50%;
+    justify-content: flex-start;
+  }
+}
+
+// Search Bar
+.fs-header-search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 24px;
+}
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  padding: 0 16px;
+  width: 100%;
+  height: 40px;
+
+  svg {
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 8px;
+  }
+
+  input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+// Loading Spinner
+.fs-loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  
+  .spin-animation {
+    animation: spin 2s linear infinite;
+  }
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+// Autoplay Toggle in Queue View
+.queue-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+
+  .autoplay-info {
+    h4 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+      color: #fff;
+    }
+    p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+}
+
+// Toggle Switch
+.gt-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+
+  input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .gt-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255,255,255,0.2);
+    transition: .4s;
+    border-radius: 24px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+  }
+
+  input:checked + .gt-slider {
+    background-color: #1db954; // standard green for autoplay/active
+  }
+
+  input:checked + .gt-slider:before {
+    transform: translateX(24px);
+  }
 }

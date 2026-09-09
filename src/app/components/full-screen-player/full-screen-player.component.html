@@ -12,8 +12,16 @@
         <svg lucideChevronDown [attr.size]="32"></svg>
       </button>
 
+      <!-- Search Bar (Desktop Only) -->
+      <div class="fs-header-search" *ngIf="isDesktop">
+        <div class="search-input-wrapper">
+          <svg lucideSearch [attr.size]="18"></svg>
+          <input type="text" placeholder="Search for songs, artists, or podcasts..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" />
+        </div>
+      </div>
+
       <!-- Playing From text for Artwork View -->
-      <div class="fs-header-text">
+      <div class="fs-header-text" *ngIf="!isDesktop">
         <span class="fs-now-playing">NOW PLAYING</span>
         <span class="fs-source">{{ displayTrack()?.channelTitle }}</span>
       </div>
@@ -29,10 +37,10 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="fs-main">
+    <div class="fs-main" [class.desktop-layout]="isDesktop">
       
       <!-- Artwork View -->
-      <div class="fs-player-view" *ngIf="activeView === 'artwork'">
+      <div class="fs-player-view" *ngIf="activeView === 'artwork' || isDesktop">
         <div class="fs-artwork-container" (click)="onCoverClick($event)" (contextmenu)="onRightClick($event)">
           <img 
             [src]="useLowQualityCover ? displayTrack()?.thumbnail : (displayTrack()?.thumbnailHigh || displayTrack()?.thumbnail)" 
@@ -43,6 +51,11 @@
             (load)="onCoverLoad()"
             (error)="onCoverError()"
           />
+
+          <!-- Loading Spinner -->
+          <div class="fs-loading-spinner" *ngIf="playerService.playerState() === 'loading'">
+            <svg lucideLoader2 [attr.size]="48" class="spin-animation" stroke="rgba(255,255,255,0.8)"></svg>
+          </div>
           
           <!-- Animated Ad Overlay -->
           <div class="fs-cover-ad-container" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
@@ -77,10 +90,22 @@
       </div>
 
       <!-- Lists View Container -->
-      <div class="fs-list-view" *ngIf="activeView !== 'artwork'">
+      <div class="fs-list-view" *ngIf="activeView !== 'artwork' || isDesktop">
         
         <!-- Queue View (Up Next) -->
-        <div class="fs-queue-view" *ngIf="activeView === 'queue'">
+        <div class="fs-queue-view" *ngIf="activeView === 'queue' || (isDesktop && activeView === 'artwork')">
+          
+          <div class="queue-header-actions">
+            <div class="autoplay-info">
+              <h4>Auto-play</h4>
+              <p>Add similar content to the end of the queue</p>
+            </div>
+            <label class="gt-switch">
+              <input type="checkbox" [checked]="playerService.isAutoplayEnabled()" (change)="playerService.toggleAutoplay()">
+              <span class="gt-slider round"></span>
+            </label>
+          </div>
+
           <div class="queue-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
             <div 
               class="queue-item" 
@@ -244,7 +269,7 @@
             <!-- Repeat All -->
             <svg *ngIf="playerService.repeatMode() === 'all'" lucideRepeat [attr.size]="20" stroke="#fff"></svg>
             <!-- Repeat One -->
-            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="20" stroke="#fff"></svg>
+            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" stroke="#fff"></svg>
           </button>
         </div>
 

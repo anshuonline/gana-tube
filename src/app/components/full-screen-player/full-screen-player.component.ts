@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect, ChangeDetectorRef, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService } from '../../services/youtube-api.service';
@@ -14,14 +14,17 @@ import {
   LucideHeart,
   LucideCar,
   LucideRepeat,
-  LucideRepeat2,
+  LucideRepeat1,
   LucideGripVertical,
   LucideMonitor,
   LucideListMusic,
   LucideRadio,
   LucideMinimize2,
-  LucideMusic2
+  LucideMusic2,
+  LucideSearch,
+  LucideLoader2
 } from '@lucide/angular';
+import { Router } from '@angular/router';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
@@ -47,13 +50,15 @@ import { SyncService } from '../../services/sync.service';
     LucideHeart,
     LucideCar,
     LucideRepeat,
-    LucideRepeat2,
+    LucideRepeat1,
     LucideGripVertical,
     LucideMonitor,
     LucideListMusic,
     LucideRadio,
     LucideMinimize2,
     LucideMusic2,
+    LucideSearch,
+    LucideLoader2,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
@@ -74,6 +79,10 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   public syncService = inject(SyncService);
   private toastService = inject(ToastService);
+  private router = inject(Router);
+
+  isDesktop = false;
+  searchQuery = '';
 
   @Input() playerCoverAd: any = null;
   @Input() safePlayerCoverAdUrl: any = null;
@@ -190,6 +199,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.checkDesktop();
     // Show guide after 1 second if it's the first time
     const hasSeenGuide = localStorage.getItem('ganatube_has_seen_double_tap_guide');
     if (!hasSeenGuide) {
@@ -210,6 +220,24 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   clearAdTimers(): void {
     this.adTimers.forEach(t => clearTimeout(t));
     this.adTimers = [];
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkDesktop();
+  }
+
+  private checkDesktop() {
+    this.isDesktop = typeof window !== 'undefined' && window.innerWidth >= 992;
+  }
+
+  onSearch(): void {
+    const q = this.searchQuery.trim();
+    if (q) {
+      this.close();
+      this.router.navigate(['/search'], { queryParams: { q } });
+      this.searchQuery = '';
+    }
   }
 
   // Double Tap & Guide Logic

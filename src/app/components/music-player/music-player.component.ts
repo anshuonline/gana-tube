@@ -11,7 +11,7 @@ import {
   LucideVolume1,
   LucideShuffle,
   LucideRepeat,
-  LucideRepeat2,
+  LucideRepeat1,
   LucideMusic2,
   LucideMaximize2,
   LucideMinimize2,
@@ -50,7 +50,7 @@ import { SyncService } from '../../services/sync.service';
     LucideVolume1,
     LucideShuffle,
     LucideRepeat,
-    LucideRepeat2,
+    LucideRepeat1,
     LucideMusic2,
     LucideMaximize2,
     LucideMinimize2,
@@ -179,8 +179,8 @@ import { SyncService } from '../../services/sync.service';
             (click)="playerService.toggleRepeat()"
             [title]="'Repeat: ' + playerService.repeatMode()"
           >
-            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="20"></svg>
-            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20"></svg>
+            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" stroke="#fff"></svg>
+            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#fff'"></svg>
           </button>
         </div>
       </div>
@@ -440,8 +440,8 @@ import { SyncService } from '../../services/sync.service';
               (click)="playerService.toggleRepeat()"
               [title]="'Repeat: ' + playerService.repeatMode()"
             >
-              <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat2 [attr.size]="24"></svg>
-              <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="24"></svg>
+              <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="24" stroke="#fff"></svg>
+              <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="24" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#fff'"></svg>
             </button>
           </div>
           

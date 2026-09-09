@@ -102,6 +102,9 @@ export class PlayerService {
   isMuted = signal<boolean>(false);
   isShuffled = signal<boolean>(false);
   repeatMode = signal<'none' | 'one' | 'all'>('none');
+  isAutoplayEnabled = signal<boolean>(
+    typeof localStorage !== 'undefined' ? localStorage.getItem('gt_autoplay') !== 'false' : true
+  );
   currentLanguage = signal<string>('Hindi');
   isPlaylistContext = signal<boolean>(false);
   isCrossfadeEnabled = signal<boolean>(
@@ -559,6 +562,14 @@ export class PlayerService {
     this.repeatMode.set(modes[(curr + 1) % modes.length]);
   }
 
+  toggleAutoplay(): void {
+    const newVal = !this.isAutoplayEnabled();
+    this.isAutoplayEnabled.set(newVal);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_autoplay', newVal.toString());
+    }
+  }
+
   toggleCrossfade(): void {
     const newVal = !this.isCrossfadeEnabled();
     this.isCrossfadeEnabled.set(newVal);
@@ -723,7 +734,7 @@ export class PlayerService {
     const q = this.queue();
     const idx = this.currentIndex();
     // Fetch more if we have 3 or fewer tracks left to play, and not repeating all, and NOT in playlist context
-    if (idx >= q.length - 3 && !this.isFetchingMore && this.repeatMode() !== 'all' && !this.isPlaylistContext()) {
+    if (idx >= q.length - 3 && !this.isFetchingMore && this.repeatMode() !== 'all' && !this.isPlaylistContext() && this.isAutoplayEnabled()) {
       this.isFetchingMore = true;
       const lang = this.currentLanguage();
       
@@ -787,7 +798,7 @@ export class PlayerService {
     } else {
       const q = this.queue();
       // Auto-generate queue if we reach the end and not in playlist context
-      if (this.currentIndex() === q.length - 1 && !this.isPlaylistContext() && this.repeatMode() !== 'all') {
+      if (this.currentIndex() === q.length - 1 && !this.isPlaylistContext() && this.repeatMode() !== 'all' && this.isAutoplayEnabled()) {
         const current = this.currentTrack();
         if (current) {
           this.algorithmService.getAutoplayQueue(current).subscribe(newTracks => {
