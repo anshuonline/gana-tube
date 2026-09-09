@@ -463,6 +463,9 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.playerService.updateQueueOrder(queue, newCurrentIdx);
   }
 
+  isScrubbing = false;
+  scrubTime = 0;
+
   formatTime(seconds: number): string {
     if (!seconds || isNaN(seconds)) return '0:00';
     const m = Math.floor(seconds / 60);
@@ -470,10 +473,20 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
+  get displayCurrentTime(): number {
+    return this.isScrubbing ? this.scrubTime : this.playerService.currentTime();
+  }
+
+  onScrubInput(event: any): void {
+    this.isScrubbing = true;
+    this.scrubTime = parseFloat(event.target.value);
+  }
+
   onSeek(event: any): void {
-    const time = event.target.value;
-    if ((this.playerService as any).ytPlayer) {
-      (this.playerService as any).ytPlayer.seekTo(time, true);
+    this.isScrubbing = false;
+    const time = parseFloat(event.target.value);
+    if (!isNaN(time)) {
+      this.playerService.seekTo(time);
     }
   }
 

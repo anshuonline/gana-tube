@@ -76,7 +76,7 @@
       <div class="header-actions">
         <button 
           class="install-app-btn" 
-          *ngIf="pwaService.canInstall()" 
+          *ngIf="!pwaService.isInstalledPWA()"
           (click)="pwaService.installApp()"
         >
           <svg lucideDownload [attr.size]="16"></svg>
@@ -143,7 +143,7 @@
             <ng-container *ngIf="authService.currentUser() === null">
               <h1 class="username">Guest User</h1>
               <p class="user-email">Free Account</p>
-              <button class="login-action-btn primary-btn" (click)="login()">Login with Google</button>
+              <button class="login-action-btn" (click)="login()">Login with Google</button>
             </ng-container>
 
             <ng-container *ngIf="authService.currentUser()">

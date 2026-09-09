@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, NgZone } from '@angular/core';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { YouTubeSearchResult } from './youtube-api.service';
@@ -35,6 +35,7 @@ export class PlayerService {
   private isFetchingMore = false;
   private isRemoteUpdate = false;
   private location = inject(Location);
+  private ngZone = inject(NgZone);
 
   // When true, this instance of the player is just a remote control for another device
   public isRemoteControl = signal<boolean>(false);
@@ -576,6 +577,18 @@ export class PlayerService {
         this.clearLoadTimeout();
         this.playerState.set('playing');
         this.duration.set(this.ytPlayer?.getDuration() || 0);
+        
+        // Fix sudden blast of volume at the beginning of a crossfade
+        try {
+          if (this.isCrossfadeEnabled() && this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function' && (this.ytPlayer.getCurrentTime() || 0) < 1) {
+            if (typeof this.ytPlayer.setVolume === 'function') {
+              this.ytPlayer.setVolume(0);
+            }
+          }
+        } catch (e) {
+          console.error('Error setting initial crossfade volume', e);
+        }
+        
         this.startProgressTracking();
         break;
       case 2: // paused
@@ -814,48 +827,71 @@ export class PlayerService {
   private startProgressTracking(): void {
     this.stopProgressTracking();
     this.lastTickTime = Date.now();
-    this.progressInterval = setInterval(() => {
-      const now = Date.now();
-      const deltaSeconds = (now - this.lastTickTime) / 1000;
-      this.lastTickTime = now;
+    this.ngZone.runOutsideAngular(() => {
+      this.progressInterval = setInterval(() => {
+        const now = Date.now();
+        const deltaSeconds = (now - this.lastTickTime) / 1000;
+        this.lastTickTime = now;
 
-      if (this.ytPlayer && !this.isRemoteControl()) {
-        const cTime = this.ytPlayer.getCurrentTime() || 0;
-        const dur = this.ytPlayer.getDuration() || 0;
-        this.currentTime.set(cTime);
-        this.duration.set(dur);
-        this.broadcastToSync(); // Send to sync service (will be throttled)
-        
-        // Fake crossfade logic (fade in/out volume)
-        if (this.isCrossfadeEnabled() && dur > 10) {
-          const timeLeft = dur - cTime;
-          if (timeLeft <= 5 && timeLeft > 0) {
-            const fadeRatio = Math.max(0, timeLeft / 5);
-            this.ytPlayer.setVolume(this.volume() * fadeRatio);
-          } else if (cTime <= 5) {
-            const fadeRatio = Math.min(1, cTime / 5);
-            this.ytPlayer.setVolume(this.volume() * fadeRatio);
-          } else {
-            // Restore normal volume if user scrubs to middle
-            this.ytPlayer.setVolume(this.volume());
+        if (this.ytPlayer && !this.isRemoteControl()) {
+          this.ngZone.run(() => {
+            try {
+              const cTime = typeof this.ytPlayer.getCurrentTime === 'function' ? this.ytPlayer.getCurrentTime() || 0 : 0;
+              const dur = typeof this.ytPlayer.getDuration === 'function' ? this.ytPlayer.getDuration() || 0 : 0;
+              this.currentTime.set(cTime);
+              this.duration.set(dur);
+            } catch (e) {
+              console.error('Error reading time', e);
+            }
+          });
+          
+          try {
+            const cTime = typeof this.ytPlayer.getCurrentTime === 'function' ? this.ytPlayer.getCurrentTime() || 0 : 0;
+            const dur = typeof this.ytPlayer.getDuration === 'function' ? this.ytPlayer.getDuration() || 0 : 0;
+            this.broadcastToSync(); // Send to sync service (will be throttled)
+          
+          // Fake crossfade logic (fade in/out volume)
+          if (this.isCrossfadeEnabled() && dur > 10 && typeof this.ytPlayer.setVolume === 'function') {
+            const timeLeft = dur - cTime;
+            let targetVol = this.volume();
+            
+            if (timeLeft <= 5 && timeLeft > 0) {
+              const fadeRatio = Math.max(0, timeLeft / 5);
+              targetVol = Math.round(this.volume() * fadeRatio);
+            } else if (cTime <= 5) {
+              const fadeRatio = Math.min(1, cTime / 5);
+              targetVol = Math.round(this.volume() * fadeRatio);
+            } else {
+              targetVol = Math.round(this.volume());
+            }
+
+            if ((this as any)._lastSetVolume !== targetVol) {
+              this.ytPlayer.setVolume(targetVol);
+              (this as any)._lastSetVolume = targetVol;
+            }
           }
-        }
-        
-        // Track listening time for spin wheel (120 seconds = 1 chance)
-        // ONLY if user has exhausted all daily spins (spinsLeft <= 0)
-        if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
-          this.listeningSeconds.update(v => v + deltaSeconds);
-          if (this.listeningSeconds() >= 120) {
-            this.listeningSeconds.set(0); // reset
-            this.awardSpinChance();
+          
+          // Track listening time for spin wheel (120 seconds = 1 chance)
+          // ONLY if user has exhausted all daily spins (spinsLeft <= 0)
+          if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
+            this.listeningSeconds.update(v => v + deltaSeconds);
+            if (this.listeningSeconds() >= 120) {
+              this.listeningSeconds.set(0); // reset
+              this.awardSpinChance();
+            }
           }
+        } catch (e) {
+          console.error('Error in progress tracking interval', e);
         }
       } else if (this.isRemoteControl() && this.playerState() === 'playing') {
         // Increment locally by delta if acting as remote, to keep UI moving
-        this.currentTime.update(t => t + deltaSeconds);
+        this.ngZone.run(() => {
+          this.currentTime.update(t => t + deltaSeconds);
+        });
       }
     }, 500);
-  }
+  });
+}
   
   private toastService = inject(ToastService);
 

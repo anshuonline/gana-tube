@@ -137,7 +137,12 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       unMute: () => this.players[this.activePlayerIndex]?.unMute(),
       playVideo: () => this.players[this.activePlayerIndex]?.playVideo(),
       pauseVideo: () => this.players[this.activePlayerIndex]?.pauseVideo(),
-      seekTo: (sec: number, allow: boolean) => this.players[this.activePlayerIndex]?.seekTo(sec, allow),
+      seekTo: (sec: number, allow: boolean) => {
+        const p = this.players[this.activePlayerIndex];
+        if (p && typeof p.seekTo === 'function') {
+          p.seekTo(Math.round(sec), allow);
+        }
+      },
       getPlayerState: () => this.players[this.activePlayerIndex]?.getPlayerState(),
       getCurrentTime: () => this.players[this.activePlayerIndex]?.getCurrentTime(),
       getDuration: () => this.players[this.activePlayerIndex]?.getDuration(),

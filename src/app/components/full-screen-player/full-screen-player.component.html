@@ -194,9 +194,10 @@
           type="range" 
           class="fs-progress-bar" 
           min="0" 
+          step="1"
           [max]="playerService.duration() || 100" 
           [value]="playerService.currentTime()" 
-          (input)="onSeek($event)"
+          (change)="onSeek($event)"
         />
         <span class="fs-time">{{ formatTime(playerService.duration()) }}</span>
       </div>

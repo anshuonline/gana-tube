@@ -626,6 +626,17 @@ export class MusicPlayerComponent implements OnDestroy {
     this.scrubTarget = target;
     this.isScrubbing.set(true);
     this.calculateScrub(event);
+    // Also seek immediately on click (not just on mouseup)
+    const rect = target.getBoundingClientRect();
+    let clientX = 0;
+    if (event instanceof MouseEvent) {
+      clientX = event.clientX;
+    } else if ((event as TouchEvent).touches && (event as TouchEvent).touches.length > 0) {
+      clientX = (event as TouchEvent).touches[0].clientX;
+    }
+    const ratio = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
+    const seekTime = ratio * this.playerService.duration();
+    this.playerService.seekTo(seekTime);
   }
 
   calculateScrub(event: MouseEvent | TouchEvent, doSeek = false): void {
