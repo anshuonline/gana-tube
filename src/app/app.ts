@@ -227,14 +227,33 @@ export class App implements OnInit {
   isSearchFocused = signal<boolean>(false);
   searchFilter = signal<'all' | 'songs' | 'albums' | 'playlists'>('all');
   searchGenres = [
-    { title: 'Pop', color: 'linear-gradient(135deg, #FF005B, #8B008B)' },
-    { title: 'Indie', color: 'linear-gradient(135deg, #00C6FF, #0072FF)' },
-    { title: 'Hip Hop', color: 'linear-gradient(135deg, #F7971E, #FFD200)' },
-    { title: 'Romance', color: 'linear-gradient(135deg, #FF416C, #FF4B2B)' },
-    { title: 'Party', color: 'linear-gradient(135deg, #8E2DE2, #4A00E0)' },
-    { title: 'Chill', color: 'linear-gradient(135deg, #11998E, #38EF7D)' },
-    { title: 'Workout', color: 'linear-gradient(135deg, #f12711, #f5af19)' },
-    { title: 'K-Pop', color: 'linear-gradient(135deg, #ff9a9e, #fecfef)' }
+    // Moods & Vibes
+    { title: 'Romance', color: 'linear-gradient(135deg, #FF416C, #FF4B2B)', emoji: '💕' },
+    { title: 'Chill', color: 'linear-gradient(135deg, #11998E, #38EF7D)', emoji: '🧊' },
+    { title: 'Party', color: 'linear-gradient(135deg, #8E2DE2, #4A00E0)', emoji: '🎉' },
+    { title: 'Sad Songs', color: 'linear-gradient(135deg, #2C3E50, #4CA1AF)', emoji: '😢' },
+    { title: 'Workout', color: 'linear-gradient(135deg, #f12711, #f5af19)', emoji: '💪' },
+    { title: 'Sleep', color: 'linear-gradient(135deg, #0f0c29, #302b63)', emoji: '🌙' },
+    { title: 'Devotional', color: 'linear-gradient(135deg, #F09819, #EDDE5D)', emoji: '🙏' },
+    { title: 'Focus', color: 'linear-gradient(135deg, #355C7D, #6C5B7B)', emoji: '🎯' },
+    // Regional
+    { title: 'Bollywood', color: 'linear-gradient(135deg, #FC466B, #3F5EFB)', emoji: '🎬' },
+    { title: 'Kollywood', color: 'linear-gradient(135deg, #00B4DB, #0083B0)', emoji: '🎵' },
+    { title: 'Tollywood', color: 'linear-gradient(135deg, #F7971E, #FFD200)', emoji: '🌟' },
+    { title: 'Punjabi', color: 'linear-gradient(135deg, #FF512F, #DD2476)', emoji: '🥁' },
+    { title: 'Bhojpuri', color: 'linear-gradient(135deg, #f5af19, #f12711)', emoji: '🎤' },
+    { title: 'Haryanvi', color: 'linear-gradient(135deg, #56ab2f, #a8e063)', emoji: '🌾' },
+    { title: 'Marathi', color: 'linear-gradient(135deg, #ee0979, #ff6a00)', emoji: '🪘' },
+    { title: 'Bengali', color: 'linear-gradient(135deg, #4776E6, #8E54E9)', emoji: '🎶' },
+    // Global
+    { title: 'Pop', color: 'linear-gradient(135deg, #FF005B, #8B008B)', emoji: '🎧' },
+    { title: 'Hip Hop', color: 'linear-gradient(135deg, #F7971E, #FFD200)', emoji: '🔥' },
+    { title: 'K-Pop', color: 'linear-gradient(135deg, #ff9a9e, #fecfef)', emoji: '🇰🇷' },
+    { title: 'Indie', color: 'linear-gradient(135deg, #00C6FF, #0072FF)', emoji: '🎸' },
+    { title: 'Lo-Fi', color: 'linear-gradient(135deg, #614385, #516395)', emoji: '📻' },
+    { title: 'Classical', color: 'linear-gradient(135deg, #C9D6FF, #E2E2E2)', emoji: '🎻' },
+    { title: 'EDM', color: 'linear-gradient(135deg, #00F260, #0575E6)', emoji: '🎛️' },
+    { title: 'R&B', color: 'linear-gradient(135deg, #6a3093, #a044ff)', emoji: '🎷' }
   ];
 
   // Track currently loading playlist to prevent race conditions

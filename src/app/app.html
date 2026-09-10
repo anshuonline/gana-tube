@@ -361,14 +361,43 @@
 
           <!-- Browse Genres (when no search active) -->
           <div class="search-genre-section" *ngIf="!hasSearched()">
-            <h3 class="genre-section-title">Browse all</h3>
+            
+            <h3 class="genre-section-title">🎭 Moods & Vibes</h3>
             <div class="genre-grid">
-              <div class="genre-card" *ngFor="let genre of searchGenres" 
-                   [style.background]="genre.color"
-                   (click)="searchByGenre(genre.title)">
-                <span class="genre-name">{{ genre.title }}</span>
-              </div>
+              <ng-container *ngFor="let genre of searchGenres; let i = index">
+                <div class="genre-card" *ngIf="i < 8"
+                     [style.background]="genre.color"
+                     (click)="searchByGenre(genre.title)">
+                  <span class="genre-emoji">{{ genre.emoji }}</span>
+                  <span class="genre-name">{{ genre.title }}</span>
+                </div>
+              </ng-container>
             </div>
+
+            <h3 class="genre-section-title">🇮🇳 Regional</h3>
+            <div class="genre-grid">
+              <ng-container *ngFor="let genre of searchGenres; let i = index">
+                <div class="genre-card" *ngIf="i >= 8 && i < 16"
+                     [style.background]="genre.color"
+                     (click)="searchByGenre(genre.title)">
+                  <span class="genre-emoji">{{ genre.emoji }}</span>
+                  <span class="genre-name">{{ genre.title }}</span>
+                </div>
+              </ng-container>
+            </div>
+
+            <h3 class="genre-section-title">🌍 Global</h3>
+            <div class="genre-grid">
+              <ng-container *ngFor="let genre of searchGenres; let i = index">
+                <div class="genre-card" *ngIf="i >= 16"
+                     [style.background]="genre.color"
+                     (click)="searchByGenre(genre.title)">
+                  <span class="genre-emoji">{{ genre.emoji }}</span>
+                  <span class="genre-name">{{ genre.title }}</span>
+                </div>
+              </ng-container>
+            </div>
+
           </div>
         </div>
 
