@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, computed, inject, HostListener } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, computed, inject, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, Title, Meta } from '@angular/platform-browser';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
@@ -21,7 +21,7 @@ import { AppStateService } from '../../services/app-state.service';
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
-export class PlaylistPageComponent implements OnInit, OnChanges {
+export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   @Input() playlist!: PlaylistMeta;
   @Output() back = new EventEmitter<void>();
 
@@ -44,6 +44,11 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
   menuX = 0;
   menuY = 0;
   activeMenuTrack: any = null;
+
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
+  private originalTitle = '';
+  private originalDescription = '';
 
   @HostListener('window:scroll')
   onScroll(): void {
@@ -68,10 +73,27 @@ export class PlaylistPageComponent implements OnInit, OnChanges {
   constructor() {}
 
   ngOnInit(): void {
+    this.originalTitle = this.titleService.getTitle();
+    this.originalDescription = this.metaService.getTag('name="description"')?.content || '';
+    
     if (this.playlist) {
+      this.titleService.setTitle(`${this.playlist.title} - Listen on GanaTube`);
+      this.metaService.updateTag({ 
+        name: 'description', 
+        content: `Listen to ${this.playlist.title} ${this.playlist.language ? '- ' + this.playlist.language : ''} songs on GanaTube. Unlimited free music without audio ads.` 
+      });
       this.loadSongs();
     }
     this.loadAd();
+  }
+
+  ngOnDestroy(): void {
+    if (this.originalTitle) {
+      this.titleService.setTitle(this.originalTitle);
+    }
+    if (this.originalDescription) {
+      this.metaService.updateTag({ name: 'description', content: this.originalDescription });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -11,6 +11,7 @@ import { LucideChevronDown, LucideChevronUp, LucideTrash2, LucidePlus, LucideX, 
 interface CustomSection {
   title: string;
   songs: YouTubeSearchResult[];
+  ytPlaylistId?: string;
 }
 
 @Component({
@@ -29,9 +30,10 @@ export class ManagegtSectionsComponent implements OnInit {
   currentSections: CustomSection[] = [];
 
   // Add new section state
-  createMode: 'simple' | 'json' = 'simple';
+  createMode: 'simple' | 'json' | 'playlist' = 'simple';
   newSectionTitle = '';
   jsonInput = '';
+  ytPlaylistId = '';
   isFetching = false;
   isPublishing = false;
   fetchProgress = 0;
@@ -257,6 +259,85 @@ export class ManagegtSectionsComponent implements OnInit {
     this.newSectionTitle = '';
     this.fetchError = '';
     this.openSection(0);
+  }
+
+  async addSectionFromPlaylist() {
+    if (!this.newSectionTitle.trim()) {
+      this.fetchError = 'Please provide a section title.';
+      return;
+    }
+    if (!this.ytPlaylistId.trim()) {
+      this.fetchError = 'Please provide a YouTube Playlist ID or URL.';
+      return;
+    }
+
+    this.isFetching = true;
+    this.fetchError = '';
+    this.publishMessage = '';
+
+    try {
+      let playlistId = this.ytPlaylistId.trim();
+      if (playlistId.includes('list=')) {
+        playlistId = playlistId.split('list=')[1].split('&')[0];
+      }
+
+      const results = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
+      
+      if (results && results.length > 0) {
+        this.currentSections.unshift({
+          title: this.newSectionTitle.trim(),
+          songs: results,
+          ytPlaylistId: playlistId
+        });
+        
+        this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+        this.publishSections(true);
+        
+        this.newSectionTitle = '';
+        this.ytPlaylistId = '';
+        this.openSection(0);
+      } else {
+        this.fetchError = 'Could not fetch songs. Invalid Playlist ID or playlist is empty.';
+      }
+    } catch (e: any) {
+      this.fetchError = 'Failed to fetch playlist: ' + (e.message || 'Unknown error');
+    } finally {
+      this.isFetching = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async syncSectionWithPlaylist(index: number) {
+    let playlistId = this.currentSections[index].ytPlaylistId?.trim();
+    if (!playlistId) {
+      alert('Please enter a YouTube Playlist ID or URL to sync.');
+      return;
+    }
+    
+    if (playlistId.includes('list=')) {
+      playlistId = playlistId.split('list=')[1].split('&')[0];
+      this.currentSections[index].ytPlaylistId = playlistId; // normalize it
+    }
+
+    try {
+      this.isPublishing = true;
+      this.publishMessage = 'Fetching playlist...';
+      const results = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
+      if (results && results.length > 0) {
+        this.currentSections[index].songs = results;
+        this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+        await this.publishSections();
+        alert('Playlist synced successfully! Songs updated.');
+      } else {
+        alert('Could not fetch songs. Invalid Playlist ID or playlist is empty.');
+      }
+    } catch(e: any) {
+      alert('Error fetching playlist: ' + (e.message || 'Unknown error'));
+    } finally {
+      this.isPublishing = false;
+      this.publishMessage = '';
+      this.cdr.detectChanges();
+    }
   }
 
   async addSection() {

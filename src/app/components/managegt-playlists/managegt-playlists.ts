@@ -192,7 +192,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
     }
 
     if (!this.jsonInput.trim()) {
-      this.fetchError = 'Please paste a JSON list of songs';
+      this.fetchError = 'Please paste a JSON list of songs or a YouTube Playlist ID/URL';
       return;
     }
 
@@ -207,53 +207,78 @@ export class ManagegtPlaylistsComponent implements OnInit {
     }
 
     let searchQueries: string[] = [];
-    try {
-      searchQueries = JSON.parse(this.jsonInput);
-      if (!Array.isArray(searchQueries)) {
-        throw new Error('Must be an array');
+    let isYtPlaylist = false;
+    let playlistId = '';
+
+    const inputTrimmed = this.jsonInput.trim();
+    // Simple check: if it looks like a URL with list= or starts with PL/RDCLAK, treat as playlist
+    if (inputTrimmed.includes('list=') || /^PL[a-zA-Z0-9_-]+$/.test(inputTrimmed) || /^RDCLAK[a-zA-Z0-9_-]+$/.test(inputTrimmed) || /^OLAK5uy_[a-zA-Z0-9_-]+$/.test(inputTrimmed)) {
+      isYtPlaylist = true;
+      if (inputTrimmed.includes('list=')) {
+        playlistId = inputTrimmed.split('list=')[1].split('&')[0];
+      } else {
+        playlistId = inputTrimmed;
       }
-    } catch (e) {
-      this.fetchError = 'Invalid JSON format. Please paste a valid JSON array like ["Song 1", "Song 2"]';
-      return;
+    } else {
+      try {
+        searchQueries = JSON.parse(inputTrimmed);
+        if (!Array.isArray(searchQueries)) {
+          throw new Error('Must be an array');
+        }
+      } catch (e) {
+        this.fetchError = 'Invalid format. Please paste a YT Playlist URL/ID OR a valid JSON array like ["Song 1"]';
+        return;
+      }
     }
 
     this.isFetching = true;
     this.fetchProgress = 0;
-    this.totalToFetch = searchQueries.length;
+    this.totalToFetch = isYtPlaylist ? 1 : searchQueries.length;
     this.cdr.detectChanges();
 
     try {
-      // 1. Fetch Songs chunk by chunk
-      const allResults: YouTubeSearchResult[] = [];
-      const chunkSize = 5;
-      
-      for (let i = 0; i < searchQueries.length; i += chunkSize) {
-        const chunk = searchQueries.slice(i, i + chunkSize);
-        const promises = chunk.map(async (query) => {
-          try {
-            const results = await firstValueFrom(
-              this.youtubeApi.searchMusic(query, 1).pipe(
-                timeout(5000),
-                catchError(() => of([]))
-              )
-            );
-            if (results && results.length > 0) {
-              allResults.push(results[0]);
-            }
-          } catch (e) {
-            console.error('Error fetching song', query, e);
-          } finally {
-            this.fetchProgress++;
-            this.cdr.detectChanges();
-          }
-        });
+      let allResults: YouTubeSearchResult[] = [];
+
+      if (isYtPlaylist) {
+        const results = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
+        if (results && results.length > 0) {
+          allResults = results;
+          this.fetchProgress = 1;
+        } else {
+          throw new Error('Could not fetch songs from the provided playlist. Make sure it is public.');
+        }
+      } else {
+        // Fetch Songs chunk by chunk
+        const chunkSize = 5;
         
-        await Promise.all(promises);
-        if (i + chunkSize < searchQueries.length) {
-          await new Promise(res => setTimeout(res, 1000));
+        for (let i = 0; i < searchQueries.length; i += chunkSize) {
+          const chunk = searchQueries.slice(i, i + chunkSize);
+          const promises = chunk.map(async (query) => {
+            try {
+              const results = await firstValueFrom(
+                this.youtubeApi.searchMusic(query, 1).pipe(
+                  timeout(5000),
+                  catchError(() => of([]))
+                )
+              );
+              if (results && results.length > 0) {
+                allResults.push(results[0]);
+              }
+            } catch (e) {
+              console.error('Error fetching song', query, e);
+            } finally {
+              this.fetchProgress++;
+              this.cdr.detectChanges();
+            }
+          });
+          
+          await Promise.all(promises);
+          if (i + chunkSize < searchQueries.length) {
+            await new Promise(res => setTimeout(res, 1000));
+          }
         }
       }
-      
+
       // 2. Upload Image (Replaced with Link)
       const imageUrl = this.newPlaylistCoverUrl.trim();
 

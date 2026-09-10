@@ -226,7 +226,17 @@ export class App implements OnInit {
   isSearchMode = signal<boolean>(false);
   isSearchFocused = signal<boolean>(false);
   searchFilter = signal<'all' | 'songs' | 'albums' | 'playlists'>('all');
-  
+  searchGenres = [
+    { title: 'Pop', color: 'linear-gradient(135deg, #FF005B, #8B008B)' },
+    { title: 'Indie', color: 'linear-gradient(135deg, #00C6FF, #0072FF)' },
+    { title: 'Hip Hop', color: 'linear-gradient(135deg, #F7971E, #FFD200)' },
+    { title: 'Romance', color: 'linear-gradient(135deg, #FF416C, #FF4B2B)' },
+    { title: 'Party', color: 'linear-gradient(135deg, #8E2DE2, #4A00E0)' },
+    { title: 'Chill', color: 'linear-gradient(135deg, #11998E, #38EF7D)' },
+    { title: 'Workout', color: 'linear-gradient(135deg, #f12711, #f5af19)' },
+    { title: 'K-Pop', color: 'linear-gradient(135deg, #ff9a9e, #fecfef)' }
+  ];
+
   // Track currently loading playlist to prevent race conditions
   currentLoadingPlaylistId: string | null = null;
 
@@ -628,7 +638,14 @@ export class App implements OnInit {
     }
   }
 
-  // --- Performance Optimization ---
+  searchByGenre(genre: string) {
+    if (this.searchBar) {
+      this.searchBar.query = genre;
+    }
+    this.onSearch(genre);
+  }
+
+  // --- Search Integration ---
   trackByVideoId(index: number, track: any): string {
     return track.videoId;
   }

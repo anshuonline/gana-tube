@@ -358,6 +358,18 @@
               <button class="filter-chip" [class.active]="searchFilter() === 'playlists'" (click)="setSearchFilter('playlists')">Playlists</button>
             </div>
           </div>
+
+          <!-- Browse Genres (when no search active) -->
+          <div class="search-genre-section" *ngIf="!hasSearched()">
+            <h3 class="genre-section-title">Browse all</h3>
+            <div class="genre-grid">
+              <div class="genre-card" *ngFor="let genre of searchGenres" 
+                   [style.background]="genre.color"
+                   (click)="searchByGenre(genre.title)">
+                <span class="genre-name">{{ genre.title }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Recommendation Shelves (Home Screen) -->

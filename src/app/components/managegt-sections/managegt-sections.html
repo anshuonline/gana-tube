@@ -81,6 +81,7 @@
 
       <div class="mode-toggle">
         <button [class.active]="createMode === 'simple'" (click)="createMode = 'simple'" class="mode-btn">Name Only</button>
+        <button [class.active]="createMode === 'playlist'" (click)="createMode = 'playlist'" class="mode-btn">YT Playlist</button>
         <button [class.active]="createMode === 'json'" (click)="createMode = 'json'" class="mode-btn">Advanced JSON</button>
       </div>
 
@@ -113,6 +114,21 @@
         </span>
       </button>
 
+      <!-- Playlist Mode Inputs -->
+      <div class="form-group" *ngIf="createMode === 'playlist'">
+        <label>YouTube Playlist ID or URL</label>
+        <input type="text" [(ngModel)]="ytPlaylistId" placeholder="e.g. PL... or https://youtube.com/playlist?list=PL..." class="form-input" />
+      </div>
+
+      <!-- Button for Playlist mode -->
+      <button *ngIf="createMode === 'playlist'" class="submit-btn" [disabled]="isFetching || isPublishing" (click)="addSectionFromPlaylist()">
+        <span *ngIf="!isFetching && !isPublishing">Import & Publish Playlist</span>
+        <span *ngIf="isFetching || isPublishing" class="loading-text">
+          <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          Processing...
+        </span>
+      </button>
+
       <!-- Button for Simple mode -->
       <button *ngIf="createMode === 'simple'" class="submit-btn" [disabled]="isPublishing" (click)="createEmptySection()">
         <span>Create Empty Section</span>
@@ -133,6 +149,17 @@
           <h2>{{ currentSections[activeSectionIndex].title }}</h2>
           <span class="badge">{{ currentSections[activeSectionIndex].songs.length }} Songs</span>
         </div>
+      </div>
+
+      <div class="section-playlist-link">
+         <label style="display:block; margin-bottom: 8px; font-weight: 500;">Linked YT Playlist (Optional)</label>
+         <div style="display:flex; gap:10px; margin-bottom: 20px;">
+            <input type="text" [(ngModel)]="currentSections[activeSectionIndex].ytPlaylistId" placeholder="Paste YT Playlist Link/ID to sync" class="form-input" style="margin-bottom:0;">
+            <button class="submit-btn" style="width:auto; padding: 0 16px; margin-top:0;" [disabled]="isPublishing" (click)="syncSectionWithPlaylist(activeSectionIndex)">
+              <span *ngIf="!isPublishing">Sync / Fetch</span>
+              <span *ngIf="isPublishing">Syncing...</span>
+            </button>
+         </div>
       </div>
 
       <div class="songs-list-container">

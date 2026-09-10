@@ -17,7 +17,7 @@ declare var webkitSpeechRecognition: any;
   template: `
     <div class="search-wrapper">
       <div class="search-bar" [class.focused]="isFocused">
-        <svg lucideSearch class="search-icon" [attr.size]="24" (click)="onSearch()"></svg>
+        <svg lucideSearch class="search-icon left-icon" [attr.size]="20"></svg>
         <input
           #searchInput
           id="music-search-input"
@@ -38,12 +38,10 @@ declare var webkitSpeechRecognition: any;
         <div class="divider"></div>
 
         <button 
-          class="voice-btn" 
-          [class.listening]="isListening"
-          (click)="toggleVoiceSearch()" 
-          title="Voice Search">
-          <svg *ngIf="!isListening" lucideMic [attr.size]="22"></svg>
-          <svg *ngIf="isListening" lucideLoader2 class="spin" [attr.size]="22"></svg>
+          class="voice-btn search-submit-btn" 
+          (click)="onSearch()" 
+          title="Search">
+          <svg lucideSearch [attr.size]="20"></svg>
         </button>
       </div>
 

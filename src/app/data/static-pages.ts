@@ -18,7 +18,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <li><strong>On iOS (Safari):</strong> Tap the Share button at the bottom of the screen and select "Add to Home Screen".</li>
           <li><strong>On Desktop (Chrome/Edge):</strong> Look for the install icon (a small screen with a downward arrow) in the right side of your URL address bar.</li>
         </ul>
-        <p>Once installed, GanaTube will launch as a standalone application without the browser interface, providing a more immersive experience and enabling features like background playback more reliably.</p>
+        <p>Once installed, GanaTube will launch as a standalone application without the browser interface, providing a more immersive experience.</p>
 
         <h4>3. Creating an Account (Optional)</h4>
         <p>GanaTube is 100% free and you can start listening immediately without signing up. However, utilizing the optional Google Login unlocks essential features:</p>
@@ -38,8 +38,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <li><strong>Lyrics (Where Available):</strong> Sing along with synchronized lyrics accessible directly from the player.</li>
         </ul>
 
-        <h4>Background Playback</h4>
-        <p>One of our most popular features. Simply start playing a song, and switch to another app or lock your screen. The music will continue to play flawlessly. On most modern devices, you will also see media controls on your lock screen and notification shade, allowing you to control playback without reopening the app.</p>
+
 
         <h4>Smart Algorithmic Queuing (Auto-Play)</h4>
         <p>Never run out of music. When your current song or playlist ends, GanaTube's intelligent engine takes over. It analyzes the metadata (genre, artist, language, tempo) of what you were just listening to and instantly generates an infinite queue of similar tracks. It's like having a personal DJ who knows exactly what vibe you're going for.</p>
@@ -51,8 +50,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h4>Minimize Mode (Floating Mini Player)</h4>
         <p>Want to browse the app while keeping an eye on what's playing? Minimize Mode shrinks the player down to a floating widget that you can drag around the screen while you search for new tracks, create playlists, or browse the discovery page.</p>
 
-        <h3>Offline Listening & Downloads</h3>
-        <p>Taking a flight or heading somewhere with poor internet? You can download songs directly within GanaTube. We utilize advanced browser storage (IndexedDB) to cache encrypted audio files directly on your device. Just tap the download icon on any track, album, or playlist. Access your offline library from the "Downloads" tab in your library. Note: Downloaded files are managed by the browser and will be cleared if you clear your browser's site data.</p>
+
 
         <h3>Discovery and Exploration</h3>
         <h4>Language-Based Recommendations</h4>
@@ -79,12 +77,12 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>100% Free & Uninterrupted</h3>
         <ul class="feature-list">
           <li><strong>Zero Audio Ads:</strong> Unlike other free tiers that interrupt your vibe with jarring audio advertisements every three songs, GanaTube guarantees absolute zero audio ads between tracks. Period.</li>
-          <li><strong>No Paywalls or Subscriptions:</strong> Every feature listed on this page is available to every user. We don't hide high-quality audio, offline downloads, or background play behind a monthly fee.</li>
+          <li><strong>No Paywalls or Subscriptions:</strong> Every feature listed on this page is available to every user. We don't hide high-quality audio behind a monthly fee.</li>
         </ul>
 
         <h3>Advanced Playback Capabilities</h3>
         <ul class="feature-list">
-          <li><strong>Background Playback:</strong> Lock your screen, open another app, check your messages. Your music keeps playing seamlessly. No hacks or workarounds required.</li>
+
           <li><strong>Smart Algorithmic Queuing:</strong> Our intelligent engine auto-generates infinite, perfectly tailored queues based on the track, artist, or genre you are currently enjoying. The music never has to stop.</li>
           <li><strong>Car Mode:</strong> A simplified, high-contrast interface with massive buttons designed specifically for safe operation while driving.</li>
           <li><strong>Minimize Mode:</strong> A floating mini-player that lets you navigate the app, search, and manage playlists without losing sight or control of the current track.</li>
@@ -94,7 +92,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>Seamless Integration & Technology</h3>
         <ul class="feature-list">
           <li><strong>Progressive Web App (PWA):</strong> Install GanaTube directly from your browser to your home screen or desktop. It behaves exactly like a native app, utilizing negligible storage space compared to traditional applications.</li>
-          <li><strong>Offline Downloads:</strong> Save your favorite tracks, albums, and playlists directly to your device via your browser's IndexedDB. Listen anywhere, even in airplane mode or subways without internet.</li>
+
           <li><strong>Keyboard Shortcuts:</strong> Power users on desktop can navigate effortlessly. Use Ctrl+K for instant search, Spacebar for Play/Pause, Arrow keys for track navigation, and more.</li>
         </ul>
 
@@ -125,7 +123,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <div class="faq-item">
           <h3>1. Is GanaTube really 100% free?</h3>
-          <p>Yes. GanaTube is completely free to use. There are no premium subscriptions, no hidden fees, and absolutely no paywalls. Every feature, from offline downloads to background playback, is available to all users.</p>
+          <p>Yes. GanaTube is completely free to use. There are no premium subscriptions, no hidden fees, and absolutely no paywalls. Every feature is available to all users.</p>
         </div>
 
         <div class="faq-item">
@@ -138,15 +136,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <p>GanaTube acts as a highly optimized, custom interface. We utilize official third-party APIs (primarily the YouTube API) to source and stream audio content. We do not host, store, or distribute any copyrighted audio files on our own servers. We simply provide a superior player experience for publicly available streams.</p>
         </div>
 
-        <div class="faq-item">
-          <h3>4. How do I enable Background Playback on my phone?</h3>
-          <p>Background playback works automatically on most modern devices! Simply start playing a track and minimize the browser or lock your screen. For the most reliable experience, we strongly recommend installing GanaTube as a PWA (Add to Home Screen) rather than running it inside a standard browser tab.</p>
-        </div>
 
-        <div class="faq-item">
-          <h3>5. How does the Offline Download feature work?</h3>
-          <p>When you click the download icon, GanaTube downloads the audio data and stores it locally in your device's browser storage using a technology called IndexedDB. These are not standard MP3 files that you can share via Bluetooth; they are encrypted cache files readable only by the GanaTube app. If you clear your browser's site data/cache, your downloaded songs will be deleted.</p>
-        </div>
 
         <div class="faq-item">
           <h3>6. Do I need to create an account?</h3>
@@ -178,10 +168,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <p>Open the player settings (gear icon) and change the Music Quality from "High" or "Standard" to "Data Saver". This streams the audio at a lower bitrate, consuming significantly less mobile data.</p>
         </div>
 
-        <div class="faq-item">
-          <h3>12. Why did my downloaded offline songs disappear?</h3>
-          <p>Offline songs are stored in your browser's cache. If you used a "cache cleaner" app, cleared your browser history/site data, or if your device ran extremely low on storage space, the OS or browser may have automatically cleared the IndexedDB storage to free up room.</p>
-        </div>
+
 
         <div class="faq-item">
           <h3>13. Is GanaTube available on iOS/iPhone?</h3>
@@ -226,7 +213,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <h3>Our Mission</h3>
         <p><strong>To democratize access to a premium music listening experience for everyone, regardless of their ability to pay.</strong></p>
-        <p>We believe that background playback is not a luxury that should cost $10 a month. We believe that an uninterrupted listening experience without screaming audio ads is a baseline requirement, not a premium perk. We are committed to maintaining a platform where the barriers to entry are nonexistent.</p>
+        <p>We believe that an uninterrupted listening experience without screaming audio ads is a baseline requirement, not a premium perk. We are committed to maintaining a platform where the barriers to entry are nonexistent.</p>
 
         <h3>Our Vision for the Future</h3>
         <p>We are constantly iterating and improving. Our vision for GanaTube is to become the definitive unified music platform for the Indian subcontinent and beyond. We are heavily focused on localization, ensuring that whether you listen to Bhojpuri folk, Punjabi hip-hop, Tamil cinema tracks, or global pop, GanaTube feels custom-tailored to your cultural context.</p>
@@ -268,15 +255,14 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <h4>1.2 Information Collected Automatically</h4>
         <ul class="feature-list">
-          <li><strong>Usage Data:</strong> We automatically collect information regarding how you interact with the Service. This includes your search queries, the songs and playlists you listen to, the features you use (e.g., Car Mode, Downloads), and your language preferences. This data is essential for our smart algorithmic queuing and recommendation systems.</li>
+          <li><strong>Usage Data:</strong> We automatically collect information regarding how you interact with the Service. This includes your search queries, the songs and playlists you listen to, the features you use (e.g., Car Mode), and your language preferences. This data is essential for our smart algorithmic queuing and recommendation systems.</li>
           <li><strong>Device and Connection Information:</strong> We collect hardware models, operating system versions, browser types, and IP addresses. This helps us optimize the Service for different devices and diagnose technical issues.</li>
-          <li><strong>Local Storage Data:</strong> When you use the "Offline Download" feature, we store encrypted audio cache data locally on your device using IndexedDB. This data remains on your device and is not transmitted back to our servers.</li>
         </ul>
 
         <h3>2. How We Use Your Information</h3>
         <p>We use the collected information for the following specific purposes:</p>
         <ul class="feature-list">
-          <li><strong>To Provide and Maintain the Service:</strong> Ensuring audio streams seamlessly, syncing your playlists across devices (if logged in), and facilitating offline downloads.</li>
+          <li><strong>To Provide and Maintain the Service:</strong> Ensuring audio streams seamlessly, and syncing your playlists across devices (if logged in).</li>
           <li><strong>To Personalize Your Experience:</strong> Using your listening history and language preferences to power the "Smart Algorithmic Queue" and generate relevant homepage recommendations.</li>
           <li><strong>To Improve our Platform:</strong> Analyzing aggregated, anonymized usage data to understand which features are popular, identify bugs, and plan future developments.</li>
           <li><strong>To Communicate with You:</strong> Responding to your support requests, inquiries, or feedback submitted to support@ganatube.in.</li>
@@ -323,7 +309,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>2. Acceptable Use</h3>
         <p>You agree not to use the Service in any way that causes, or may cause, damage to the Service or impairment of the availability or accessibility of the Service; or in any way which is unlawful, illegal, fraudulent, or harmful. Specifically, you agree NOT to:</p>
         <ul class="feature-list">
-          <li>Use the Service to extract, rip, or permanently download copyrighted audio streams into shareable formats (e.g., MP3 files) for distribution. The "Offline Download" feature provided by GanaTube caches encrypted data strictly within the browser environment for temporary offline listening within the GanaTube interface only.</li>
+          <li>Use the Service to extract, rip, or permanently download copyrighted audio streams into shareable formats (e.g., MP3 files) for distribution.</li>
           <li>Attempt to reverse engineer, decompile, or bypass any security measures implemented by GanaTube or the underlying third-party APIs.</li>
           <li>Use the Service to build a competitive product or service.</li>
           <li>Engage in any automated use of the system, such as using scripts to send automated queries or artificially inflate play counts.</li>
@@ -381,11 +367,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <li><strong>UI Preferences:</strong> Your language selection, theme choice (Dark Mode), and UI mode (Car Mode toggles) are saved locally.</li>
         </ul>
 
-        <h4>B. Offline Downloads (IndexedDB)</h4>
-        <p>This is the largest use of storage on GanaTube.</p>
-        <ul class="feature-list">
-          <li><strong>Audio Cache:</strong> When you use the "Download" feature, we download the audio stream and store it securely within your browser's IndexedDB. This allows you to listen to music without an active internet connection. This data is massive compared to standard cookies and is stored entirely on your device; it is never uploaded to our servers.</li>
-        </ul>
+
 
         <h4>C. Analytics and Performance</h4>
         <p>We use minimal third-party analytics (which may set traditional cookies) to understand aggregated traffic patterns, such as how many active users we have and which features (like Listen Together or Shorts) are used most often. This data is anonymized and helps us improve server infrastructure.</p>
@@ -393,8 +375,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>3. Controlling Your Storage</h3>
         <p>Because GanaTube relies on Local Storage and IndexedDB rather than traditional cookies, standard "cookie blockers" may not affect the app, but clearing your browser's "Site Data" will.</p>
         
-        <h4>Managing IndexedDB (Offline Downloads)</h4>
-        <p>You can manage your downloaded songs directly within the GanaTube interface under the "Downloads" or "Library" section, where you can delete specific tracks to free up space.</p>
+
         
         <h4>Clearing All App Data</h4>
         <p>If you wish to completely wipe all GanaTube data from your device:</p>
@@ -403,7 +384,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <li><strong>On Android (Chrome):</strong> Go to Settings > Site settings > All sites > ganatube.in, and tap "Clear & reset".</li>
           <li><strong>On iOS (Safari):</strong> Go to Settings > Safari > Advanced > Website Data, search for ganatube.in, and delete it.</li>
         </ul>
-        <p><strong>Warning:</strong> Doing this will instantly delete all your downloaded offline music, sign you out, and reset your UI preferences.</p>
+        <p><strong>Warning:</strong> Doing this will instantly sign you out, and reset your UI preferences.</p>
 
         <h3>4. Updates to This Policy</h3>
         <p>We may update this policy periodically to reflect changes in the technologies we use or for other operational or legal reasons. Please revisit this page regularly to stay informed.</p>
@@ -462,9 +443,8 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>3. Service Availability and Performance</h3>
         <p>The GanaTube service is provided on an "as is" and "as available" basis. While we strive to maintain 100% uptime, the functionality of the platform relies heavily on the availability and stability of third-party APIs. If these underlying APIs change their structure, experience downtime, or restrict our access, the GanaTube platform may temporarily or permanently lose functionality without prior notice. We make no guarantees regarding uninterrupted access, speed, or flawless operation.</p>
 
-        <h3>4. Data Usage and Offline Downloads</h3>
+        <h3>4. Data Usage</h3>
         <p>Users who utilize the platform on mobile networks are solely responsible for any data charges incurred. While GanaTube provides a "Data Saver" mode, audio streaming can consume significant bandwidth.</p>
-        <p>The "Offline Download" feature caches encrypted data locally within the user's browser environment (via IndexedDB). This feature is intended for personal, non-commercial offline listening within the GanaTube application only. Users are strictly prohibited from attempting to extract, decrypt, or distribute these cached files. GanaTube is not responsible for data loss if the browser cache is cleared by the user or the operating system.</p>
 
         <h3>5. "No Ads" Guarantee Definition</h3>
         <p>Our promise of "Zero Audio Ads" refers strictly to the audio streaming experience provided through our custom interface, wherein we actively filter or utilize API endpoints that do not serve interstitial audio advertisements between tracks. GanaTube reserves the right to monetize the platform through non-intrusive visual display advertising on the website itself to support server costs.</p>
