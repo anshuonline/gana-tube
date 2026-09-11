@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
   // --- Listening Rooms Events ---
   socket.on('room:create', ({ name, isPublic, adminUser }) => {
     const roomId = nanoid(6).toUpperCase();
-    const joinCode = isPublic ? null : nanoid(6);
+    const joinCode = isPublic ? null : roomId;
     
     const room = {
       roomId,
@@ -224,7 +224,7 @@ io.on('connection', (socket) => {
     
     room.isPublic = !room.isPublic;
     if (!room.isPublic && !room.joinCode) {
-      room.joinCode = nanoid(6);
+      room.joinCode = room.roomId;
       room.codeExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
     }
     io.to(roomId).emit('room:state', room);
@@ -236,7 +236,7 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomId);
     if (!room || room.adminUid !== socket.id) return;
     
-    room.joinCode = nanoid(6);
+    room.joinCode = room.roomId;
     room.codeExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
     io.to(roomId).emit('room:state', room);
   });

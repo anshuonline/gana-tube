@@ -19,9 +19,15 @@ import {
   LucideCopy,
   LucideRefreshCw,
   LucideTrash2,
-  LucideMusic
+  LucideMusic,
+  LucideSearch,
+  LucideMoreVertical,
+  LucideRepeat,
+  LucideRepeat1
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
+import { TrackMenuComponent } from '../../track-menu/track-menu.component';
+import { AppStateService } from '../../../services/app-state.service';
 
 @Component({
   selector: 'app-room-view',
@@ -42,7 +48,12 @@ import { RoomMembersPanelComponent } from '../room-members-panel/room-members-pa
     LucideRefreshCw,
     LucideTrash2,
     LucideMusic,
-    RoomMembersPanelComponent
+    LucideSearch,
+    LucideMoreVertical,
+    LucideRepeat,
+    LucideRepeat1,
+    RoomMembersPanelComponent,
+    TrackMenuComponent
   ],
   templateUrl: './room-view.component.html',
   styleUrls: ['./room-view.component.scss']
@@ -54,12 +65,19 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   private toastService = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private appState = inject(AppStateService);
 
   @ViewChild('chatScroll') private chatScrollContainer!: ElementRef;
 
   chatInput = '';
   showMembersPanel = false;
   activeMobileTab: 'queue' | 'chat' = 'chat';
+  
+  // Track Menu state
+  isMenuOpen = false;
+  menuX = 0;
+  menuY = 0;
+  activeMenuTrack: any = null;
   
   private routeSub: any;
 
@@ -157,5 +175,31 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  openSearch() {
+    this.router.navigate(['/search']);
+  }
+
+  openTrackMenu(track: Track, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeMenuTrack = track;
+    this.menuX = event.clientX;
+    this.menuY = event.clientY;
+    this.isMenuOpen = true;
+  }
+
+  closeTrackMenu(): void {
+    this.isMenuOpen = false;
+    this.activeMenuTrack = null;
+  }
+
+  openSaveModal(track: any) {
+    this.appState.openSavePlaylist(track);
+  }
+
+  removeFromPlaylist(track: any): void {
+    // No-op for room view, removing from queue is handled by removeQueueItem
+    this.closeTrackMenu();
   }
 }

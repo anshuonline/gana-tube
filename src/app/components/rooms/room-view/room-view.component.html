@@ -78,6 +78,10 @@
       
       <!-- Controls -->
       <div class="controls" [class.disabled]="!roomService.isAdmin()">
+        <button class="btn-control secondary" [class.active]="playerService.repeatMode() !== 'none'" (click)="playerService.toggleRepeat()" [disabled]="!roomService.isAdmin()" title="Repeat">
+          <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" stroke="#9333ea"></svg>
+          <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+        </button>
         <button class="btn-control" (click)="previousTrack()" [disabled]="!roomService.isAdmin()">
           <svg lucideSkipBack [attr.size]="24"></svg>
         </button>
@@ -87,6 +91,9 @@
         </button>
         <button class="btn-control" (click)="nextTrack()" [disabled]="!roomService.isAdmin()">
           <svg lucideSkipForward [attr.size]="24"></svg>
+        </button>
+        <button class="btn-control secondary" (click)="openSearch()" title="Search & Add Songs">
+          <svg lucideSearch [attr.size]="20"></svg>
         </button>
       </div>
       <div class="admin-note" *ngIf="!roomService.isAdmin()">
@@ -113,13 +120,15 @@
         <div class="queue-list">
           <div class="queue-item" *ngFor="let track of playerService.queue(); let i = index" [class.active]="i === playerService.currentIndex()">
             <img [src]="track.thumbnail" alt="Thumb">
-            <div class="item-info">
-              <span class="title">{{track.title}}</span>
-              <span class="artist">{{track.channelTitle}}</span>
+            <div class="queue-meta">
+              <span class="queue-title">{{track.title}}</span>
+              <span class="queue-artist">{{track.channelTitle}}</span>
             </div>
-            <!-- Admin only delete -->
-            <button class="btn-remove" *ngIf="roomService.isAdmin() && i !== playerService.currentIndex()" (click)="removeQueueItem(i)">
-              <svg lucideTrash2 [attr.size]="16"></svg>
+            <button class="queue-menu-btn" (click)="openTrackMenu(track, $event)" title="More Options" style="background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px;">
+              <svg lucideMoreVertical [attr.size]="18"></svg>
+            </button>
+            <button class="queue-remove-btn" (click)="removeQueueItem(i); $event.stopPropagation()" *ngIf="roomService.isAdmin()" title="Remove">
+              <svg lucideTrash2 [attr.size]="14"></svg>
             </button>
           </div>
           <div class="empty-queue" *ngIf="playerService.queue().length === 0">
@@ -163,5 +172,18 @@
     </section>
   </div>
 </div>
+
+<app-track-menu
+  *ngIf="isMenuOpen"
+  [track]="activeMenuTrack"
+  [isOpen]="isMenuOpen"
+  [xPos]="menuX"
+  [yPos]="menuY"
+  playlistContextId="room-queue"
+  [isOwner]="false"
+  (removeFromPlaylist)="removeFromPlaylist($event)"
+  (openPlaylist)="openSaveModal($event)"
+  (closeMenu)="closeTrackMenu()">
+</app-track-menu>
 
 <app-room-members-panel *ngIf="showMembersPanel" (close)="showMembersPanel = false"></app-room-members-panel>
