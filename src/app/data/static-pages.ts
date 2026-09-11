@@ -489,5 +489,151 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         </ul>
       </div>
     `
+  },
+  'release-notes': {
+    title: 'Release Notes - GanaTube Changelog',
+    html: `
+      <div class="static-content-block">
+        <h2>Release Notes</h2>
+        <p>A comprehensive log of all major updates, improvements, and fixes shipped to GanaTube. We are committed to continuous improvement and ship updates regularly.</p>
+
+        <div class="faq-item">
+          <h3>v3.8 -- September 2026</h3>
+          <h4>Repeat Mode Visual Feedback</h4>
+          <ul class="feature-list">
+            <li>Fixed repeat mode icon not updating on click in Full Screen Player and Car Mode.</li>
+            <li>Users can now clearly distinguish between Repeat Off, Repeat All, and Repeat One states via distinct icon and color changes.</li>
+          </ul>
+          <h4>Genre Card Visual Overhaul</h4>
+          <ul class="feature-list">
+            <li>Added a radial glow and drop-shadow behind genre card emojis for improved visibility and a premium aesthetic.</li>
+            <li>Emoji now scales up on hover for tactile feedback.</li>
+          </ul>
+          <h4>Release Notes Page</h4>
+          <ul class="feature-list">
+            <li>Introduced this dedicated Release Notes page, accessible from the footer, to keep users informed of all platform updates.</li>
+          </ul>
+        </div>
+
+        <div class="faq-item">
+          <h3>v3.7 -- September 2026</h3>
+          <h4>Full Screen Player Enhancements</h4>
+          <ul class="feature-list">
+            <li>Implemented smooth track transition animations with fade-in/fade-out effects when switching songs.</li>
+            <li>Added high-resolution cover art loading with automatic fallback to standard quality on slow connections.</li>
+            <li>Integrated a loading spinner overlay when tracks are buffering.</li>
+          </ul>
+          <h4>Analytics Dashboard</h4>
+          <ul class="feature-list">
+            <li>Deployed internal analytics API for tracking daily active users, top played tracks, and device distribution.</li>
+          </ul>
+          <h4>SEO and Metadata</h4>
+          <ul class="feature-list">
+            <li>Added sitemap.xml and updated site.webmanifest for improved search engine indexing and PWA compliance.</li>
+            <li>Added comprehensive static pages: Privacy Policy, Terms of Service, Cookie Policy, DMCA, Disclaimer, About, FAQ, Features, How It Works, and Contact.</li>
+          </ul>
+        </div>
+
+        <div class="faq-item">
+          <h3>v3.6 -- August 2026</h3>
+          <h4>Advertising Platform</h4>
+          <ul class="feature-list">
+            <li>Launched the Advertise With Us portal with self-service ad booking, ad terms documentation, and prohibited content guidelines.</li>
+            <li>Added support for Player Cover Ads, In-Feed Banner Ads, and Bottom Player Ads with custom HTML/iframe support.</li>
+          </ul>
+          <h4>Spin Wheel and Rewards</h4>
+          <ul class="feature-list">
+            <li>Introduced the Lucky Draw Spin Wheel feature with daily spins and prize tracking via the rewards history panel.</li>
+          </ul>
+          <h4>ManageGT Admin Panel</h4>
+          <ul class="feature-list">
+            <li>Built internal management dashboard for curating playlists, managing custom homepage sections, and configuring ad placements.</li>
+          </ul>
+        </div>
+
+        <div class="faq-item">
+          <h3>v3.5 -- July 2026</h3>
+          <h4>Car Mode</h4>
+          <ul class="feature-list">
+            <li>Designed and shipped a distraction-free Car Mode with oversized controls, voice search, and ambient background blur derived from album art.</li>
+            <li>Integrated voice search using the Web Speech API for hands-free song discovery while driving.</li>
+          </ul>
+          <h4>Playlist System</h4>
+          <ul class="feature-list">
+            <li>Implemented full custom playlist support with create, rename, delete, and reorder capabilities.</li>
+            <li>Added Save to Playlist modal accessible from the track context menu across all views.</li>
+            <li>Deployed curated editorial playlists with language-based filtering.</li>
+          </ul>
+          <h4>Queue Management</h4>
+          <ul class="feature-list">
+            <li>Added drag-and-drop queue reordering in the Full Screen Player using Angular CDK.</li>
+            <li>Implemented Play Next and Add to Queue actions in the track context menu.</li>
+          </ul>
+        </div>
+
+        <div class="faq-item">
+          <h3>v3.4 -- July 2026</h3>
+          <h4>Synced Lyrics</h4>
+          <ul class="feature-list">
+            <li>Integrated real-time synced lyrics with automatic scrolling and tap-to-seek functionality.</li>
+            <li>Added fallback to plain text lyrics when synced data is unavailable.</li>
+          </ul>
+          <h4>Discovery Page and Aura AI</h4>
+          <ul class="feature-list">
+            <li>Launched the Discovery page with AI-powered natural language music curation via the Aura chatbot.</li>
+            <li>Users can describe a mood or vibe in plain text and receive a curated track list instantly.</li>
+          </ul>
+          <h4>Shorts Feed</h4>
+          <ul class="feature-list">
+            <li>Introduced a vertical-swipe music Shorts feed for rapid song discovery, featuring auto-play, like, and share actions.</li>
+          </ul>
+        </div>
+
+        <div class="faq-item">
+          <h3>v3.3 -- June 2026</h3>
+          <h4>User Accounts and Cloud Sync</h4>
+          <ul class="feature-list">
+            <li>Implemented Google Sign-In (SSO) for optional account creation.</li>
+            <li>Enabled cross-device sync for Liked Songs, custom playlists, preferred languages, and listening history.</li>
+            <li>Added editable usernames in the Profile page.</li>
+          </ul>
+          <h4>Smart Algorithmic Queuing</h4>
+          <ul class="feature-list">
+            <li>Deployed the auto-play engine that generates infinite, contextually relevant song queues based on the currently playing track's metadata.</li>
+            <li>Added a toggle for enabling or disabling auto-play in the queue panel.</li>
+          </ul>
+        </div>
+
+        <div class="faq-item">
+          <h3>v3.2 -- June 2026</h3>
+          <h4>Homepage Personalization</h4>
+          <ul class="feature-list">
+            <li>Built dynamic homepage shelves powered by language preferences with lazy-loaded sections for performance.</li>
+            <li>Added Recently Played shelf with a coverflow swiper layout.</li>
+            <li>Implemented dynamic artist and playlist sections injected between recommendation shelves.</li>
+          </ul>
+          <h4>Search Overhaul</h4>
+          <ul class="feature-list">
+            <li>Redesigned the search experience with a dedicated full-page search view, filter chips (All, Songs, Albums, Playlists), and ambient background effects.</li>
+            <li>Added genre/mood browsing cards with gradient backgrounds in the search idle state.</li>
+          </ul>
+        </div>
+
+        <div class="faq-item">
+          <h3>v3.1 -- May 2026</h3>
+          <h4>Core Platform Launch</h4>
+          <ul class="feature-list">
+            <li>Launched GanaTube as a Progressive Web App with full installability on Android, iOS, and Desktop.</li>
+            <li>Built the core audio pipeline using a hidden YouTube iframe player with custom UI overlay.</li>
+            <li>Implemented the mini-player bar, full-screen player, and keyboard shortcuts (Space, Arrow Keys, Ctrl+K).</li>
+            <li>Designed the AMOLED black theme with the Inter font system for a premium, battery-efficient interface.</li>
+          </ul>
+          <h4>Audio Quality Selector</h4>
+          <ul class="feature-list">
+            <li>Added three-tier audio quality settings: High, Standard, and Data Saver for users on limited mobile data plans.</li>
+          </ul>
+        </div>
+      </div>
+    `
   }
 };

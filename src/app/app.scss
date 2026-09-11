@@ -830,6 +830,10 @@
     transform: translateY(-4px) scale(1.03);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
     border-color: rgba(255, 255, 255, 0.12);
+
+    .genre-emoji {
+      transform: scale(1.15);
+    }
   }
 
   &:active {
@@ -841,8 +845,24 @@
     position: relative;
     z-index: 2;
     margin-bottom: 4px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     line-height: 1;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 24px rgba(255, 255, 255, 0.25));
+
+    // Glowing radial backdrop behind emoji
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
   }
 
   .genre-name {
@@ -862,6 +882,11 @@
 
     .genre-emoji {
       font-size: 1.5rem;
+
+      &::after {
+        width: 44px;
+        height: 44px;
+      }
     }
 
     .genre-name {
