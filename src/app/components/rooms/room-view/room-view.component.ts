@@ -23,7 +23,8 @@ import {
   LucideSearch,
   LucideMoreVertical,
   LucideRepeat,
-  LucideRepeat1
+  LucideRepeat1,
+  LucideShare2
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -52,6 +53,7 @@ import { AppStateService } from '../../../services/app-state.service';
     LucideMoreVertical,
     LucideRepeat,
     LucideRepeat1,
+    LucideShare2,
     RoomMembersPanelComponent,
     TrackMenuComponent
   ],
@@ -132,6 +134,15 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   regenerateCode() {
     this.roomService.regenerateCode();
+  }
+
+  shareRoom() {
+    const info = this.roomService.currentRoomInfo();
+    if (info) {
+      const shareUrl = `${window.location.origin}/rooms/${info.roomId}`;
+      navigator.clipboard.writeText(shareUrl);
+      this.toastService.show('Room link copied to clipboard!');
+    }
   }
 
   sendMessage() {

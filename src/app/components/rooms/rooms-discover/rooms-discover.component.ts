@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { RoomService, RoomInfo } from '../../../services/room.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
@@ -33,6 +34,7 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   public roomService = inject(RoomService);
   public authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private router = inject(Router);
   
   showCreateModal = false;
   showJoinModal = false;
@@ -76,6 +78,13 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
     
     const user = this.authService.currentUser();
     if (user) {
+      const handler = (state: any) => {
+        if (state.roomId === roomId) {
+          this.roomService.getSocket().off('room:state', handler);
+          this.router.navigate(['/rooms', state.roomId]);
+        }
+      };
+      this.roomService.getSocket().on('room:state', handler);
       this.roomService.joinRoom(roomId, null, user);
     }
   }

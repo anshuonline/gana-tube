@@ -18,6 +18,10 @@
         <svg lucideUsers [attr.size]="18"></svg>
         <span>{{room.listenerCount}}</span>
       </button>
+      <button class="btn-share" (click)="shareRoom()" title="Share Room">
+        <svg lucideShare2 [attr.size]="18"></svg>
+        <span class="hide-mobile">Share</span>
+      </button>
       <button class="btn-leave" (click)="leaveRoom()">
         <svg lucideLogOut [attr.size]="18"></svg>
         <span class="hide-mobile">Leave</span>
