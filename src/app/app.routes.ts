@@ -20,6 +20,7 @@ export const routes: Routes = [
   { path: 'user/:username/:id', children: [] },
   { path: 'rooms', children: [] },
   { path: 'rooms/:roomId', children: [] },
+  { path: 'release-notes', children: [] },
   { path: 'gtanalytic', loadComponent: () => import('./components/analytics-page/analytics-page.component').then(m => m.AnalyticsPageComponent) },
   { path: ':id', children: [] },
 

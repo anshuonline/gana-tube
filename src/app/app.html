@@ -40,6 +40,10 @@
         <svg lucideRadio [attr.size]="24"></svg>
         <span class="sidebar-label">Rooms</span>
       </div>
+      <div class="sidebar-item" (click)="openReleaseNotes()" [class.active]="currentPage() === 'release-notes'">
+        <svg lucideSparkles [attr.size]="24"></svg>
+        <span class="sidebar-label">What's New</span>
+      </div>
       <div class="sidebar-item" (click)="openCuratedPlaylistsPage()" [class.active]="currentPage() === 'curated-playlists'">
         <svg lucideMusic [attr.size]="24"></svg>
         <span class="sidebar-label">Curated Playlists</span>
@@ -664,6 +668,9 @@
     <div class="static-page-container" *ngIf="pageContent[currentPage()]">
       <div class="static-page-content" [innerHTML]="pageContent[currentPage()]?.html"></div>
     </div>
+
+    <!-- Release Notes Component -->
+    <app-release-notes *ngIf="currentPage() === 'release-notes'"></app-release-notes>
 
     <!-- Playlist Page Section -->
     <app-playlist-page 

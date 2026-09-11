@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio } from '@lucide/angular';
+import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -43,6 +43,7 @@ import { OfflineLibraryComponent } from './components/offline-library/offline-li
 import { CuratedPlaylistsComponent } from './components/curated-playlists/curated-playlists';
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
+import { ReleaseNotesComponent } from './components/release-notes/release-notes.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
@@ -80,6 +81,7 @@ export interface SponsoredAd {
     LucideLogOut,
     LucideX,
     LucideRadio,
+    LucideSparkles,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -106,7 +108,8 @@ export interface SponsoredAd {
     OfflineLibraryComponent,
     CuratedPlaylistsComponent,
     RoomsDiscoverComponent,
-    RoomViewComponent
+    RoomViewComponent,
+    ReleaseNotesComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -931,6 +934,11 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         this.isFullScreenPlayerVisible.set(false);
         return;
+      } else if (event.urlAfterRedirects.startsWith('/release-notes')) {
+        this.currentPage.set('release-notes');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        this.isFullScreenPlayerVisible.set(false);
+        return;
       } else if (event.urlAfterRedirects.startsWith('/advertise')) {
         this.currentPage.set('advertise');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1234,6 +1242,11 @@ export class App implements OnInit {
   openRoomsPage() {
     this.closeMobileMenu();
     this.router.navigate(['/rooms']);
+  }
+
+  openReleaseNotes() {
+    this.closeMobileMenu();
+    this.router.navigate(['/release-notes']);
   }
 
 
