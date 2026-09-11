@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideRadio, LucideCar, LucideDownload, LucideMic2, LucideSparkles, LucideRocket } from '@lucide/angular';
+import { LucideAngularModule } from 'lucide-angular';
 
 interface ReleaseNote {
   title: string;
@@ -12,13 +12,7 @@ interface ReleaseNote {
   selector: 'app-release-notes',
   standalone: true,
   imports: [
-    CommonModule, 
-    LucideRadio, 
-    LucideCar, 
-    LucideDownload, 
-    LucideMic2,
-    LucideSparkles,
-    LucideRocket
+    CommonModule
   ],
   templateUrl: './release-notes.component.html',
   styleUrls: ['./release-notes.component.scss']

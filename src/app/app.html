@@ -36,10 +36,6 @@
         <svg lucideCompass [attr.size]="24"></svg>
         <span class="sidebar-label">Discovery</span>
       </div>
-      <div class="sidebar-item" (click)="openRoomsPage()" [class.active]="currentPage() === 'rooms'">
-        <svg lucideRadio [attr.size]="24"></svg>
-        <span class="sidebar-label">Rooms</span>
-      </div>
       <div class="sidebar-item" (click)="openReleaseNotes()" [class.active]="currentPage() === 'release-notes'">
         <svg lucideSparkles [attr.size]="24"></svg>
         <span class="sidebar-label">What's New</span>
