@@ -84,18 +84,25 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   private routeSub: any;
 
   ngOnInit() {
-    this.routeSub = this.route.paramMap.subscribe(params => {
-      const roomId = params.get('roomId');
-      // If we are deep linking, check if we are already in this room
-      if (roomId) {
+    this.routeSub = this.router.events.subscribe(() => {
+      this.checkDeepLink();
+    });
+    this.checkDeepLink();
+  }
+
+  private checkDeepLink() {
+    const url = this.router.url;
+    if (url.startsWith('/rooms/')) {
+      const parts = url.split('/');
+      if (parts.length > 2 && parts[2]) {
+        const roomId = parts[2];
         const info = this.roomService.currentRoomInfo();
         if (!info || info.roomId !== roomId) {
-          // Deep link join not fully supported yet without join code
           this.toastService.show('Please join through the Rooms page', 'info');
-          this.router.navigate(['/']);
+          this.router.navigate(['/rooms']);
         }
       }
-    });
+    }
   }
 
   ngOnDestroy() {

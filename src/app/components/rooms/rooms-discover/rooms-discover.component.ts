@@ -2,17 +2,18 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RoomService, RoomInfo } from '../../../services/room.service';
+import { PlayerService } from '../../../services/player.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
-import { 
-  LucideRadio, 
-  LucidePlus, 
-  LucideUsers,
-  LucideMusic,
-  LucideLock
-} from '@lucide/angular';
 import { RoomsCreateModalComponent } from '../rooms-create-modal/rooms-create-modal.component';
 import { RoomsJoinModalComponent } from '../rooms-join-modal/rooms-join-modal.component';
+import { 
+  LucideRadio, 
+  LucideLock, 
+  LucidePlus, 
+  LucideMusic, 
+  LucideUsers 
+} from '@lucide/angular';
 
 @Component({
   selector: 'app-rooms-discover',
@@ -20,10 +21,10 @@ import { RoomsJoinModalComponent } from '../rooms-join-modal/rooms-join-modal.co
   imports: [
     CommonModule, 
     LucideRadio, 
+    LucideLock, 
     LucidePlus, 
-    LucideUsers, 
-    LucideMusic,
-    LucideLock,
+    LucideMusic, 
+    LucideUsers,
     RoomsCreateModalComponent,
     RoomsJoinModalComponent
   ],
@@ -32,6 +33,7 @@ import { RoomsJoinModalComponent } from '../rooms-join-modal/rooms-join-modal.co
 })
 export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   public roomService = inject(RoomService);
+  public playerService = inject(PlayerService);
   public authService = inject(AuthService);
   private toastService = inject(ToastService);
   private router = inject(Router);
@@ -57,6 +59,10 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   openCreateModal() {
     if (this.authService.currentUser() === null || this.authService.currentUser() === undefined) {
       this.toastService.show('Please log in to create a room.', 'info');
+      return;
+    }
+    if (!this.playerService.currentTrack()) {
+      this.toastService.show('First play a song', 'info');
       return;
     }
     this.showCreateModal = true;
