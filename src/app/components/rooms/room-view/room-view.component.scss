@@ -1,7 +1,8 @@
 .room-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 75px);
+  margin-top: 75px;
   background: #0B0B0E;
   color: #F5F5F7;
   overflow: hidden;
@@ -564,7 +565,7 @@
 
 @media (max-width: 992px) {
   .room-container {
-    height: calc(100vh - 60px); // leave room for mobile bottom nav
+    height: calc(100vh - 135px); // leave room for mobile bottom nav + top header
   }
   
   .hide-mobile { display: none; }
