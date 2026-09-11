@@ -33,6 +33,7 @@
     "firebase": "^12.15.0",
     "localforage": "^1.10.0",
     "mysql2": "^3.22.5",
+    "nanoid": "^3.3.19",
     "ng2-charts": "^10.0.0",
     "rxjs": "~7.8.0",
     "socket.io": "^4.8.3",

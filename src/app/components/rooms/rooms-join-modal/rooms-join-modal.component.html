@@ -1,0 +1,51 @@
+<div class="modal-backdrop" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Join Private Room</h2>
+      <button class="btn-close" (click)="closeModal()">
+        <svg lucideX [attr.size]="20"></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="icon-container">
+        <svg lucideKey [attr.size]="48"></svg>
+      </div>
+      
+      <p class="description">Enter the Room ID and the invite code provided by the host to join their private listening session.</p>
+
+      <div class="form-group">
+        <label for="roomId">Room ID</label>
+        <input 
+          type="text" 
+          id="roomId" 
+          [(ngModel)]="roomId" 
+          maxlength="6"
+          placeholder="e.g. A1B2C3"
+          autocomplete="off"
+          style="text-transform: uppercase;">
+      </div>
+
+      <div class="form-group">
+        <label for="joinCode">Join Code</label>
+        <input 
+          type="text" 
+          id="joinCode" 
+          [(ngModel)]="joinCode" 
+          placeholder="Enter secret code"
+          autocomplete="off">
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        {{error}}
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-primary" (click)="joinRoom()" [disabled]="!roomId.trim() || !joinCode.trim()">
+        Join Room
+      </button>
+    </div>
+  </div>
+</div>

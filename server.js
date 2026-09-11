@@ -7,6 +7,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('fs');
 const path = require('path');
+const { nanoid } = require('nanoid');
 const app = express();
 app.use(compression()); // Enable gzip compression for all responses
 const server = http.createServer(app);
@@ -21,16 +22,37 @@ const PORT = process.env.PORT || 3000;
 
 const userDevices = new Map(); // email -> [{socketId, deviceId, deviceName, isMobile, isActive}]
 
+// Listening Rooms State (In-Memory)
+const rooms = new Map(); // roomId -> RoomData object
+const socketToRoom = new Map(); // socketId -> roomId
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
-
-
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
 
-    
-    // Remove from device sync rooms
+    // --- Listening Rooms cleanup ---
+    const roomId = socketToRoom.get(socket.id);
+    if (roomId) {
+      const room = rooms.get(roomId);
+      if (room) {
+        if (room.adminUid === socket.id) {
+          // Admin left, destroy room
+          io.to(roomId).emit('room:closed');
+          io.socketsLeave(roomId);
+          rooms.delete(roomId);
+        } else {
+          // Regular member left
+          room.members = room.members.filter(m => m.socketId !== socket.id);
+          room.listenerCount = room.members.length;
+          io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+        }
+      }
+      socketToRoom.delete(socket.id);
+    }
+
+    // --- Device Sync cleanup ---
     for (const [email, devices] of userDevices.entries()) {
       const idx = devices.findIndex(d => d.socketId === socket.id);
       if (idx !== -1) {
@@ -77,6 +99,216 @@ io.on('connection', (socket) => {
       io.to(`user_sync_${email}`).emit('available_devices', devices);
     }
     socket.to(`user_sync_${email}`).emit('takeover_requested', { fromDeviceId, toDeviceId });
+  });
+
+  // --- Listening Rooms Events ---
+  socket.on('room:create', ({ name, isPublic, adminUser }) => {
+    const roomId = nanoid(6).toUpperCase();
+    const joinCode = isPublic ? null : nanoid(6);
+    
+    const room = {
+      roomId,
+      name: name.substring(0, 40),
+      isPublic,
+      joinCode,
+      codeExpiresAt: isPublic ? null : Date.now() + 24 * 60 * 60 * 1000,
+      adminUid: socket.id,
+      adminName: adminUser.displayName || 'Host',
+      members: [{
+        socketId: socket.id,
+        uid: adminUser.uid,
+        displayName: adminUser.displayName || 'Host',
+        photoURL: adminUser.photoURL,
+        isAdmin: true
+      }],
+      currentTrack: null,
+      queue: [],
+      currentTime: 0,
+      isPlaying: false,
+      chat: [],
+      listenerCount: 1
+    };
+    
+    rooms.set(roomId, room);
+    socketToRoom.set(socket.id, roomId);
+    socket.join(roomId);
+    
+    socket.emit('room:state', room);
+  });
+
+  socket.on('room:join', ({ roomId, joinCode, user }) => {
+    const room = rooms.get(roomId);
+    if (!room) {
+      return socket.emit('room:error', 'Room not found');
+    }
+    
+    if (!room.isPublic) {
+      if (room.joinCode !== joinCode) {
+        return socket.emit('room:error', 'Invalid join code');
+      }
+      if (room.codeExpiresAt && Date.now() > room.codeExpiresAt) {
+        return socket.emit('room:error', 'That code has expired — ask the admin for a new one');
+      }
+    }
+    
+    if (room.members.length >= 50) {
+      return socket.emit('room:error', 'Room is full (50/50)');
+    }
+    
+    const existingIdx = room.members.findIndex(m => m.uid === user.uid || m.socketId === socket.id);
+    if (existingIdx === -1) {
+      const newMember = {
+        socketId: socket.id,
+        uid: user.uid,
+        displayName: user.displayName || 'Listener',
+        photoURL: user.photoURL,
+        isAdmin: false
+      };
+      room.members.push(newMember);
+      room.listenerCount = room.members.length;
+    }
+    
+    socketToRoom.set(socket.id, roomId);
+    socket.join(roomId);
+    
+    socket.emit('room:state', room);
+    io.to(roomId).emit('room:member_joined', { members: room.members, listenerCount: room.listenerCount });
+  });
+
+  socket.on('room:leave', () => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    
+    const room = rooms.get(roomId);
+    if (room) {
+      if (room.adminUid === socket.id) {
+        io.to(roomId).emit('room:closed');
+        io.socketsLeave(roomId);
+        rooms.delete(roomId);
+      } else {
+        room.members = room.members.filter(m => m.socketId !== socket.id);
+        room.listenerCount = room.members.length;
+        socket.leave(roomId);
+        io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+      }
+    }
+    socketToRoom.delete(socket.id);
+  });
+
+  socket.on('room:transfer_admin', ({ targetSocketId }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    const targetMember = room.members.find(m => m.socketId === targetSocketId);
+    if (targetMember) {
+      // old admin
+      const currentAdmin = room.members.find(m => m.socketId === socket.id);
+      if (currentAdmin) currentAdmin.isAdmin = false;
+      
+      // new admin
+      targetMember.isAdmin = true;
+      room.adminUid = targetSocketId;
+      room.adminName = targetMember.displayName;
+      
+      io.to(roomId).emit('room:admin_changed', { newAdminUid: targetSocketId, members: room.members });
+    }
+  });
+
+  socket.on('room:toggle_visibility', () => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    room.isPublic = !room.isPublic;
+    if (!room.isPublic && !room.joinCode) {
+      room.joinCode = nanoid(6);
+      room.codeExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    }
+    io.to(roomId).emit('room:state', room);
+  });
+
+  socket.on('room:regenerate_code', () => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    room.joinCode = nanoid(6);
+    room.codeExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    io.to(roomId).emit('room:state', room);
+  });
+
+  socket.on('room:play_track', ({ track }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    room.currentTrack = track;
+    room.currentTime = 0;
+    room.isPlaying = true;
+    io.to(roomId).emit('room:track_changed', { track });
+  });
+
+  socket.on('room:playback_sync', ({ isPlaying, currentTime }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    room.isPlaying = isPlaying;
+    room.currentTime = currentTime;
+    // Broadcast to everyone else
+    socket.to(roomId).emit('room:playback_sync', { isPlaying, currentTime });
+  });
+
+  socket.on('room:queue_updated', ({ queue }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    room.queue = queue;
+    io.to(roomId).emit('room:queue_updated', { queue });
+  });
+
+  socket.on('room:chat_message', ({ type, content, track, senderUid, senderName }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room) return;
+    
+    const msg = {
+      id: nanoid(),
+      senderUid,
+      senderName,
+      type,
+      content,
+      track,
+      timestamp: Date.now()
+    };
+    
+    // keep last 100 msgs max in memory to prevent leak
+    if (room.chat.length > 100) room.chat.shift();
+    room.chat.push(msg);
+    
+    io.to(roomId).emit('room:chat_new', msg);
+  });
+
+  socket.on('room:discover', () => {
+    const publicRooms = Array.from(rooms.values())
+      .filter(r => r.isPublic)
+      .map(r => ({
+        roomId: r.roomId,
+        name: r.name,
+        adminName: r.adminName,
+        currentTrack: r.currentTrack,
+        listenerCount: r.listenerCount
+      }));
+    socket.emit('room:discover_results', publicRooms);
   });
 });
 

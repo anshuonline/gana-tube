@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX } from '@lucide/angular';
+import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -41,6 +41,8 @@ import { DiscoveryPageComponent } from './components/discovery-page/discovery-pa
 import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
 import { CuratedPlaylistsComponent } from './components/curated-playlists/curated-playlists';
+import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
+import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
@@ -77,6 +79,7 @@ export interface SponsoredAd {
     LucideEdit3,
     LucideLogOut,
     LucideX,
+    LucideRadio,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -101,7 +104,9 @@ export interface SponsoredAd {
     SpinWheelComponent,
     LucideGift,
     OfflineLibraryComponent,
-    CuratedPlaylistsComponent
+    CuratedPlaylistsComponent,
+    RoomsDiscoverComponent,
+    RoomViewComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -916,6 +921,16 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         this.isFullScreenPlayerVisible.set(false);
         return;
+      } else if (event.urlAfterRedirects.startsWith('/rooms')) {
+        const parts = event.urlAfterRedirects.split('/');
+        if (parts.length > 2 && parts[2]) {
+          this.currentPage.set('rooms-view');
+        } else {
+          this.currentPage.set('rooms');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        this.isFullScreenPlayerVisible.set(false);
+        return;
       } else if (event.urlAfterRedirects.startsWith('/advertise')) {
         this.currentPage.set('advertise');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1214,6 +1229,11 @@ export class App implements OnInit {
   openCuratedPlaylistsPage() {
     this.closeMobileMenu();
     this.router.navigate(['/curated-playlists']);
+  }
+
+  openRoomsPage() {
+    this.closeMobileMenu();
+    this.router.navigate(['/rooms']);
   }
 
 

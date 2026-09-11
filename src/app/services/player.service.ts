@@ -217,65 +217,68 @@ export class PlayerService {
   }
   
   private setupSocketListeners() {
-    const socket = this.roomService.getSocket();
-    if (!socket) return;
-    
-    socket.on('room_state', (state: any) => {
-      this.isRemoteUpdate = true;
-      if (state.queue && state.queue.length > 0) {
-        this.queue.set(state.queue);
-        // Find current index based on currentTrack
-        if (state.currentTrack) {
-          const idx = state.queue.findIndex((t: any) => t.videoId === state.currentTrack.videoId);
-          this.currentIndex.set(idx >= 0 ? idx : 0);
-          this.playTrack(state.currentTrack);
-          
-          if (state.currentTime > 0) {
-            if (this.ytPlayer) {
-              setTimeout(() => {
-                if (this.ytPlayer) this.ytPlayer.seekTo(state.currentTime, true);
-              }, 1000);
-            } else {
-              (this as any)._pendingSeekTime = state.currentTime;
+    // Wait until room service initializes its socket
+    setTimeout(() => {
+      const socket = this.roomService.getSocket();
+      if (!socket) return;
+      
+      socket.on('room:state', (state: any) => {
+        this.isRemoteUpdate = true;
+        if (state.queue && state.queue.length > 0) {
+          this.queue.set(state.queue);
+          if (state.currentTrack) {
+            const idx = state.queue.findIndex((t: any) => t.videoId === state.currentTrack.videoId);
+            this.currentIndex.set(idx >= 0 ? idx : 0);
+            this.playTrack(state.currentTrack);
+            
+            if (state.currentTime > 0) {
+              if (this.ytPlayer) {
+                setTimeout(() => {
+                  if (this.ytPlayer) this.ytPlayer.seekTo(state.currentTime, true);
+                }, 1000);
+              } else {
+                (this as any)._pendingSeekTime = state.currentTime;
+              }
             }
           }
         }
-      }
-      this.isRemoteUpdate = false;
-    });
+        this.isRemoteUpdate = false;
+      });
 
-    socket.on('track_changed', (track: Track) => {
-      this.isRemoteUpdate = true;
-      this.playTrack(track);
-    });
+      socket.on('room:track_changed', ({ track }) => {
+        this.isRemoteUpdate = true;
+        this.playTrack(track);
+      });
 
-    socket.on('playback_synced', ({ isPlaying, currentTime }) => {
-      if (!this.ytPlayer) return;
-      this.isRemoteUpdate = true;
-      
-      // Sync time if there's a big drift (> 2 seconds)
-      const current = this.ytPlayer.getCurrentTime();
-      if (currentTime !== undefined && Math.abs(current - currentTime) > 2) {
-        this.ytPlayer.seekTo(currentTime, true);
-      }
-      
-      if (isPlaying) {
-        this.ytPlayer.playVideo();
-      } else {
-        this.ytPlayer.pauseVideo();
-      }
-      
-      // Reset immediately since native calls don't trigger wrapper functions
-      this.isRemoteUpdate = false;
-    });
+      socket.on('room:playback_sync', ({ isPlaying, currentTime }) => {
+        if (!this.ytPlayer) return;
+        this.isRemoteUpdate = true;
+        
+        const current = this.ytPlayer.getCurrentTime();
+        if (currentTime !== undefined && Math.abs(current - currentTime) > 2) {
+          this.ytPlayer.seekTo(currentTime, true);
+        }
+        
+        if (isPlaying) {
+          this.ytPlayer.playVideo();
+        } else {
+          this.ytPlayer.pauseVideo();
+        }
+        
+        this.isRemoteUpdate = false;
+      });
 
-    socket.on('queue_synced', ({ queue, currentIndex }) => {
-      this.isRemoteUpdate = true;
-      this.queue.set(queue);
-      this.currentIndex.set(currentIndex);
-      this.isRemoteUpdate = false;
-    });
+      socket.on('room:queue_updated', ({ queue, currentIndex }) => {
+        this.isRemoteUpdate = true;
+        this.queue.set(queue);
+        if (currentIndex !== undefined) this.currentIndex.set(currentIndex);
+        this.isRemoteUpdate = false;
+      });
+    }, 1000);
   }
+
+  // Determine if user is in a room
+  isInRoom = computed(() => !!this.roomService.currentRoomInfo());
 
   playTrack(track: Track): void {
     this.triggerEngagement();
@@ -308,12 +311,8 @@ export class PlayerService {
     this.currentIndex.set(startIndex);
     this.playerState.set('loading');
 
-    if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
-      this.roomService.getSocket().emit('sync_queue', {
-        roomId: this.roomService.currentRoom(),
-        queue: tracks,
-        currentIndex: startIndex
-      });
+    if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
+      this.roomService.adminQueueUpdate(tracks);
     }
     this.isRemoteUpdate = false;
     
@@ -327,12 +326,8 @@ export class PlayerService {
     this.queue.set(newQueue);
     this.currentIndex.set(newCurrentIndex);
     
-    if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
-      this.roomService.getSocket().emit('sync_queue', {
-        roomId: this.roomService.currentRoom(),
-        queue: newQueue,
-        currentIndex: newCurrentIndex
-      });
+    if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
+      this.roomService.adminQueueUpdate(newQueue);
     }
   }
 
@@ -369,12 +364,12 @@ export class PlayerService {
   
   private broadcastPlaybackSync(isPlaying: boolean) {
     this.broadcastToSync(true); // Broadcast for personal device sync
-    if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
-      this.roomService.getSocket().emit('sync_playback', {
-        roomId: this.roomService.currentRoom(),
-        isPlaying,
-        currentTime: this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0
-      });
+    if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
+      if (isPlaying) {
+        this.roomService.adminResume(this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0);
+      } else {
+        this.roomService.adminPause(this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0);
+      }
     }
   }
 
@@ -479,12 +474,8 @@ export class PlayerService {
     if (this.isPlayingOffline() && this.htmlAudio) {
       this.htmlAudio.currentTime = seconds;
       this.broadcastToSync(true);
-      if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
-        this.roomService.getSocket().emit('sync_playback', {
-          roomId: this.roomService.currentRoom(),
-          isPlaying: this.playerState() === 'playing',
-          currentTime: seconds
-        });
+      if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
+        this.roomService.adminSeek(seconds);
       }
       return;
     }
@@ -493,12 +484,8 @@ export class PlayerService {
       this.ytPlayer.seekTo(seconds, true);
       this.broadcastToSync(true);
       
-      if (!this.isRemoteUpdate && this.roomService.currentRoom()) {
-        this.roomService.getSocket().emit('sync_playback', {
-          roomId: this.roomService.currentRoom(),
-          isPlaying: this.playerState() === 'playing',
-          currentTime: seconds
-        });
+      if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
+        this.roomService.adminSeek(seconds);
       }
     }
   }
@@ -717,17 +704,10 @@ export class PlayerService {
       }
     }
 
-    if (!this.isRemoteUpdate && current && this.roomService.currentRoom()) {
-      this.roomService.getSocket().emit('play_track', { 
-        roomId: this.roomService.currentRoom(), 
-        track: current
-      });
+    if (!this.isRemoteUpdate && current && this.roomService.currentRoomInfo()) {
+      this.roomService.adminPlayTrack(current);
       // also sync queue when song auto-changes
-      this.roomService.getSocket().emit('sync_queue', {
-        roomId: this.roomService.currentRoom(),
-        queue: this.queue(),
-        currentIndex: this.currentIndex()
-      });
+      this.roomService.adminQueueUpdate(this.queue());
     }
     this.isRemoteUpdate = false;
   }

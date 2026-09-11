@@ -301,8 +301,8 @@
           </button>
 
           <button class="fs-control-btn secondary" (click)="playerService.toggleRepeat()" title="Repeat" style="margin-left: 16px;">
-            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" stroke="#9333ea"></svg>
-            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" style="stroke: #9333ea"></svg>
+            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
           </button>
         </div>
 

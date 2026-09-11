@@ -1,0 +1,63 @@
+<div class="discover-container">
+  <div class="discover-header">
+    <div class="header-title">
+      <svg lucideRadio class="icon-radio"></svg>
+      <h2>Listening Rooms</h2>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn-join-private" (click)="openJoinModal()">
+        <svg lucideLock [attr.size]="12"></svg>
+        Join Private
+      </button>
+      <button class="btn-create" (click)="openCreateModal()">
+        <svg lucidePlus [attr.size]="18"></svg>
+        Create Room
+      </button>
+    </div>
+  </div>
+
+  <div class="subtitle">
+    <p>Join a live room to listen together, chat, and discover new music in real-time.</p>
+  </div>
+
+  <div class="rooms-grid" *ngIf="roomService.publicRooms().length > 0">
+    <div class="room-card" *ngFor="let room of roomService.publicRooms()">
+      <div class="card-art" [ngClass]="{'has-art': !!room.currentTrack}">
+        <img *ngIf="room.currentTrack" [src]="room.currentTrack.thumbnailHigh" alt="Cover">
+        <div *ngIf="!room.currentTrack" class="art-placeholder">
+          <svg lucideMusic [attr.size]="32"></svg>
+        </div>
+        <div class="listener-badge">
+          <div class="pulse-dot"></div>
+          <span>{{room.listenerCount}}</span>
+          <svg lucideUsers [attr.size]="12"></svg>
+        </div>
+      </div>
+      
+      <div class="card-info">
+        <h3 class="room-name">{{room.name}}</h3>
+        <p class="admin-name">Host: {{room.adminName}}</p>
+        
+        <div class="now-playing">
+          <span class="playing-label">Now Playing</span>
+          <p class="song-title">{{room.currentTrack ? room.currentTrack.title : 'Nothing playing yet'}}</p>
+        </div>
+        
+        <button class="btn-join" (click)="joinPublicRoom(room.roomId)">Join Room</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="roomService.publicRooms().length === 0">
+    <div class="empty-icon">
+      <svg lucideRadio [attr.size]="48"></svg>
+    </div>
+    <h3>No public rooms are live right now</h3>
+    <p>Be the first to start a listening session and invite others to join.</p>
+    <button class="btn-create-large" (click)="openCreateModal()">Create a Room</button>
+  </div>
+</div>
+
+<app-rooms-create-modal *ngIf="showCreateModal" (close)="showCreateModal = false"></app-rooms-create-modal>
+<app-rooms-join-modal *ngIf="showJoinModal" (close)="showJoinModal = false"></app-rooms-join-modal>

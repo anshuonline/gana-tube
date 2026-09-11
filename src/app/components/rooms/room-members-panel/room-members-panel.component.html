@@ -1,0 +1,51 @@
+<div class="panel-backdrop" (click)="closePanel()"></div>
+<div class="side-panel">
+  <div class="panel-header">
+    <div class="title">
+      <h2>Room Members</h2>
+      <span class="count">{{roomService.members().length}}</span>
+    </div>
+    <button class="btn-close" (click)="closePanel()">
+      <svg lucideX [attr.size]="20"></svg>
+    </button>
+  </div>
+
+  <div class="panel-content" (click)="activeMenuSocketId = null">
+    <div class="members-list">
+      
+      <div class="member-item" *ngFor="let member of roomService.members()">
+        
+        <div class="avatar">
+          <img *ngIf="member.photoURL" [src]="member.photoURL" alt="Avatar">
+          <svg *ngIf="!member.photoURL" lucideUser [attr.size]="20"></svg>
+        </div>
+        
+        <div class="info">
+          <span class="name">
+            {{member.displayName}}
+            <span class="you-badge" *ngIf="member.socketId === roomService.getSocketId()">(You)</span>
+          </span>
+          <span class="role-badge admin" *ngIf="member.isAdmin">
+            <svg lucideCrown [attr.size]="12"></svg>
+            Host
+          </span>
+        </div>
+
+        <div class="actions" *ngIf="roomService.isAdmin() && !member.isAdmin">
+          <button class="btn-more" (click)="toggleMenu(member.socketId, $event)">
+            <svg lucideMoreVertical [attr.size]="16"></svg>
+          </button>
+          
+          <div class="dropdown-menu" *ngIf="activeMenuSocketId === member.socketId">
+            <button (click)="makeAdmin(member.socketId)">
+              <svg lucideCrown [attr.size]="14"></svg>
+              Make Host
+            </button>
+          </div>
+        </div>
+        
+      </div>
+
+    </div>
+  </div>
+</div>
