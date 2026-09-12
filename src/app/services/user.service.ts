@@ -26,6 +26,7 @@ export class UserService {
   recentPlays = signal<any[]>([]);
   listeningPreferences = signal<string[]>([]);
   customPlaylists = signal<any[]>([]);
+  isProfileLoaded = false;
   private _creatingPlaylists = new Set<string>();
   
   constructor(private http: HttpClient) {
@@ -101,6 +102,7 @@ export class UserService {
       const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}?action=getProfile&email=${encodeURIComponent(email)}`));
       
       if (response.status === 'success') {
+        this.isProfileLoaded = true;
         if (response.display_name !== undefined) {
           this.displayName.set(response.display_name);
         }
@@ -155,6 +157,10 @@ export class UserService {
   // Helper to quickly toggle a liked song and sync
   async toggleLike(email: string, songObj: any, currentLangs: string[]) {
     if (!email || !songObj) return;
+    if (!this.isProfileLoaded) {
+      setTimeout(() => this.toggleLike(email, songObj, currentLangs), 1000);
+      return;
+    }
 
     let currentLikes = [...this.likedSongs()];
     const exists = currentLikes.some(song => typeof song === 'string' ? song === songObj.videoId : song.videoId === songObj.videoId);
@@ -182,6 +188,10 @@ export class UserService {
   // Helper to add to recent plays
   async addRecentPlay(email: string, songObj: any, currentLangs: string[]) {
     if (!email || !songObj) return;
+    if (!this.isProfileLoaded) {
+      setTimeout(() => this.addRecentPlay(email, songObj, currentLangs), 1000);
+      return;
+    }
     
     let plays = [...this.recentPlays()];
     // Remove if already exists so we can put it at the top
@@ -203,6 +213,10 @@ export class UserService {
   // Helper to add to listening history/preferences
   async trackListeningPreference(email: string, queryOrGenre: string, currentLangs: string[]) {
     if (!email || !queryOrGenre) return;
+    if (!this.isProfileLoaded) {
+      setTimeout(() => this.trackListeningPreference(email, queryOrGenre, currentLangs), 1000);
+      return;
+    }
 
     let currentPrefs = [...this.listeningPreferences()];
     // Avoid duplicates, keep max 20 recent preferences

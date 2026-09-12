@@ -755,11 +755,21 @@
     padding-top: 140px;
   }
   
-  &.is-shorts, &.is-rooms-view {
+  &.is-shorts {
     max-width: 100%;
     width: 100%;
     margin: 0;
     padding: 0 !important;
+  }
+
+  &.is-rooms-view {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0 0 0 70px !important;
+    @media (max-width: 768px) {
+      padding: 0 !important;
+    }
   }
 }
 
