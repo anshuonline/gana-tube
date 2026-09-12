@@ -172,12 +172,19 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   showRulesPopup = signal(false);
   rulesAccepted = false;
 
+  private errorHandler = (err: string) => {
+    this.toastService.show(err, 'error');
+    this.router.navigate(['/rooms']);
+  };
+
   ngOnInit() {
     if (typeof sessionStorage !== 'undefined') {
       if (!sessionStorage.getItem('gt_room_rules_accepted')) {
         this.showRulesPopup.set(true);
       }
     }
+    
+    this.roomService.getSocket().on('room:error', this.errorHandler);
   }
 
   acceptRules() {
@@ -188,6 +195,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnDestroy() {
+    this.roomService.getSocket().off('room:error', this.errorHandler);
     // Do NOT leave room on destroy — room persists while navigating
   }
 

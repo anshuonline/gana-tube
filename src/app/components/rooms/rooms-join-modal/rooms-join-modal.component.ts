@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoomService } from '../../../services/room.service';
@@ -19,6 +19,7 @@ export class RoomsJoinModalComponent implements OnInit, OnDestroy {
   private roomService = inject(RoomService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   roomCode = '';
   error = '';
@@ -29,6 +30,7 @@ export class RoomsJoinModalComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.errorHandler = (err: string) => {
       this.error = err;
+      this.cdr.detectChanges();
     };
     this.stateHandler = (state: any) => {
       this.closeModal();
