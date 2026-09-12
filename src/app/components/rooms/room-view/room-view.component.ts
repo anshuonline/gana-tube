@@ -112,6 +112,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       const user = this.authService.currentUser();
       const info = this.roomService.currentRoomInfo();
       const url = this.router.url;
+      const showingRules = this.showRulesPopup();
 
       // Wait until auth state is determined
       if (user === undefined) return;
@@ -123,6 +124,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
           
           if (!info || info.roomId !== roomId) {
             if (user) {
+              if (showingRules) return; // Do not join until rules are accepted
               this.roomService.joinRoom(roomId, null, user);
             } else {
               this.toastService.show('Please log in to join a room', 'info');
@@ -134,13 +136,13 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }, { allowSignalWrites: true });
   }
 
-  showRulesPopup = false;
+  showRulesPopup = signal(false);
   rulesAccepted = false;
 
   ngOnInit() {
     if (typeof sessionStorage !== 'undefined') {
       if (!sessionStorage.getItem('gt_room_rules_accepted')) {
-        this.showRulesPopup = true;
+        this.showRulesPopup.set(true);
       }
     }
   }
@@ -149,7 +151,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem('gt_room_rules_accepted', 'true');
     }
-    this.showRulesPopup = false;
+    this.showRulesPopup.set(false);
   }
 
   ngOnDestroy() {
