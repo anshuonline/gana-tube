@@ -255,11 +255,14 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
           email: '',
           displayName: guestName,
           photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${guestName}`
-        } as any;
+        };
       } else {
         return;
       }
     }
+    
+    // Ensure we have a valid user object before proceeding
+    if (!currentUser || !currentUser.uid) return;
     
     // Check for third-party links
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -282,32 +285,30 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     // Check if the input is a GanaTube URL
-    const gtRegex = /(?:betatesting\.)?ganatube\.in\/(?:play|share\.php)\?v=([a-zA-Z0-9_-]{11})/;
-    const match = this.chatInput.match(gtRegex);
-    
-    const currentInput = this.chatInput;
+    const ganatubeUrlPattern = /https?:\/\/(?:www\.)?(?:betatesting\.)?ganatube\.in\/(?:play|home)\?v=([a-zA-Z0-9_-]+)/;
+    const currentInput = this.chatInput.trim();
     this.chatInput = '';
     this.showEmojiPicker = false;
 
+    const match = currentInput.match(ganatubeUrlPattern);
     if (match && match[1]) {
       const videoId = match[1];
-      this.toastService.show('Loading track details...', 'info', 2000);
       
       this.youtubeApi.getVideoDetails([videoId]).subscribe({
         next: (results) => {
           if (results && results.length > 0) {
-            this.roomService.sendSongShare(results[0], user.uid, user.displayName || 'User');
+            this.roomService.sendSongShare(results[0], currentUser.uid, currentUser.displayName || 'User');
           } else {
-            this.roomService.sendChatMessage(currentInput, user.uid, user.displayName || 'User');
+            this.roomService.sendChatMessage(currentInput, currentUser.uid, currentUser.displayName || 'User');
           }
         },
         error: (err) => {
           console.error('Failed to load track details:', err);
-          this.roomService.sendChatMessage(currentInput, user.uid, user.displayName || 'User');
+          this.roomService.sendChatMessage(currentInput, currentUser.uid, currentUser.displayName || 'User');
         }
       });
     } else {
-      this.roomService.sendChatMessage(currentInput, user.uid, user.displayName || 'User');
+      this.roomService.sendChatMessage(currentInput, currentUser.uid, currentUser.displayName || 'User');
     }
   }
 
