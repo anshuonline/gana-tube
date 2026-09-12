@@ -102,32 +102,35 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
       }
     });
-  }
 
-  ngOnInit() {
-    // If user lands on /rooms/:roomId without being in the room, try to auto-join
-    this.tryAutoJoin();
-  }
+    // Auto-join effect
+    effect(() => {
+      const user = this.authService.currentUser();
+      const info = this.roomService.currentRoomInfo();
+      const url = this.router.url;
 
-  private tryAutoJoin() {
-    const url = this.router.url;
-    if (url.startsWith('/rooms/')) {
-      const parts = url.split('/');
-      if (parts.length > 2 && parts[2]) {
-        const roomId = parts[2];
-        const info = this.roomService.currentRoomInfo();
-        if (!info || info.roomId !== roomId) {
-          // Not in this room — try auto-join for logged in users
-          const user = this.authService.currentUser();
-          if (user) {
-            this.roomService.joinRoom(roomId, null, user);
-          } else {
-            this.toastService.show('Please log in to join a room', 'info');
-            this.router.navigate(['/rooms']);
+      // Wait until auth state is determined
+      if (user === undefined) return;
+
+      if (url.startsWith('/rooms/')) {
+        const parts = url.split('/');
+        if (parts.length > 2 && parts[2]) {
+          const roomId = parts[2];
+          
+          if (!info || info.roomId !== roomId) {
+            if (user) {
+              this.roomService.joinRoom(roomId, null, user);
+            } else {
+              this.toastService.show('Please log in to join a room', 'info');
+              this.router.navigate(['/rooms']);
+            }
           }
         }
       }
-    }
+    }, { allowSignalWrites: true });
+  }
+
+  ngOnInit() {
   }
 
   ngOnDestroy() {
