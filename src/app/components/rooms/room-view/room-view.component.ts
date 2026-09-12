@@ -255,13 +255,14 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
           email: '',
           displayName: guestName,
           photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${guestName}`
-        };
+        } as any;
       } else {
         return;
       }
     }
     
     // Ensure we have a valid user object before proceeding
+    const currentUser = user;
     if (!currentUser || !currentUser.uid) return;
     
     // Check for third-party links
