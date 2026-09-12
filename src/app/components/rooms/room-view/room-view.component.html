@@ -17,6 +17,12 @@
     </div>
     
     <div class="header-right">
+      <button class="btn-icon-sm hide-desktop" (click)="showSearchModal.set(true)" title="Search Music">
+        <svg lucideSearch [attr.size]="20"></svg>
+      </button>
+      <button class="btn-icon-sm" (click)="showInfoModal.set(true)" title="Room Guide">
+        <svg lucideInfo [attr.size]="20"></svg>
+      </button>
       <button class="btn-members" (click)="showMembersPanel = true">
         <svg lucideUsers [attr.size]="18"></svg>
         <span>{{room.listenerCount}}</span>
@@ -87,8 +93,18 @@
     
     <!-- Left: Player Section -->
     <section class="player-section">
-      <div class="album-art-container" [class.playing]="playerService.playerState() === 'playing'">
+      <div class="album-art-container" 
+           [class.playing]="playerService.playerState() === 'playing'"
+           [class.clickable]="roomService.isAdmin()"
+           (click)="togglePlay()">
         <img *ngIf="playerService.currentTrack()" [src]="playerService.currentTrack()?.thumbnailHigh" alt="Cover Art">
+        
+        <!-- Play/Pause Overlay for Admin -->
+        <div class="art-overlay" *ngIf="roomService.isAdmin() && playerService.currentTrack()">
+          <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="48"></svg>
+          <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="48"></svg>
+        </div>
+
         <div *ngIf="!playerService.currentTrack()" class="empty-art">
           <svg lucideMusic [attr.size]="48"></svg>
           <p>Waiting for a song...</p>
@@ -103,8 +119,10 @@
       <!-- Progress (visible to all, interactive only for admin) -->
       <div class="progress-container" [class.disabled]="!roomService.isAdmin()">
         <span class="time">{{formatTime(playerService.currentTime())}}</span>
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="playerService.duration() > 0 ? (playerService.currentTime() / playerService.duration()) * 100 : 0"></div>
+        <div class="progress-bar" (click)="seekProgress($event, progressBar)" #progressBar>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="playerService.duration() > 0 ? (playerService.currentTime() / playerService.duration()) * 100 : 0"></div>
+          </div>
         </div>
         <span class="time">{{formatTime(playerService.duration())}}</span>
       </div>
@@ -139,13 +157,23 @@
       
       <!-- Queue Panel -->
       <div class="queue-panel panel" [class.mobile-hidden]="activeMobileTab !== 'queue'">
-        <div class="panel-header">
-          <h3>Up Next</h3>
-          <span class="count">{{playerService.queue().length}} songs</span>
+        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3>Up Next</h3>
+            <span class="count">{{playerService.queue().length}} songs</span>
+          </div>
+          <button class="btn-search-queue hide-mobile" (click)="showSearchModal.set(true)">
+            <svg lucideSearch [attr.size]="16"></svg>
+            Add Music
+          </button>
         </div>
         
         <div class="queue-list">
-          <div class="queue-item" *ngFor="let track of playerService.queue(); let i = index" [class.active]="i === playerService.currentIndex()">
+          <div class="queue-item" 
+               *ngFor="let track of playerService.queue(); let i = index" 
+               [class.active]="i === playerService.currentIndex()"
+               [class.clickable]="roomService.isAdmin()"
+               (click)="playQueueItem(i)">
             <img [src]="track.thumbnail" alt="Thumb">
             <div class="queue-meta">
               <span class="queue-title">{{track.title}}</span>
@@ -229,6 +257,9 @@
             (focus)="showEmojiPicker = false"
             placeholder="Type a message..."
             maxlength="200">
+          <button class="btn-like" (click)="sendLike()" title="Send Love">
+            <img src="assets/heart-white.png" width="22" height="22" alt="Love">
+          </button>
           <button class="btn-send" (click)="sendMessage()" [disabled]="!chatInput.trim()">
             <svg lucideSend [attr.size]="18"></svg>
           </button>
@@ -237,6 +268,19 @@
       
     </section>
   </div>
+</div>
+
+<!-- Floating Hearts Container -->
+<div class="floating-hearts-container">
+  <div *ngFor="let heart of floatingHearts" 
+       class="floating-heart" 
+       [ngStyle]="{
+         'left.%': heart.left,
+         'animation-duration.s': heart.animationDuration
+       }">
+    <img [src]="'assets/heart-' + heart.color + '.png'" width="32" height="32" alt="heart">
+  </div>
+</div>
 
   <div class="rules-overlay" *ngIf="showRulesPopup()">
     <div class="rules-modal">
@@ -306,3 +350,66 @@
 <app-room-members-panel *ngIf="showMembersPanel" (close)="showMembersPanel = false"></app-room-members-panel>
 
 <app-guest-name-modal *ngIf="showGuestModal()" (close)="showGuestModal.set(false)" (confirm)="onGuestNameConfirmed($event)"></app-guest-name-modal>
+
+<!-- Info Modal -->
+<div class="rules-overlay" *ngIf="showInfoModal()">
+  <div class="rules-modal">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h2 style="margin: 0; font-size: 20px;">Room Guide</h2>
+      <button class="btn-icon-sm" (click)="showInfoModal.set(false)">
+        <svg lucideX [attr.size]="20"></svg>
+      </button>
+    </div>
+    <div class="rules-list" style="max-height: 60vh;">
+      <div class="rule-item">
+        <strong>👑 Admin Controls:</strong> Only the room creator (Admin) can control playback, seek the progress bar, and play songs directly from the queue.
+      </div>
+      <div class="rule-item">
+        <strong>🎵 Live Sync:</strong> All listeners will automatically sync to the exact timestamp of the Admin's player.
+      </div>
+      <div class="rule-item">
+        <strong>🎧 Add Music:</strong> Use the Search button to find and add music. If you are a listener, clicking a song will share it in the chat for the Admin to play!
+      </div>
+      <div class="rule-item">
+        <strong>📱 Mobile Tips:</strong> You can minimize the room using the top-left arrow to browse the app while listening together!
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search Modal -->
+<div class="rules-overlay" *ngIf="showSearchModal()">
+  <div class="rules-modal search-modal">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h2 style="margin: 0; font-size: 20px;">Add Music</h2>
+      <button class="btn-icon-sm" (click)="showSearchModal.set(false)">
+        <svg lucideX [attr.size]="20"></svg>
+      </button>
+    </div>
+    
+    <div class="search-input-wrapper">
+      <svg lucideSearch [attr.size]="18" class="search-icon"></svg>
+      <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchSongs()" placeholder="Search songs, artists..." autofocus>
+      <button class="btn-primary-sm" (click)="searchSongs()" [disabled]="!searchQuery.trim() || isSearching">
+        {{ isSearching ? 'Searching...' : 'Search' }}
+      </button>
+    </div>
+
+    <div class="search-results-list" *ngIf="searchResults.length > 0">
+      <div class="search-result-item" *ngFor="let track of searchResults" (click)="selectSearchResult(track)">
+        <img [src]="track.thumbnail" alt="Thumb">
+        <div class="meta">
+          <h4>{{track.title}}</h4>
+          <p>{{track.channelTitle}}</p>
+        </div>
+        <button class="btn-add">
+          <svg lucidePlay [attr.size]="16"></svg>
+        </button>
+      </div>
+    </div>
+    
+    <div class="empty-state" *ngIf="searchResults.length === 0 && !isSearching">
+      <p>Search for a song on YouTube to add it to the room.</p>
+    </div>
+  </div>
+</div>

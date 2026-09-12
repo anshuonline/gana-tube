@@ -17,7 +17,7 @@ export interface ChatMessage {
   id: string;
   senderUid: string;
   senderName: string;
-  type: 'text' | 'song-share' | 'system-join' | 'system-leave';
+  type: 'text' | 'song-share' | 'system-join' | 'system-leave' | 'like';
   content: string;
   track?: Track;
   timestamp: number;
@@ -51,6 +51,7 @@ export class RoomService {
   public chat = signal<ChatMessage[]>([]);
   public roomQueue = signal<Track[]>([]);
   public isAdmin = signal<boolean>(false);
+  public onLikeReceived = new EventEmitter<{senderName: string}>();
   public publicRooms = signal<RoomInfo[]>([]);
   public roomError = signal<string | null>(null);
 
@@ -111,6 +112,10 @@ export class RoomService {
     });
 
     this.socket.on('room:chat_new', (msg: ChatMessage) => {
+      if (msg.type === 'like') {
+        this.onLikeReceived.emit({ senderName: msg.senderName });
+        return;
+      }
       this.chat.update(current => {
         const newChat = [...current, msg];
         if (newChat.length > 100) return newChat.slice(-100);
@@ -197,6 +202,15 @@ export class RoomService {
     if (this.isAdmin()) {
       this.socket.emit('room:kick_member', { targetSocketId });
     }
+  }
+
+  sendLike(senderUid: string, senderName: string) {
+    this.socket.emit('room:chat_message', {
+      type: 'like',
+      content: '',
+      senderUid,
+      senderName
+    });
   }
 
   sendChatMessage(content: string, senderUid: string, senderName: string) {

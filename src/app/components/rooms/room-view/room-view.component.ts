@@ -23,7 +23,9 @@ import {
   LucideMoreVertical,
   LucideShare2,
   LucideSmile,
-  LucideChevronDown
+  LucideChevronDown,
+  LucideInfo,
+  LucideSearch
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -52,6 +54,8 @@ import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.co
     LucideShare2,
     LucideSmile,
     LucideChevronDown,
+    LucideInfo,
+    LucideSearch,
     RoomMembersPanelComponent,
     TrackMenuComponent,
     GuestNameModalComponent
@@ -75,6 +79,16 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   showMembersPanel = false;
   activeMobileTab: 'queue' | 'chat' = 'chat';
   showEmojiPicker = false;
+  mobileOptionsOpen = signal(false);
+  showInfoModal = signal(false);
+  showSearchModal = signal(false);
+  searchQuery = '';
+  searchResults: Track[] = [];
+  isSearching = false;
+
+  floatingHearts: { id: number, color: string, left: number, animationDuration: number }[] = [];
+  heartColors = ['white', 'orange', 'pink', 'blue'];
+  heartIdCounter = 0;
   
   // Track Menu state
   isMenuOpen = false;
@@ -177,6 +191,8 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.router.navigate(['/rooms']);
   };
 
+  private likeSub?: any;
+
   ngOnInit() {
     if (typeof sessionStorage !== 'undefined') {
       if (!sessionStorage.getItem('gt_room_rules_accepted')) {
@@ -185,6 +201,30 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
     
     this.roomService.getSocket().on('room:error', this.errorHandler);
+
+    this.likeSub = this.roomService.onLikeReceived.subscribe(() => {
+      this.spawnHeart();
+    });
+  }
+
+  sendLike() {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.roomService.sendLike(user.uid, user.name || 'User');
+    }
+  }
+
+  spawnHeart() {
+    const color = this.heartColors[Math.floor(Math.random() * this.heartColors.length)];
+    const left = Math.random() * 20 + 80; // random between 80% to 100% of the screen width
+    const animationDuration = Math.random() * 1.5 + 2; // 2-3.5s
+    const id = this.heartIdCounter++;
+    
+    this.floatingHearts.push({ id, color, left, animationDuration });
+    
+    setTimeout(() => {
+      this.floatingHearts = this.floatingHearts.filter(h => h.id !== id);
+    }, animationDuration * 1000);
   }
 
   acceptRules() {
@@ -196,6 +236,9 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnDestroy() {
     this.roomService.getSocket().off('room:error', this.errorHandler);
+    if (this.likeSub) {
+      this.likeSub.unsubscribe();
+    }
     // Do NOT leave room on destroy — room persists while navigating
   }
 
@@ -345,6 +388,56 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     } else if (state === 'paused' || state === 'unstarted') {
       this.playerService.togglePlayPause();
     }
+  }
+
+  playQueueItem(index: number) {
+    if (!this.roomService.isAdmin()) return;
+    this.playerService.playFromQueue(index);
+  }
+
+  seekProgress(event: MouseEvent, progressBar: HTMLElement) {
+    if (!this.roomService.isAdmin()) return;
+    
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+    const newTime = percentage * this.playerService.duration();
+    
+    this.playerService.seekTo(newTime);
+  }
+
+  // --- Search functionality ---
+  
+  async searchSongs() {
+    if (!this.searchQuery.trim()) return;
+    this.isSearching = true;
+    try {
+      this.youtubeApi.searchMusic(this.searchQuery.trim()).subscribe(results => {
+        this.searchResults = results;
+        this.isSearching = false;
+      });
+    } catch (e) {
+      this.toastService.show('Failed to search. Try again.', 'error');
+      this.isSearching = false;
+    }
+  }
+
+  selectSearchResult(track: Track) {
+    if (this.roomService.isAdmin()) {
+      // Add directly to queue
+      this.playerService.addToQueue(track);
+      this.toastService.show(`Added "${track.title}" to queue`);
+    } else {
+      // Listeners can suggest by sharing to chat
+      const user = this.authService.currentUser();
+      if (user) {
+        this.roomService.sendSongShare(track, user.uid, user.name);
+        this.toastService.show(`Shared "${track.title}" in chat!`);
+      }
+    }
+    this.showSearchModal.set(false);
+    this.searchQuery = '';
+    this.searchResults = [];
   }
 
   nextTrack() {
