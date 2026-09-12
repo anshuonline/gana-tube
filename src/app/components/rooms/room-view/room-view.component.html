@@ -170,7 +170,7 @@
                     [disabled]="!roomService.isAdmin()" 
                     (click)="playEmbeddedSong(msg.track)"
                     [title]="roomService.isAdmin() ? 'Play this track' : 'Only Host can play'">
-                    <lucide-play [size]="16"></lucide-play>
+                    <svg lucidePlay [attr.size]="16"></svg>
                   </button>
                 </div>
               </div>

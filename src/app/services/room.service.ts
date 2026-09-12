@@ -17,7 +17,7 @@ export interface ChatMessage {
   id: string;
   senderUid: string;
   senderName: string;
-  type: 'text' | 'song-share';
+  type: 'text' | 'song-share' | 'system-join' | 'system-leave';
   content: string;
   track?: Track;
   timestamp: number;
