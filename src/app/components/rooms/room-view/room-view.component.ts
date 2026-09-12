@@ -181,7 +181,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   showGuestModal = signal(false);
   pendingRoomIdToJoin = '';
-  mobileOptionsOpen = signal(false);
   
   showRulesPopup = signal(false);
   rulesAccepted = false;
@@ -210,7 +209,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   sendLike() {
     const user = this.authService.currentUser();
     if (user) {
-      this.roomService.sendLike(user.uid, user.name || 'User');
+      this.roomService.sendLike(user.uid, user.displayName || 'User');
     }
   }
 
@@ -431,7 +430,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       // Listeners can suggest by sharing to chat
       const user = this.authService.currentUser();
       if (user) {
-        this.roomService.sendSongShare(track, user.uid, user.name);
+        this.roomService.sendSongShare(track, user.uid, user.displayName || 'User');
         this.toastService.show(`Shared "${track.title}" in chat!`);
       }
     }
