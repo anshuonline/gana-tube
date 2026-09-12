@@ -186,7 +186,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!user) return;
     
     // Check if the input is a GanaTube URL
-    const gtRegex = /(?:betatesting\.)?ganatube\.in\/play\?v=([a-zA-Z0-9_-]{11})/;
+    const gtRegex = /(?:betatesting\.)?ganatube\.in\/(?:play|share\.php)\?v=([a-zA-Z0-9_-]{11})/;
     const match = this.chatInput.match(gtRegex);
     
     if (match && match[1]) {
