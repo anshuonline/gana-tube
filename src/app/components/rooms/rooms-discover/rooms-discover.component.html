@@ -7,11 +7,11 @@
     
     <div class="header-actions">
       <button class="btn-join-private" (click)="openJoinModal()">
-        <svg lucideLock [attr.size]="12"></svg>
+        <svg lucideLock [attr.size]="14"></svg>
         Join Private
       </button>
       <button class="btn-create" (click)="openCreateModal()">
-        <svg lucidePlus [attr.size]="18"></svg>
+        <svg lucidePlus [attr.size]="16"></svg>
         Create Room
       </button>
     </div>
@@ -21,31 +21,38 @@
     <p>Join a live room to listen together, chat, and discover new music in real-time.</p>
   </div>
 
-  <div class="rooms-grid" *ngIf="roomService.publicRooms().length > 0">
-    <div class="room-card" *ngFor="let room of roomService.publicRooms()">
-      <div class="card-art" [ngClass]="{'has-art': !!room.currentTrack}">
+  <div class="rooms-list" *ngIf="roomService.publicRooms().length > 0">
+    <div class="room-row" *ngFor="let room of roomService.publicRooms()" (click)="joinPublicRoom(room.roomId)">
+      
+      <div class="room-thumbnail">
         <img *ngIf="room.currentTrack" [src]="room.currentTrack.thumbnailHigh" alt="Cover">
         <div *ngIf="!room.currentTrack" class="art-placeholder">
-          <svg lucideMusic [attr.size]="32"></svg>
-        </div>
-        <div class="listener-badge">
-          <div class="pulse-dot"></div>
-          <span>{{room.listenerCount}}</span>
-          <svg lucideUsers [attr.size]="12"></svg>
+          <svg lucideMusic [attr.size]="24"></svg>
         </div>
       </div>
       
-      <div class="card-info">
+      <div class="room-details">
         <h3 class="room-name">{{room.name}}</h3>
         <p class="admin-name">Host: {{room.adminName}}</p>
         
-        <div class="now-playing">
-          <span class="playing-label">Now Playing</span>
-          <p class="song-title">{{room.currentTrack ? room.currentTrack.title : 'Nothing playing yet'}}</p>
+        <div class="now-playing-compact">
+          <span class="playing-label">Playing:</span>
+          <span class="song-title">{{room.currentTrack ? room.currentTrack.title : 'Nothing playing yet'}}</span>
         </div>
-        
-        <button class="btn-join" (click)="joinPublicRoom(room.roomId)">Join Room</button>
       </div>
+      
+      <div class="room-stats">
+        <div class="listener-count">
+          <div class="pulse-dot"></div>
+          <svg lucideUsers [attr.size]="16"></svg>
+          <span>{{room.listenerCount}} {{room.listenerCount === 1 ? 'Member' : 'Members'}}</span>
+        </div>
+      </div>
+      
+      <div class="room-actions">
+        <button class="btn-join">Join Room</button>
+      </div>
+      
     </div>
   </div>
 

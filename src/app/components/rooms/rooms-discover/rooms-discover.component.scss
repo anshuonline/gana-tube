@@ -1,8 +1,8 @@
 .discover-container {
   padding: 24px;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 75px auto 0 auto;
-  color: #F5F5F7;
+  color: #FFFFFF;
   
   .discover-header {
     display: flex;
@@ -16,7 +16,7 @@
       gap: 12px;
       
       .icon-radio {
-        color: #EC4899;
+        color: #9333EA;
       }
       
       h2 {
@@ -34,18 +34,13 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 16px;
+        padding: 10px 18px;
         border-radius: 20px;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         border: none;
         transition: all 0.2s ease;
-        
-        lucide-icon {
-          width: 16px;
-          height: 16px;
-        }
       }
       
       .btn-join-private {
@@ -58,12 +53,12 @@
       }
       
       .btn-create {
-        background: linear-gradient(135deg, #7C3AED, #EC4899);
+        background: linear-gradient(135deg, #7C3AED, #9333EA);
         color: #FFF;
         
         &:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+          box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
         }
       }
     }
@@ -72,37 +67,49 @@
   .subtitle {
     margin-bottom: 32px;
     p {
-      color: #9C9CA6;
+      color: #A0A0AB;
       font-size: 16px;
       margin: 0;
     }
   }
 
-  .rooms-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 320px));
-    justify-content: start;
-    gap: 24px;
-  }
-  
-  .room-card {
-    background: #17171C;
-    border-radius: 16px;
-    overflow: hidden;
-    transition: transform 0.2s ease;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  .rooms-list {
     display: flex;
     flex-direction: column;
+    gap: 12px;
+  }
+  
+  .room-row {
+    display: flex;
+    align-items: center;
+    background: #000000;
+    border-radius: 12px;
+    padding: 12px 16px;
+    gap: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s ease;
+    cursor: pointer;
     
     &:hover {
-      transform: translateY(-4px);
-      border-color: rgba(236, 72, 153, 0.3);
+      background: #111111;
+      border-color: rgba(124, 58, 237, 0.4);
+      transform: translateY(-2px);
+      
+      .btn-join {
+        background: linear-gradient(135deg, #7C3AED, #9333EA);
+        color: #FFF;
+        border-color: transparent;
+      }
     }
     
-    .card-art {
+    .room-thumbnail {
+      width: 100px;
+      height: 60px;
+      border-radius: 8px;
+      background: #1A1A1A;
+      overflow: hidden;
+      flex-shrink: 0;
       position: relative;
-      height: 160px;
-      background: #0B0B0E;
       
       img {
         width: 100%;
@@ -116,48 +123,17 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #333;
-        
-        lucide-icon {
-          width: 48px;
-          height: 48px;
-        }
-      }
-      
-      .listener-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
-        padding: 4px 10px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        
-        .pulse-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #EC4899;
-          box-shadow: 0 0 8px #EC4899;
-          animation: pulse 2s infinite;
-        }
+        color: #555;
       }
     }
     
-    .card-info {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
+    .room-details {
       flex: 1;
+      min-width: 0;
       
       .room-name {
         margin: 0 0 4px 0;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
         white-space: nowrap;
         overflow: hidden;
@@ -165,55 +141,70 @@
       }
       
       .admin-name {
-        margin: 0 0 16px 0;
+        margin: 0 0 6px 0;
         font-size: 13px;
-        color: #9C9CA6;
+        color: #A0A0AB;
       }
       
-      .now-playing {
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 16px;
-        flex: 1;
+      .now-playing-compact {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
         
         .playing-label {
-          font-size: 11px;
-          text-transform: uppercase;
-          color: #EC4899;
-          font-weight: 700;
-          letter-spacing: 0.5px;
-          margin-bottom: 4px;
-          display: block;
+          color: #9333EA;
+          font-weight: 600;
         }
         
         .song-title {
-          margin: 0;
-          font-size: 14px;
           color: #E0E0E0;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
+          white-space: nowrap;
           overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
+    }
+    
+    .room-stats {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      
+      .listener-count {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #E0E0E0;
+        font-size: 14px;
+        font-weight: 500;
+        
+        .pulse-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #10B981; /* Green for active */
+          box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+          animation: pulse 2s infinite;
+        }
+      }
+    }
+    
+    .room-actions {
+      padding-left: 16px;
       
       .btn-join {
-        margin-top: auto;
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #7C3AED, #9333EA);
-        color: white;
-        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        background: transparent;
+        color: #FFFFFF;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         font-weight: 600;
+        font-size: 14px;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
-        }
+        transition: all 0.2s ease;
       }
     }
   }
@@ -225,8 +216,9 @@
     justify-content: center;
     padding: 64px 24px;
     text-align: center;
-    background: #17171C;
+    background: #000000;
     border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
     margin-top: 32px;
     
     .empty-icon {
@@ -241,7 +233,7 @@
     }
     
     p {
-      color: #9C9CA6;
+      color: #A0A0AB;
       margin: 0 0 24px 0;
       max-width: 400px;
     }
@@ -249,7 +241,7 @@
     .btn-create-large {
       padding: 12px 24px;
       border-radius: 24px;
-      background: linear-gradient(135deg, #7C3AED, #EC4899);
+      background: linear-gradient(135deg, #7C3AED, #9333EA);
       color: #FFF;
       border: none;
       font-size: 16px;
@@ -285,6 +277,36 @@
         button {
           flex: 1;
           justify-content: center;
+        }
+      }
+    }
+    
+    .room-row {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px;
+      
+      .room-thumbnail {
+        width: 100%;
+        height: 120px;
+      }
+      
+      .room-stats {
+        width: 100%;
+        padding: 12px 0;
+        margin: 8px 0;
+        border-left: none;
+        border-right: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      
+      .room-actions {
+        width: 100%;
+        padding-left: 0;
+        
+        .btn-join {
+          width: 100%;
         }
       }
     }
