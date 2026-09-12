@@ -153,7 +153,7 @@
               {{msg.content}}
             </div>
             
-            <div class="msg-song-embed" *ngIf="msg.type === 'song-share' || msg.type === 'song_embed'">
+            <div class="msg-song-embed" *ngIf="msg.type === 'song-share'">
               <div class="embed-header">Shared a track:</div>
               <div class="embed-card" *ngIf="msg.track">
                 <img [src]="msg.track.thumbnail" alt="Thumb">
