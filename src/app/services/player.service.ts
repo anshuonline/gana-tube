@@ -68,7 +68,7 @@ export class PlayerService {
           }
         }
       }
-    }, 5000);
+    }, 2000);
   }
 
   private setupDeviceSyncListeners() {
@@ -250,24 +250,39 @@ export class PlayerService {
       
       socket.on('room:state', (state: any) => {
         this.isRemoteUpdate = true;
-        if (state.queue && state.queue.length > 0) {
+        
+        if (state.queue) {
           this.queue.set(state.queue);
-          if (state.currentTrack) {
-            const idx = state.queue.findIndex((t: any) => t.videoId === state.currentTrack.videoId);
-            this.currentIndex.set(idx >= 0 ? idx : 0);
+        }
+        
+        if (state.currentTrack) {
+          const q = this.queue();
+          const idx = q.findIndex((t: any) => t.videoId === state.currentTrack.videoId);
+          this.currentIndex.set(idx >= 0 ? idx : -1);
+          
+          const currentPlayingId = this.currentTrack()?.videoId || (this as any)._lastLoadedVideoId;
+          if (currentPlayingId !== state.currentTrack.videoId || this.playerState() === 'unstarted') {
             this.playTrack(state.currentTrack);
-            
-            if (state.currentTime > 0) {
-              if (this.ytPlayer) {
-                setTimeout(() => {
-                  if (this.ytPlayer) this.ytPlayer.seekTo(state.currentTime, true);
-                }, 1000);
-              } else {
-                (this as any)._pendingSeekTime = state.currentTime;
-              }
+            (this as any)._lastLoadedVideoId = state.currentTrack.videoId;
+          }
+          
+          if (state.currentTime > 0) {
+            if (this.ytPlayer) {
+              setTimeout(() => {
+                if (this.ytPlayer) this.ytPlayer.seekTo(state.currentTime, true);
+              }, 1000);
+            } else {
+              (this as any)._pendingSeekTime = state.currentTime;
             }
           }
+          
+          if (state.isPlaying && this.ytPlayer) {
+             setTimeout(() => {
+               if (this.ytPlayer) this.ytPlayer.playVideo();
+             }, 1000);
+          }
         }
+        
         this.isRemoteUpdate = false;
       });
 
