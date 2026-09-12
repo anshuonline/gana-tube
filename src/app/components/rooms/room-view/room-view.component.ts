@@ -2,6 +2,7 @@ import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, Af
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { RoomService } from '../../../services/room.service';
 import { PlayerService, Track } from '../../../services/player.service';
 import { AuthService } from '../../../services/auth.service';
@@ -247,6 +248,9 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (this.likeSub) {
       this.likeSub.unsubscribe();
     }
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+    }
     // Do NOT leave room on destroy — room persists while navigating
   }
 
@@ -414,13 +418,20 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.playerService.seekTo(newTime);
   }
 
+  searchSub?: Subscription;
+
   // --- Search functionality ---
   
   async searchSongs() {
     if (!this.searchQuery.trim()) return;
     this.isSearching = true;
+    
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+    }
+    
     try {
-      this.youtubeApi.searchMusic(this.searchQuery.trim()).subscribe(results => {
+      this.searchSub = this.youtubeApi.searchMusic(this.searchQuery.trim()).subscribe(results => {
         this.searchResults = results;
         this.isSearching = false;
       });

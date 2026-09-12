@@ -4,6 +4,7 @@ const { nanoid } = require('nanoid');
 const rooms = new Map();
 const socketToRoom = new Map();
 const userMutes = new Map(); // Firebase UID -> { level: number, expiresAt: number, history: { time: number, content: string }[] }
+const disconnectTimeouts = new Map();
 
 // --- Spam Filter ---
 function applySpamMute(uid, socket) {
@@ -113,6 +114,11 @@ function setupRoomHandlers(io, socket) {
   });
 
   socket.on('room:join', ({ roomId, joinCode, user }) => {
+    if (disconnectTimeouts.has(user.uid)) {
+      clearTimeout(disconnectTimeouts.get(user.uid));
+      disconnectTimeouts.delete(user.uid);
+    }
+    
     let room = rooms.get(roomId);
     if (!room) {
       for (const [rid, r] of rooms.entries()) {
@@ -192,7 +198,7 @@ function setupRoomHandlers(io, socket) {
   });
 
   socket.on('room:leave', () => {
-    handleRoomDisconnect(io, socket.id);
+    handleRoomDisconnect(io, socket.id, true);
   });
 
   socket.on('room:transfer_admin', ({ targetSocketId }) => {
@@ -296,11 +302,19 @@ function setupRoomHandlers(io, socket) {
     const room = rooms.get(roomId);
     if (!room) return;
     
+    // Secure identity check
+    const member = room.members.find(m => m.socketId === socket.id);
+    if (!member) return;
+    
+    msg.senderUid = member.uid;
+    msg.senderName = member.displayName;
+    
     // SPAM CHECK
     let checkContent = msg.content;
     if (msg.type === 'song-share') checkContent = 'song-share-' + (msg.track?.videoId || '');
+    if (msg.type === 'like') checkContent = 'like'; // Hearts don't count heavily
     
-    if (checkSpam(msg.senderUid, checkContent, socket)) {
+    if (msg.type !== 'like' && checkSpam(msg.senderUid, checkContent, socket)) {
       return; // Dropped
     }
     
@@ -331,41 +345,39 @@ function setupRoomHandlers(io, socket) {
   });
 }
 
-function handleRoomDisconnect(io, socketId) {
+function handleRoomDisconnect(io, socketId, isIntentional = false) {
   const roomId = socketToRoom.get(socketId);
   if (roomId) {
     const room = rooms.get(roomId);
     if (room) {
       const leavingMember = room.members.find(m => m.socketId === socketId);
+      if (!leavingMember) return;
       
-      room.members = room.members.filter(m => m.socketId !== socketId);
-      room.listenerCount = room.members.length;
+      socketToRoom.delete(socketId);
+      
+      const removeUser = () => {
+        const r = rooms.get(roomId);
+        if (!r) return;
+        r.members = r.members.filter(m => m.uid !== leavingMember.uid);
+        r.listenerCount = r.members.length;
 
-      if (room.members.length === 0) {
-        io.to(roomId).emit('room:closed');
-        io.socketsLeave(roomId);
-        rooms.delete(roomId);
-        console.log(`Room ${roomId} destroyed (empty)`);
-      } else {
-        
-        if (room.adminUid === socketId) {
-          const newAdmin = room.members[0];
-          newAdmin.isAdmin = true;
-          room.adminUid = newAdmin.socketId;
-          room.adminFirebaseUid = newAdmin.uid;
-          room.adminName = newAdmin.displayName;
-          
-          io.in(socketId).socketsLeave(roomId);
-          io.to(roomId).emit('room:admin_changed', { newAdminUid: newAdmin.socketId, members: room.members });
-          io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
-          console.log(`Room ${roomId}: admin transferred to ${newAdmin.displayName}`);
+        if (r.members.length === 0) {
+          io.to(roomId).emit('room:closed');
+          io.socketsLeave(roomId);
+          rooms.delete(roomId);
+          console.log(`Room ${roomId} destroyed (empty)`);
         } else {
-          io.in(socketId).socketsLeave(roomId);
-          io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
-        }
-        
-        // System Chat Message for Leave
-        if (leavingMember) {
+          if (r.adminFirebaseUid === leavingMember.uid) {
+            const newAdmin = r.members[0];
+            newAdmin.isAdmin = true;
+            r.adminUid = newAdmin.socketId;
+            r.adminFirebaseUid = newAdmin.uid;
+            r.adminName = newAdmin.displayName;
+            
+            io.to(roomId).emit('room:admin_changed', { newAdminUid: newAdmin.socketId, members: r.members });
+          }
+          io.to(roomId).emit('room:member_left', { members: r.members, listenerCount: r.listenerCount });
+          
           const msg = {
             id: nanoid(10),
             senderUid: 'system',
@@ -374,15 +386,34 @@ function handleRoomDisconnect(io, socketId) {
             content: `* ${leavingMember.displayName} left the room.`,
             timestamp: Date.now()
           };
-          room.chat.push(msg);
-          if (room.chat.length > 100) room.chat.shift();
+          r.chat.push(msg);
+          if (r.chat.length > 100) r.chat.shift();
           io.to(roomId).emit('room:chat_new', msg);
         }
+      };
+
+      if (isIntentional) {
+        removeUser();
+      } else {
+        const tid = setTimeout(() => {
+          removeUser();
+        }, 15000); // 15s grace period
+        disconnectTimeouts.set(leavingMember.uid, tid);
       }
     }
-    socketToRoom.delete(socketId);
   }
 }
+
+// --- Cleanup Tasks ---
+setInterval(() => {
+  const now = Date.now();
+  for (const [uid, state] of userMutes.entries()) {
+    // If expired for more than 24h, delete from map
+    if (state.expiresAt > 0 && now > state.expiresAt + 24 * 60 * 60 * 1000) {
+      userMutes.delete(uid);
+    }
+  }
+}, 60 * 60 * 1000); // Run every 1 hour
 
 module.exports = {
   setupRoomHandlers,
