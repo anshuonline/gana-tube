@@ -22,7 +22,8 @@ import {
   LucideMusic,
   LucideMoreVertical,
   LucideShare2,
-  LucideSmile
+  LucideSmile,
+  LucideChevronDown
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -50,6 +51,7 @@ import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.co
     LucideMoreVertical,
     LucideShare2,
     LucideSmile,
+    LucideChevronDown,
     RoomMembersPanelComponent,
     TrackMenuComponent,
     GuestNameModalComponent
@@ -220,6 +222,11 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.roomService.leaveRoom();
     this.playerService.pause();
     this.router.navigate(['/rooms']);
+  }
+
+  minimizeRoom() {
+    // Navigate away without leaving the room — music keeps playing
+    this.router.navigate(['/']);
   }
 
   toggleVisibility() {

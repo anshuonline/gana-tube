@@ -3,6 +3,10 @@
   <!-- Header -->
   <header class="room-header">
     <div class="header-left">
+      <!-- Mobile minimize button -->
+      <button class="btn-minimize hide-desktop" (click)="minimizeRoom()" title="Minimize Room">
+        <svg lucideChevronDown [attr.size]="20"></svg>
+      </button>
       <div class="live-badge">
         <div class="pulse-dot"></div>
         <span>LIVE</span>
@@ -31,6 +35,10 @@
           <svg lucideMoreVertical [attr.size]="20"></svg>
         </button>
         <div class="options-dropdown" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)">
+           <button class="dropdown-item" (click)="copyRoomCode()">
+             <svg lucideCopy [attr.size]="16"></svg>
+             Copy Room Code
+           </button>
            <button class="dropdown-item" (click)="shareRoom()">
              <svg lucideShare2 [attr.size]="16"></svg>
              Share Room

@@ -831,6 +831,21 @@
 .hide-mobile { }
 .hide-desktop { display: none; }
 
+.btn-minimize {
+  background: none;
+  border: none;
+  padding: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  
+  &:hover {
+    color: white;
+  }
+}
+
 // Mobile Responsive
 @media (max-width: 768px) {
   :host {
@@ -863,6 +878,10 @@
     padding: 4px 12px;
     flex-wrap: wrap;
     gap: 6px;
+  }
+
+  .room-code-strip {
+    display: none;
   }
 
   .main-layout {
