@@ -37,15 +37,28 @@ io.on('connection', (socket) => {
     if (roomId) {
       const room = rooms.get(roomId);
       if (room) {
-        if (room.adminUid === socket.id) {
-          // Admin left, destroy room
-          io.to(roomId).emit('room:closed');
-          io.socketsLeave(roomId);
+        // Remove disconnected member
+        room.members = room.members.filter(m => m.socketId !== socket.id);
+        room.listenerCount = room.members.length;
+
+        if (room.members.length === 0) {
+          // No one left — destroy room
           rooms.delete(roomId);
+          console.log(`Room ${roomId} destroyed (empty)`);
+        } else if (room.adminUid === socket.id) {
+          // Admin disconnected but others remain — transfer admin to next member
+          const newAdmin = room.members[0];
+          newAdmin.isAdmin = true;
+          room.adminUid = newAdmin.socketId;
+          room.adminFirebaseUid = newAdmin.uid;
+          room.adminName = newAdmin.displayName;
+          // Mark old admin
+          // (already removed from members array above)
+          io.to(roomId).emit('room:admin_changed', { newAdminUid: newAdmin.socketId, members: room.members });
+          io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+          console.log(`Room ${roomId}: admin transferred to ${newAdmin.displayName}`);
         } else {
           // Regular member left
-          room.members = room.members.filter(m => m.socketId !== socket.id);
-          room.listenerCount = room.members.length;
           io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
         }
       }
@@ -104,15 +117,15 @@ io.on('connection', (socket) => {
   // --- Listening Rooms Events ---
   socket.on('room:create', ({ name, isPublic, adminUser }) => {
     const roomId = nanoid(6).toUpperCase();
-    const joinCode = isPublic ? null : roomId;
     
     const room = {
       roomId,
       name: name.substring(0, 40),
       isPublic,
-      joinCode,
-      codeExpiresAt: isPublic ? null : Date.now() + 24 * 60 * 60 * 1000,
+      // Room code = roomId itself. For private rooms, users enter this code to join.
+      joinCode: roomId,
       adminUid: socket.id,
+      adminFirebaseUid: adminUser.uid, // Firebase UID for reconnection
       adminName: adminUser.displayName || 'Host',
       members: [{
         socketId: socket.id,
@@ -137,17 +150,27 @@ io.on('connection', (socket) => {
   });
 
   socket.on('room:join', ({ roomId, joinCode, user }) => {
-    const room = rooms.get(roomId);
+    // Try to find room by roomId directly, or search by joinCode
+    let room = rooms.get(roomId);
+    if (!room) {
+      // Maybe user entered room code — search all rooms
+      for (const [rid, r] of rooms.entries()) {
+        if (r.joinCode === roomId || r.roomId === roomId) {
+          room = r;
+          roomId = rid;
+          break;
+        }
+      }
+    }
     if (!room) {
       return socket.emit('room:error', 'Room not found');
     }
     
+    // For private rooms, the joinCode must match (joinCode = roomId)
     if (!room.isPublic) {
-      if (room.joinCode !== joinCode) {
-        return socket.emit('room:error', 'Invalid join code');
-      }
-      if (room.codeExpiresAt && Date.now() > room.codeExpiresAt) {
-        return socket.emit('room:error', 'That code has expired — ask the admin for a new one');
+      const codeToCheck = joinCode || roomId;
+      if (room.joinCode !== codeToCheck) {
+        return socket.emit('room:error', 'Invalid room code');
       }
     }
     
@@ -155,8 +178,29 @@ io.on('connection', (socket) => {
       return socket.emit('room:error', 'Room is full (50/50)');
     }
     
-    const existingIdx = room.members.findIndex(m => m.uid === user.uid || m.socketId === socket.id);
-    if (existingIdx === -1) {
+    // Check if this user is reconnecting (same Firebase UID)
+    const existingIdx = room.members.findIndex(m => m.uid === user.uid);
+    if (existingIdx !== -1) {
+      // Reconnecting user — update their socket ID
+      const existingMember = room.members[existingIdx];
+      const oldSocketId = existingMember.socketId;
+      existingMember.socketId = socket.id;
+      
+      // If this was the admin reconnecting, restore admin status
+      if (room.adminFirebaseUid === user.uid) {
+        existingMember.isAdmin = true;
+        room.adminUid = socket.id;
+        room.adminName = existingMember.displayName;
+        // Remove admin from any other member who got it temporarily
+        room.members.forEach(m => {
+          if (m.uid !== user.uid) m.isAdmin = false;
+        });
+      }
+      
+      // Clean up old mapping
+      socketToRoom.delete(oldSocketId);
+    } else {
+      // New member joining
       const newMember = {
         socketId: socket.id,
         uid: user.uid,
@@ -181,13 +225,29 @@ io.on('connection', (socket) => {
     
     const room = rooms.get(roomId);
     if (room) {
-      if (room.adminUid === socket.id) {
+      room.members = room.members.filter(m => m.socketId !== socket.id);
+      room.listenerCount = room.members.length;
+      
+      if (room.members.length === 0) {
+        // No one left — destroy room
         io.to(roomId).emit('room:closed');
         io.socketsLeave(roomId);
         rooms.delete(roomId);
+        console.log(`Room ${roomId} destroyed (admin left, no members)`);
+      } else if (room.adminUid === socket.id) {
+        // Admin explicitly left but others remain — transfer admin
+        const newAdmin = room.members[0];
+        newAdmin.isAdmin = true;
+        room.adminUid = newAdmin.socketId;
+        room.adminFirebaseUid = newAdmin.uid;
+        room.adminName = newAdmin.displayName;
+        
+        socket.leave(roomId);
+        io.to(roomId).emit('room:admin_changed', { newAdminUid: newAdmin.socketId, members: room.members });
+        io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+        console.log(`Room ${roomId}: admin left, transferred to ${newAdmin.displayName}`);
       } else {
-        room.members = room.members.filter(m => m.socketId !== socket.id);
-        room.listenerCount = room.members.length;
+        // Regular member left
         socket.leave(roomId);
         io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
       }
@@ -210,10 +270,41 @@ io.on('connection', (socket) => {
       // new admin
       targetMember.isAdmin = true;
       room.adminUid = targetSocketId;
+      room.adminFirebaseUid = targetMember.uid;
       room.adminName = targetMember.displayName;
       
       io.to(roomId).emit('room:admin_changed', { newAdminUid: targetSocketId, members: room.members });
     }
+  });
+
+  // Kick a member (admin only)
+  socket.on('room:kick_member', ({ targetSocketId }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    // Can't kick yourself
+    if (targetSocketId === socket.id) return;
+    
+    const targetMember = room.members.find(m => m.socketId === targetSocketId);
+    if (!targetMember) return;
+    
+    // Remove from room
+    room.members = room.members.filter(m => m.socketId !== targetSocketId);
+    room.listenerCount = room.members.length;
+    
+    // Notify the kicked user
+    io.to(targetSocketId).emit('room:kicked', { reason: 'You were removed from the room by the host' });
+    
+    // Remove from socket room
+    const targetSocket = io.sockets.sockets.get(targetSocketId);
+    if (targetSocket) targetSocket.leave(roomId);
+    socketToRoom.delete(targetSocketId);
+    
+    // Notify remaining members
+    io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+    console.log(`Room ${roomId}: ${targetMember.displayName} was kicked by admin`);
   });
 
   socket.on('room:toggle_visibility', () => {
@@ -223,21 +314,6 @@ io.on('connection', (socket) => {
     if (!room || room.adminUid !== socket.id) return;
     
     room.isPublic = !room.isPublic;
-    if (!room.isPublic && !room.joinCode) {
-      room.joinCode = room.roomId;
-      room.codeExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
-    }
-    io.to(roomId).emit('room:state', room);
-  });
-
-  socket.on('room:regenerate_code', () => {
-    const roomId = socketToRoom.get(socket.id);
-    if (!roomId) return;
-    const room = rooms.get(roomId);
-    if (!room || room.adminUid !== socket.id) return;
-    
-    room.joinCode = room.roomId;
-    room.codeExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
     io.to(roomId).emit('room:state', room);
   });
 
@@ -306,7 +382,8 @@ io.on('connection', (socket) => {
         name: r.name,
         adminName: r.adminName,
         currentTrack: r.currentTrack,
-        listenerCount: r.listenerCount
+        listenerCount: r.listenerCount,
+        isPublic: r.isPublic
       }));
     socket.emit('room:discover_results', publicRooms);
   });

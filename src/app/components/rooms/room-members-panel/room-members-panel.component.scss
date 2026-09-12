@@ -190,6 +190,14 @@
             &:hover {
               background: rgba(255, 255, 255, 0.05);
             }
+            
+            &.btn-danger {
+              color: #EF4444;
+              
+              &:hover {
+                background: rgba(239, 68, 68, 0.1);
+              }
+            }
           }
         }
       }

@@ -44,6 +44,11 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   private refreshInterval: any;
 
   ngOnInit() {
+    const info = this.roomService.currentRoomInfo();
+    if (info) {
+      this.router.navigate(['/rooms', info.roomId]);
+      return;
+    }
     this.refreshRooms();
     this.refreshInterval = setInterval(() => this.refreshRooms(), 10000);
   }
@@ -59,10 +64,6 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   openCreateModal() {
     if (this.authService.currentUser() === null || this.authService.currentUser() === undefined) {
       this.toastService.show('Please log in to create a room.', 'info');
-      return;
-    }
-    if (!this.playerService.currentTrack()) {
-      this.toastService.show('First play a song', 'info');
       return;
     }
     this.showCreateModal = true;
@@ -84,13 +85,11 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
     
     const user = this.authService.currentUser();
     if (user) {
-      const handler = (state: any) => {
+      this.roomService.getSocket().once('room:state', (state: any) => {
         if (state.roomId === roomId) {
-          this.roomService.getSocket().off('room:state', handler);
           this.router.navigate(['/rooms', state.roomId]);
         }
-      };
-      this.roomService.getSocket().on('room:state', handler);
+      });
       this.roomService.joinRoom(roomId, null, user);
     }
   }

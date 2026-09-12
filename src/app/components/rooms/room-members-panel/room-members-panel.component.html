@@ -41,6 +41,10 @@
               <svg lucideCrown [attr.size]="14"></svg>
               Make Host
             </button>
+            <button class="btn-danger" *ngIf="member.socketId !== roomService.getSocketId()" (click)="kickMember(member.socketId)">
+              <svg lucideUserX [attr.size]="14"></svg>
+              Kick
+            </button>
           </div>
         </div>
         

@@ -1,12 +1,12 @@
 import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RoomService, RoomMember } from '../../../services/room.service';
-import { LucideX, LucideUser, LucideCrown, LucideMoreVertical } from '@lucide/angular';
+import { LucideX, LucideUser, LucideCrown, LucideMoreVertical, LucideUserX } from '@lucide/angular';
 
 @Component({
   selector: 'app-room-members-panel',
   standalone: true,
-  imports: [CommonModule, LucideX, LucideUser, LucideCrown, LucideMoreVertical],
+  imports: [CommonModule, LucideX, LucideUser, LucideCrown, LucideMoreVertical, LucideUserX],
   templateUrl: './room-members-panel.component.html',
   styleUrls: ['./room-members-panel.component.scss']
 })
@@ -32,6 +32,11 @@ export class RoomMembersPanelComponent {
 
   makeAdmin(targetSocketId: string) {
     this.roomService.transferAdmin(targetSocketId);
+    this.activeMenuSocketId = null;
+  }
+
+  kickMember(targetSocketId: string) {
+    this.roomService.kickMember(targetSocketId);
     this.activeMenuSocketId = null;
   }
 }

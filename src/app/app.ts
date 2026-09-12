@@ -14,6 +14,7 @@ import { ToastComponent } from './components/toast/toast.component';
 import { ToastService } from './services/toast.service';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
 import { PlayerService } from './services/player.service';
+import { RoomService } from './services/room.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
@@ -122,6 +123,7 @@ export class App implements OnInit {
 
   public pwaService = inject(PwaService);
   public analyticsService = inject(AnalyticsService);
+  public roomService = inject(RoomService);
 
   openSpinWheel() {
     this.spinWheel?.open();
@@ -1241,7 +1243,12 @@ export class App implements OnInit {
 
   openRoomsPage() {
     this.closeMobileMenu();
-    this.router.navigate(['/rooms']);
+    const info = this.roomService.currentRoomInfo();
+    if (info) {
+      this.router.navigate(['/rooms', info.roomId]);
+    } else {
+      this.router.navigate(['/rooms']);
+    }
   }
 
   openReleaseNotes() {

@@ -26,8 +26,8 @@ export interface RoomInfo {
   name: string;
   isPublic: boolean;
   joinCode?: string;
-  codeExpiresAt?: number;
   adminUid: string;
+  adminFirebaseUid?: string;
   adminName: string;
   members: RoomMember[];
   currentTrack: Track | null;
@@ -123,6 +123,15 @@ export class RoomService {
       this.roomError.set('Room was closed by the admin');
     });
 
+    this.socket.on('room:kicked', ({ reason }) => {
+      this.currentRoomInfo.set(null);
+      this.members.set([]);
+      this.chat.set([]);
+      this.roomQueue.set([]);
+      this.isAdmin.set(false);
+      this.roomError.set(reason || 'You were removed from the room');
+    });
+
     this.socket.on('room:error', (err: string) => {
       this.roomError.set(err);
     });
@@ -170,9 +179,9 @@ export class RoomService {
     }
   }
 
-  regenerateCode() {
+  kickMember(targetSocketId: string) {
     if (this.isAdmin()) {
-      this.socket.emit('room:regenerate_code');
+      this.socket.emit('room:kick_member', { targetSocketId });
     }
   }
 

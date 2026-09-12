@@ -17,14 +17,11 @@ import {
   LucideGlobe,
   LucideLock,
   LucideCopy,
-  LucideRefreshCw,
-  LucideTrash2,
+  LucideX,
   LucideMusic,
-  LucideSearch,
   LucideMoreVertical,
-  LucideRepeat,
-  LucideRepeat1,
-  LucideShare2
+  LucideShare2,
+  LucideSmile
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -46,14 +43,11 @@ import { AppStateService } from '../../../services/app-state.service';
     LucideGlobe,
     LucideLock,
     LucideCopy,
-    LucideRefreshCw,
-    LucideTrash2,
+    LucideX,
     LucideMusic,
-    LucideSearch,
     LucideMoreVertical,
-    LucideRepeat,
-    LucideRepeat1,
     LucideShare2,
+    LucideSmile,
     RoomMembersPanelComponent,
     TrackMenuComponent
   ],
@@ -73,36 +67,49 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   chatInput = '';
   showMembersPanel = false;
-  showRoomClosedPopup = false;
   activeMobileTab: 'queue' | 'chat' = 'chat';
+  showEmojiPicker = false;
   
   // Track Menu state
   isMenuOpen = false;
   menuX = 0;
   menuY = 0;
   activeMenuTrack: any = null;
-  
-  private routeSub: any;
+
+  // Common emojis for picker
+  emojis = [
+    '😀', '😂', '🥰', '😎', '🤩', '😍', '🥳', '😢',
+    '🔥', '❤️', '💜', '🎵', '🎶', '🎧', '🎤', '🎸',
+    '👏', '🙌', '💯', '✨', '⭐', '🌟', '👍', '👎',
+    '🤘', '🎉', '🎊', '💃', '🕺', '🎹', '🥁', '🎺'
+  ];
 
   constructor() {
     effect(() => {
       const err = this.roomService.roomError();
-      if (err === 'Room was closed by the admin') {
-        this.toastService.show('Host has closed the room', 'info', 5000);
+      if (err) {
+        if (err === 'Room was closed by the admin') {
+          this.toastService.show('Host has closed the room', 'info', 5000);
+        } else if (err.includes('removed from the room')) {
+          this.toastService.show(err, 'info', 5000);
+        } else {
+          this.toastService.show(err, 'info', 3000);
+        }
         this.roomService.roomError.set(null);
-        this.router.navigate(['/rooms']);
+        // Navigate back to rooms list if we lost room access
+        if (!this.roomService.currentRoomInfo()) {
+          this.router.navigate(['/rooms']);
+        }
       }
     });
   }
 
   ngOnInit() {
-    this.routeSub = this.router.events.subscribe(() => {
-      this.checkDeepLink();
-    });
-    this.checkDeepLink();
+    // If user lands on /rooms/:roomId without being in the room, try to auto-join
+    this.tryAutoJoin();
   }
 
-  private checkDeepLink() {
+  private tryAutoJoin() {
     const url = this.router.url;
     if (url.startsWith('/rooms/')) {
       const parts = url.split('/');
@@ -110,15 +117,21 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
         const roomId = parts[2];
         const info = this.roomService.currentRoomInfo();
         if (!info || info.roomId !== roomId) {
-          this.toastService.show('Please join through the Rooms page', 'info');
-          this.router.navigate(['/rooms']);
+          // Not in this room — try auto-join for logged in users
+          const user = this.authService.currentUser();
+          if (user) {
+            this.roomService.joinRoom(roomId, null, user);
+          } else {
+            this.toastService.show('Please log in to join a room', 'info');
+            this.router.navigate(['/rooms']);
+          }
         }
       }
     }
   }
 
   ngOnDestroy() {
-    if (this.routeSub) this.routeSub.unsubscribe();
+    // Do NOT leave room on destroy — room persists while navigating
   }
 
   ngAfterViewChecked() {
@@ -136,28 +149,27 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   leaveRoom() {
     this.roomService.leaveRoom();
     this.playerService.pause();
-    this.router.navigate(['/']);
+    this.router.navigate(['/rooms']);
   }
 
   toggleVisibility() {
     this.roomService.toggleVisibility();
   }
 
-  copyJoinCode() {
+  copyRoomCode() {
     const info = this.roomService.currentRoomInfo();
-    if (info?.joinCode) {
-      navigator.clipboard.writeText(info.joinCode);
-      this.toastService.show('Join code copied to clipboard!');
+    if (info?.roomId) {
+      navigator.clipboard.writeText(info.roomId);
+      this.toastService.show('Room code copied!');
     }
   }
-
 
   shareRoom() {
     const info = this.roomService.currentRoomInfo();
     if (info) {
       const shareUrl = `${window.location.origin}/rooms/${info.roomId}`;
       navigator.clipboard.writeText(shareUrl);
-      this.toastService.show('Room link copied to clipboard!');
+      this.toastService.show('Room link copied!');
     }
   }
 
@@ -168,6 +180,15 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     
     this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
     this.chatInput = '';
+    this.showEmojiPicker = false;
+  }
+
+  addEmoji(emoji: string) {
+    this.chatInput += emoji;
+  }
+
+  toggleEmojiPicker() {
+    this.showEmojiPicker = !this.showEmojiPicker;
   }
 
   // --- Admin Player Controls ---
@@ -204,10 +225,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   }
 
-  openSearch() {
-    this.router.navigate(['/search']);
-  }
-
   openTrackMenu(track: Track, event: MouseEvent): void {
     event.stopPropagation();
     this.activeMenuTrack = track;
@@ -226,7 +243,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   removeFromPlaylist(track: any): void {
-    // No-op for room view, removing from queue is handled by removeQueueItem
     this.closeTrackMenu();
   }
 }

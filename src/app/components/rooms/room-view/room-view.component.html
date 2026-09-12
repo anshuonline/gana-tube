@@ -9,7 +9,6 @@
       </div>
       <div class="room-title">
         <h2>{{room.name}}</h2>
-        <span class="room-id">ID: {{room.roomId}}</span>
       </div>
     </div>
     
@@ -20,7 +19,6 @@
       </button>
       <button class="btn-share" (click)="shareRoom()" title="Share Room">
         <svg lucideShare2 [attr.size]="18"></svg>
-        <span class="hide-mobile">Share</span>
       </button>
       <button class="btn-leave" (click)="leaveRoom()">
         <svg lucideLogOut [attr.size]="18"></svg>
@@ -29,38 +27,46 @@
     </div>
   </header>
 
-  <!-- Admin Controls Ribbon (only visible to admin) -->
+  <!-- Admin Ribbon (only visible to admin) -->
   <div class="admin-ribbon" *ngIf="roomService.isAdmin()">
     <div class="ribbon-left">
-      <span class="admin-badge">Admin Mode</span>
+      <span class="admin-badge">Admin</span>
       <button class="btn-visibility" (click)="toggleVisibility()" [title]="room.isPublic ? 'Make Private' : 'Make Public'">
-        <svg *ngIf="room.isPublic" lucideGlobe [attr.size]="16"></svg>
-        <svg *ngIf="!room.isPublic" lucideLock [attr.size]="16"></svg>
-        {{room.isPublic ? 'Public Room' : 'Private Room'}}
+        <svg *ngIf="room.isPublic" lucideGlobe [attr.size]="14"></svg>
+        <svg *ngIf="!room.isPublic" lucideLock [attr.size]="14"></svg>
+        {{room.isPublic ? 'Public' : 'Private'}}
       </button>
     </div>
     
-    <div class="ribbon-right" *ngIf="!room.isPublic && room.joinCode">
-      <div class="join-code-box">
+    <div class="ribbon-right">
+      <div class="room-code-box">
         <span class="label">Code:</span>
-        <span class="code">{{room.joinCode}}</span>
-        <button class="btn-icon" (click)="copyJoinCode()" title="Copy Code">
-          <svg lucideCopy [attr.size]="14"></svg>
+        <span class="code">{{room.roomId}}</span>
+        <button class="btn-icon-sm" (click)="copyRoomCode()" title="Copy Room Code">
+          <svg lucideCopy [attr.size]="12"></svg>
         </button>
-        
       </div>
     </div>
   </div>
 
+  <!-- Room Code for non-admin (so they can share) -->
+  <div class="room-code-strip" *ngIf="!roomService.isAdmin()">
+    <span class="label">Room Code:</span>
+    <span class="code">{{room.roomId}}</span>
+    <button class="btn-icon-sm" (click)="copyRoomCode()" title="Copy">
+      <svg lucideCopy [attr.size]="12"></svg>
+    </button>
+  </div>
+
   <div class="main-layout">
     
-    <!-- Player Section -->
+    <!-- Left: Player Section -->
     <section class="player-section">
       <div class="album-art-container" [class.playing]="playerService.playerState() === 'playing'">
         <img *ngIf="playerService.currentTrack()" [src]="playerService.currentTrack()?.thumbnailHigh" alt="Cover Art">
         <div *ngIf="!playerService.currentTrack()" class="empty-art">
-          <svg lucideMusic [attr.size]="64"></svg>
-          <p>Waiting for host to play something...</p>
+          <svg lucideMusic [attr.size]="48"></svg>
+          <p>Waiting for a song...</p>
         </div>
       </div>
       
@@ -68,37 +74,31 @@
         <h3>{{track.title}}</h3>
         <p>{{track.channelTitle}}</p>
       </div>
-      
-      <!-- Progress Bar (Readonly for all in room view, syncs with actual player) -->
-      <div class="progress-container">
+
+      <!-- Progress (visible to all, interactive only for admin) -->
+      <div class="progress-container" [class.disabled]="!roomService.isAdmin()">
         <span class="time">{{formatTime(playerService.currentTime())}}</span>
         <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="(playerService.currentTime() / playerService.duration()) * 100"></div>
+          <div class="progress-fill" [style.width.%]="playerService.duration() > 0 ? (playerService.currentTime() / playerService.duration()) * 100 : 0"></div>
         </div>
         <span class="time">{{formatTime(playerService.duration())}}</span>
       </div>
-      
-      <!-- Controls -->
-      <div class="controls" [class.disabled]="!roomService.isAdmin()">
-        <button class="btn-control secondary" [class.active]="playerService.repeatMode() !== 'none'" (click)="playerService.toggleRepeat()" [disabled]="!roomService.isAdmin()" title="Repeat">
-          <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" stroke="#9333ea"></svg>
-          <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+
+      <!-- Admin Controls -->
+      <div class="playback-controls" *ngIf="roomService.isAdmin()">
+        <button class="ctrl-btn" (click)="previousTrack()" title="Previous">
+          <svg lucideSkipBack [attr.size]="22"></svg>
         </button>
-        <button class="btn-control" (click)="previousTrack()" [disabled]="!roomService.isAdmin()">
-          <svg lucideSkipBack [attr.size]="24"></svg>
+        <button class="ctrl-btn play-btn" (click)="togglePlay()">
+          <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="28"></svg>
+          <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="28"></svg>
         </button>
-        <button class="btn-play" (click)="togglePlay()" [disabled]="!roomService.isAdmin()">
-          <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="32"></svg>
-          <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="32" class="offset"></svg>
-        </button>
-        <button class="btn-control" (click)="nextTrack()" [disabled]="!roomService.isAdmin()">
-          <svg lucideSkipForward [attr.size]="24"></svg>
-        </button>
-        <button class="btn-control secondary" (click)="openSearch()" title="Search & Add Songs">
-          <svg lucideSearch [attr.size]="20"></svg>
+        <button class="ctrl-btn" (click)="nextTrack()" title="Next">
+          <svg lucideSkipForward [attr.size]="22"></svg>
         </button>
       </div>
-      <div class="admin-note" *ngIf="!roomService.isAdmin()">
+
+      <div class="listener-note" *ngIf="!roomService.isAdmin()">
         Only the host can control playback
       </div>
     </section>
@@ -109,7 +109,7 @@
       <button [class.active]="activeMobileTab === 'chat'" (click)="activeMobileTab = 'chat'">Chat</button>
     </div>
 
-    <!-- Right Panels: Queue & Chat -->
+    <!-- Right: Panels (Queue + Chat) -->
     <section class="panels-section" [class.mobile-view]="activeMobileTab">
       
       <!-- Queue Panel -->
@@ -126,11 +126,8 @@
               <span class="queue-title">{{track.title}}</span>
               <span class="queue-artist">{{track.channelTitle}}</span>
             </div>
-            <button class="queue-menu-btn" (click)="openTrackMenu(track, $event)" title="More Options" style="background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px;">
-              <svg lucideMoreVertical [attr.size]="18"></svg>
-            </button>
             <button class="queue-remove-btn" (click)="removeQueueItem(i); $event.stopPropagation()" *ngIf="roomService.isAdmin()" title="Remove">
-              <svg lucideTrash2 [attr.size]="14"></svg>
+              <svg lucideX [attr.size]="14"></svg>
             </button>
           </div>
           <div class="empty-queue" *ngIf="playerService.queue().length === 0">
@@ -158,11 +155,22 @@
           </div>
         </div>
         
+        <!-- Emoji Picker -->
+        <div class="emoji-picker" *ngIf="showEmojiPicker">
+          <div class="emoji-grid">
+            <button class="emoji-btn" *ngFor="let e of emojis" (click)="addEmoji(e)">{{e}}</button>
+          </div>
+        </div>
+
         <div class="chat-input-area">
+          <button class="btn-emoji" (click)="toggleEmojiPicker()" title="Emoji">
+            <svg lucideSmile [attr.size]="18"></svg>
+          </button>
           <input 
             type="text" 
             [(ngModel)]="chatInput" 
             (keyup.enter)="sendMessage()"
+            (focus)="showEmojiPicker = false"
             placeholder="Type a message..."
             maxlength="200">
           <button class="btn-send" (click)="sendMessage()" [disabled]="!chatInput.trim()">
@@ -173,6 +181,12 @@
       
     </section>
   </div>
+</div>
+
+<!-- Loading state when auto-joining -->
+<div class="room-loading" *ngIf="!roomService.currentRoomInfo()">
+  <div class="loading-spinner"></div>
+  <p>Joining room...</p>
 </div>
 
 <app-track-menu

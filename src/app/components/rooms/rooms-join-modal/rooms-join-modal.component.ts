@@ -20,37 +20,39 @@ export class RoomsJoinModalComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  roomId = '';
-  joinCode = '';
+  roomCode = '';
   error = '';
   
-  private errorSub: any;
-  private stateSub: any;
+  private errorHandler: ((err: string) => void) | null = null;
+  private stateHandler: ((state: any) => void) | null = null;
 
   ngOnInit() {
-    this.errorSub = this.roomService.getSocket().on('room:error', (err: string) => {
+    this.errorHandler = (err: string) => {
       this.error = err;
-    });
-    
-    this.stateSub = this.roomService.getSocket().on('room:state', (state: any) => {
+    };
+    this.stateHandler = (state: any) => {
       this.closeModal();
       this.router.navigate(['/rooms', state.roomId]);
-    });
+    };
+    
+    this.roomService.getSocket().on('room:error', this.errorHandler);
+    this.roomService.getSocket().on('room:state', this.stateHandler);
   }
 
   ngOnDestroy() {
-    if (this.errorSub) this.roomService.getSocket().off('room:error', this.errorSub);
-    if (this.stateSub) this.roomService.getSocket().off('room:state', this.stateSub);
+    if (this.errorHandler) this.roomService.getSocket().off('room:error', this.errorHandler);
+    if (this.stateHandler) this.roomService.getSocket().off('room:state', this.stateHandler);
   }
 
   joinRoom() {
-    if (!this.roomId.trim() || !this.joinCode.trim()) return;
+    if (!this.roomCode.trim()) return;
     this.error = '';
     
     const user = this.authService.currentUser();
     if (!user) return;
     
-    this.roomService.joinRoom(this.roomId.trim().toUpperCase(), this.joinCode.trim(), user);
+    const code = this.roomCode.trim().toUpperCase();
+    this.roomService.joinRoom(code, code, user);
   }
 
   closeModal() {
