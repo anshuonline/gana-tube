@@ -178,13 +178,12 @@ function setupRoomHandlers(io, socket) {
         senderUid: 'system',
         senderName: 'System',
         type: 'system-join',
-        content: `🎉 ${user.displayName || 'A listener'} joined the room!`,
+        content: `* ${user.displayName || 'A listener'} joined the room.`,
         timestamp: Date.now()
       };
       room.chat.push(msg);
       if (room.chat.length > 100) room.chat.shift();
       io.to(roomId).emit('room:chat_new', msg);
-    }
   });
 
   socket.on('room:leave', () => {
@@ -354,7 +353,7 @@ function handleRoomDisconnect(io, socketId) {
             senderUid: 'system',
             senderName: 'System',
             type: 'system-leave',
-            content: `👋 ${leavingMember.displayName} left the room.`,
+            content: `* ${leavingMember.displayName} left the room.`,
             timestamp: Date.now()
           };
           room.chat.push(msg);
