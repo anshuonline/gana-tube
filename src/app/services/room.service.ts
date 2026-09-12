@@ -31,6 +31,7 @@ export interface RoomInfo {
   adminUid: string;
   adminFirebaseUid?: string;
   adminName: string;
+  maxMembers?: number;
   members: RoomMember[];
   currentTrack: Track | null;
   queue: Track[];
@@ -211,6 +212,10 @@ export class RoomService {
       senderUid,
       senderName
     });
+  }
+
+  updateRoomSettings(maxMembers: number) {
+    this.socket.emit('room:update_settings', { maxMembers });
   }
 
   sendChatMessage(content: string, senderUid: string, senderName: string) {

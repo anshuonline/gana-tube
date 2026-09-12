@@ -1,21 +1,33 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RoomService, RoomMember } from '../../../services/room.service';
-import { LucideX, LucideUser, LucideCrown, LucideMoreVertical, LucideUserX } from '@lucide/angular';
+import { LucideX, LucideUser, LucideCrown, LucideMoreVertical, LucideUserX, LucideSettings } from '@lucide/angular';
 
 @Component({
   selector: 'app-room-members-panel',
   standalone: true,
-  imports: [CommonModule, LucideX, LucideUser, LucideCrown, LucideMoreVertical, LucideUserX],
+  imports: [CommonModule, FormsModule, LucideX, LucideUser, LucideCrown, LucideMoreVertical, LucideUserX, LucideSettings],
   templateUrl: './room-members-panel.component.html',
   styleUrls: ['./room-members-panel.component.scss']
 })
-export class RoomMembersPanelComponent {
+export class RoomMembersPanelComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   
   public roomService = inject(RoomService);
   
   activeMenuSocketId: string | null = null;
+  maxMembersInput: number = 10;
+  
+  ngOnInit() {
+    this.maxMembersInput = this.roomService.currentRoomInfo()?.maxMembers || 10;
+  }
+  
+  saveLimit() {
+    if (this.maxMembersInput < 2) this.maxMembersInput = 2;
+    if (this.maxMembersInput > 100) this.maxMembersInput = 100;
+    this.roomService.updateRoomSettings(this.maxMembersInput);
+  }
 
   closePanel() {
     this.close.emit();

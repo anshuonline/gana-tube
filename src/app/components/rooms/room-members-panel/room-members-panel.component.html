@@ -11,6 +11,21 @@
   </div>
 
   <div class="panel-content" (click)="activeMenuSocketId = null">
+    
+    <div class="room-settings-section" *ngIf="roomService.isAdmin()">
+      <div class="settings-header">
+        <svg lucideSettings [attr.size]="16"></svg>
+        <span>Room Settings</span>
+      </div>
+      <div class="setting-row">
+        <label>Member Limit (Max 100)</label>
+        <div class="input-group">
+          <input type="number" [(ngModel)]="maxMembersInput" min="2" max="100" />
+          <button class="btn-primary-sm" (click)="saveLimit()">Save</button>
+        </div>
+      </div>
+    </div>
+
     <div class="members-list">
       
       <div class="member-item" *ngFor="let member of roomService.members()">

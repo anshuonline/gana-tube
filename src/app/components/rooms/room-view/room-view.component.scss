@@ -927,30 +927,29 @@
     flex: 0 0 auto;
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 12px;
-    gap: 12px;
-    flex-direction: row;
-    flex-wrap: wrap;
+    padding: 24px 16px;
+    gap: 16px;
+    flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
 
     .album-art-container {
-      width: 80px;
-      height: 80px;
-      margin: 0;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
     }
 
     .track-info {
-      flex: 1;
-      text-align: left;
+      width: 100%;
+      text-align: center;
       
-      h3 { font-size: 14px; margin-bottom: 4px; }
-      p { font-size: 12px; }
+      h3 { font-size: 16px; margin-bottom: 4px; }
+      p { font-size: 13px; }
     }
 
     .progress-container {
       width: 100%;
-      margin-top: 4px;
+      margin-top: 8px;
       gap: 8px;
       .time { font-size: 10px; }
     }

@@ -89,6 +89,7 @@ function setupRoomHandlers(io, socket) {
       adminUid: socket.id,
       adminFirebaseUid: adminUser.uid,
       adminName: adminUser.displayName || 'Host',
+      maxMembers: 10,
       members: [{
         socketId: socket.id,
         uid: adminUser.uid,
@@ -133,8 +134,12 @@ function setupRoomHandlers(io, socket) {
       }
     }
     
-    if (room.members.length >= 50) {
-      return socket.emit('room:error', 'Room is full (50/50)');
+    const maxLimit = room.maxMembers || 10;
+    // Allow admin to rejoin regardless of limit
+    const isAdminRejoining = room.adminFirebaseUid === user.uid;
+    
+    if (!isAdminRejoining && room.members.length >= maxLimit && !room.members.some(m => m.uid === user.uid)) {
+      return socket.emit('room:error', `Room is full (${maxLimit}/${maxLimit})`);
     }
     
     const existingIdx = room.members.findIndex(m => m.uid === user.uid);
@@ -249,6 +254,19 @@ function setupRoomHandlers(io, socket) {
     room.currentTime = 0;
     room.isPlaying = true;
     io.to(roomId).emit('room:track_changed', { track });
+  });
+
+  socket.on('room:update_settings', ({ maxMembers }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    
+    const newLimit = parseInt(maxMembers);
+    if (newLimit >= 2 && newLimit <= 100) {
+      room.maxMembers = newLimit;
+      io.to(roomId).emit('room:state', room);
+    }
   });
 
   socket.on('room:playback_sync', ({ isPlaying, currentTime }) => {
