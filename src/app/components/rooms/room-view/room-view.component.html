@@ -146,47 +146,79 @@
     <section class="panels-section" [class.mobile-view]="activeMobileTab">
       
       <!-- Queue Panel -->
-      <div class="queue-panel panel" [class.mobile-hidden]="activeMobileTab !== 'queue'" [class.desktop-collapsed]="!isQueueVisibleDesktop">
-        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="btn-toggle-queue hide-mobile" (click)="isQueueVisibleDesktop = !isQueueVisibleDesktop" title="Toggle Queue" style="background: transparent; border: none; color: #9C9CA6; cursor: pointer; padding: 4px; display: flex;">
-              <svg *ngIf="isQueueVisibleDesktop" lucideChevronDown [attr.size]="18"></svg>
-              <svg *ngIf="!isQueueVisibleDesktop" lucideChevronUp [attr.size]="18"></svg>
-            </button>
-            <div>
-              <h3>Up Next</h3>
-              <span class="count">{{playerService.queue().length}} songs</span>
+              <div class="queue-panel panel" [class.mobile-hidden]="activeMobileTab !== 'queue'" [class.desktop-collapsed]="!isQueueVisibleDesktop">
+          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button class="btn-toggle-queue hide-mobile" (click)="isQueueVisibleDesktop = !isQueueVisibleDesktop" title="Toggle Queue" style="background: transparent; border: none; color: #9C9CA6; cursor: pointer; padding: 4px; align-items: center; justify-content: center;">
+                <svg *ngIf="isQueueVisibleDesktop" lucideChevronDown [attr.size]="18"></svg>
+                <svg *ngIf="!isQueueVisibleDesktop" lucideChevronUp [attr.size]="18"></svg>
+              </button>
+              <div class="queue-tabs" style="display: flex; gap: 12px; align-items: baseline;">
+                <h3 [class.inactive]="showRequests()" (click)="showRequests.set(false)" style="cursor: pointer; transition: color 0.2s;">Queue <span class="count" style="font-size: 12px; font-weight: normal; color: #9C9CA6;">{{playerService.queue().length}}</span></h3>
+                <h3 [class.inactive]="!showRequests()" (click)="showRequests.set(true)" style="cursor: pointer; transition: color 0.2s;">Requests <span class="count" style="font-size: 12px; font-weight: normal; color: #9C9CA6;">{{roomService.recommendations().length}}</span></h3>
+              </div>
             </div>
-          </div>
-          <button class="btn-search-queue hide-mobile" *ngIf="roomService.isAdmin()" (click)="showSearchModal.set(true)">
-            <svg lucideSearch [attr.size]="16"></svg>
-            Add Music
-          </button>
-        </div>
-        
-        <div class="queue-list">
-          <div class="queue-item" 
-               *ngFor="let track of playerService.queue(); let i = index" 
-               [class.active]="i === playerService.currentIndex()"
-               [class.clickable]="roomService.isAdmin()"
-               (click)="playQueueItem(i)">
-            <img [src]="track.thumbnail" alt="Thumb">
-            <div class="queue-meta">
-              <span class="queue-title">{{track.title}}</span>
-              <span class="queue-artist">{{track.channelTitle}}</span>
-            </div>
-            <button class="queue-remove-btn" (click)="removeQueueItem(i); $event.stopPropagation()" *ngIf="roomService.isAdmin()" title="Remove">
-              <svg lucideX [attr.size]="14"></svg>
+            <!-- Visible for both Host and Listener on Desktop, and also Add Music works for mobile now if we remove hide-mobile? The user wanted it for mobile too! -->
+            <button class="btn-search-queue" (click)="showSearchModal.set(true)">
+              <svg lucideSearch [attr.size]="16"></svg>
+              {{ roomService.isAdmin() ? 'Add Music' : 'Request Song' }}
             </button>
           </div>
-          <div class="empty-queue" *ngIf="playerService.queue().length === 0">
-            Queue is empty
+          
+          <div class="queue-list" *ngIf="!showRequests()">
+            <div class="queue-item" 
+                 *ngFor="let track of playerService.queue(); let i = index" 
+                 [class.active]="i === playerService.currentIndex()"
+                 [class.clickable]="roomService.isAdmin()"
+                 (click)="playQueueItem(i)">
+              <img [src]="track.thumbnail" alt="Thumb">
+              <div class="queue-meta">
+                <span class="queue-title">{{track.title}}</span>
+                <span class="queue-artist">{{track.channelTitle}}</span>
+              </div>
+              <div class="playing-indicator" *ngIf="i === playerService.currentIndex()">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              </div>
+            </div>
+            <div class="empty-state" *ngIf="playerService.queue().length === 0">
+              <svg lucideMusic [attr.size]="32"></svg>
+              <p>Queue is empty</p>
+            </div>
+          </div>
+
+          <div class="queue-list requests-list" *ngIf="showRequests()">
+            <div class="queue-item request-item" *ngFor="let req of roomService.recommendations()">
+              <img [src]="req.track.thumbnail" alt="Thumb">
+              <div class="queue-meta" style="flex: 1;">
+                <span class="queue-title">{{req.track.title}}</span>
+                <span class="queue-artist" style="display: flex; gap: 6px; align-items: center;">
+                  <img *ngIf="req.suggestedBy.photoURL" [src]="req.suggestedBy.photoURL" style="width: 14px; height: 14px; border-radius: 50%;">
+                  Requested by {{req.suggestedBy.displayName}}
+                </span>
+              </div>
+              <div class="request-actions" style="display: flex; gap: 8px; align-items: center;">
+                <!-- Host Actions -->
+                <ng-container *ngIf="roomService.isAdmin()">
+                  <button (click)="acceptRequest(req.track.videoId)" class="btn-accept" style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">Accept</button>
+                  <button (click)="rejectRequest(req.track.videoId)" class="btn-reject" style="background: transparent; border: none; color: #ff4d4d; padding: 4px; cursor: pointer;"><svg lucideX [attr.size]="16"></svg></button>
+                </ng-container>
+                
+                <!-- Listener Actions -->
+                <ng-container *ngIf="!roomService.isAdmin()">
+                  <button (click)="roomService.requestSong(req.track)" class="btn-upvote" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 4px 8px; border-radius: 12px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px;">
+                    <svg lucideThumbsUp [attr.size]="12"></svg> {{req.voters.length}}
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+            <div class="empty-state" *ngIf="roomService.recommendations().length === 0">
+              <svg lucideMusic [attr.size]="32"></svg>
+              <p>No song requests yet</p>
+              <p style="font-size: 12px; color: #9C9CA6; margin-top: 4px;">Click 'Request Song' to suggest a track</p>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <!-- Chat Panel -->
-      <div class="chat-panel panel" [class.mobile-hidden]="activeMobileTab !== 'chat'">
+        <div class="chat-panel panel" [class.mobile-hidden]="activeMobileTab !== 'chat'">
         <div class="panel-header">
           <h3>Live Chat</h3>
         </div>
@@ -407,3 +439,4 @@
       <p>Search for a song on YouTube to add it to the room.</p>
     </div>
   </div>
+

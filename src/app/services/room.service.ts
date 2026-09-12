@@ -18,8 +18,16 @@ export interface ChatMessage {
   senderUid: string;
   senderName: string;
   type: 'text' | 'song-share' | 'system-join' | 'system-leave' | 'like';
-  content: string;
+  content?: string;
   track?: Track;
+  timestamp: number;
+}
+
+export interface RoomRecommendation {
+  id: string;
+  track: Track;
+  suggestedBy: { uid: string; displayName: string; photoURL?: string };
+  voters: string[];
   timestamp: number;
 }
 
@@ -38,6 +46,7 @@ export interface RoomInfo {
   currentTime: number;
   isPlaying: boolean;
   chat: ChatMessage[];
+  recommendations?: RoomRecommendation[];
   listenerCount: number;
 }
 
@@ -51,6 +60,7 @@ export class RoomService {
   public members = signal<RoomMember[]>([]);
   public chat = signal<ChatMessage[]>([]);
   public roomQueue = signal<Track[]>([]);
+  public recommendations = signal<RoomRecommendation[]>([]);
   public isAdmin = signal<boolean>(false);
   public onLikeReceived = new EventEmitter<{senderName: string}>();
   public publicRooms = signal<RoomInfo[]>([]);
@@ -79,10 +89,15 @@ export class RoomService {
       this.chat.set((state.chat || []).filter((c: any) => c.type !== 'like'));
       this.roomQueue.set(state.queue || []);
       this.isAdmin.set(state.adminUid === this.socket.id);
+        this.recommendations.set(state.recommendations || []);
       this.roomError.set(null);
     });
 
-    this.socket.on('room:member_joined', ({ members, listenerCount }) => {
+    this.socket.on('room:recommendations_updated', ({ recommendations }) => {
+        this.recommendations.set(recommendations || []);
+      });
+
+      this.socket.on('room:member_joined', ({ members, listenerCount }) => {
       this.members.set(members);
       const info = this.currentRoomInfo();
       if (info) {
@@ -228,6 +243,18 @@ export class RoomService {
     });
   }
 
+  requestSong(track: Track) {
+    this.socket.emit('room:recommend_song', { track });
+  }
+
+  acceptRequest(videoId: string) {
+    this.socket.emit('room:remove_recommendation', { videoId });
+  }
+
+  rejectRequest(videoId: string) {
+    this.socket.emit('room:remove_recommendation', { videoId });
+  }
+
   sendSongShare(track: Track, senderUid: string, senderName: string) {
     this.socket.emit('room:chat_message', {
       type: 'song-share',
@@ -273,3 +300,4 @@ export class RoomService {
     }
   }
 }
+

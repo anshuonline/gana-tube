@@ -469,6 +469,16 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+  showRequests = signal(false);
+
+  acceptRequest(id: string) {
+    this.roomService.acceptRequest(id);
+  }
+
+  rejectRequest(id: string) {
+    this.roomService.rejectRequest(id);
+  }
+
   selectSearchResult(track: Track) {
     if (this.roomService.isAdmin()) {
       // Add directly to queue
@@ -542,3 +552,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.closeTrackMenu();
   }
 }
+
+
+
+

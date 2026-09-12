@@ -103,6 +103,7 @@ function setupRoomHandlers(io, socket) {
       currentTime: 0,
       isPlaying: false,
       chat: [],
+      recommendations: [],
       listenerCount: 1
     };
     
@@ -294,6 +295,60 @@ function setupRoomHandlers(io, socket) {
     
     room.queue = queue;
     socket.to(roomId).emit('room:queue_updated', { queue, currentIndex });
+  });
+
+  socket.on('room:recommend_song', ({ track }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room) return;
+    
+    const member = room.members.find(m => m.socketId === socket.id);
+    if (!member) return;
+    
+    if (checkSpam(member.uid, 'recommend')) {
+      socket.emit('room:error', { message: 'You are recommending too fast. Please wait.' });
+      return;
+    }
+    
+    if (!room.recommendations) room.recommendations = [];
+    
+    if (room.currentTrack && room.currentTrack.videoId === track.videoId) return;
+    if (room.queue.some(t => t.videoId === track.videoId)) return;
+    
+    const existing = room.recommendations.find(r => r.track.videoId === track.videoId);
+    if (existing) {
+      if (!existing.voters.includes(member.uid)) {
+        existing.voters.push(member.uid);
+        room.recommendations.sort((a, b) => b.voters.length - a.voters.length);
+        io.to(roomId).emit('room:recommendations_updated', { recommendations: room.recommendations });
+      }
+    } else {
+      if (room.recommendations.length > 50) room.recommendations.pop();
+      room.recommendations.push({
+        id: nanoid(8),
+        track,
+        suggestedBy: { uid: member.uid, displayName: member.displayName, photoURL: member.photoURL },
+        voters: [member.uid],
+        timestamp: Date.now()
+      });
+      room.recommendations.sort((a, b) => b.voters.length - a.voters.length);
+      io.to(roomId).emit('room:recommendations_updated', { recommendations: room.recommendations });
+    }
+  });
+
+  socket.on('room:remove_recommendation', ({ videoId }) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (!roomId) return;
+    const room = rooms.get(roomId);
+    if (!room || room.adminUid !== socket.id) return;
+    if (!room.recommendations) return;
+    
+    const index = room.recommendations.findIndex(r => r.track.videoId === videoId);
+    if (index !== -1) {
+      room.recommendations.splice(index, 1);
+      io.to(roomId).emit('room:recommendations_updated', { recommendations: room.recommendations });
+    }
   });
 
   socket.on('room:chat_message', (msg) => {

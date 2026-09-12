@@ -490,6 +490,10 @@
   max-height: 40%;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
+  .btn-toggle-queue {
+    display: flex;
+  }
+
   &.desktop-collapsed {
     max-height: none;
     .queue-list {
@@ -937,17 +941,17 @@
     display: flex;
 
     .panels-section {
-      order: 1;
+      order: 2;
       flex: 1;
     }
   }
 
   .player-section {
-    order: 2;
+    order: 1;
     flex: 0 0 auto;
     border-right: none;
-    border-bottom: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: none;
     padding: 24px 16px;
     gap: 16px;
     flex-direction: column;

@@ -321,7 +321,7 @@ export class PlayerService {
   // Determine if user is in a room
   isInRoom = computed(() => !!this.roomService.currentRoomInfo());
 
-  playTrack(track: Track): void {
+  playTrack(track: Track): void { if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) { this.toastService.show("You cannot play music directly while listening in a room.", 'error'); return; }
     this.triggerEngagement();
     this.isShuffled.set(false);
     this.isPlaylistContext.set(false);
@@ -340,9 +340,19 @@ export class PlayerService {
     this.playerState.set('loading');
     this.location.replaceState('/play?v=' + track.videoId);
     this.loadInPlayer(track.videoId);
+
+    if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
+      this.roomService.adminQueueUpdate(this.queue(), this.currentIndex());
+      this.roomService.adminPlayTrack(track);
+    }
+    this.isRemoteUpdate = false;
   }
 
   setQueue(tracks: Track[], startIndex = 0): void {
+    if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) {
+      this.toastService.show('You cannot play music directly while listening in a room.', 'error');
+      return;
+    }
     this.triggerEngagement();
     this.isShuffled.set(false);
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
@@ -364,6 +374,10 @@ export class PlayerService {
   }
 
   updateQueueOrder(newQueue: Track[], newCurrentIndex: number): void {
+    if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) {
+      this.toastService.show('You cannot modify queue order while listening in a room.', 'error');
+      return;
+    }
     this.queue.set(newQueue);
     this.currentIndex.set(newCurrentIndex);
     
@@ -462,7 +476,7 @@ export class PlayerService {
     }
   }
 
-  addToQueue(track: Track): void {
+  addToQueue(track: Track): void { if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) { this.toastService.show("You cannot add music directly while listening in a room.", 'error'); return; }
     const q = this.queue();
     this.queue.set([...q, track]);
     if (q.length === 0) {
@@ -944,3 +958,4 @@ export class PlayerService {
     }
   }
 }
+
