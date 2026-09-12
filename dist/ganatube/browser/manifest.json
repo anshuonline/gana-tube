@@ -1,0 +1,43 @@
+{
+  "name": "GanaTube.in",
+  "short_name": "GanaTube.in",
+  "description": "Free Music Streaming - Listen to Latest Bollywood, Punjabi & English Songs Online",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#0d0d1a",
+  "theme_color": "#0d0d1a",
+  "orientation": "any",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GanaTube Homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search Music",
+      "short_name": "Search",
+      "description": "Search for songs, artists, albums",
+      "url": "/?action=search",
+      "icons": [{ "src": "ganatube.png", "sizes": "512x512" }]
+    }
+  ]
+}
