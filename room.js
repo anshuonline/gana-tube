@@ -321,8 +321,10 @@ function setupRoomHandlers(io, socket) {
     msg.id = nanoid(10);
     msg.timestamp = Date.now();
     
-    room.chat.push(msg);
-    if (room.chat.length > 100) room.chat.shift();
+    if (msg.type !== 'like') {
+      room.chat.push(msg);
+      if (room.chat.length > 100) room.chat.shift();
+    }
     
     io.to(roomId).emit('room:chat_new', msg);
   });

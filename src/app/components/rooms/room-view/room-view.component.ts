@@ -92,6 +92,9 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   floatingHearts: { id: number, color: string, left: number, animationDuration: number }[] = [];
   heartColors = ['white', 'orange', 'pink', 'blue'];
   heartIdCounter = 0;
+  pendingHearts = 0;
+  heartInterval: any;
+  private lastEmitTime = 0;
   
   // Track Menu state
   isMenuOpen = false;
@@ -205,23 +208,35 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.roomService.getSocket().on('room:error', this.errorHandler);
 
     this.likeSub = this.roomService.onLikeReceived.subscribe(() => {
-      this.spawnHeart();
+      this.pendingHearts++;
+      if (this.pendingHearts > 40) this.pendingHearts = 40; // Max cap to prevent infinite rendering
     });
+
+    this.heartInterval = setInterval(() => {
+      if (this.pendingHearts > 0) {
+        // Spawn 1 or 2 hearts per tick to make a continuous stream
+        const spawnCount = Math.min(this.pendingHearts, Math.floor(Math.random() * 2) + 1);
+        for(let i = 0; i < spawnCount; i++) {
+          this.spawnHeart();
+        }
+        this.pendingHearts -= spawnCount;
+      }
+    }, 250); // Check 4 times a second
   }
 
-  private lastLikeTime = 0;
-
   sendLike() {
-    const now = Date.now();
-    if (now - this.lastLikeTime < 3000) {
-      this.toastService.show('Please wait before sending more love!', 'info');
-      return;
-    }
-    this.lastLikeTime = now;
-    
     const user = this.authService.currentUser();
     if (user) {
-      this.roomService.sendLike(user.uid, user.displayName || 'User');
+      // Throttle socket emits to prevent network flood (max 2 per second)
+      const now = Date.now();
+      if (now - this.lastEmitTime > 500) {
+        this.roomService.sendLike(user.uid, user.displayName || 'User');
+        this.lastEmitTime = now;
+      }
+      
+      // Locally spawn instantly by adding to queue
+      this.pendingHearts++;
+      if (this.pendingHearts > 40) this.pendingHearts = 40;
     }
   }
 
@@ -252,6 +267,9 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
     if (this.searchSub) {
       this.searchSub.unsubscribe();
+    }
+    if (this.heartInterval) {
+      clearInterval(this.heartInterval);
     }
     // Do NOT leave room on destroy — room persists while navigating
   }
