@@ -859,3 +859,118 @@
     }
   }
 }
+
+.rules-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  .rules-modal {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 550px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
+    h2 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .rules-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0;
+    }
+
+    .rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 40vh;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 16px;
+      border-radius: 8px;
+
+      .rule-item {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.5;
+
+        strong {
+          color: white;
+        }
+
+        &.spam-system {
+          margin-top: 8px;
+          padding-top: 12px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          color: #ff4d4d;
+          strong {
+            color: #ff4d4d;
+          }
+        }
+      }
+    }
+
+    .rules-action {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: white;
+        cursor: pointer;
+
+        input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          accent-color: #9333ea;
+          cursor: pointer;
+        }
+      }
+
+      .btn-agree {
+        background: #9333ea;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+
+        &:hover:not(:disabled) {
+          background: #7e22ce;
+        }
+
+        &:disabled {
+          background: rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.3);
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

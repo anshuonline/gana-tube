@@ -142,7 +142,7 @@
           <h3>Live Chat</h3>
         </div>
         
-        <div class="chat-messages" #chatScroll>
+        <div class="chat-messages" #chatScroll (scroll)="onChatScroll()">
           <div class="message" *ngFor="let msg of roomService.chat()" [class.own]="msg.senderUid === authService.currentUser()?.uid">
             <div class="msg-header" *ngIf="msg.senderUid !== authService.currentUser()?.uid">
               <span class="sender">{{msg.senderName}}</span>
@@ -197,6 +197,51 @@
       </div>
       
     </section>
+  </div>
+
+  <div class="rules-overlay" *ngIf="showRulesPopup">
+    <div class="rules-modal">
+      <h2>Welcome to the Room</h2>
+      <p class="rules-subtitle">Before joining, please review and agree to our chat rules. These rules help keep the room friendly and enjoyable for everyone.</p>
+      
+      <div class="rules-list">
+        <div class="rule-item">
+          <strong>Be Respectful</strong> — Treat everyone with respect. Harassment, bullying, personal attacks, or abusive language are not allowed.
+        </div>
+        <div class="rule-item">
+          <strong>No Spam or Flooding</strong> — Sending messages too quickly, repeatedly, or flooding the chat may trigger an automatic temporary mute.
+        </div>
+        <div class="rule-item">
+          <strong>No Hate or Offensive Content</strong> — Hate speech, discrimination, threats, or severely offensive content are not allowed.
+        </div>
+        <div class="rule-item">
+          <strong>Respect Privacy</strong> — Do not share personal information or private conversations without permission.
+        </div>
+        <div class="rule-item">
+          <strong>No Abusive or Disruptive Behavior</strong> — Do not intentionally disturb the room, misuse chat features, or attempt to bypass restrictions.
+        </div>
+        <div class="rule-item">
+          <strong>Follow Moderation Actions</strong> — System and moderator restrictions must be respected. Repeated violations may result in longer restrictions or a temporary platform-wide chat ban.
+        </div>
+        <div class="rule-item spam-system">
+          <strong>Chat Restriction System:</strong><br>
+          • 1st Warning → 2-minute chat mute<br>
+          • 2nd Warning → 10-minute chat mute<br>
+          • 3rd Warning → 30-minute chat mute<br>
+          • 4th Warning → 24-hour chat restriction (in all rooms)
+        </div>
+      </div>
+
+      <div class="rules-action">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="rulesAccepted">
+          I have read and agree to follow the Room Rules.
+        </label>
+        <button class="btn-agree" [disabled]="!rulesAccepted" (click)="acceptRules()">
+          Agree & Join Room
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 

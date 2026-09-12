@@ -134,18 +134,43 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }, { allowSignalWrites: true });
   }
 
+  showRulesPopup = false;
+  rulesAccepted = false;
+
   ngOnInit() {
+    if (typeof sessionStorage !== 'undefined') {
+      if (!sessionStorage.getItem('gt_room_rules_accepted')) {
+        this.showRulesPopup = true;
+      }
+    }
+  }
+
+  acceptRules() {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('gt_room_rules_accepted', 'true');
+    }
+    this.showRulesPopup = false;
   }
 
   ngOnDestroy() {
     // Do NOT leave room on destroy — room persists while navigating
   }
 
+  isUserScrolledUp = false;
+
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
 
+  onChatScroll() {
+    if (!this.chatScrollContainer) return;
+    const el = this.chatScrollContainer.nativeElement;
+    // Allow a 50px threshold for being "at the bottom"
+    this.isUserScrolledUp = (el.scrollHeight - el.scrollTop - el.clientHeight) > 50;
+  }
+
   private scrollToBottom(): void {
+    if (this.isUserScrolledUp) return; // Pause auto-scroll if user scrolled up
     try {
       if (this.chatScrollContainer) {
         this.chatScrollContainer.nativeElement.scrollTop = this.chatScrollContainer.nativeElement.scrollHeight;
@@ -185,6 +210,26 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     const user = this.authService.currentUser();
     if (!user) return;
     
+    // Check for third-party links
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = this.chatInput.match(urlRegex);
+    
+    if (urls) {
+      let hasExternalLink = false;
+      for (const url of urls) {
+        if (!url.includes('ganatube.in') && !url.includes('betatesting.ganatube.in')) {
+          hasExternalLink = true;
+          break;
+        }
+      }
+      if (hasExternalLink) {
+        this.toastService.show('Third-party links not allowed', 'error');
+        this.chatInput = '';
+        this.showEmojiPicker = false;
+        return;
+      }
+    }
+
     // Check if the input is a GanaTube URL
     const gtRegex = /(?:betatesting\.)?ganatube\.in\/(?:play|share\.php)\?v=([a-zA-Z0-9_-]{11})/;
     const match = this.chatInput.match(gtRegex);
