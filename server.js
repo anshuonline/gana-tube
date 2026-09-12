@@ -83,12 +83,7 @@ io.on('connection', (socket) => {
   });
 
   // --- Listening Rooms Events ---
-        currentTrack: r.currentTrack,
-        listenerCount: r.listenerCount,
-        isPublic: r.isPublic
-      }));
-    socket.emit('room:discover_results', publicRooms);
-  });
+  setupRoomHandlers(io, socket);
 });
 
 app.use(cors());
