@@ -255,16 +255,23 @@ export class PlayerService {
           this.queue.set(state.queue);
         }
         
-        if (state.currentTrack) {
-          const q = this.queue();
-          const idx = q.findIndex((t: any) => t.videoId === state.currentTrack.videoId);
-          this.currentIndex.set(idx >= 0 ? idx : -1);
-          
-          const currentPlayingId = this.currentTrack()?.videoId || (this as any)._lastLoadedVideoId;
-          if (currentPlayingId !== state.currentTrack.videoId || this.playerState() === 'unstarted') {
-            this.playTrack(state.currentTrack);
-            (this as any)._lastLoadedVideoId = state.currentTrack.videoId;
-          }
+          if (state.currentTrack) {
+            const q = this.queue();
+            const idx = q.findIndex((t: any) => t.videoId === state.currentTrack.videoId);
+            
+            if (idx >= 0) {
+              this.currentIndex.set(idx);
+            } else {
+              // If not in queue, add it
+              this.queue.set([...q, state.currentTrack]);
+              this.currentIndex.set(q.length);
+            }
+            
+            if ((this as any)._lastLoadedVideoId !== state.currentTrack.videoId) {
+              this.location.replaceState('/play?v=' + state.currentTrack.videoId);
+              this.loadInPlayer(state.currentTrack.videoId);
+              (this as any)._lastLoadedVideoId = state.currentTrack.videoId;
+            }
           
           if (state.currentTime > 0) {
             if (this.ytPlayer) {
@@ -958,4 +965,5 @@ export class PlayerService {
     }
   }
 }
+
 
