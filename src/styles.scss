@@ -15,7 +15,8 @@
   -ms-user-select: none !important;
   -webkit-touch-callout: none !important;
   -webkit-user-drag: none !important;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
 }
 
 input, textarea {

@@ -146,11 +146,17 @@
     <section class="panels-section" [class.mobile-view]="activeMobileTab">
       
       <!-- Queue Panel -->
-      <div class="queue-panel panel" [class.mobile-hidden]="activeMobileTab !== 'queue'">
+      <div class="queue-panel panel" [class.mobile-hidden]="activeMobileTab !== 'queue'" [class.desktop-collapsed]="!isQueueVisibleDesktop">
         <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h3>Up Next</h3>
-            <span class="count">{{playerService.queue().length}} songs</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn-toggle-queue hide-mobile" (click)="isQueueVisibleDesktop = !isQueueVisibleDesktop" title="Toggle Queue" style="background: transparent; border: none; color: #9C9CA6; cursor: pointer; padding: 4px; display: flex;">
+              <svg *ngIf="isQueueVisibleDesktop" lucideChevronDown [attr.size]="18"></svg>
+              <svg *ngIf="!isQueueVisibleDesktop" lucideChevronUp [attr.size]="18"></svg>
+            </button>
+            <div>
+              <h3>Up Next</h3>
+              <span class="count">{{playerService.queue().length}} songs</span>
+            </div>
           </div>
           <button class="btn-search-queue hide-mobile" *ngIf="roomService.isAdmin()" (click)="showSearchModal.set(true)">
             <svg lucideSearch [attr.size]="16"></svg>

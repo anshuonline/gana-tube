@@ -99,6 +99,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   heartInterval: any;
   private lastEmitTime = 0;
   isPlayerVisibleMobile = true;
+  isQueueVisibleDesktop = true;
   
   // Track Menu state
   isMenuOpen = false;

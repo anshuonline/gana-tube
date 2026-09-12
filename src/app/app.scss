@@ -56,6 +56,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   min-width: 0;
+  -webkit-tap-highlight-color: transparent !important;
   
   &:hover {
     background: rgba(255, 255, 255, 0.08);
@@ -1026,6 +1027,7 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   aspect-ratio: 3 / 4;
   will-change: transform;
+  -webkit-tap-highlight-color: transparent !important;
   contain: layout style paint;
 }
 

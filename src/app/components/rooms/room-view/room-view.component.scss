@@ -274,18 +274,17 @@
 
 // Player Section (Left)
 .player-section {
-  flex: 0 0 340px;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 24px 20px;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
   gap: 16px;
 
   .album-art-container {
-    width: 240px;
-    height: 240px;
+    width: 320px;
+    height: 320px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
@@ -450,11 +449,12 @@
 
 // Panels Section (Right)
 .panels-section {
-  flex: 1;
+  flex: 0 0 420px;
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 // Panel shared
@@ -489,6 +489,13 @@
   flex: 0 0 auto;
   max-height: 40%;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  &.desktop-collapsed {
+    max-height: none;
+    .queue-list {
+      display: none;
+    }
+  }
 
   .queue-list {
     overflow-y: auto;
@@ -1003,6 +1010,12 @@
   .queue-panel {
     max-height: none;
     flex: 1;
+
+    &.desktop-collapsed {
+      .queue-list {
+        display: block;
+      }
+    }
   }
 
   .chat-panel {
