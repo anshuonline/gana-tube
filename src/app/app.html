@@ -113,7 +113,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
       
       <!-- New Banner Layout -->

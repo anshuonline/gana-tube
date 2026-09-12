@@ -165,6 +165,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   showGuestModal = signal(false);
   pendingRoomIdToJoin = '';
+  mobileOptionsOpen = signal(false);
   
   showRulesPopup = signal(false);
   rulesAccepted = false;
@@ -189,16 +190,21 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   isUserScrolledUp = false;
+  private previousChatLength = 0;
 
   ngAfterViewChecked() {
-    this.scrollToBottom();
+    const currentLength = this.roomService.chat().length;
+    if (currentLength > this.previousChatLength) {
+      this.previousChatLength = currentLength;
+      this.scrollToBottom();
+    }
   }
 
   onChatScroll() {
     if (!this.chatScrollContainer) return;
     const el = this.chatScrollContainer.nativeElement;
-    // Allow a 50px threshold for being "at the bottom"
-    this.isUserScrolledUp = (el.scrollHeight - el.scrollTop - el.clientHeight) > 50;
+    // Allow a 20px threshold for being "at the bottom"
+    this.isUserScrolledUp = (el.scrollHeight - el.scrollTop - el.clientHeight) > 20;
   }
 
   private scrollToBottom(): void {
@@ -239,8 +245,21 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   sendMessage() {
     if (!this.chatInput.trim()) return;
-    const user = this.authService.currentUser();
-    if (!user) return;
+    let user = this.authService.currentUser();
+    if (!user) {
+      const guestName = localStorage.getItem('gt_guest_name');
+      const guestId = localStorage.getItem('gt_guest_id');
+      if (guestName && guestId) {
+        user = {
+          uid: guestId,
+          email: '',
+          displayName: guestName,
+          photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${guestName}`
+        } as any;
+      } else {
+        return;
+      }
+    }
     
     // Check for third-party links
     const urlRegex = /(https?:\/\/[^\s]+)/g;

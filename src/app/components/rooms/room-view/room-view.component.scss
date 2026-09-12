@@ -83,12 +83,63 @@
     }
 
     .btn-leave {
-      color: #EF4444;
-      border-color: rgba(239, 68, 68, 0.3);
-      background: rgba(239, 68, 68, 0.08);
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.2);
 
       &:hover {
         background: rgba(239, 68, 68, 0.2);
+      }
+    }
+
+    .mobile-options {
+      position: relative;
+      .btn-options {
+        background: none;
+        border: none;
+        padding: 6px;
+      }
+
+      .options-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        background: #1c1c1e;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        z-index: 100;
+        min-width: 140px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          padding: 10px 12px;
+          background: transparent;
+          border: none;
+          color: #F5F5F7;
+          font-size: 14px;
+          text-align: left;
+          border-radius: 6px;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+          }
+
+          &.text-danger {
+            color: #ef4444;
+            &:hover {
+              background: rgba(239, 68, 68, 0.1);
+            }
+          }
+        }
       }
     }
   }
@@ -780,7 +831,7 @@
 // Mobile Responsive
 @media (max-width: 768px) {
   :host {
-    height: calc(100vh - 135px);
+    height: 100dvh;
   }
 
   .room-header {
@@ -819,12 +870,54 @@
     flex: 0 0 auto;
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 16px 12px;
-    gap: 10px;
+    padding: 12px;
+    gap: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
 
     .album-art-container {
-      width: 160px;
-      height: 160px;
+      width: 80px;
+      height: 80px;
+      margin: 0;
+    }
+
+    .track-info {
+      flex: 1;
+      text-align: left;
+      
+      h3 { font-size: 14px; margin-bottom: 4px; }
+      p { font-size: 12px; }
+    }
+
+    .progress-container {
+      width: 100%;
+      margin-top: 4px;
+      gap: 8px;
+      .time { font-size: 10px; }
+    }
+
+    .playback-controls {
+      width: 100%;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 4px;
+      
+      .ctrl-btn {
+        padding: 6px;
+        svg { width: 18px; height: 18px; }
+      }
+      .play-btn {
+        padding: 8px;
+        svg { width: 22px; height: 22px; }
+      }
+    }
+    
+    .listener-note {
+      width: 100%;
+      text-align: center;
+      margin-top: 0;
     }
   }
 

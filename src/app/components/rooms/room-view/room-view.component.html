@@ -17,13 +17,30 @@
         <svg lucideUsers [attr.size]="18"></svg>
         <span>{{room.listenerCount}}</span>
       </button>
-      <button class="btn-share" (click)="shareRoom()" title="Share Room">
+      <button class="btn-share hide-mobile" (click)="shareRoom()" title="Share Room">
         <svg lucideShare2 [attr.size]="18"></svg>
       </button>
-      <button class="btn-leave" (click)="leaveRoom()">
+      <button class="btn-leave hide-mobile" (click)="leaveRoom()">
         <svg lucideLogOut [attr.size]="18"></svg>
-        <span class="hide-mobile">Leave</span>
+        <span>Leave</span>
       </button>
+      
+      <!-- Mobile Options Menu -->
+      <div class="mobile-options hide-desktop" style="position: relative;">
+        <button class="btn-options" (click)="mobileOptionsOpen.set(!mobileOptionsOpen())">
+          <svg lucideMoreVertical [attr.size]="20"></svg>
+        </button>
+        <div class="options-dropdown" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)">
+           <button class="dropdown-item" (click)="shareRoom()">
+             <svg lucideShare2 [attr.size]="16"></svg>
+             Share Room
+           </button>
+           <button class="dropdown-item text-danger" (click)="leaveRoom()">
+             <svg lucideLogOut [attr.size]="16"></svg>
+             Leave Room
+           </button>
+        </div>
+      </div>
     </div>
   </header>
 
