@@ -189,29 +189,30 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     const gtRegex = /(?:betatesting\.)?ganatube\.in\/(?:play|share\.php)\?v=([a-zA-Z0-9_-]{11})/;
     const match = this.chatInput.match(gtRegex);
     
+    const currentInput = this.chatInput;
+    this.chatInput = '';
+    this.showEmojiPicker = false;
+
     if (match && match[1]) {
       const videoId = match[1];
       this.toastService.show('Loading track details...', 'info', 2000);
       
-      // Fallback API is used by searchMusic if backend fails, which is nice
-      this.youtubeApi.searchMusic(videoId, 1).subscribe({
+      this.youtubeApi.getVideoDetails([videoId]).subscribe({
         next: (results) => {
           if (results && results.length > 0) {
             this.roomService.sendSongShare(results[0], user.uid, user.displayName || 'User');
           } else {
-            this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
+            this.roomService.sendChatMessage(currentInput, user.uid, user.displayName || 'User');
           }
         },
-        error: () => {
-          this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
+        error: (err) => {
+          console.error('Failed to load track details:', err);
+          this.roomService.sendChatMessage(currentInput, user.uid, user.displayName || 'User');
         }
       });
     } else {
-      this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
+      this.roomService.sendChatMessage(currentInput, user.uid, user.displayName || 'User');
     }
-    
-    this.chatInput = '';
-    this.showEmojiPicker = false;
   }
 
   addEmoji(emoji: string) {
