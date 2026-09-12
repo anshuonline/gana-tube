@@ -312,7 +312,7 @@ export class PlayerService {
     this.playerState.set('loading');
 
     if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
-      this.roomService.adminQueueUpdate(tracks);
+      this.roomService.adminQueueUpdate(tracks, this.currentIndex());
     }
     this.isRemoteUpdate = false;
     
@@ -327,7 +327,7 @@ export class PlayerService {
     this.currentIndex.set(newCurrentIndex);
     
     if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
-      this.roomService.adminQueueUpdate(newQueue);
+      this.roomService.adminQueueUpdate(newQueue, this.currentIndex());
     }
   }
 
@@ -707,7 +707,7 @@ export class PlayerService {
     if (!this.isRemoteUpdate && current && this.roomService.currentRoomInfo()) {
       this.roomService.adminPlayTrack(current);
       // also sync queue when song auto-changes
-      this.roomService.adminQueueUpdate(this.queue());
+      this.roomService.adminQueueUpdate(this.queue(), this.currentIndex());
     }
     this.isRemoteUpdate = false;
   }

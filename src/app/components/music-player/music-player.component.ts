@@ -32,6 +32,7 @@ import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { OfflineService } from '../../services/offline.service';
 import { ToastService } from '../../services/toast.service';
+import { RoomService } from '../../services/room.service';
 
 import { SyncService } from '../../services/sync.service';
 
@@ -66,7 +67,7 @@ import { SyncService } from '../../services/sync.service';
     LucideMoreVertical
   ],
   template: `
-    <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" (click)="onPlayerBarClick($event)">
+    <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" [class.room-locked]="isRoomLocked()" (click)="onPlayerBarClick($event)">
       
       <!-- Ambient Background Wrapper to contain blur -->
       <div class="ambient-bg-wrapper" style="position: absolute; inset: 0; overflow: hidden; z-index: -2; border-radius: inherit;">
@@ -518,7 +519,8 @@ export class MusicPlayerComponent implements OnDestroy {
     public authService: AuthService,
     public syncService: SyncService,
     public offlineService: OfflineService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    public roomService: RoomService
   ) {}
 
   isDownloaded(): boolean {
@@ -664,9 +666,18 @@ export class MusicPlayerComponent implements OnDestroy {
   }
 
   toggleFullScreen(): void {
+    if (this.roomService.currentRoomInfo() && !this.roomService.isAdmin()) {
+      this.toastService.show('You\'re in a room — you can\'t control playback', 'info');
+      return;
+    }
     if (this.playerService.currentTrack() !== null) {
       this.expand.emit();
     }
+  }
+
+  /** Block all player controls when in a room (non-admin) */
+  isRoomLocked(): boolean {
+    return !!this.roomService.currentRoomInfo() && !this.roomService.isAdmin();
   }
 
 

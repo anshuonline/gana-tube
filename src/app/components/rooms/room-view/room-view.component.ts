@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -73,6 +73,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   chatInput = '';
   showMembersPanel = false;
+  showRoomClosedPopup = false;
   activeMobileTab: 'queue' | 'chat' = 'chat';
   
   // Track Menu state
@@ -82,6 +83,17 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   activeMenuTrack: any = null;
   
   private routeSub: any;
+
+  constructor() {
+    effect(() => {
+      const err = this.roomService.roomError();
+      if (err === 'Room was closed by the admin') {
+        this.toastService.show('Host has closed the room', 'info', 5000);
+        this.roomService.roomError.set(null);
+        this.router.navigate(['/rooms']);
+      }
+    });
+  }
 
   ngOnInit() {
     this.routeSub = this.router.events.subscribe(() => {
@@ -139,9 +151,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  regenerateCode() {
-    this.roomService.regenerateCode();
-  }
 
   shareRoom() {
     const info = this.roomService.currentRoomInfo();
@@ -185,7 +194,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   removeQueueItem(index: number) {
     if (!this.roomService.isAdmin()) return;
     this.playerService.removeFromQueue(index);
-    this.roomService.adminQueueUpdate(this.playerService.queue());
+    this.roomService.adminQueueUpdate(this.playerService.queue(), this.playerService.currentIndex());
   }
 
   formatTime(seconds: number): string {

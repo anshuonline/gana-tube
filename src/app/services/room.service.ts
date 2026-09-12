@@ -225,9 +225,9 @@ export class RoomService {
     }
   }
 
-  adminQueueUpdate(queue: Track[]) {
+  adminQueueUpdate(queue: Track[], currentIndex: number) {
     if (this.isAdmin()) {
-      this.socket.emit('room:queue_updated', { queue });
+      this.socket.emit('room:queue_updated', { queue, currentIndex });
     }
   }
 }

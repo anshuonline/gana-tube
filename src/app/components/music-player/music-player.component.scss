@@ -1536,3 +1536,17 @@
 .options-dropdown .dropdown-item { background: none; border: none; color: #fff; padding: 12px 20px; width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 14px; white-space: nowrap; }
 .options-dropdown .dropdown-item:hover { background: rgba(255,255,255,0.1); }
 @media (max-width: 768px) { .desktop-only { display: none !important; } .mobile-only { display: flex !important; } }
+
+// Room locked state - disable controls when in room
+.player-bar.room-locked {
+  .player-center,
+  .player-right {
+    .ctrl-btn, .play-pause-btn, .volume-slider, .maximize-btn, .options-btn {
+      pointer-events: none;
+      opacity: 0.25;
+    }
+  }
+  .progress-track {
+    pointer-events: none;
+  }
+}

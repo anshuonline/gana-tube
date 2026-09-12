@@ -1,0 +1,14 @@
+// This file is imported into music-player.component.scss
+// Room-locked styles for when user is in a room and not admin
+.player-bar.room-locked {
+  .player-center,
+  .player-right {
+    .ctrl-btn, .play-pause-btn, .volume-slider, .maximize-btn, .options-btn {
+      pointer-events: none;
+      opacity: 0.25;
+    }
+  }
+  .progress-track {
+    pointer-events: none;
+  }
+}
