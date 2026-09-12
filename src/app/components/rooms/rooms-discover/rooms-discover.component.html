@@ -68,3 +68,5 @@
 
 <app-rooms-create-modal *ngIf="showCreateModal" (close)="showCreateModal = false"></app-rooms-create-modal>
 <app-rooms-join-modal *ngIf="showJoinModal" (close)="showJoinModal = false"></app-rooms-join-modal>
+
+<app-guest-name-modal *ngIf="showGuestModal" (close)="showGuestModal = false" (confirm)="onGuestNameConfirmed($event)"></app-guest-name-modal>

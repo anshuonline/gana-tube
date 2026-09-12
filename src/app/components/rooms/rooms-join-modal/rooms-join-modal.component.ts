@@ -48,7 +48,18 @@ export class RoomsJoinModalComponent implements OnInit, OnDestroy {
     if (!this.roomCode.trim()) return;
     this.error = '';
     
-    const user = this.authService.currentUser();
+    let user: any = this.authService.currentUser();
+    if (!user && typeof localStorage !== 'undefined') {
+      const guestName = localStorage.getItem('gt_guest_name');
+      if (guestName) {
+        user = {
+          uid: `guest-${localStorage.getItem('gt_guest_id') || Math.random().toString(36).substring(2, 10)}`,
+          displayName: guestName,
+          photoURL: null
+        } as any;
+      }
+    }
+
     if (!user) return;
     
     const code = this.roomCode.trim().toUpperCase();

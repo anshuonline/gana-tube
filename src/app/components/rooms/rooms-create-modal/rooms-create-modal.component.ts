@@ -32,11 +32,22 @@ export class RoomsCreateModalComponent {
 
   createRoom() {
     if (!this.roomName.trim()) return;
+
+    let user: any = this.authService.currentUser();
+    if (!user && typeof localStorage !== 'undefined') {
+      const guestName = localStorage.getItem('gt_guest_name');
+      if (guestName) {
+        user = {
+          uid: `guest-${localStorage.getItem('gt_guest_id') || Math.random().toString(36).substring(2, 10)}`,
+          displayName: guestName,
+          photoURL: null
+        } as any;
+      }
+    }
     
-    const user = this.authService.currentUser();
     if (!user) return;
     
-    this.roomService.createRoom(this.roomName, this.isPublic, user);
+    this.roomService.createRoom(this.roomName.trim(), this.isPublic, user);
     
     // Listen for room state once to get the created room id
     const sub = this.roomService.getSocket().once('room:state', (state: any) => {

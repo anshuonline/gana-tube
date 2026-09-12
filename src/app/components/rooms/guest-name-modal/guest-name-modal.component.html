@@ -1,0 +1,33 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="btn-close" (click)="closeModal()">
+      <svg lucideX [attr.size]="20"></svg>
+    </button>
+    
+    <h2>Join as Guest</h2>
+    <p>Please enter a display name to join the room.</p>
+    
+    <div class="input-group">
+      <div class="input-icon">
+        <svg lucideUser [attr.size]="18"></svg>
+        <input 
+          type="text" 
+          [(ngModel)]="guestName" 
+          placeholder="Enter your name" 
+          (keyup.enter)="submit()"
+          maxlength="20"
+          autofocus>
+      </div>
+    </div>
+    
+    <div class="error-msg" *ngIf="error">{{error}}</div>
+    
+    <button class="btn-primary" (click)="submit()" [disabled]="!guestName.trim()">
+      Continue to Room
+    </button>
+    
+    <div class="login-hint">
+      Or <a href="/profile">login with Google</a> to save your liked songs.
+    </div>
+  </div>
+</div>

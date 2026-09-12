@@ -15,6 +15,8 @@ import {
   LucideUsers 
 } from '@lucide/angular';
 
+import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.component';
+
 @Component({
   selector: 'app-rooms-discover',
   standalone: true,
@@ -26,7 +28,8 @@ import {
     LucideMusic, 
     LucideUsers,
     RoomsCreateModalComponent,
-    RoomsJoinModalComponent
+    RoomsJoinModalComponent,
+    GuestNameModalComponent
   ],
   templateUrl: './rooms-discover.component.html',
   styleUrls: ['./rooms-discover.component.scss']
@@ -40,6 +43,10 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   
   showCreateModal = false;
   showJoinModal = false;
+  showGuestModal = false;
+  
+  pendingAction: 'create' | 'join_private' | 'join_public' | null = null;
+  pendingRoomId: string | null = null;
   
   private refreshInterval: any;
 
@@ -49,41 +56,84 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
       this.router.navigate(['/rooms', info.roomId]);
       return;
     }
-    this.refreshRooms();
-    this.refreshInterval = setInterval(() => this.refreshRooms(), 10000);
+    this.roomService.discoverRooms();
+    
+    // Auto-refresh every 30s
+    this.refreshInterval = setInterval(() => {
+      this.roomService.discoverRooms();
+    }, 30000);
   }
 
   ngOnDestroy() {
-    if (this.refreshInterval) clearInterval(this.refreshInterval);
-  }
-
-  refreshRooms() {
-    this.roomService.discoverRooms();
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
   }
 
   openCreateModal() {
     if (this.authService.currentUser() === null || this.authService.currentUser() === undefined) {
-      this.toastService.show('Please log in to create a room.', 'info');
-      return;
+      if (!this.checkGuestNameAndProceed('create')) return;
     }
     this.showCreateModal = true;
   }
 
   openJoinModal() {
     if (this.authService.currentUser() === null || this.authService.currentUser() === undefined) {
-      this.toastService.show('Please log in to join a private room.', 'info');
-      return;
+      if (!this.checkGuestNameAndProceed('join_private')) return;
     }
     this.showJoinModal = true;
   }
 
   joinPublicRoom(roomId: string) {
     if (this.authService.currentUser() === null || this.authService.currentUser() === undefined) {
-      this.toastService.show('Please log in to join a room.', 'info');
-      return;
+      if (!this.checkGuestNameAndProceed('join_public', roomId)) return;
     }
     
-    const user = this.authService.currentUser();
+    this.executeJoinPublicRoom(roomId);
+  }
+  
+  private checkGuestNameAndProceed(action: 'create' | 'join_private' | 'join_public', roomId: string | null = null): boolean {
+    if (typeof localStorage !== 'undefined') {
+      const guestName = localStorage.getItem('gt_guest_name');
+      if (guestName) {
+        return true;
+      }
+    }
+    
+    this.pendingAction = action;
+    this.pendingRoomId = roomId;
+    this.showGuestModal = true;
+    return false;
+  }
+  
+  onGuestNameConfirmed(name: string) {
+    this.showGuestModal = false;
+    
+    if (this.pendingAction === 'create') {
+      this.showCreateModal = true;
+    } else if (this.pendingAction === 'join_private') {
+      this.showJoinModal = true;
+    } else if (this.pendingAction === 'join_public' && this.pendingRoomId) {
+      this.executeJoinPublicRoom(this.pendingRoomId);
+    }
+    
+    this.pendingAction = null;
+    this.pendingRoomId = null;
+  }
+  
+  private executeJoinPublicRoom(roomId: string) {
+    let user: any = this.authService.currentUser();
+    if (!user && typeof localStorage !== 'undefined') {
+      user = {
+        uid: `guest-${localStorage.getItem('gt_guest_id') || Math.random().toString(36).substring(2, 10)}`,
+        displayName: localStorage.getItem('gt_guest_name'),
+        photoURL: null
+      } as any;
+      if (!localStorage.getItem('gt_guest_id')) {
+        localStorage.setItem('gt_guest_id', user.uid.replace('guest-', ''));
+      }
+    }
+    
     if (user) {
       this.roomService.getSocket().once('room:state', (state: any) => {
         if (state.roomId === roomId) {

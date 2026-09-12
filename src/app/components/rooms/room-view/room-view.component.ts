@@ -27,6 +27,7 @@ import {
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
 import { AppStateService } from '../../../services/app-state.service';
+import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.component';
 
 @Component({
   selector: 'app-room-view',
@@ -50,7 +51,8 @@ import { AppStateService } from '../../../services/app-state.service';
     LucideShare2,
     LucideSmile,
     RoomMembersPanelComponent,
-    TrackMenuComponent
+    TrackMenuComponent,
+    GuestNameModalComponent
   ],
   templateUrl: './room-view.component.html',
   styleUrls: ['./room-view.component.scss']
@@ -113,6 +115,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       const info = this.roomService.currentRoomInfo();
       const url = this.router.url;
       const showingRules = this.showRulesPopup();
+      const showingGuestModal = this.showGuestModal();
 
       // Wait until auth state is determined
       if (user === undefined) return;
@@ -124,11 +127,30 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
           
           if (!info || info.roomId !== roomId) {
             if (user) {
-              if (showingRules) return; // Do not join until rules are accepted
+              if (showingRules || showingGuestModal) return; // Do not join until rules are accepted
               this.roomService.joinRoom(roomId, null, user);
             } else {
-              this.toastService.show('Please log in to join a room', 'info');
-              this.router.navigate(['/rooms']);
+              // Guest Flow
+              if (typeof localStorage !== 'undefined') {
+                const guestName = localStorage.getItem('gt_guest_name');
+                if (guestName) {
+                  // We have a guest name, join as guest
+                  if (showingRules || showingGuestModal) return;
+                  const guestUser = {
+                    uid: `guest-${localStorage.getItem('gt_guest_id') || Math.random().toString(36).substring(2, 10)}`,
+                    displayName: guestName,
+                    photoURL: null
+                  };
+                  if (!localStorage.getItem('gt_guest_id')) {
+                    localStorage.setItem('gt_guest_id', guestUser.uid.replace('guest-', ''));
+                  }
+                  this.roomService.joinRoom(roomId, null, guestUser);
+                } else {
+                  // Prompt for guest name
+                  this.pendingRoomIdToJoin = roomId;
+                  this.showGuestModal.set(true);
+                }
+              }
             }
           }
         }
@@ -136,6 +158,14 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }, { allowSignalWrites: true });
   }
 
+  onGuestNameConfirmed(name: string) {
+    this.showGuestModal.set(false);
+    // The effect will re-run and join automatically since localStorage is set
+  }
+
+  showGuestModal = signal(false);
+  pendingRoomIdToJoin = '';
+  
   showRulesPopup = signal(false);
   rulesAccepted = false;
 

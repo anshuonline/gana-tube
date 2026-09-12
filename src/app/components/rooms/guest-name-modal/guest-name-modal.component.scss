@@ -1,0 +1,131 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  text-align: center;
+  
+  .btn-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    
+    &:hover {
+      color: white;
+    }
+  }
+  
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  
+  p {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 24px;
+    font-size: 0.95rem;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+    text-align: left;
+    
+    .input-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+      
+      lucide-user {
+        position: absolute;
+        left: 12px;
+        color: rgba(255, 255, 255, 0.4);
+      }
+      
+      input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 12px 12px 12px 40px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.2s;
+        
+        &:focus {
+          outline: none;
+          border-color: #9333EA;
+          background: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+  }
+  
+  .error-msg {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    background: #9333EA;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    
+    &:hover {
+      background: #7e22ce;
+    }
+    
+    &:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.3);
+      cursor: not-allowed;
+    }
+  }
+  
+  .login-hint {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    
+    a {
+      color: #9333EA;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

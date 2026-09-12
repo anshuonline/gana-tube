@@ -279,3 +279,5 @@
 </app-track-menu>
 
 <app-room-members-panel *ngIf="showMembersPanel" (close)="showMembersPanel = false"></app-room-members-panel>
+
+<app-guest-name-modal *ngIf="showGuestModal()" (close)="showGuestModal.set(false)" (confirm)="onGuestNameConfirmed($event)"></app-guest-name-modal>
