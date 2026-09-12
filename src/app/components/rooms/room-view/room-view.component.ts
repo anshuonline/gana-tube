@@ -24,7 +24,9 @@ import {
   LucideMoreVertical,
   LucideShare2,
   LucideSmile,
+  LucideVolumeX,
   LucideChevronDown,
+  LucideChevronUp,
   LucideInfo,
   LucideSearch,
   LucideHeart
@@ -56,6 +58,7 @@ import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.co
     LucideShare2,
     LucideSmile,
     LucideChevronDown,
+    LucideChevronUp,
     LucideInfo,
     LucideSearch,
     LucideHeart,
@@ -95,6 +98,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   pendingHearts = 0;
   heartInterval: any;
   private lastEmitTime = 0;
+  isPlayerVisibleMobile = true;
   
   // Track Menu state
   isMenuOpen = false;

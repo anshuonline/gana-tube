@@ -78,7 +78,7 @@
   <div class="main-layout">
     
     <!-- Left: Player Section -->
-    <section class="player-section">
+    <section class="player-section" [class.mobile-hidden]="!isPlayerVisibleMobile">
       <div class="album-art-container" 
            [class.playing]="playerService.playerState() === 'playing'"
            [class.clickable]="roomService.isAdmin()"
@@ -136,6 +136,10 @@
     <div class="mobile-tabs hide-desktop">
       <button [class.active]="activeMobileTab === 'queue'" (click)="activeMobileTab = 'queue'">Queue</button>
       <button [class.active]="activeMobileTab === 'chat'" (click)="activeMobileTab = 'chat'">Chat</button>
+      <button class="toggle-player-btn" (click)="isPlayerVisibleMobile = !isPlayerVisibleMobile" title="Toggle Player" style="flex: 0 0 auto; padding: 0 16px; border-left: 1px solid rgba(255, 255, 255, 0.08);">
+        <svg *ngIf="isPlayerVisibleMobile" lucideChevronDown [attr.size]="20"></svg>
+        <svg *ngIf="!isPlayerVisibleMobile" lucideChevronUp [attr.size]="20"></svg>
+      </button>
     </div>
 
     <!-- Right: Panels (Queue + Chat) -->
