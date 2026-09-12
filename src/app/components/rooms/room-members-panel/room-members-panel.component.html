@@ -46,21 +46,29 @@
           </span>
         </div>
 
-        <div class="actions" *ngIf="roomService.isAdmin() && !member.isAdmin">
-          <button class="btn-more" (click)="toggleMenu(member.socketId, $event)">
-            <svg lucideMoreVertical [attr.size]="16"></svg>
+        <div class="actions">
+          <!-- Leave Button for current user -->
+          <button class="btn-leave-member" *ngIf="member.socketId === roomService.getSocketId()" (click)="leaveRoom()" title="Leave Room">
+            <svg lucideLogOut [attr.size]="18" stroke="#ef4444"></svg>
           </button>
           
-          <div class="dropdown-menu" *ngIf="activeMenuSocketId === member.socketId">
-            <button (click)="makeAdmin(member.socketId)">
-              <svg lucideCrown [attr.size]="14"></svg>
-              Make Host
+          <!-- Admin Actions -->
+          <ng-container *ngIf="roomService.isAdmin() && !member.isAdmin">
+            <button class="btn-more" (click)="toggleMenu(member.socketId, $event)">
+              <svg lucideMoreVertical [attr.size]="16"></svg>
             </button>
-            <button class="btn-danger" *ngIf="member.socketId !== roomService.getSocketId()" (click)="kickMember(member.socketId)">
-              <svg lucideUserX [attr.size]="14"></svg>
-              Kick
-            </button>
-          </div>
+            
+            <div class="dropdown-menu" *ngIf="activeMenuSocketId === member.socketId">
+              <button (click)="makeAdmin(member.socketId)">
+                <svg lucideCrown [attr.size]="14"></svg>
+                Make Host
+              </button>
+              <button class="btn-danger" *ngIf="member.socketId !== roomService.getSocketId()" (click)="kickMember(member.socketId)">
+                <svg lucideUserX [attr.size]="14"></svg>
+                Kick
+              </button>
+            </div>
+          </ng-container>
         </div>
         
       </div>

@@ -76,7 +76,7 @@ export class RoomService {
     this.socket.on('room:state', (state: RoomInfo) => {
       this.currentRoomInfo.set(state);
       this.members.set(state.members);
-      this.chat.set(state.chat || []);
+      this.chat.set((state.chat || []).filter((c: any) => c.type !== 'like'));
       this.roomQueue.set(state.queue || []);
       this.isAdmin.set(state.adminUid === this.socket.id);
       this.roomError.set(null);

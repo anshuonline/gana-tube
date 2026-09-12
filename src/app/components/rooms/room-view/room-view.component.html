@@ -8,12 +8,7 @@
         <svg lucideChevronDown [attr.size]="20"></svg>
       </button>
       <div class="room-title">
-        <h2 style="display: flex; align-items: center; gap: 8px;">
-          {{room.name}}
-          <button class="btn-leave-inline" (click)="leaveRoom()" title="Leave Room">
-            <svg lucideLogOut [attr.size]="18" color="#ef4444"></svg>
-          </button>
-        </h2>
+        <h2>{{room.name}}</h2>
       </div>
     </div>
     
@@ -192,7 +187,7 @@
                [class.system]="msg.senderUid === 'system'">
                
             <!-- Normal User Messages -->
-            <ng-container *ngIf="msg.senderUid !== 'system'">
+            <ng-container *ngIf="msg.senderUid !== 'system' && msg.type !== 'like'">
               <div class="msg-header" *ngIf="msg.senderUid !== authService.currentUser()?.uid">
                 <span class="sender">{{msg.senderName}}</span>
                 <span class="time">{{msg.timestamp | date:'shortTime'}}</span>

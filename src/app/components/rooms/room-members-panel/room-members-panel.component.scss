@@ -147,6 +147,25 @@
       
       .actions {
         position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .btn-leave-member {
+          background: transparent;
+          border: none;
+          padding: 8px;
+          border-radius: 50%;
+          cursor: pointer;
+          color: #ef4444;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background: rgba(239, 68, 68, 0.1);
+          }
+        }
         
         .btn-more {
           background: transparent;
