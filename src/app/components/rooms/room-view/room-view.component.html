@@ -249,7 +249,7 @@
             placeholder="Type a message..."
             maxlength="200">
           <button class="btn-like" (click)="sendLike()" title="Send Love">
-            <svg lucideHeart [attr.size]="22" fill="#ef4444" stroke="#ef4444"></svg>
+            <img src="assets/heart-white.png" width="22" height="22" alt="Love">
           </button>
           <button class="btn-send" (click)="sendMessage()" [disabled]="!chatInput.trim()">
             <svg lucideSend [attr.size]="18"></svg>
@@ -269,7 +269,7 @@
            'left.%': heart.left,
            'animation-duration.s': heart.animationDuration
          }">
-      <svg lucideHeart [attr.size]="32" [attr.fill]="heart.color" [attr.stroke]="heart.color"></svg>
+      <img [src]="'assets/heart-' + heart.color + '.png'" width="32" height="32" alt="heart">
     </div>
   </div>
 

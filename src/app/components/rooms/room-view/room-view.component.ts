@@ -90,7 +90,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   isSearching = false;
 
   floatingHearts: { id: number, color: string, left: number, animationDuration: number }[] = [];
-  heartColors = ['#ffffff', '#f97316', '#ec4899', '#3b82f6'];
+  heartColors = ['white', 'orange', 'pink', 'blue'];
   heartIdCounter = 0;
   
   // Track Menu state

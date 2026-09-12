@@ -928,9 +928,12 @@
   .main-layout {
     flex-direction: column;
     display: flex;
+    overflow-y: auto;
 
     .panels-section {
       order: 1;
+      flex: 1 0 auto;
+      min-height: calc(100dvh - 60px);
     }
   }
 
