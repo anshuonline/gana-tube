@@ -43,6 +43,32 @@ export class PlayerService {
   constructor() {
     this.setupSocketListeners();
     this.setupDeviceSyncListeners();
+    
+    // Listen Together Sync Worker
+    setInterval(() => {
+      // Only sync if user is in a room and is the admin
+      if (this.roomService.currentRoomInfo() && this.roomService.isAdmin()) {
+        const pState = this.playerState();
+        if (pState === 'playing' || pState === 'paused') {
+          const isPlaying = pState === 'playing';
+          let t = 0;
+          try {
+            if (this.isPlayingOffline()) {
+              t = this.htmlAudio?.currentTime || 0;
+            } else if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
+              t = this.ytPlayer.getCurrentTime() || 0;
+            }
+            
+            const socket = this.roomService.getSocket();
+            if (socket) {
+              socket.emit('room:playback_sync', { isPlaying, currentTime: t });
+            }
+          } catch (e) {
+            console.warn('Sync worker error:', e);
+          }
+        }
+      }
+    }, 5000);
   }
 
   private setupDeviceSyncListeners() {

@@ -297,9 +297,8 @@ io.on('connection', (socket) => {
     // Notify the kicked user
     io.to(targetSocketId).emit('room:kicked', { reason: 'You were removed from the room by the host' });
     
-    // Remove from socket room
-    const targetSocket = io.sockets.sockets.get(targetSocketId);
-    if (targetSocket) targetSocket.leave(roomId);
+    // Remove from socket room properly
+    io.in(targetSocketId).socketsLeave(roomId);
     socketToRoom.delete(targetSocketId);
     
     // Notify remaining members

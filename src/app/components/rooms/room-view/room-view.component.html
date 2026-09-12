@@ -152,6 +152,23 @@
             <div class="msg-bubble" *ngIf="msg.type === 'text'">
               {{msg.content}}
             </div>
+            
+            <div class="msg-song-embed" *ngIf="msg.type === 'song-share' || msg.type === 'song_embed'">
+              <div class="embed-header">Shared a track:</div>
+              <div class="embed-card" *ngIf="msg.track">
+                <img [src]="msg.track.thumbnail" alt="Thumb">
+                <div class="embed-info">
+                  <h4>{{msg.track.title}}</h4>
+                  <p>{{msg.track.channelTitle}}</p>
+                </div>
+                <button class="embed-play-btn" 
+                  [disabled]="!roomService.isAdmin()" 
+                  (click)="playEmbeddedSong(msg.track)"
+                  [title]="roomService.isAdmin() ? 'Play this track' : 'Only Host can play'">
+                  <svg lucidePlay [attr.size]="16"></svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         

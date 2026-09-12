@@ -515,12 +515,94 @@
       }
 
       .msg-bubble {
-        padding: 6px 12px;
+        padding: 8px 14px;
         background: rgba(255, 255, 255, 0.06);
         border-radius: 12px 12px 12px 4px;
-        font-size: 13px;
-        line-height: 1.4;
+        font-size: 15px;
+        line-height: 1.5;
         word-break: break-word;
+      }
+      
+      .msg-song-embed {
+        background: rgba(147, 51, 234, 0.1);
+        border: 1px solid rgba(147, 51, 234, 0.3);
+        border-radius: 12px 12px 12px 4px;
+        padding: 10px;
+        margin-top: 4px;
+        
+        .embed-header {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
+          margin-bottom: 8px;
+          font-weight: 500;
+        }
+        
+        .embed-card {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          background: rgba(0, 0, 0, 0.3);
+          padding: 8px;
+          border-radius: 8px;
+          
+          img {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+          }
+          
+          .embed-info {
+            flex: 1;
+            min-width: 0;
+            
+            h4 {
+              margin: 0 0 4px 0;
+              font-size: 14px;
+              color: #FFF;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            
+            p {
+              margin: 0;
+              font-size: 12px;
+              color: rgba(255, 255, 255, 0.5);
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+          
+          .embed-play-btn {
+            background: rgba(147, 51, 234, 0.2);
+            color: #9333EA;
+            border: 1px solid rgba(147, 51, 234, 0.4);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            
+            &:hover:not(:disabled) {
+              background: #9333EA;
+              color: #FFF;
+              transform: scale(1.05);
+            }
+            
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+              border-color: rgba(255, 255, 255, 0.1);
+              color: rgba(255, 255, 255, 0.3);
+            }
+          }
+        }
       }
     }
   }

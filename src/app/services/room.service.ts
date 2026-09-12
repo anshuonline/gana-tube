@@ -2,6 +2,8 @@ import { Injectable, signal } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { Track } from './player.service';
+import { ToastService } from './toast.service';
+import { inject } from '@angular/core';
 
 export interface RoomMember {
   socketId: string;
@@ -52,6 +54,8 @@ export class RoomService {
   public publicRooms = signal<RoomInfo[]>([]);
   public roomError = signal<string | null>(null);
 
+  private toastService = inject(ToastService);
+
   constructor() {
     this.connect();
   }
@@ -98,7 +102,12 @@ export class RoomService {
       if (info) {
         this.currentRoomInfo.set({ ...info, members, adminUid: newAdminUid, adminName: members.find((m: any) => m.socketId === newAdminUid)?.displayName || info.adminName });
       }
-      this.isAdmin.set(newAdminUid === this.socket.id);
+      
+      const isNowAdmin = newAdminUid === this.socket.id;
+      if (isNowAdmin && !this.isAdmin()) {
+        this.toastService.show('You are now the host. You have the control.', 'success', 5000);
+      }
+      this.isAdmin.set(isNowAdmin);
     });
 
     this.socket.on('room:chat_new', (msg: ChatMessage) => {

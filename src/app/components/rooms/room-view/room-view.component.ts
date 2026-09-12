@@ -6,6 +6,7 @@ import { RoomService } from '../../../services/room.service';
 import { PlayerService, Track } from '../../../services/player.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
+import { YoutubeApiService } from '../../../services/youtube-api.service';
 import { 
   LucideUsers, 
   LucideLogOut,
@@ -58,10 +59,11 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   public roomService = inject(RoomService);
   public playerService = inject(PlayerService);
   public authService = inject(AuthService);
-  private toastService = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toastService = inject(ToastService);
   private appState = inject(AppStateService);
+  private youtubeApi = inject(YoutubeApiService);
 
   @ViewChild('chatScroll') private chatScrollContainer!: ElementRef;
 
@@ -90,8 +92,10 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       if (err) {
         if (err === 'Room was closed by the admin') {
           this.toastService.show('Host has closed the room', 'info', 5000);
+          this.playerService.pause();
         } else if (err.includes('removed from the room')) {
           this.toastService.show(err, 'info', 5000);
+          this.playerService.pause();
         } else {
           this.toastService.show(err, 'info', 3000);
         }
@@ -181,7 +185,31 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     const user = this.authService.currentUser();
     if (!user) return;
     
-    this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
+    // Check if the input is a GanaTube URL
+    const gtRegex = /(?:betatesting\.)?ganatube\.in\/play\?v=([a-zA-Z0-9_-]{11})/;
+    const match = this.chatInput.match(gtRegex);
+    
+    if (match && match[1]) {
+      const videoId = match[1];
+      this.toastService.show('Loading track details...', 'info', 2000);
+      
+      // Fallback API is used by searchMusic if backend fails, which is nice
+      this.youtubeApi.searchMusic(videoId, 1).subscribe({
+        next: (results) => {
+          if (results && results.length > 0) {
+            this.roomService.sendSongShare(results[0], user.uid, user.displayName || 'User');
+          } else {
+            this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
+          }
+        },
+        error: () => {
+          this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
+        }
+      });
+    } else {
+      this.roomService.sendChatMessage(this.chatInput, user.uid, user.displayName || 'User');
+    }
+    
     this.chatInput = '';
     this.showEmojiPicker = false;
   }
@@ -213,6 +241,17 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   previousTrack() {
     if (!this.roomService.isAdmin()) return;
     this.playerService.previous();
+  }
+  
+  playEmbeddedSong(track: any) {
+    if (!this.roomService.isAdmin()) return;
+    this.playerService.playTrack(track);
+    
+    // Add an automated system message saying the host picked it
+    const user = this.authService.currentUser();
+    if (user) {
+      this.roomService.sendChatMessage(`Host picked this music: ${track.title}`, user.uid, 'System');
+    }
   }
   
   removeQueueItem(index: number) {
