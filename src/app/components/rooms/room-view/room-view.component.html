@@ -7,12 +7,13 @@
       <button class="btn-minimize hide-desktop" (click)="minimizeRoom()" title="Minimize Room">
         <svg lucideChevronDown [attr.size]="20"></svg>
       </button>
-      <div class="live-badge">
-        <div class="pulse-dot"></div>
-        <span>LIVE</span>
-      </div>
       <div class="room-title">
-        <h2>{{room.name}}</h2>
+        <h2 style="display: flex; align-items: center; gap: 8px;">
+          {{room.name}}
+          <button class="btn-leave-inline" (click)="leaveRoom()" title="Leave Room">
+            <svg lucideLogOut [attr.size]="18" color="#ef4444"></svg>
+          </button>
+        </h2>
       </div>
     </div>
     
@@ -27,17 +28,14 @@
       <button class="btn-share hide-mobile" (click)="shareRoom()" title="Share Room">
         <svg lucideShare2 [attr.size]="18"></svg>
       </button>
-      <button class="btn-leave hide-mobile" (click)="leaveRoom()">
-        <svg lucideLogOut [attr.size]="18"></svg>
-        <span>Leave</span>
-      </button>
       
       <!-- Mobile Options Menu -->
       <div class="mobile-options hide-desktop" style="position: relative;">
         <button class="btn-options" (click)="mobileOptionsOpen.set(!mobileOptionsOpen())">
           <svg lucideMoreVertical [attr.size]="20"></svg>
         </button>
-        <div class="options-dropdown" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)">
+        <div class="dropdown-backdrop" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99;"></div>
+        <div class="options-dropdown" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)" style="z-index: 100; position: absolute;">
            <button class="dropdown-item" (click)="copyRoomCode()">
              <svg lucideCopy [attr.size]="16"></svg>
              Copy Room Code
@@ -45,10 +43,6 @@
            <button class="dropdown-item" (click)="shareRoom()">
              <svg lucideShare2 [attr.size]="16"></svg>
              Share Room
-           </button>
-           <button class="dropdown-item text-danger" (click)="leaveRoom()">
-             <svg lucideLogOut [attr.size]="16"></svg>
-             Leave Room
            </button>
         </div>
       </div>
@@ -255,7 +249,7 @@
             placeholder="Type a message..."
             maxlength="200">
           <button class="btn-like" (click)="sendLike()" title="Send Love">
-            <img src="/assets/heart-white.png" width="22" height="22" alt="Love">
+            <svg lucideHeart [attr.size]="22" fill="#ef4444" stroke="#ef4444"></svg>
           </button>
           <button class="btn-send" (click)="sendMessage()" [disabled]="!chatInput.trim()">
             <svg lucideSend [attr.size]="18"></svg>
@@ -268,16 +262,16 @@
 </div>
 
 <!-- Floating Hearts Container -->
-<div class="floating-hearts-container">
-  <div *ngFor="let heart of floatingHearts" 
-       class="floating-heart" 
-       [ngStyle]="{
-         'left.%': heart.left,
-         'animation-duration.s': heart.animationDuration
-       }">
-    <img [src]="'/assets/heart-' + heart.color + '.png'" width="32" height="32" alt="heart">
+  <div class="floating-hearts-container">
+    <div *ngFor="let heart of floatingHearts" 
+         class="floating-heart" 
+         [ngStyle]="{
+           'left.%': heart.left,
+           'animation-duration.s': heart.animationDuration
+         }">
+      <svg lucideHeart [attr.size]="32" [attr.fill]="heart.color" [attr.stroke]="heart.color"></svg>
+    </div>
   </div>
-</div>
 
   <div class="rules-overlay" *ngIf="showRulesPopup()">
     <div class="rules-modal">

@@ -32,6 +32,7 @@ import { FormsModule } from '@angular/forms';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SyncService } from '../../services/sync.service';
+import { RoomService } from '../../services/room.service';
 
 @Component({
   selector: 'app-full-screen-player',
@@ -80,6 +81,31 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   public syncService = inject(SyncService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  public roomService = inject(RoomService);
+  
+  hasShownRoomWarning = false;
+
+  checkRoomWarning() {
+    if (!this.hasShownRoomWarning && !!this.roomService.currentRoomInfo() && this.roomService.isAdmin()) {
+      this.toastService.show('You are in a room. Your changes will reflect for all members.', 'info');
+      this.hasShownRoomWarning = true;
+    }
+  }
+
+  handlePlayPause() {
+    this.checkRoomWarning();
+    this.playerService.togglePlayPause();
+  }
+
+  handleNext() {
+    this.checkRoomWarning();
+    this.playerService.next();
+  }
+
+  handlePrevious() {
+    this.checkRoomWarning();
+    this.playerService.previous();
+  }
 
   isDesktop = false;
   searchQuery = '';

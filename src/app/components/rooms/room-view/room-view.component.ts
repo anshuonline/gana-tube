@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -26,7 +26,8 @@ import {
   LucideSmile,
   LucideChevronDown,
   LucideInfo,
-  LucideSearch
+  LucideSearch,
+  LucideHeart
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -57,6 +58,7 @@ import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.co
     LucideChevronDown,
     LucideInfo,
     LucideSearch,
+    LucideHeart,
     RoomMembersPanelComponent,
     TrackMenuComponent,
     GuestNameModalComponent
@@ -88,7 +90,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   isSearching = false;
 
   floatingHearts: { id: number, color: string, left: number, animationDuration: number }[] = [];
-  heartColors = ['white', 'orange', 'pink', 'blue'];
+  heartColors = ['#ffffff', '#f97316', '#ec4899', '#3b82f6'];
   heartIdCounter = 0;
   
   // Track Menu state
@@ -418,6 +420,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.playerService.seekTo(newTime);
   }
 
+  private cdr = inject(ChangeDetectorRef);
   searchSub?: Subscription;
 
   // --- Search functionality ---
@@ -434,10 +437,12 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.searchSub = this.youtubeApi.searchMusic(this.searchQuery.trim()).subscribe(results => {
         this.searchResults = results;
         this.isSearching = false;
+        this.cdr.detectChanges();
       });
     } catch (e) {
       this.toastService.show('Failed to search. Try again.', 'error');
       this.isSearching = false;
+      this.cdr.detectChanges();
     }
   }
 
