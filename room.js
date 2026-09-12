@@ -168,8 +168,23 @@ function setupRoomHandlers(io, socket) {
     socketToRoom.set(socket.id, roomId);
     socket.join(roomId);
     
-    socket.emit('room:state', room);
-    io.to(roomId).emit('room:member_joined', { members: room.members, listenerCount: room.listenerCount });
+      // Notify room
+      socket.emit('room:state', room);
+      io.to(roomId).emit('room:member_joined', { members: room.members, listenerCount: room.listenerCount });
+
+      // System Chat Message for Join
+      const msg = {
+        id: nanoid(10),
+        senderUid: 'system',
+        senderName: 'System',
+        type: 'system-join',
+        content: `🎉 ${user.displayName || 'A listener'} joined the room!`,
+        timestamp: Date.now()
+      };
+      room.chat.push(msg);
+      if (room.chat.length > 100) room.chat.shift();
+      io.to(roomId).emit('room:chat_new', msg);
+    }
   });
 
   socket.on('room:leave', () => {
@@ -304,6 +319,8 @@ function handleRoomDisconnect(io, socketId) {
   if (roomId) {
     const room = rooms.get(roomId);
     if (room) {
+      const leavingMember = room.members.find(m => m.socketId === socketId);
+      
       room.members = room.members.filter(m => m.socketId !== socketId);
       room.listenerCount = room.members.length;
 
@@ -312,20 +329,38 @@ function handleRoomDisconnect(io, socketId) {
         io.socketsLeave(roomId);
         rooms.delete(roomId);
         console.log(`Room ${roomId} destroyed (empty)`);
-      } else if (room.adminUid === socketId) {
-        const newAdmin = room.members[0];
-        newAdmin.isAdmin = true;
-        room.adminUid = newAdmin.socketId;
-        room.adminFirebaseUid = newAdmin.uid;
-        room.adminName = newAdmin.displayName;
-        
-        io.in(socketId).socketsLeave(roomId);
-        io.to(roomId).emit('room:admin_changed', { newAdminUid: newAdmin.socketId, members: room.members });
-        io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
-        console.log(`Room ${roomId}: admin transferred to ${newAdmin.displayName}`);
       } else {
-        io.in(socketId).socketsLeave(roomId);
-        io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+        
+        if (room.adminUid === socketId) {
+          const newAdmin = room.members[0];
+          newAdmin.isAdmin = true;
+          room.adminUid = newAdmin.socketId;
+          room.adminFirebaseUid = newAdmin.uid;
+          room.adminName = newAdmin.displayName;
+          
+          io.in(socketId).socketsLeave(roomId);
+          io.to(roomId).emit('room:admin_changed', { newAdminUid: newAdmin.socketId, members: room.members });
+          io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+          console.log(`Room ${roomId}: admin transferred to ${newAdmin.displayName}`);
+        } else {
+          io.in(socketId).socketsLeave(roomId);
+          io.to(roomId).emit('room:member_left', { members: room.members, listenerCount: room.listenerCount });
+        }
+        
+        // System Chat Message for Leave
+        if (leavingMember) {
+          const msg = {
+            id: nanoid(10),
+            senderUid: 'system',
+            senderName: 'System',
+            type: 'system-leave',
+            content: `👋 ${leavingMember.displayName} left the room.`,
+            timestamp: Date.now()
+          };
+          room.chat.push(msg);
+          if (room.chat.length > 100) room.chat.shift();
+          io.to(roomId).emit('room:chat_new', msg);
+        }
       }
     }
     socketToRoom.delete(socketId);

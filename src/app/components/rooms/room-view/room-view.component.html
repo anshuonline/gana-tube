@@ -143,32 +143,46 @@
         </div>
         
         <div class="chat-messages" #chatScroll (scroll)="onChatScroll()">
-          <div class="message" *ngFor="let msg of roomService.chat()" [class.own]="msg.senderUid === authService.currentUser()?.uid">
-            <div class="msg-header" *ngIf="msg.senderUid !== authService.currentUser()?.uid">
-              <span class="sender">{{msg.senderName}}</span>
-              <span class="time">{{msg.timestamp | date:'shortTime'}}</span>
-            </div>
-            
-            <div class="msg-bubble" *ngIf="msg.type === 'text'">
-              {{msg.content}}
-            </div>
-            
-            <div class="msg-song-embed" *ngIf="msg.type === 'song-share'">
-              <div class="embed-header">Shared a track:</div>
-              <div class="embed-card" *ngIf="msg.track">
-                <img [src]="msg.track.thumbnail" alt="Thumb">
-                <div class="embed-info">
-                  <h4>{{msg.track.title}}</h4>
-                  <p>{{msg.track.channelTitle}}</p>
-                </div>
-                <button class="embed-play-btn" 
-                  [disabled]="!roomService.isAdmin()" 
-                  (click)="playEmbeddedSong(msg.track)"
-                  [title]="roomService.isAdmin() ? 'Play this track' : 'Only Host can play'">
-                  <svg lucidePlay [attr.size]="16"></svg>
-                </button>
+          <div class="message" *ngFor="let msg of roomService.chat()" 
+               [class.own]="msg.senderUid === authService.currentUser()?.uid"
+               [class.system]="msg.senderUid === 'system'">
+               
+            <!-- Normal User Messages -->
+            <ng-container *ngIf="msg.senderUid !== 'system'">
+              <div class="msg-header" *ngIf="msg.senderUid !== authService.currentUser()?.uid">
+                <span class="sender">{{msg.senderName}}</span>
+                <span class="time">{{msg.timestamp | date:'shortTime'}}</span>
               </div>
-            </div>
+              
+              <div class="msg-bubble" *ngIf="msg.type === 'text'">
+                {{msg.content}}
+              </div>
+              
+              <div class="msg-song-embed" *ngIf="msg.type === 'song-share'">
+                <div class="embed-header">Shared a track:</div>
+                <div class="embed-card" *ngIf="msg.track">
+                  <img [src]="msg.track.thumbnail" alt="Thumb">
+                  <div class="embed-info">
+                    <h4>{{msg.track.title}}</h4>
+                    <p>{{msg.track.channelTitle}}</p>
+                  </div>
+                  <button class="embed-play-btn" 
+                    [disabled]="!roomService.isAdmin()" 
+                    (click)="playEmbeddedSong(msg.track)"
+                    [title]="roomService.isAdmin() ? 'Play this track' : 'Only Host can play'">
+                    <lucide-play [size]="16"></lucide-play>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- System Messages -->
+            <ng-container *ngIf="msg.senderUid === 'system'">
+              <div class="system-message" [class.join]="msg.type === 'system-join'" [class.leave]="msg.type === 'system-leave'">
+                {{msg.content}}
+              </div>
+            </ng-container>
+
           </div>
         </div>
         
