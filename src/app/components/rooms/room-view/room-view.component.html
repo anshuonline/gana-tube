@@ -17,9 +17,6 @@
     </div>
     
     <div class="header-right">
-      <button class="btn-icon-sm hide-desktop" (click)="showSearchModal.set(true)" title="Search Music">
-        <svg lucideSearch [attr.size]="20"></svg>
-      </button>
       <button class="btn-icon-sm" (click)="showInfoModal.set(true)" title="Room Guide">
         <svg lucideInfo [attr.size]="20"></svg>
       </button>
@@ -162,7 +159,7 @@
             <h3>Up Next</h3>
             <span class="count">{{playerService.queue().length}} songs</span>
           </div>
-          <button class="btn-search-queue hide-mobile" (click)="showSearchModal.set(true)">
+          <button class="btn-search-queue hide-mobile" *ngIf="roomService.isAdmin()" (click)="showSearchModal.set(true)">
             <svg lucideSearch [attr.size]="16"></svg>
             Add Music
           </button>
@@ -258,7 +255,7 @@
             placeholder="Type a message..."
             maxlength="200">
           <button class="btn-like" (click)="sendLike()" title="Send Love">
-            <img src="assets/heart-white.png" width="22" height="22" alt="Love">
+            <img src="/assets/heart-white.png" width="22" height="22" alt="Love">
           </button>
           <button class="btn-send" (click)="sendMessage()" [disabled]="!chatInput.trim()">
             <svg lucideSend [attr.size]="18"></svg>
@@ -278,7 +275,7 @@
          'left.%': heart.left,
          'animation-duration.s': heart.animationDuration
        }">
-    <img [src]="'assets/heart-' + heart.color + '.png'" width="32" height="32" alt="heart">
+    <img [src]="'/assets/heart-' + heart.color + '.png'" width="32" height="32" alt="heart">
   </div>
 </div>
 

@@ -206,7 +206,16 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
+  private lastLikeTime = 0;
+
   sendLike() {
+    const now = Date.now();
+    if (now - this.lastLikeTime < 3000) {
+      this.toastService.show('Please wait before sending more love!', 'info');
+      return;
+    }
+    this.lastLikeTime = now;
+    
     const user = this.authService.currentUser();
     if (user) {
       this.roomService.sendLike(user.uid, user.displayName || 'User');
