@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 3000;
 
 const userDevices = new Map(); // email -> [{socketId, deviceId, deviceName, isMobile, isActive}]
 
-const { setupRoomHandlers, handleRoomDisconnect } = require('./room.js');
+const { setupRoomHandlers, handleRoomDisconnect, initBotRooms } = require('./room.js');
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -102,6 +102,58 @@ async function getYTMusic() {
   }
   return ytmusicInstance;
 }
+
+// ─── Bot Rooms: trending song pool for auto-play (cron-driven) ──────────────
+function parseDurationToSeconds(d) {
+  if (typeof d === 'number' && d > 0) return d;
+  if (typeof d === 'string') {
+    const parts = d.split(':').map(p => parseInt(p, 10));
+    if (parts.length === 2 && parts.every(p => !isNaN(p))) return parts[0] * 60 + parts[1];
+    if (parts.length === 3 && parts.every(p => !isNaN(p))) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+  return 210;
+}
+
+async function getBotSongs() {
+  const yt = await getYTMusic();
+  const queries = ['Trending Hindi Songs', 'Trending English Songs'];
+  const results = await Promise.all(queries.map(q => yt.searchSongs(q).catch(() => [])));
+
+  const toHDUrl = (url) => {
+    if (!url) return '';
+    if (url.includes('img.youtube.com')) {
+      return url.replace('/default.jpg', '/hqdefault.jpg');
+    }
+    return url
+      .replace(/=w\d+-h\d+/, '=w600-h600')
+      .replace(/-w\d+-h\d+/, '-w600-h600')
+      .replace(/\/s\d+-/, '/s600-');
+  };
+
+  const mapped = [];
+  for (const list of results) {
+    for (const item of (list || [])) {
+      const artistName = item.artist && typeof item.artist === 'object'
+        ? item.artist.name
+        : (typeof item.artist === 'string' ? item.artist : 'Unknown Artist');
+      const videoId = item.videoId;
+      if (!videoId) continue;
+      const thumbs = item.thumbnails || [];
+      mapped.push({
+        videoId,
+        title: item.name || item.title,
+        channelTitle: artistName,
+        thumbnail: toHDUrl(thumbs[0]?.url || ''),
+        thumbnailHigh: toHDUrl(thumbs[thumbs.length - 1]?.url || ''),
+        duration: parseDurationToSeconds(item.duration),
+        publishedAt: new Date().toISOString()
+      });
+    }
+  }
+  return mapped;
+}
+
+initBotRooms(io, getBotSongs);
 
 // ─── Smart Query Enhancement ────────────────────────────────────────────────
 // ytmusic-api's search is biased toward the server's regional language (Hindi).

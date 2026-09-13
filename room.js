@@ -472,7 +472,259 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000); // Run every 1 hour
 
+// ════════════════════════════════════════════════════════════════════════════
+// ─── Bot Rooms System (Cron) ────────────────────────────────────────────────
+// Keeps the Rooms lobby alive: 6 bot-hosted rooms with 60 distributed bot
+// listeners, auto-playing music and light random activity. Runs entirely
+// server-side via scheduled ticks (cron-style).
+// ════════════════════════════════════════════════════════════════════════════
+
+const BOT_NAMES = [
+  // Realistic Indian names
+  'Aarav', 'Priya', 'Rohan', 'Ananya', 'Vikram', 'Neha', 'Arjun', 'Kavya',
+  'Aditya', 'Isha', 'Kabir', 'Meera', 'Rahul', 'Pooja', 'Karan', 'Sneha',
+  'Varun', 'Divya', 'Siddharth', 'Riya', 'Nikhil', 'Anjali', 'Manav', 'Tanya',
+  'Yash', 'Shreya', 'Dev', 'Nisha', 'Raghav', 'Simran', 'Aryan', 'Preeti',
+  'Harsh', 'Anaya', 'Rishi', 'Kiara', 'Mohit', 'Aisha', 'Sameer', 'Trisha',
+  'Abhay', 'Nandini', 'Kunal', 'Ira', 'Parth', 'Myra', 'Dhruv', 'Sara',
+  // A few foreign names in the mix
+  'Liam', 'Emma', 'Noah', 'Sofia', 'Lucas', 'Mia', 'Ethan', 'Chloe', 'Aiden', 'Zoe', 'Leo', 'Ivy'
+];
+
+const ROOM_NAME_PATTERNS = [
+  (n) => `${n}'s Room`,
+  (n) => `${n}'s Vibes`,
+  (n) => `${n} ki Mehfil`,
+  (n) => `${n}'s Party`,
+  (n) => `${n}'s Lounge`,
+  (n) => `${n} & Chill`
+];
+
+const BOT_CHAT_LINES = [
+  'banger', 'this track never gets old', 'kya vibe hai',
+  'add this to your playlist guys', 'anyone listening from Delhi?',
+  'volume is perfect right now', 'next one should be something chill',
+  'classic after ages', 'looping this all day', 'such a mood right now',
+  'old is gold', 'this playlist never disappoints'
+];
+
+const BOT_ROOM_COUNT = 6;
+const BOT_POOL_REFRESH_MS = 30 * 60 * 1000; // refresh song pool every 30 min
+
+const botRooms = new Set(); // roomIds managed by bots
+let botTrackPool = [];
+let botSongsProvider = null;
+let botPoolRefreshedAt = 0;
+let botTickerStarted = false;
+
+// ytmusic-api returns "3:30" style strings, frontend uses seconds — normalize here
+function parseDurationToSeconds(d) {
+  if (typeof d === 'number' && d > 0) return d;
+  if (typeof d === 'string') {
+    const parts = d.split(':').map(p => parseInt(p, 10));
+    if (parts.length === 2 && parts.every(p => !isNaN(p))) return parts[0] * 60 + parts[1];
+    if (parts.length === 3 && parts.every(p => !isNaN(p))) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+  return 210;
+}
+
+// Fallback pool (well-known music videos) so bot rooms are never silent
+function fallbackBotTracks() {
+  const ids = [
+    { videoId: 'JGwWNGJdvx8', title: 'Shape of You', channelTitle: 'Ed Sheeran' },
+    { videoId: 'OPf0YbXqDm0', title: 'Uptown Funk', channelTitle: 'Mark Ronson' },
+    { videoId: 'fRh_vgS2dFE', title: "Can't Stop the Feeling!", channelTitle: 'Justin Timberlake' },
+    { videoId: 'hT_nvWreIhg', title: 'Counting Stars', channelTitle: 'OneRepublic' },
+    { videoId: 'YQHsXMglC9A', title: 'Hello', channelTitle: 'Adele' },
+    { videoId: 'RgKAFK5djSk', title: 'See You Again', channelTitle: 'Wiz Khalifa' }
+  ];
+  return ids.map(t => ({
+    ...t,
+    thumbnail: `https://img.youtube.com/vi/${t.videoId}/mqdefault.jpg`,
+    thumbnailHigh: `https://img.youtube.com/vi/${t.videoId}/hqdefault.jpg`,
+    duration: 220,
+    publishedAt: new Date().toISOString()
+  }));
+}
+
+function pickBotTracks() {
+  return botTrackPool.length > 0 ? botTrackPool : fallbackBotTracks();
+}
+
+function createBotRoom(io, admin, listeners, namePatternIdx) {
+  const roomId = nanoid(6).toUpperCase();
+  const pool = [...pickBotTracks()].sort(() => 0.5 - Math.random());
+  const room = {
+    roomId,
+    name: ROOM_NAME_PATTERNS[namePatternIdx % ROOM_NAME_PATTERNS.length](admin.displayName),
+    isPublic: true,
+    joinCode: roomId,
+    adminUid: `bot_socket_${admin.uid}`,
+    adminFirebaseUid: admin.uid,
+    adminName: admin.displayName,
+    maxMembers: 30,
+    members: [
+      { socketId: `bot_socket_${admin.uid}`, uid: admin.uid, displayName: admin.displayName, isAdmin: true },
+      ...listeners.map(b => ({ socketId: `bot_socket_${b.uid}`, uid: b.uid, displayName: b.displayName, isAdmin: false }))
+    ],
+    currentTrack: pool[0] || null,
+    queue: pool.slice(1, 6),
+    currentTime: Math.floor(Math.random() * 60),
+    isPlaying: true,
+    chat: [],
+    recommendations: [],
+    listenerCount: listeners.length + 1,
+    _isBotRoom: true
+  };
+  rooms.set(roomId, room);
+  botRooms.add(roomId);
+  return room;
+}
+
+async function refreshBotPool(force = false) {
+  if (!botSongsProvider) return;
+  if (!force && botPoolRefreshedAt > 0 && Date.now() - botPoolRefreshedAt < BOT_POOL_REFRESH_MS) return;
+  try {
+    const tracks = await botSongsProvider();
+    if (tracks && tracks.length > 0) {
+      botTrackPool = tracks;
+      botPoolRefreshedAt = Date.now();
+    }
+  } catch (e) {
+    console.warn('Bot track pool refresh failed, keeping old pool:', e.message);
+  }
+}
+
+function hasRealListeners(room) {
+  return room.members.some(m => !m.uid.startsWith('bot_'));
+}
+
+function initBotRooms(io, provider) {
+  botSongsProvider = provider;
+  refreshBotPool(true).then(() => {
+    // 60 bots shuffled, distributed across 6 rooms (7-13 per room, leftovers join random rooms)
+    const bots = [...BOT_NAMES].sort(() => 0.5 - Math.random())
+      .map((name, i) => ({ uid: `bot_${String(i + 1).padStart(2, '0')}`, displayName: name }));
+    let idx = 0;
+    for (let i = 0; i < BOT_ROOM_COUNT; i++) {
+      const size = Math.min(bots.length - idx, 7 + Math.floor(Math.random() * 7));
+      const group = bots.slice(idx, idx + size);
+      idx += size;
+      const admin = group[0];
+      admin.isAdmin = true;
+      createBotRoom(io, admin, group.slice(1), i);
+    }
+    while (idx < bots.length) {
+      const bot = bots[idx++];
+      const roomIds = [...botRooms];
+      const r = rooms.get(roomIds[Math.floor(Math.random() * roomIds.length)]);
+      if (r) {
+        r.members.push({ socketId: `bot_socket_${bot.uid}`, uid: bot.uid, displayName: bot.displayName, isAdmin: false });
+        r.listenerCount = r.members.length;
+      }
+    }
+    console.log(`Bot rooms live: ${botRooms.size} rooms with ${bots.length} bots`);
+    startBotTicker(io);
+  }).catch(err => console.warn('Bot room init failed:', err.message));
+}
+
+function startBotTicker(io) {
+  if (botTickerStarted) return;
+  botTickerStarted = true;
+
+  // ── Playback progression (every second) ──
+  setInterval(() => {
+    for (const roomId of botRooms) {
+      const room = rooms.get(roomId);
+      if (!room || !room.isPlaying || !room.currentTrack) continue;
+      const dur = parseDurationToSeconds(room.currentTrack.duration);
+      room.currentTime += 1;
+      if (room.currentTime >= dur) {
+        // Track ended — play next (queue first, then random from pool)
+        const pool = pickBotTracks();
+        if (room.queue.length > 0) {
+          room.currentTrack = room.queue.shift();
+        } else {
+          room.currentTrack = pool[Math.floor(Math.random() * pool.length)];
+        }
+        const nextUp = pool[Math.floor(Math.random() * pool.length)];
+        if (!room.queue.some(t => t.videoId === nextUp.videoId) && nextUp.videoId !== room.currentTrack.videoId) {
+          room.queue.push(nextUp);
+        }
+        room.currentTime = 0;
+        // Keep real listeners in sync with the new track
+        io.to(roomId).emit('room:track_changed', { track: room.currentTrack });
+      }
+    }
+  }, 1000);
+
+  // ── Light activity cron (every 3 minutes) ──
+  setInterval(async () => {
+    const roomIds = [...botRooms];
+    if (roomIds.length === 0) return;
+
+    // 1) Shuffle 1-2 listeners between random rooms
+    const moveCount = 1 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < moveCount; i++) {
+      const fromId = roomIds[Math.floor(Math.random() * roomIds.length)];
+      const from = rooms.get(fromId);
+      if (!from) continue;
+      const botMembers = from.members.filter(m => m.uid.startsWith('bot_') && !m.isAdmin);
+      if (botMembers.length <= 4) continue; // keep a minimum crowd in every room
+
+      const mover = botMembers[Math.floor(Math.random() * botMembers.length)];
+      from.members = from.members.filter(m => m.uid !== mover.uid);
+      from.listenerCount = from.members.length;
+      io.to(fromId).emit('room:member_left', { members: from.members, listenerCount: from.listenerCount });
+
+      const toId = roomIds[Math.floor(Math.random() * roomIds.length)];
+      const to = rooms.get(toId);
+      if (to && toId !== fromId) {
+        to.members.push(mover);
+        to.listenerCount = to.members.length;
+        io.to(toId).emit('room:member_joined', { members: to.members, listenerCount: to.listenerCount });
+      }
+    }
+
+    // 2) Random bot drops a chat message
+    if (Math.random() < 0.6) {
+      const chatRoomId = roomIds[Math.floor(Math.random() * roomIds.length)];
+      const chatRoom = rooms.get(chatRoomId);
+      if (chatRoom) {
+        const botsInRoom = chatRoom.members.filter(m => m.uid.startsWith('bot_'));
+        const speaker = botsInRoom[Math.floor(Math.random() * botsInRoom.length)];
+        if (speaker) {
+          const msg = {
+            id: nanoid(10),
+            senderUid: speaker.uid,
+            senderName: speaker.displayName,
+            type: 'text',
+            content: BOT_CHAT_LINES[Math.floor(Math.random() * BOT_CHAT_LINES.length)],
+            timestamp: Date.now()
+          };
+          chatRoom.chat.push(msg);
+          if (chatRoom.chat.length > 100) chatRoom.chat.shift();
+          io.to(chatRoomId).emit('room:chat_new', msg);
+        }
+      }
+    }
+
+    // 3) Refresh the song pool periodically (cached)
+    await refreshBotPool();
+
+    // 4) Push a playback sync to rooms with real listeners so they stay glued to the bot clock
+    for (const roomId of botRooms) {
+      const room = rooms.get(roomId);
+      if (!room || !room.currentTrack) continue;
+      if (hasRealListeners(room)) {
+        io.to(roomId).emit('room:playback_sync', { isPlaying: room.isPlaying, currentTime: room.currentTime });
+      }
+    }
+  }, 3 * 60 * 1000);
+}
+
 module.exports = {
   setupRoomHandlers,
-  handleRoomDisconnect
+  handleRoomDisconnect,
+  initBotRooms
 };
