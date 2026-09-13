@@ -713,7 +713,7 @@ export class PlayerService {
     }
   }
 
-  private async loadInPlayer(videoId: string): Promise<void> {
+  private async loadInPlayer(videoId: string): Promise<void> { const isRemote = this.isRemoteUpdate;
     this.location.replaceState('/play?v=' + videoId);
     const current = this.currentTrack();
     this.initHtmlAudio();
@@ -766,12 +766,11 @@ export class PlayerService {
       }
     }
 
-    if (!this.isRemoteUpdate && current && this.roomService.currentRoomInfo()) {
+    if (!isRemote && current && this.roomService.currentRoomInfo()) {
       this.roomService.adminPlayTrack(current);
       // also sync queue when song auto-changes
       this.roomService.adminQueueUpdate(this.queue(), this.currentIndex());
     }
-    this.isRemoteUpdate = false;
   }
 
   private loadInYtPlayer(videoId: string): void {
@@ -965,5 +964,6 @@ export class PlayerService {
     }
   }
 }
+
 
 
