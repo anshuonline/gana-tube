@@ -64,7 +64,7 @@
   <!-- Header -->
   <header class="app-header" [class.scrolled]="isScrolled()" *ngIf="currentPage() !== 'rooms-view' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts'">
     <div class="header-inner">
-      <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="header-left">
         <!-- Mobile Hamburger Menu -->
         <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Toggle Menu">
           <svg lucideMenu [attr.size]="24"></svg>
@@ -74,16 +74,13 @@
           <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" style="height: 38px; width: auto;" />
           <span class="logo-text" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-family: var(--primary-font); display: flex; align-items: center;">GanaTube.in</span>
         </div>
-        <!-- <button (click)="openSpinWheel()" title="Lucky Draw" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';">
-          <svg lucideGift [attr.size]="18"></svg>
-        </button> -->
         <button (click)="copyWebsiteLink()" title="Share Website" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';">
           <svg lucideShare2 [attr.size]="18" *ngIf="!linkCopied"></svg>
           <svg lucideCheck [attr.size]="18" *ngIf="linkCopied" style="color: #4ade80; transform: scale(1.1); transition: transform 0.2s ease;"></svg>
         </button>
       </div>
 
-      <!-- Compact Fake Search Button in Header -->
+      <!-- Center: Search Trigger -->
       <div class="header-actions">
         <button class="header-search-trigger" (click)="openSearchPage()" *ngIf="!isSearchMode()">
           <svg lucideSearch class="trigger-icon" style="color: #fff; display: block;" [attr.size]="18"></svg>
@@ -92,22 +89,31 @@
         </button>
       </div>
 
+      <!-- Right: Auth / Profile -->
+      <div class="header-auth">
+        <ng-container *ngIf="authService.currentUser(); else authLoadingTpl">
+          <button class="header-profile-btn" (click)="openProfilePage()" title="Account Settings">
+            <img [src]="authService.currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile" class="header-avatar" />
+            <span class="header-profile-name">{{ getDisplayUsername() }}</span>
+            <svg lucideChevronDown [attr.size]="16" class="header-profile-chevron"></svg>
+          </button>
+        </ng-container>
+        <ng-template #authLoadingTpl>
+          <ng-container *ngIf="authService.currentUser() === null; else authSkeletonTpl">
+            <button class="header-login-btn" (click)="login()" [disabled]="isLoggingIn" title="Login with Google">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="display: block;"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.99 3.66 9.13 8.44 9.88v-6.99H7.9V12h2.54V9.8c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99C18.34 21.13 22 16.99 22 12c0-5.52-4.48-10-10-10z"/></svg>
+              <span>Login</span>
+            </button>
+          </ng-container>
+          <ng-template #authSkeletonTpl>
+            <div class="header-avatar skeleton-pulse"></div>
+          </ng-template>
+        </ng-template>
+      </div>
+
       <!-- API Key Warning Banner -->
       <div class="api-notice" *ngIf="apiKeyMissing">
         <span>🔑 Demo mode — Add your <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">YouTube API Key</a> in <code>environment.ts</code> to enable real search</span>
-      </div>
-    </div>
-
-    <!-- Header Genre & Mood Chips (Below Navbar) -->
-    <div class="header-chips-container" [class.hidden]="isScrolled()" *ngIf="!apiKeyMissing && !isSearchMode() && currentPage() === 'home'">
-      <div class="header-chips-scroll">
-        <button 
-          *ngFor="let chip of dynamicChips()" 
-          class="header-chip" 
-          [class.active]="currentQuery === chip || (!hasSearched() && chip === 'All')" 
-          (click)="onSuggestSearch(chip)">
-          {{ chip }}
-        </button>
       </div>
     </div>
   </header>
@@ -202,6 +208,29 @@
               <button class="q-btn" [class.active]="musicQuality() === 'Standard'" (click)="setMusicQuality('Standard')">Standard</button>
               <button class="q-btn" [class.active]="musicQuality() === 'Data Saver'" (click)="setMusicQuality('Data Saver')">Data Saver</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Playback Toggles -->
+        <div class="settings-group group-playback">
+          <h2 class="group-title">Playback</h2>
+          <div class="setting-item">
+            <div class="setting-info">
+              <h3>Crossfade</h3>
+              <p>Smoothly fade volume between songs.</p>
+            </div>
+            <button class="toggle-switch" [class.on]="playerService.isCrossfadeEnabled()" (click)="playerService.toggleCrossfade()" aria-label="Toggle Crossfade" [attr.aria-pressed]="playerService.isCrossfadeEnabled()">
+              <span class="toggle-knob"></span>
+            </button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <h3>Autoplay</h3>
+              <p>Keep the music going with similar songs.</p>
+            </div>
+            <button class="toggle-switch" [class.on]="playerService.isAutoplayEnabled()" (click)="playerService.toggleAutoplay()" aria-label="Toggle Autoplay" [attr.aria-pressed]="playerService.isAutoplayEnabled()">
+              <span class="toggle-knob"></span>
+            </button>
           </div>
         </div>
 

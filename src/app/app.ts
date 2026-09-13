@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles } from '@lucide/angular';
+import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -84,6 +84,7 @@ export interface SponsoredAd {
     LucideX,
     LucideRadio,
     LucideSparkles,
+    LucideChevronDown,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -816,24 +817,27 @@ export class App implements OnInit {
               this.randomRecentThumbnail.set(thumbUrl);
             }
             if (recentPlays && recentPlays.length > 0) {
-              const hasRecentShelf = this.allShelfDefinitions.some(s => s.title === 'Recently Played');
-              if (!hasRecentShelf) {
+              const hasRecentDef = this.allShelfDefinitions.some(s => s.title === 'Recently Played');
+              const hasRecentLoaded = this.loadedShelves().some(s => s.title === 'Recently Played');
+              if (!hasRecentDef && !hasRecentLoaded && this.allShelfDefinitions.length > 0) {
+                // Initial shelves already built: inject definition + visible shelf
                 const recentShelf = {
                   title: 'Recently Played',
                   query: '',
                   songs: recentPlays
                 };
-                
+
                 // Inject at index 2 (after Suggested and Time-based) or at end
-                this.allShelfDefinitions.splice(2, 0, recentShelf);
-                
+                this.allShelfDefinitions.splice(Math.min(2, this.allShelfDefinitions.length), 0, recentShelf);
+
                 this.loadedShelves.update(shelves => {
+                  if (shelves.some(s => s.title === 'Recently Played')) return shelves;
                   const updated = [...shelves];
-                  const insertIndex = Math.min(2, updated.length);
-                  updated.splice(insertIndex, 0, recentShelf);
+                  updated.splice(Math.min(2, updated.length), 0, recentShelf);
                   return updated;
                 });
               }
+              // If initial shelves haven't been built yet, loadInitialShelves() will include it automatically
             }
           }
         });
@@ -1575,6 +1579,8 @@ export class App implements OnInit {
           });
           
           this.loadedShelves.update(shelvesList => {
+            // Guard against duplicate sections (e.g. after PWA resume)
+            if (shelvesList.some(s => s.title === def.title)) return shelvesList;
             const updated = [...shelvesList];
             updated.push({ title: def.title, query: def.query, songs: dedupedSongs });
             return updated.sort((a, b) => {
@@ -1618,6 +1624,8 @@ export class App implements OnInit {
                 });
                 
                 this.loadedShelves.update(shelvesList => {
+                  // Guard against duplicate sections (e.g. after PWA resume)
+                  if (shelvesList.some(s => s.title === def.title)) return shelvesList;
                   const updated = [...shelvesList];
                   updated.push({ title: def.title, query: def.query, songs: dedupedSongs });
                   return updated.sort((a, b) => {
@@ -1654,14 +1662,20 @@ export class App implements OnInit {
   }
 
   loadNextShelf(language?: string): void {
-    const currentCount = this.loadedShelves().length;
-    if (currentCount >= this.allShelfDefinitions.length || this.shelfLoading()) {
+    if (this.shelfLoading()) {
+      return;
+    }
+
+    // Title-based pending list — immune to section insertions (e.g. 'Recently Played')
+    const loadedTitles = new Set(this.loadedShelves().map(s => s.title));
+    const pendingDefs = this.allShelfDefinitions.filter(d => !loadedTitles.has(d.title));
+    if (pendingDefs.length === 0 || this.loadedShelves().length >= this.allShelfDefinitions.length) {
       return;
     }
 
     // Load 2 shelves at a time for smoother lazy loading
     const batchSize = 2;
-    const nextDefs = this.allShelfDefinitions.slice(currentCount, currentCount + batchSize);
+    const nextDefs = pendingDefs.slice(0, batchSize);
     
     this.loadingShelfTitle.set(nextDefs[0].title + (nextDefs.length > 1 ? ' & more...' : ''));
     this.shelfLoading.set(true);
@@ -1713,7 +1727,12 @@ export class App implements OnInit {
       });    
         
         if (newShelves.length > 0) {
-          this.loadedShelves.update(shelves => [...shelves, ...newShelves]);
+          this.loadedShelves.update(shelves => {
+            // Guard against duplicate sections
+            const existing = new Set(shelves.map(s => s.title));
+            const toAdd = newShelves.filter(s => !existing.has(s.title));
+            return toAdd.length > 0 ? [...shelves, ...toAdd] : shelves;
+          });
         }
         this.shelfLoading.set(false);
         // Note: Automatic recursive loading removed to allow scroll-based lazy loading
