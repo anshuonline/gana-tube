@@ -455,10 +455,13 @@
 
 // ---- Hero ----
 .hero-section {
-  padding: 120px 0 20px;
+  padding: 100px 0 30px;
   position: relative;
   z-index: 1100;
-  background: #000000;
+  background:
+    radial-gradient(55% 90% at 12% 45%, rgba(124, 58, 237, 0.09) 0%, rgba(0, 0, 0, 0) 60%),
+    radial-gradient(45% 75% at 88% 25%, rgba(236, 72, 153, 0.06) 0%, rgba(0, 0, 0, 0) 60%),
+    #000000;
   overflow: visible;
 
   @media (max-width: 992px) {
@@ -541,27 +544,29 @@
 }
 
 .hero-tab {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #a0a0a0;
-  padding: 12px 28px;
+  padding: 11px 26px;
   border-radius: 40px;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.45);
     color: #fff;
+    background: rgba(255, 255, 255, 0.08);
   }
 
   &.active {
-    background: rgba(255, 255, 255, 0.9);
+    background: #ffffff;
     color: #000;
     border-color: transparent;
     font-weight: 800;
+    box-shadow: 0 4px 24px rgba(255, 255, 255, 0.18);
   }
 
   @media (max-width: 768px) {
@@ -612,11 +617,19 @@
 }
 
 .hero-badge {
-  color: #a0a0a0;
-  font-size: 1.1rem;
-  letter-spacing: 0.05em;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  gap: 8px;
+  color: #C4B5FD;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  font-weight: 700;
   text-transform: uppercase;
+  padding: 8px 18px;
+  border-radius: 30px;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.3);
 
   @media (max-width: 992px) {
     display: none;
@@ -624,12 +637,13 @@
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 8vw, 7.5rem);
+  font-size: clamp(2.5rem, 7vw, 6.5rem);
   font-weight: 800;
   color: #fff;
   margin: 0;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-shadow: 0 0 80px rgba(124, 58, 237, 0.3);
 
   @media (max-width: 992px) {
     display: none;
@@ -651,12 +665,12 @@
 
 .explore-btn {
   width: max-content;
-  background: rgba(255, 255, 255, 0.95);
-  color: #000000;
-  border: 1px solid rgba(255, 255, 255, 1);
-  font-size: 1.35rem;
-  font-weight: 800;
-  padding: 20px 48px;
+  background: linear-gradient(135deg, #7C3AED, #9333EA);
+  color: #fff;
+  border: none;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 18px 44px;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -665,19 +679,16 @@
   gap: 14px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.35);
 
   svg {
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   &:hover {
-    background: #ffffff;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(255, 255, 255, 0.25);
-    border-color: #ffffff;
+    box-shadow: 0 14px 44px rgba(124, 58, 237, 0.5);
 
     svg {
       transform: translateX(4px) scale(1.1);
@@ -693,7 +704,7 @@
     padding: 12px 28px;
     border-radius: 12px;
     gap: 8px;
-    
+
     svg {
       width: 18px;
       height: 18px;
@@ -707,7 +718,20 @@
   justify-content: flex-end;
   position: relative;
   min-height: 320px;
-  
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 15%;
+    right: 4%;
+    width: 65%;
+    height: 75%;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   img {
     width: 100%;
     max-width: 800px;
@@ -722,11 +746,11 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out, transform 0.5s ease;
-    
+
     /* Apply bottom fade out */
     -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
     mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-    
+
     &.active {
       opacity: 1;
       visibility: visible;
@@ -737,10 +761,14 @@
   @media (max-width: 992px) {
     justify-content: center;
     min-height: 250px;
-    
+
     img {
       right: auto;
       max-width: 90%;
+    }
+
+    &::before {
+      display: none;
     }
   }
 }
