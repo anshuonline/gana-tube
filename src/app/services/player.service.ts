@@ -638,9 +638,10 @@ export class PlayerService {
           this.trackStartTime = Date.now();
         }
         this.clearLoadTimeout();
+        this.clearStuckLoadingTimer();
         this.playerState.set('playing');
         this.duration.set(this.ytPlayer?.getDuration() || 0);
-        
+
         // Fix sudden blast of volume at the beginning of a crossfade
         try {
           if (this.isCrossfadeEnabled() && this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function' && (this.ytPlayer.getCurrentTime() || 0) < 1) {
@@ -651,16 +652,18 @@ export class PlayerService {
         } catch (e) {
           console.error('Error setting initial crossfade volume', e);
         }
-        
+
         this.startProgressTracking();
         break;
       case 2: // paused
         this.clearLoadTimeout();
+        this.clearStuckLoadingTimer();
         this.playerState.set('paused');
         this.stopProgressTracking();
         break;
       case 0: // ended
         this.clearLoadTimeout();
+        this.clearStuckLoadingTimer();
         this.playerState.set('ended');
         this.stopProgressTracking();
         this.currentTime.set(0);
@@ -668,7 +671,40 @@ export class PlayerService {
         break;
       case 3: // buffering
         this.playerState.set('loading');
+        this.startStuckLoadingTimer();
         break;
+      case 5: // cued — video loaded but browser blocked autoplay after reload
+        this.clearLoadTimeout();
+        this.clearStuckLoadingTimer();
+        if (this.currentTrack()) {
+          this.playerState.set('paused');
+        }
+        break;
+    }
+  }
+
+  private loadStuckTimer: any = null;
+
+  private startStuckLoadingTimer(): void {
+    this.clearStuckLoadingTimer();
+    this.loadStuckTimer = setTimeout(() => {
+      if (this.playerState() !== 'loading') return;
+      let isActuallyPlaying = false;
+      try {
+        isActuallyPlaying = !!this.ytPlayer && typeof this.ytPlayer.getPlayerState === 'function' && this.ytPlayer.getPlayerState() === 1;
+      } catch (e) {
+        isActuallyPlaying = false;
+      }
+      if (!isActuallyPlaying) {
+        this.playerState.set('paused');
+      }
+    }, 8000);
+  }
+
+  private clearStuckLoadingTimer(): void {
+    if (this.loadStuckTimer) {
+      clearTimeout(this.loadStuckTimer);
+      this.loadStuckTimer = null;
     }
   }
 

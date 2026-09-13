@@ -42,6 +42,7 @@ import { DiscoveryPageComponent } from './components/discovery-page/discovery-pa
 import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
 import { CuratedPlaylistsComponent } from './components/curated-playlists/curated-playlists';
+import { LanguageSelectModalComponent } from './components/language-select-modal/language-select-modal.component';
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { ReleaseNotesComponent } from './components/release-notes/release-notes.component';
@@ -106,8 +107,8 @@ export interface SponsoredAd {
     DiscoveryPageComponent,
     SpinWheelComponent,
     LucideGift,
-    OfflineLibraryComponent,
     CuratedPlaylistsComponent,
+    LanguageSelectModalComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
     ReleaseNotesComponent
@@ -165,6 +166,8 @@ export class App implements OnInit {
   // Language filter
   availableLanguages = ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi', 'Tamil'];
   homeScreenLanguage = signal<string>('English');
+  showLanguageModal = signal<boolean>(false);
+  isMobileView = signal<boolean>(false);
 
   // Playlists State
   customPlaylists = signal<PlaylistMeta[]>([]);
@@ -1305,6 +1308,9 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {
+    // Detect mobile view
+    this.isMobileView.set(window.innerWidth <= 768);
+
     // Check PWA Install Prompt every 2 hours
     if (!this.pwaService.isInstalledPWA()) {
       const lastPrompt = localStorage.getItem('lastInstallPromptShown');
@@ -2061,6 +2067,24 @@ export class App implements OnInit {
       event.stopPropagation();
     }
     this.router.navigate(['/language', lang.toLowerCase()]);
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.isMobileView.set(window.innerWidth <= 768);
+  }
+
+  openLanguageModal(): void {
+    this.showLanguageModal.set(true);
+  }
+
+  closeLanguageModal(): void {
+    this.showLanguageModal.set(false);
+  }
+
+  onLanguageSelect(lang: string): void {
+    this.closeLanguageModal();
+    this.setLanguage(lang);
   }
 
   getHeroImage(lang: string): string {

@@ -1,0 +1,26 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Select Language</h2>
+      <button class="btn-close" (click)="closeModal()" aria-label="Close">
+        <svg lucideX [attr.size]="20"></svg>
+      </button>
+    </div>
+
+    <p class="modal-subtitle">Choose your preferred music language.</p>
+
+    <div class="language-list">
+      <button
+        class="language-option"
+        *ngFor="let lang of languages"
+        [class.active]="currentLanguage === lang.code"
+        (click)="choose(lang.code)">
+        <div class="lang-info">
+          <span class="lang-native">{{ lang.native }}</span>
+          <span class="lang-name">{{ lang.code }}</span>
+        </div>
+        <svg *ngIf="currentLanguage === lang.code" lucideCheck [attr.size]="20"></svg>
+      </button>
+    </div>
+  </div>
+</div>
