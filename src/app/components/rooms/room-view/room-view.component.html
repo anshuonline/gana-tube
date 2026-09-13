@@ -160,8 +160,8 @@
                 <svg *ngIf="!isQueueVisibleDesktop" lucideChevronUp [attr.size]="18"></svg>
               </button>
               <div class="queue-tabs" style="display: flex; gap: 12px; align-items: baseline;">
-                <h3 [class.inactive]="showRequests()" (click)="showRequests.set(false)" style="cursor: pointer; transition: color 0.2s;">Queue <span class="count" style="font-size: 12px; font-weight: normal; color: #9C9CA6;">{{playerService.queue().length}}</span></h3>
-                <h3 [class.inactive]="!showRequests()" (click)="showRequests.set(true)" style="cursor: pointer; transition: color 0.2s;">Requests <span class="count" style="font-size: 12px; font-weight: normal; color: #9C9CA6;">{{roomService.recommendations().length}}</span></h3>
+                <h3 [class.inactive]="showRequests()" (click)="showRequests.set(false); isQueueVisibleDesktop = true;" style="cursor: pointer; transition: color 0.2s;">Queue <span class="count" style="font-size: 12px; font-weight: normal; color: #9C9CA6;">{{playerService.queue().length}}</span></h3>
+                <h3 [class.inactive]="!showRequests()" (click)="showRequests.set(true); isQueueVisibleDesktop = true;" style="cursor: pointer; transition: color 0.2s;">Requests <span class="count" style="font-size: 12px; font-weight: normal; color: #9C9CA6;">{{roomService.recommendations().length}}</span></h3>
               </div>
             </div>
             <!-- Visible for both Host and Listener on Desktop, and also Add Music works for mobile now if we remove hide-mobile? The user wanted it for mobile too! -->

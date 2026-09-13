@@ -29,7 +29,7 @@ import {
   LucideChevronUp,
   LucideInfo,
   LucideSearch,
-  LucideHeart
+  LucideHeart, LucideLoader2, LucideThumbsUp
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -61,7 +61,7 @@ import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.co
     LucideChevronUp,
     LucideInfo,
     LucideSearch,
-    LucideHeart,
+    LucideHeart, LucideLoader2, LucideThumbsUp,
     RoomMembersPanelComponent,
     TrackMenuComponent,
     GuestNameModalComponent
@@ -485,12 +485,9 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.playerService.addToQueue(track);
       this.toastService.show(`Added "${track.title}" to queue`);
     } else {
-      // Listeners can suggest by sharing to chat
-      const user = this.authService.currentUser();
-      if (user) {
-        this.roomService.sendSongShare(track, user.uid, user.displayName || 'User');
-        this.toastService.show(`Shared "${track.title}" in chat!`);
-      }
+      // Listeners can suggest by requesting
+      this.roomService.requestSong(track);
+      this.toastService.show(`Requested "${track.title}"!`);
     }
     this.showSearchModal.set(false);
     this.searchQuery = '';
