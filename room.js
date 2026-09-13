@@ -6,6 +6,12 @@ const socketToRoom = new Map();
 const userMutes = new Map(); // Firebase UID -> { level: number, expiresAt: number, history: { time: number, content: string }[] }
 const disconnectTimeouts = new Map();
 
+// --- Room Analytics (lifetime counters, in-memory) ---
+const roomStats = {
+  totalCreated: 0,   // every room ever created (real + bot) since server start
+  dismissed: 0       // rooms closed/destroyed since server start
+};
+
 // --- Spam Filter ---
 function applySpamMute(uid, socket) {
   let state = userMutes.get(uid);
@@ -81,6 +87,7 @@ function setupRoomHandlers(io, socket) {
 
   socket.on('room:create', ({ name, isPublic, adminUser }) => {
     const roomId = nanoid(6).toUpperCase();
+    roomStats.totalCreated++;
     
     const room = {
       roomId,
@@ -422,6 +429,8 @@ function handleRoomDisconnect(io, socketId, isIntentional = false) {
           io.to(roomId).emit('room:closed');
           io.socketsLeave(roomId);
           rooms.delete(roomId);
+          botRooms.delete(roomId);
+          roomStats.dismissed++;
           console.log(`Room ${roomId} destroyed (empty)`);
         } else {
           if (r.adminFirebaseUid === leavingMember.uid) {
@@ -553,6 +562,7 @@ function pickBotTracks() {
 
 function createBotRoom(io, admin, listeners, namePatternIdx) {
   const roomId = nanoid(6).toUpperCase();
+  roomStats.totalCreated++;
   const pool = [...pickBotTracks()].sort(() => 0.5 - Math.random());
   const room = {
     roomId,
@@ -723,8 +733,44 @@ function startBotTicker(io) {
   }, 3 * 60 * 1000);
 }
 
+// --- Room Analytics Snapshot ---
+function getRoomAnalytics() {
+  const activeRooms = [];
+  let totalActiveMembers = 0;
+  let botRoomCount = 0;
+  let realRoomCount = 0;
+
+  for (const room of rooms.values()) {
+    totalActiveMembers += room.members.length;
+    if (room._isBotRoom) botRoomCount++;
+    else realRoomCount++;
+    activeRooms.push({
+      roomId: room.roomId,
+      name: room.name,
+      adminName: room.adminName,
+      listenerCount: room.listenerCount,
+      maxMembers: room.maxMembers || 10,
+      isPublic: room.isPublic,
+      isBot: !!room._isBotRoom,
+      currentTrack: room.currentTrack ? room.currentTrack.title : null,
+      hasRealListeners: room.members.some(m => !m.uid.startsWith('bot_'))
+    });
+  }
+
+  return {
+    totalCreated: roomStats.totalCreated,
+    dismissed: roomStats.dismissed,
+    activeRoomCount: activeRooms.length,
+    botRoomCount,
+    realRoomCount,
+    totalActiveMembers,
+    activeRooms
+  };
+}
+
 module.exports = {
   setupRoomHandlers,
   handleRoomDisconnect,
-  initBotRooms
+  initBotRooms,
+  getRoomAnalytics
 };

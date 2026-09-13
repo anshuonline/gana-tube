@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 3000;
 
 const userDevices = new Map(); // email -> [{socketId, deviceId, deviceName, isMobile, isActive}]
 
-const { setupRoomHandlers, handleRoomDisconnect, initBotRooms } = require('./room.js');
+const { setupRoomHandlers, handleRoomDisconnect, initBotRooms, getRoomAnalytics } = require('./room.js');
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -473,6 +473,29 @@ app.get('/api/autocomplete', async (req, res) => {
 });
 
 // Health check endpoint
+// Room analytics endpoint (admin-only; pwd validated via manageads PHP)
+app.get('/api/room-analytics', async (req, res) => {
+  const pwd = req.query.pwd || '';
+  if (!pwd) {
+    return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+  }
+
+  // Validate the admin password using the shared admin_settings hash (via PHP API)
+  const validateUrl = `https://manageads.ganatube.in/analytic-api.php?action=validatePwd&pwd=${encodeURIComponent(pwd)}`;
+  try {
+    const vres = await fetch(validateUrl);
+    const vdata = await vres.json();
+    if (vdata.status !== 'success') {
+      return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+    }
+  } catch (e) {
+    console.warn('Room analytics pwd validation failed:', e.message);
+    return res.status(503).json({ status: 'error', message: 'Validation service unavailable' });
+  }
+
+  res.json({ status: 'success', data: getRoomAnalytics() });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', ytmusicInitialized: !!ytmusicInstance });
 });

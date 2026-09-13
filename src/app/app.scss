@@ -359,6 +359,11 @@
   font-family: var(--primary-font);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 14px rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
@@ -371,7 +376,8 @@
   }
 
   @media (max-width: 768px) {
-    padding: 8px 14px;
+    padding: 7px 14px;
+    font-size: 0.85rem;
   }
 }
 
@@ -1861,6 +1867,14 @@
     backdrop-filter: blur(20px);
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: auto;
+    overflow-y: auto; /* Scrollable when items overflow on small screens */
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
     
     &:hover {
       width: 280px;

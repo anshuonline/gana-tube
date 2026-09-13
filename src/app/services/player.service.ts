@@ -285,6 +285,18 @@ export class PlayerService {
       if (!socket) return;
       
       socket.on('room:state', (state: any) => {
+        // If the local user is the ADMIN and already has music running, adopt the
+        // room as-is and sync the room to the admin's current playback instead of
+        // wiping local state (queue/cover would otherwise go blank).
+        const isAdmin = this.roomService.isAdmin();
+        const localTrack = this.currentTrack();
+        const localActive = !!localTrack && (this.playerState() === 'playing' || this.playerState() === 'loading');
+        if (isAdmin && localActive) {
+          this.roomService.adminQueueUpdate(this.queue(), this.currentIndex());
+          this.roomService.adminPlayTrack(localTrack);
+          return;
+        }
+
         this.isRemoteUpdate = true;
         
         if (state.queue) {
@@ -330,6 +342,17 @@ export class PlayerService {
       });
 
       socket.on('room:track_changed', ({ track }) => {
+        // If the same track is already loaded (echo of our own play), don't reload
+        // the player — just make sure it keeps playing.
+        const current = this.currentTrack();
+        if (current && current.videoId === track.videoId) {
+          this.isRemoteUpdate = true;
+          if (this.ytPlayer && this.playerState() !== 'playing' && this.playerState() !== 'loading') {
+            this.ytPlayer.playVideo();
+          }
+          this.isRemoteUpdate = false;
+          return;
+        }
         this.isRemoteUpdate = true;
         this.playTrack(track);
       });
