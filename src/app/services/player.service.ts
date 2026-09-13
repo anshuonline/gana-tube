@@ -342,6 +342,8 @@ export class PlayerService {
       });
 
       socket.on('room:track_changed', ({ track }) => {
+        // Ignore room events if we are no longer in a room
+        if (!this.roomService.currentRoomInfo()) return;
         // If the same track is already loaded (echo of our own play), don't reload
         // the player — just make sure it keeps playing.
         const current = this.currentTrack();
@@ -358,6 +360,8 @@ export class PlayerService {
       });
 
       socket.on('room:playback_sync', ({ isPlaying, currentTime }) => {
+        // Ignore room events if we are no longer in a room
+        if (!this.roomService.currentRoomInfo()) return;
         if (!this.ytPlayer) return;
         this.isRemoteUpdate = true;
         
@@ -376,6 +380,8 @@ export class PlayerService {
       });
 
       socket.on('room:queue_updated', ({ queue, currentIndex }) => {
+        // Ignore room events if we are no longer in a room
+        if (!this.roomService.currentRoomInfo()) return;
         this.isRemoteUpdate = true;
         this.queue.set(queue);
         if (currentIndex !== undefined) this.currentIndex.set(currentIndex);

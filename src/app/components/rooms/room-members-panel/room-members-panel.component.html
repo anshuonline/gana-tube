@@ -28,7 +28,7 @@
 
     <div class="members-list">
       
-      <div class="member-item" *ngFor="let member of roomService.members()">
+      <div class="member-item" *ngFor="let member of orderedMembers()">
         
         <div class="avatar">
           <img *ngIf="member.photoURL" [src]="member.photoURL" alt="Avatar">

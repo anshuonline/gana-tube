@@ -25,6 +25,16 @@ export class RoomMembersPanelComponent implements OnInit {
     this.maxMembersInput = this.roomService.currentRoomInfo()?.maxMembers || 10;
   }
 
+  // Host first, then the current user, then everyone else
+  orderedMembers(): RoomMember[] {
+    const members = this.roomService.members();
+    const mySocketId = this.roomService.getSocketId();
+    const host = members.find(m => m.isAdmin);
+    const me = members.find(m => m.socketId === mySocketId && m !== host);
+    const rest = members.filter(m => m !== host && m !== me);
+    return [...(host ? [host] : []), ...(me ? [me] : []), ...rest];
+  }
+
   leaveRoom() {
     this.roomService.leaveRoom();
     this.closePanel();

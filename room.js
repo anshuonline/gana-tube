@@ -418,6 +418,13 @@ function handleRoomDisconnect(io, socketId, isIntentional = false) {
       if (!leavingMember) return;
       
       socketToRoom.delete(socketId);
+
+      // Cut ALL connections: remove the socket from the room so it stops
+      // receiving any room events (sync, track changes, queue updates).
+      const leavingSocket = io.sockets?.sockets?.get(socketId);
+      if (leavingSocket) {
+        leavingSocket.leave(roomId);
+      }
       
       const removeUser = () => {
         const r = rooms.get(roomId);
@@ -560,10 +567,13 @@ function pickBotTracks() {
   return botTrackPool.length > 0 ? botTrackPool : fallbackBotTracks();
 }
 
-function createBotRoom(io, admin, listeners, namePatternIdx) {
+function createBotRoom(io, admin, listeners, namePatternIdx, roomIndex) {
   const roomId = nanoid(6).toUpperCase();
   roomStats.totalCreated++;
-  const pool = [...pickBotTracks()].sort(() => 0.5 - Math.random());
+  // Rotate the shared pool so every bot room starts on a DIFFERENT track
+  const shuffled = [...pickBotTracks()].sort(() => 0.5 - Math.random());
+  const offset = shuffled.length > 0 ? roomIndex % shuffled.length : 0;
+  const pool = [...shuffled.slice(offset), ...shuffled.slice(0, offset)];
   const room = {
     roomId,
     name: ROOM_NAME_PATTERNS[namePatternIdx % ROOM_NAME_PATTERNS.length](admin.displayName),
@@ -622,7 +632,7 @@ function initBotRooms(io, provider) {
       idx += size;
       const admin = group[0];
       admin.isAdmin = true;
-      createBotRoom(io, admin, group.slice(1), i);
+      createBotRoom(io, admin, group.slice(1), i, i);
     }
     while (idx < bots.length) {
       const bot = bots[idx++];
@@ -655,7 +665,16 @@ function startBotTicker(io) {
         if (room.queue.length > 0) {
           room.currentTrack = room.queue.shift();
         } else {
-          room.currentTrack = pool[Math.floor(Math.random() * pool.length)];
+          // Prefer a track that NO other bot room is currently playing (keeps rooms varied)
+          const taken = new Set();
+          for (const otherId of botRooms) {
+            if (otherId === roomId) continue;
+            const other = rooms.get(otherId);
+            if (other?.currentTrack) taken.add(other.currentTrack.videoId);
+          }
+          const free = pool.filter(t => !taken.has(t.videoId) && t.videoId !== room.currentTrack?.videoId);
+          const candidates = free.length > 0 ? free : pool;
+          room.currentTrack = candidates[Math.floor(Math.random() * candidates.length)];
         }
         const nextUp = pool[Math.floor(Math.random() * pool.length)];
         if (!room.queue.some(t => t.videoId === nextUp.videoId) && nextUp.videoId !== room.currentTrack.videoId) {
