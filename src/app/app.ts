@@ -46,6 +46,7 @@ import { LanguageSelectModalComponent } from './components/language-select-modal
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { ReleaseNotesComponent } from './components/release-notes/release-notes.component';
+import { RoomFeaturesPopupComponent } from './components/room-features-popup/room-features-popup.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
@@ -112,7 +113,8 @@ export interface SponsoredAd {
     LanguageSelectModalComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
-    ReleaseNotesComponent
+    ReleaseNotesComponent,
+    RoomFeaturesPopupComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],

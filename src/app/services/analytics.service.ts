@@ -105,4 +105,9 @@ export class AnalyticsService {
   getAnalytics(password: string, filter: string = 'all_time') {
     return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getAnalytics&pwd=${encodeURIComponent(password)}&filter=${filter}`);
   }
+
+  getRoomAnalytics(password: string) {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    return this.http.get<{status: string, data?: any, message?: string}>(`${backendUrl}/room-analytics?pwd=${encodeURIComponent(password)}`);
+  }
 }

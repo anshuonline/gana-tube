@@ -147,6 +147,69 @@
       </div>
     </div>
 
+    <!-- Listening Rooms Analytics Row -->
+    <div class="charts-grid" style="grid-template-columns: 1fr; margin-top: 2rem;">
+      <div class="chart-card">
+        <h3 class="chart-title"><div class="dot blue"></div> Listening Rooms Analytics</h3>
+
+        <!-- Room Stat Cards -->
+        <div class="stats-grid" style="margin-bottom: 1.5rem;">
+          <div class="stat-card purple">
+            <h3 class="stat-title">Rooms Created</h3>
+            <p class="stat-value">{{ roomAnalytics?.totalCreated ?? 0 | number }}</p>
+          </div>
+          <div class="stat-card blue">
+            <h3 class="stat-title">Active Rooms</h3>
+            <p class="stat-value">{{ roomAnalytics?.activeRoomCount ?? 0 | number }}</p>
+          </div>
+          <div class="stat-card pink">
+            <h3 class="stat-title">Listeners In Rooms</h3>
+            <p class="stat-value">{{ roomAnalytics?.totalActiveMembers ?? 0 | number }}</p>
+          </div>
+          <div class="stat-card pink" style="background: linear-gradient(to bottom right, rgba(251, 113, 133, 0.4), rgba(251, 113, 133, 0.1)); border-color: rgba(251, 113, 133, 0.5);">
+            <h3 class="stat-title" style="color: #fb7185;">Rooms Dismissed</h3>
+            <p class="stat-value">{{ roomAnalytics?.dismissed ?? 0 | number }}</p>
+          </div>
+          <div class="stat-card blue" style="background: linear-gradient(to bottom right, rgba(52, 211, 153, 0.4), rgba(52, 211, 153, 0.1)); border-color: rgba(52, 211, 153, 0.5);">
+            <h3 class="stat-title" style="color: #34d399;">Bot / Real Rooms</h3>
+            <p class="stat-value">{{ roomAnalytics?.botRoomCount ?? 0 }} / {{ roomAnalytics?.realRoomCount ?? 0 }}</p>
+          </div>
+        </div>
+
+        <!-- Active Room IDs -->
+        <div class="room-ids-scroll">
+          <div *ngIf="roomAnalyticsLoading" class="empty-text">Loading room analytics...</div>
+          <div *ngIf="!roomAnalyticsLoading && (!roomAnalytics || roomAnalytics.activeRooms?.length === 0)" class="empty-text">No rooms are live right now</div>
+
+          <table class="detailed-table" *ngIf="!roomAnalyticsLoading && roomAnalytics?.activeRooms?.length > 0">
+            <thead>
+              <tr>
+                <th>Room ID</th>
+                <th>Room Name</th>
+                <th>Host</th>
+                <th>Members</th>
+                <th>Now Playing</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let room of roomAnalytics.activeRooms">
+                <td><span class="room-id-chip">{{ room.roomId }}</span></td>
+                <td>{{ room.name }}</td>
+                <td style="color: #d1d5db;">{{ room.adminName }}</td>
+                <td>{{ room.listenerCount }} / {{ room.maxMembers }}</td>
+                <td style="color: #9ca3af;">{{ room.currentTrack || 'Idle' }}</td>
+                <td>
+                  <span class="room-type-badge" [class.bot]="room.isBot">{{ room.isBot ? 'Bot' : 'Real' }}</span>
+                  <span class="room-type-badge live" *ngIf="room.hasRealListeners">Live</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- Detailed Users Table Row -->
     <div class="charts-grid" style="grid-template-columns: 1fr; margin-top: 2rem;">
       <div class="chart-card">

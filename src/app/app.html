@@ -24,10 +24,6 @@
         <svg lucideLibrary [attr.size]="24"></svg>
         <span class="sidebar-label">Library</span>
       </div>
-      <div class="sidebar-item" (click)="openOfflineLibraryPage()" [class.active]="currentPage() === 'offline'">
-        <svg lucideDownload [attr.size]="24"></svg>
-        <span class="sidebar-label">Downloads</span>
-      </div>
       <div class="sidebar-item" (click)="openSocialsPage()" [class.active]="currentPage() === 'socials'">
         <svg lucideMessageSquare [attr.size]="24"></svg>
         <span class="sidebar-label">Socials</span>
@@ -40,11 +36,6 @@
       <div class="sidebar-item" (click)="openRoomsPage()" [class.active]="currentPage() === 'rooms'">
         <svg lucideRadio [attr.size]="24"></svg>
         <span class="sidebar-label">Rooms</span>
-      </div>
-
-      <div class="sidebar-item" (click)="openReleaseNotes()" [class.active]="currentPage() === 'release-notes'">
-        <svg lucideSparkles [attr.size]="24"></svg>
-        <span class="sidebar-label">What's New</span>
       </div>
 
       <div class="sidebar-item" (click)="openCuratedPlaylistsPage()" [class.active]="currentPage() === 'curated-playlists'">
@@ -101,7 +92,7 @@
         <ng-template #authLoadingTpl>
           <ng-container *ngIf="authService.currentUser() === null; else authSkeletonTpl">
             <button class="header-login-btn" (click)="login()" [disabled]="isLoggingIn" title="Login with Google">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="display: block;"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.99 3.66 9.13 8.44 9.88v-6.99H7.9V12h2.54V9.8c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99C18.34 21.13 22 16.99 22 12c0-5.52-4.48-10-10-10z"/></svg>
+              <svg viewBox="0 0 48 48" width="18" height="18" style="display: block;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
               <span>Login</span>
             </button>
           </ng-container>
@@ -265,6 +256,30 @@
                 {{ lang }}
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- What's New -->
+        <div class="settings-group group-whatsnew">
+          <h2 class="group-title">What's New</h2>
+          <div class="setting-item whatsnew-item">
+            <div class="setting-info">
+              <h3>New UI Optimization <span class="new-badge">NEW</span></h3>
+              <p>Fresh modern look across search, home header and account settings.</p>
+            </div>
+          </div>
+          <div class="setting-item whatsnew-item">
+            <div class="setting-info">
+              <h3>Performance Optimized <span class="new-badge">NEW</span></h3>
+              <p>Faster parallel fetching, smarter caching and smoother playback.</p>
+            </div>
+          </div>
+          <div class="setting-item whatsnew-item">
+            <div class="setting-info">
+              <h3>New Room Features <span class="new-badge">NEW</span></h3>
+              <p>Always-live listening rooms with hosts, synced music and live chat.</p>
+            </div>
+            <button class="q-btn" (click)="openRoomsPage()">Explore</button>
           </div>
         </div>
 
@@ -853,6 +868,9 @@
 
 <!-- Feedback Popup -->
 <app-feedback-popup *ngIf="showFeedbackPopup()" (close)="showFeedbackPopup.set(false)"></app-feedback-popup>
+
+<!-- One-time Room Features Popup -->
+<app-room-features-popup *ngIf="currentPage() === 'home' && !isSearchMode()"></app-room-features-popup>
 
 <!-- Install PWA Modal -->
 <div class="gt-install-modal-backdrop" *ngIf="showInstallModal" (click)="closeInstallModal()"></div>

@@ -1,0 +1,34 @@
+<div class="rfp-overlay" *ngIf="visible">
+  <div class="rfp-card">
+    <button class="rfp-close" (click)="exploreLater()" aria-label="Close">
+      <svg lucideX [attr.size]="18"></svg>
+    </button>
+
+    <div class="rfp-icon-badge">
+      <svg lucideRadio [attr.size]="22"></svg>
+    </div>
+
+    <h2 class="rfp-title">Listening Rooms are Live</h2>
+    <p class="rfp-subtitle">Jump into a room and experience music together — in real time.</p>
+
+    <div class="rfp-list">
+      <div class="rfp-item" *ngFor="let f of features">
+        <div class="rfp-item-icon">
+          <svg *ngIf="f.icon === 'users'" lucideUsers [attr.size]="16"></svg>
+          <svg *ngIf="f.icon === 'radio'" lucideRadio [attr.size]="16"></svg>
+          <svg *ngIf="f.icon === 'chat'" lucideMessageSquare [attr.size]="16"></svg>
+          <svg *ngIf="f.icon === 'music'" lucideMusic [attr.size]="16"></svg>
+        </div>
+        <div class="rfp-item-text">
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.text }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rfp-actions">
+      <button class="rfp-secondary" (click)="exploreLater()">Explore Later</button>
+      <button class="rfp-primary" (click)="exploreRooms()">Explore Rooms</button>
+    </div>
+  </div>
+</div>

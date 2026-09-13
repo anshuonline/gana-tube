@@ -22,6 +22,8 @@ export class AnalyticsPageComponent implements OnInit {
   loading = false;
 
   analyticsData: any = null;
+  roomAnalytics: any = null;
+  roomAnalyticsLoading = false;
   public currentFilter: string = 'all_time';
 
   // Chart configuration
@@ -77,7 +79,7 @@ export class AnalyticsPageComponent implements OnInit {
     if (!this.password) return;
     this.loading = true;
     this.loginError = '';
-    
+
     this.analyticsService.getAnalytics(this.password, this.currentFilter).subscribe({
       next: (res) => {
         if (res.status === 'success') {
@@ -85,6 +87,7 @@ export class AnalyticsPageComponent implements OnInit {
           this.analyticsData = res.data;
           this.prepareCharts();
           sessionStorage.setItem('gtanalytic_pwd', this.password);
+          this.loadRoomAnalytics();
         } else {
           this.loginError = res.message || 'Invalid password';
           this.isAuthenticated = false;
@@ -96,6 +99,22 @@ export class AnalyticsPageComponent implements OnInit {
         this.loginError = 'Connection failed';
         this.loading = false;
         this.isAuthenticated = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadRoomAnalytics() {
+    this.roomAnalyticsLoading = true;
+    this.analyticsService.getRoomAnalytics(this.password).subscribe({
+      next: (res) => {
+        this.roomAnalytics = res.status === 'success' ? res.data : null;
+        this.roomAnalyticsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.roomAnalytics = null;
+        this.roomAnalyticsLoading = false;
         this.cdr.detectChanges();
       }
     });
@@ -156,5 +175,6 @@ export class AnalyticsPageComponent implements OnInit {
     this.isAuthenticated = false;
     this.password = '';
     this.analyticsData = null;
+    this.roomAnalytics = null;
   }
 }

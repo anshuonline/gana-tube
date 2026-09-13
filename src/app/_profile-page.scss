@@ -501,6 +501,25 @@
   border-radius: 20px;
 }
 
+/* What's New Group */
+.group-whatsnew .setting-item {
+  background: linear-gradient(145deg, #0a0a0a 0%, #000000 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.new-badge {
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 10px;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
 /* Logout Item */
 .logout-item {
   border-radius: 12px !important;
