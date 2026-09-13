@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RoomService, RoomInfo } from '../../../services/room.service';
@@ -44,7 +44,11 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   showCreateModal = false;
   showJoinModal = false;
   showGuestModal = false;
-  
+
+  totalListeners = computed(() =>
+    this.roomService.publicRooms().reduce((sum, room) => sum + (room.listenerCount || 0), 0)
+  );
+
   pendingAction: 'create' | 'join_private' | 'join_public' | null = null;
   pendingRoomId: string | null = null;
   
