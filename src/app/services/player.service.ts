@@ -43,7 +43,8 @@ export class PlayerService {
   constructor() {
     this.setupSocketListeners();
     this.setupDeviceSyncListeners();
-    
+    this.setupNetworkWatcher();
+
     // Listen Together Sync Worker
     setInterval(() => {
       // Only sync if user is in a room and is the admin
@@ -69,6 +70,31 @@ export class PlayerService {
         }
       }
     }, 2000);
+  }
+
+  private setupNetworkWatcher(): void {
+    if (typeof navigator === 'undefined') return;
+    const conn = (navigator as any).connection;
+    if (!conn) return;
+    this.resolveAutoQuality();
+    conn.addEventListener('change', () => this.resolveAutoQuality());
+  }
+
+  private resolveAutoQuality(): void {
+    if (typeof navigator === 'undefined') return;
+    const conn = (navigator as any).connection;
+    if (!conn) return;
+    const type = conn.effectiveType || '4g';
+    const downlink = typeof conn.downlink === 'number' ? conn.downlink : 10;
+    let q: 'Data Saver' | 'Standard' | 'High' | 'Max' = 'High';
+    if (type === 'slow-2g' || type === '2g') {
+      q = 'Data Saver';
+    } else if (type === '3g') {
+      q = 'Standard';
+    } else if (downlink >= 10) {
+      q = 'Max';
+    }
+    this.effectiveQuality.set(q);
   }
 
   private setupDeviceSyncListeners() {
@@ -136,11 +162,21 @@ export class PlayerService {
   isCrossfadeEnabled = signal<boolean>(
     typeof localStorage !== 'undefined' ? localStorage.getItem('gt_crossfade') === 'true' : false
   );
-  
+  crossfadeDuration = signal<number>(
+    typeof localStorage !== 'undefined' ? Math.min(10, Math.max(1, parseInt(localStorage.getItem('gt_crossfade_duration') || '5', 10) || 5)) : 5
+  );
+
   // Audio Quality
-  musicQuality = signal<'High' | 'Standard' | 'Data Saver'>(
+  musicQuality = signal<'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'>(
     (typeof localStorage !== 'undefined' ? localStorage.getItem('gt_music_quality') : null) as any || 'High'
   );
+
+  // Network-resolved quality used when musicQuality is 'Auto'
+  private effectiveQuality = signal<'Data Saver' | 'Standard' | 'High' | 'Max'>('High');
+  resolvedQuality = computed<'Data Saver' | 'Standard' | 'High' | 'Max'>(() => {
+    const q = this.musicQuality();
+    return q === 'Auto' ? this.effectiveQuality() : (q as 'Data Saver' | 'Standard' | 'High' | 'Max');
+  });
 
   // Computed signal for the current track
   currentTrack = computed(() => {
@@ -572,19 +608,21 @@ export class PlayerService {
     }
   }
 
-  setMusicQuality(quality: 'High' | 'Standard' | 'Data Saver'): void {
+  setMusicQuality(quality: 'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'): void {
     this.musicQuality.set(quality);
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('gt_music_quality', quality);
     }
     // Change quality of currently playing video
     if (this.ytPlayer && this.ytPlayer.setPlaybackQuality) {
+      const q = quality === 'Auto' ? this.effectiveQuality() : quality;
       const qMap = {
-        'High': 'hd720',
+        'Data Saver': 'small',
         'Standard': 'medium',
-        'Data Saver': 'small'
+        'High': 'hd720',
+        'Max': 'hd2160'
       };
-      this.ytPlayer.setPlaybackQuality(qMap[quality]);
+      this.ytPlayer.setPlaybackQuality(qMap[q]);
     }
   }
 
@@ -627,6 +665,14 @@ export class PlayerService {
     this.isCrossfadeEnabled.set(newVal);
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('gt_crossfade', newVal ? 'true' : 'false');
+    }
+  }
+
+  setCrossfadeDuration(seconds: number): void {
+    const val = Math.min(10, Math.max(1, Math.round(seconds)));
+    this.crossfadeDuration.set(val);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_crossfade_duration', val.toString());
     }
   }
 
@@ -928,15 +974,16 @@ export class PlayerService {
             this.broadcastToSync(); // Send to sync service (will be throttled)
           
           // Fake crossfade logic (fade in/out volume)
-          if (this.isCrossfadeEnabled() && dur > 10 && typeof this.ytPlayer.setVolume === 'function') {
+          if (this.isCrossfadeEnabled() && dur > this.crossfadeDuration() * 2 && typeof this.ytPlayer.setVolume === 'function') {
+            const fade = this.crossfadeDuration();
             const timeLeft = dur - cTime;
             let targetVol = this.volume();
-            
-            if (timeLeft <= 5 && timeLeft > 0) {
-              const fadeRatio = Math.max(0, timeLeft / 5);
+
+            if (timeLeft <= fade && timeLeft > 0) {
+              const fadeRatio = Math.max(0, timeLeft / fade);
               targetVol = Math.round(this.volume() * fadeRatio);
-            } else if (cTime <= 5) {
-              const fadeRatio = Math.min(1, cTime / 5);
+            } else if (cTime <= fade) {
+              const fadeRatio = Math.min(1, cTime / fade);
               targetVol = Math.round(this.volume() * fadeRatio);
             } else {
               targetVol = Math.round(this.volume());

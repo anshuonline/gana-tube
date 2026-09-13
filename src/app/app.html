@@ -201,12 +201,14 @@
           <div class="setting-item">
             <div class="setting-info">
               <h3>Music Quality</h3>
-              <p>Choose audio quality for playback.</p>
+              <p>Auto adapts quality to your network speed.</p>
             </div>
             <div class="setting-actions quality-selector">
-              <button class="q-btn" [class.active]="musicQuality() === 'High'" (click)="setMusicQuality('High')">High</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Auto'" (click)="setMusicQuality('Auto')">Auto</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Data Saver'" (click)="setMusicQuality('Data Saver')">92k</button>
               <button class="q-btn" [class.active]="musicQuality() === 'Standard'" (click)="setMusicQuality('Standard')">Standard</button>
-              <button class="q-btn" [class.active]="musicQuality() === 'Data Saver'" (click)="setMusicQuality('Data Saver')">Data Saver</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'High'" (click)="setMusicQuality('High')">High</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Max'" (click)="setMusicQuality('Max')">Max</button>
             </div>
           </div>
         </div>
@@ -222,6 +224,17 @@
             <button class="toggle-switch" [class.on]="playerService.isCrossfadeEnabled()" (click)="playerService.toggleCrossfade()" aria-label="Toggle Crossfade" [attr.aria-pressed]="playerService.isCrossfadeEnabled()">
               <span class="toggle-knob"></span>
             </button>
+          </div>
+          <div class="setting-item-full crossfade-duration" *ngIf="playerService.isCrossfadeEnabled()">
+            <div class="slider-header">
+              <span class="slider-label">Duration</span>
+              <span class="slider-value">{{ playerService.crossfadeDuration() }}s</span>
+            </div>
+            <input class="crossfade-range" type="range" min="1" max="10" step="1" [value]="playerService.crossfadeDuration()" (input)="playerService.setCrossfadeDuration($any($event.target).value)">
+            <div class="slider-scale">
+              <span>1s</span>
+              <span>10s</span>
+            </div>
           </div>
           <div class="setting-item">
             <div class="setting-info">
