@@ -1311,6 +1311,15 @@ export class App implements OnInit {
     // Detect mobile view
     this.isMobileView.set(window.innerWidth <= 768);
 
+    // Auto-show language select popup on mobile every session
+    if (this.isMobileView()) {
+      setTimeout(() => {
+        if (this.currentPage() === 'home' && !this.isSearchMode() && !this.hasSearched()) {
+          this.showLanguageModal.set(true);
+        }
+      }, 1500);
+    }
+
     // Check PWA Install Prompt every 2 hours
     if (!this.pwaService.isInstalledPWA()) {
       const lastPrompt = localStorage.getItem('lastInstallPromptShown');
