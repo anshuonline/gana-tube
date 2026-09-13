@@ -230,24 +230,38 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   sendLike() {
-    const user = this.authService.currentUser();
-    if (user) {
-      // Throttle socket emits to prevent network flood (max 2 per second)
-      const now = Date.now();
-      if (now - this.lastEmitTime > 500) {
-        this.roomService.sendLike(user.uid, user.displayName || 'User');
-        this.lastEmitTime = now;
+    let user = this.authService.currentUser();
+    if (!user) {
+      // Guest flow — same identity resolution as sendMessage
+      const guestName = localStorage.getItem('gt_guest_name');
+      const guestId = localStorage.getItem('gt_guest_id');
+      if (guestName && guestId) {
+        user = {
+          uid: guestId,
+          email: '',
+          displayName: guestName,
+          photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${guestName}`
+        } as any;
       }
-      
-      // Locally spawn instantly by adding to queue
-      this.pendingHearts++;
-      if (this.pendingHearts > 40) this.pendingHearts = 40;
     }
+    if (!user || !user.uid) return;
+    // Throttle socket emits to prevent network flood (max 2 per second)
+    const now = Date.now();
+    if (now - this.lastEmitTime > 500) {
+      this.roomService.sendLike(user.uid, user.displayName || 'User');
+      this.lastEmitTime = now;
+    }
+    
+    // Locally spawn instantly by adding to queue
+    this.pendingHearts++;
+    if (this.pendingHearts > 40) this.pendingHearts = 40;
   }
 
   spawnHeart() {
     const color = this.heartColors[Math.floor(Math.random() * this.heartColors.length)];
-    const left = Math.random() * 20 + 80; // random between 80% to 100% of the screen width
+    // Spawn between 10% and 80% width so hearts stay fully visible inside the UI
+    // (previously 80-100% pushed them off the right edge, clipped on mobile)
+    const left = Math.random() * 70 + 10; // 10% to 80%
     const animationDuration = Math.random() * 1.5 + 2; // 2-3.5s
     const id = this.heartIdCounter++;
     
