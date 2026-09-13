@@ -455,18 +455,31 @@
 
 // ---- Hero ----
 .hero-section {
-  padding: 100px 0 30px;
-  position: relative;
-  z-index: 1100;
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 92vh;
+  padding: 90px 0 48px;
   background:
-    radial-gradient(55% 90% at 12% 45%, rgba(124, 58, 237, 0.09) 0%, rgba(0, 0, 0, 0) 60%),
-    radial-gradient(45% 75% at 88% 25%, rgba(236, 72, 153, 0.06) 0%, rgba(0, 0, 0, 0) 60%),
+    radial-gradient(45% 55% at 15% 45%, rgba(236, 72, 153, 0.10) 0%, rgba(0, 0, 0, 0) 60%),
+    radial-gradient(50% 60% at 82% 35%, rgba(124, 58, 237, 0.12) 0%, rgba(0, 0, 0, 0) 60%),
     #000000;
-  overflow: visible;
+  overflow: hidden;
 
   @media (max-width: 992px) {
     display: none !important;
   }
+}
+
+/* Content sheet slides over the hero on scroll */
+.hero-section ~ .results-container {
+  position: relative;
+  z-index: 2;
+  background: #000000;
+  border-radius: 32px 32px 0 0;
+  margin-top: -56px;
+  padding-top: 16px;
+  box-shadow: 0 -24px 48px rgba(0, 0, 0, 0.75);
 }
 
 .hero-inner-wrap {
@@ -477,7 +490,9 @@
   z-index: 2;
 
   &.full-width {
-    display: block;
+    display: flex;
+    align-items: center;
+    height: 100%;
   }
 }
 
@@ -621,15 +636,15 @@
   align-items: center;
   width: max-content;
   gap: 8px;
-  color: #C4B5FD;
   font-size: 0.85rem;
   letter-spacing: 0.14em;
   font-weight: 700;
   text-transform: uppercase;
   padding: 8px 18px;
   border-radius: 30px;
-  background: rgba(124, 58, 237, 0.12);
-  border: 1px solid rgba(124, 58, 237, 0.3);
+  background: linear-gradient(120deg, rgba(236, 72, 153, 0.12) 0%, rgba(124, 58, 237, 0.12) 100%);
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  color: #F9A8D4;
 
   @media (max-width: 992px) {
     display: none;
@@ -639,11 +654,14 @@
 .hero-title {
   font-size: clamp(2.5rem, 7vw, 6.5rem);
   font-weight: 800;
-  color: #fff;
   margin: 0;
   line-height: 1.05;
   letter-spacing: -0.03em;
-  text-shadow: 0 0 80px rgba(124, 58, 237, 0.3);
+  background: linear-gradient(120deg, #F472B6 0%, #EC4899 30%, #8B5CF6 70%, #7C3AED 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 
   @media (max-width: 992px) {
     display: none;
@@ -665,7 +683,7 @@
 
 .explore-btn {
   width: max-content;
-  background: linear-gradient(135deg, #7C3AED, #9333EA);
+  background: linear-gradient(120deg, #EC4899 0%, #8B5CF6 60%, #7C3AED 100%);
   color: #fff;
   border: none;
   font-size: 1.15rem;
@@ -679,16 +697,16 @@
   gap: 14px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.35);
+  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.3);
 
   svg {
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   &:hover {
-    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    background: linear-gradient(120deg, #F472B6 0%, #A78BFA 60%, #8B5CF6 100%);
     transform: translateY(-4px);
-    box-shadow: 0 14px 44px rgba(124, 58, 237, 0.5);
+    box-shadow: 0 14px 44px rgba(236, 72, 153, 0.45);
 
     svg {
       transform: translateX(4px) scale(1.1);
@@ -726,7 +744,7 @@
     right: 4%;
     width: 65%;
     height: 75%;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
+    background: radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.16) 0%, rgba(124, 58, 237, 0.12) 45%, rgba(0, 0, 0, 0) 72%);
     filter: blur(50px);
     pointer-events: none;
     z-index: 0;

@@ -1898,23 +1898,29 @@ export class App implements OnInit {
 
     // Default YouTube Search (Songs / All)
     if (this.searchFilter() === 'all') {
-      // In "All" mode, fetch songs + top playlist in parallel
+      // In "All" mode, fetch songs + albums + playlists in parallel for a structured overview
       const songsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
-        this.youtubeApi.searchMusic(query, 50, 'song').pipe(takeUntil(this.destroy$)).subscribe({
+        this.youtubeApi.searchMusic(query, 40, 'song').pipe(takeUntil(this.destroy$)).subscribe({
           next: (res) => resolve(res),
           error: () => resolve([])
         });
       });
 
-      // Fetch top playlist match (community + YT Music)
+      const albumsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
+        this.youtubeApi.searchMusic(query, 20, 'album').pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => resolve(res),
+          error: () => resolve([])
+        });
+      });
+
+      // Fetch playlist matches (community + YT Music)
       const playlistUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
-      
+
       const communityPlaylistPromise = fetch(`${playlistUrl}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
           if (data.status === 'success' && data.data && data.data.length > 0) {
-            const pl = data.data[0];
-            return {
+            return data.data.slice(0, 6).map((pl: any) => ({
               videoId: pl.playlist_id,
               title: pl.playlist_name,
               thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'ganatubenewlogo.png',
@@ -1922,26 +1928,27 @@ export class App implements OnInit {
               channelTitle: pl.owner,
               publishedAt: pl.created_at,
               type: 'community-playlist'
-            } as YouTubeSearchResult;
+            })) as YouTubeSearchResult[];
           }
-          return null;
-        }).catch(() => null);
+          return [] as YouTubeSearchResult[];
+        }).catch(() => [] as YouTubeSearchResult[]);
 
-      const ytPlaylistPromise = new Promise<YouTubeSearchResult | null>((resolve) => {
-        this.youtubeApi.searchMusic(query, 1, 'playlist').pipe(takeUntil(this.destroy$)).subscribe({
-          next: (res) => resolve(res && res.length > 0 ? { ...res[0], type: 'playlist' } : null),
-          error: () => resolve(null)
+      const ytPlaylistsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
+        this.youtubeApi.searchMusic(query, 12, 'playlist').pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => resolve((res || []).map(r => ({ ...r, type: 'playlist' }))),
+          error: () => resolve([])
         });
       });
 
-      Promise.all([songsPromise, communityPlaylistPromise, ytPlaylistPromise]).then(([songs, communityPl, ytPl]) => {
-        // Pick the best playlist to show as top result (prefer community)
-        const topPlaylist = communityPl || ytPl;
-        if (topPlaylist) {
-          this.results.set([topPlaylist, ...songs]);
-        } else {
-          this.results.set(songs);
-        }
+      Promise.all([songsPromise, albumsPromise, communityPlaylistPromise, ytPlaylistsPromise]).then(([songs, albums, communityPls, ytPls]) => {
+        // Structured order: best playlist (top result) first, then songs, albums, remaining playlists
+        const allPlaylists = [...communityPls, ...ytPls];
+        const topPlaylist = allPlaylists[0] || null;
+        const restPlaylists = allPlaylists.slice(1);
+        const combined = topPlaylist
+          ? [topPlaylist, ...songs, ...albums, ...restPlaylists]
+          : [...songs, ...albums, ...allPlaylists];
+        this.results.set(combined);
         this.isLoading.set(false);
       });
     } else {

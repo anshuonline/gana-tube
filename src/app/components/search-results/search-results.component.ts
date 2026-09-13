@@ -1,13 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucidePlay, LucideMoreVertical, LucideMusic2 } from '@lucide/angular';
+import { LucidePlay, LucideMoreVertical, LucideMusic2, LucideAudioLines, LucideDisc3, LucideLibrary } from '@lucide/angular';
 import { YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideMoreVertical, LucideMusic2],
+  imports: [CommonModule, LucidePlay, LucideMoreVertical, LucideMusic2, LucideAudioLines, LucideDisc3, LucideLibrary],
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.scss']
 })
@@ -22,10 +22,12 @@ export class SearchResultsComponent implements OnChanges {
   @Output() ambientBgFound = new EventEmitter<string>();
   @Output() toggleMenu = new EventEmitter<{track: YouTubeSearchResult, event: MouseEvent}>();
 
-  skeletons = Array(10).fill(0);
+  skeletons = Array(8).fill(0);
 
   topResult: YouTubeSearchResult | null = null;
-  otherResults: YouTubeSearchResult[] = [];
+  songResults: YouTubeSearchResult[] = [];
+  albumResults: YouTubeSearchResult[] = [];
+  playlistResults: YouTubeSearchResult[] = [];
 
   constructor(private playerService: PlayerService) {}
 
@@ -36,28 +38,54 @@ export class SearchResultsComponent implements OnChanges {
   }
 
   processResults() {
-    if (!this.results || this.results.length === 0) {
+    const results = this.results || [];
+    if (results.length === 0) {
       this.topResult = null;
-      this.otherResults = [];
+      this.songResults = [];
+      this.albumResults = [];
+      this.playlistResults = [];
       this.ambientBgFound.emit('');
       return;
     }
 
+    this.albumResults = results.filter(r => r.type === 'album');
+    this.playlistResults = results.filter(r => r.type === 'playlist' || r.type === 'community-playlist');
+    this.songResults = results.filter(r => r.type !== 'album' && r.type !== 'playlist' && r.type !== 'community-playlist');
+
     if (this.currentFilter === 'all') {
-      // In 'all' view, the first result is the "Featured/Top Result"
-      this.topResult = this.results[0];
-      this.otherResults = this.results.slice(1);
-      
-      // Emit the top result's thumbnail to be used as ambient background
+      // Top result: best playlist match, otherwise first song
+      this.topResult = this.playlistResults[0] || this.songResults[0] || null;
+
       if (this.topResult) {
+        // Remove the top result from its section so it isn't shown twice
+        if (this.topResult.type === 'playlist' || this.topResult.type === 'community-playlist') {
+          this.playlistResults = this.playlistResults.slice(1);
+        } else {
+          this.songResults = this.songResults.slice(1);
+        }
         this.ambientBgFound.emit(this.topResult.thumbnailHigh || this.topResult.thumbnail);
       }
     } else {
-      // In other views (Songs, Playlists), show everything as a list
       this.topResult = null;
-      this.otherResults = [...this.results];
-      this.ambientBgFound.emit('');
+      // Keep the ambient background alive from the first item of the active view
+      const first = this.currentFilter === 'albums'
+        ? this.albumResults[0]
+        : this.currentFilter === 'playlists'
+          ? this.playlistResults[0]
+          : this.songResults[0];
+      this.ambientBgFound.emit(first ? (first.thumbnailHigh || first.thumbnail) : '');
     }
+  }
+
+  formatDuration(seconds?: number): string {
+    if (!seconds || seconds <= 0) return '';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  getSectionLabel(type: string): string {
+    return type === 'community-playlist' ? 'Community Playlist' : type === 'album' ? 'Album' : type === 'playlist' ? 'Playlist' : 'Song';
   }
 
   onPlay(track: YouTubeSearchResult): void {
@@ -76,6 +104,9 @@ export class SearchResultsComponent implements OnChanges {
 
   onImgError(event: Event, track: YouTubeSearchResult): void {
     const img = event.target as HTMLImageElement;
-    img.src = `https://img.youtube.com/vi/${track.videoId}/mqdefault.jpg`;
+    if (track.videoId && track.videoId.length === 11) {
+      img.src = `https://img.youtube.com/vi/${track.videoId}/mqdefault.jpg`;
+    }
+    img.style.visibility = 'hidden';
   }
 }

@@ -1,9 +1,16 @@
 <!-- Loading State -->
 <div class="loading-state" *ngIf="isLoading && results.length === 0">
-  <!-- Skeletons for Top Result and List -->
   <div class="skeleton-container">
-    <div class="skeleton-top-result" *ngIf="currentFilter === 'all'"></div>
-    <div class="skeleton-list">
+    <ng-container *ngIf="currentFilter === 'all'">
+      <div class="skeleton-top-result"></div>
+      <div class="skeleton-list">
+        <div class="skeleton-list-item" *ngFor="let s of skeletons"></div>
+      </div>
+    </ng-container>
+    <div class="skeleton-grid" *ngIf="currentFilter === 'albums' || currentFilter === 'playlists'">
+      <div class="skeleton-grid-item" *ngFor="let s of skeletons"></div>
+    </div>
+    <div class="skeleton-list" *ngIf="currentFilter === 'songs'">
       <div class="skeleton-list-item" *ngFor="let s of skeletons"></div>
     </div>
   </div>
@@ -13,27 +20,35 @@
 <div class="empty-state" *ngIf="!isLoading && results.length === 0 && hasSearched">
   <svg lucideMusic2 class="empty-icon" [attr.size]="64"></svg>
   <h3>No results found</h3>
-  <p>Try searching for something else</p>
+  <p>Try a different keyword or check the spelling</p>
 </div>
 
 <!-- Results Layout -->
 <div class="results-layout" *ngIf="!isLoading && results.length > 0">
-  
-  <!-- "All" Filter View: Top Result + List -->
+
+  <!-- "All" Filter View: Top Result + Structured Sections -->
   <ng-container *ngIf="currentFilter === 'all'">
+
     <!-- Top Result Section -->
-    <div class="top-result-section" *ngIf="topResult" (click)="onPlay(topResult)" (contextmenu)="onRightClick($event, topResult)">
-      <h2 class="section-heading">Top result</h2>
-      <div class="top-result-card" [class.active]="isCurrentTrack(topResult)">
+    <div class="top-result-section" *ngIf="topResult">
+      <h2 class="section-heading">
+        <svg lucideAudioLines [attr.size]="18"></svg>
+        Top result
+      </h2>
+      <div
+        class="top-result-card"
+        [class.active]="isCurrentTrack(topResult)"
+        (click)="onPlay(topResult)"
+        (contextmenu)="onRightClick($event, topResult)">
         <div class="top-thumbnail-wrapper">
-          <img 
-            [src]="topResult.thumbnailHigh || topResult.thumbnail" 
-            [alt]="topResult.title" 
+          <img
+            [src]="topResult.thumbnailHigh || topResult.thumbnail"
+            [alt]="topResult.title"
             (error)="onImgError($event, topResult)"
             referrerpolicy="no-referrer"
           />
           <div class="play-overlay">
-            <svg lucidePlay [attr.size]="36" *ngIf="!isCurrentTrack(topResult)"></svg>
+            <svg lucidePlay [attr.size]="30" *ngIf="!isCurrentTrack(topResult)"></svg>
             <div class="play-ripple" *ngIf="isCurrentTrack(topResult)">
               <div class="bar"></div>
               <div class="bar"></div>
@@ -43,81 +58,227 @@
           </div>
         </div>
         <div class="top-info">
+          <span class="type-badge">{{ getSectionLabel(topResult.type || 'song') }}</span>
           <h3 class="top-title">{{ topResult.title }}</h3>
-          <p class="top-meta">
-            <span class="type-badge" [class.playlist-badge]="topResult.type === 'playlist' || topResult.type === 'community-playlist'">{{ (topResult.type === 'playlist' || topResult.type === 'community-playlist') ? 'Playlist' : 'Song' }}</span>
-            <span class="dot">•</span>
-            <span class="channel-name">{{ topResult.channelTitle }}</span>
-          </p>
+          <p class="top-meta">{{ topResult.channelTitle }}</p>
         </div>
       </div>
     </div>
 
-    <!-- Other Results Section -->
-    <div class="other-results-section">
-      <h2 class="section-heading">Songs</h2>
+    <!-- Songs Section -->
+    <div class="songs-section" *ngIf="songResults.length > 0">
+      <h2 class="section-heading">
+        <svg lucideAudioLines [attr.size]="18"></svg>
+        Songs
+        <span class="count">{{ songResults.length }}</span>
+      </h2>
       <div class="song-list">
-        <div 
-          class="song-list-item" 
-          *ngFor="let track of otherResults" 
+        <div
+          class="song-list-item"
+          *ngFor="let track of songResults; let i = index"
+          [style.animation-delay.ms]="i * 25"
           [class.active]="isCurrentTrack(track)"
           (click)="onPlay(track)"
-          (contextmenu)="onRightClick($event, track)"
-        >
+          (contextmenu)="onRightClick($event, track)">
+          <div class="item-index" *ngIf="!isCurrentTrack(track)">{{ i + 1 }}</div>
+          <div class="play-ripple small" *ngIf="isCurrentTrack(track)">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          </div>
           <div class="item-thumbnail">
-            <img 
-              [src]="track.thumbnail" 
+            <img
+              [src]="track.thumbnail"
               [alt]="track.title"
+              loading="lazy"
+              decoding="async"
               (error)="onImgError($event, track)"
               referrerpolicy="no-referrer"
             />
             <div class="item-overlay">
-              <svg lucidePlay [attr.size]="20" *ngIf="!isCurrentTrack(track)"></svg>
-              <div class="play-ripple small" *ngIf="isCurrentTrack(track)">
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-              </div>
+              <svg lucidePlay [attr.size]="18"></svg>
             </div>
           </div>
           <div class="item-info">
             <h4 class="item-title">{{ track.title }}</h4>
             <p class="item-artist">{{ track.channelTitle }}</p>
           </div>
+          <span class="item-duration" *ngIf="track.duration">{{ formatDuration(track.duration) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Albums Section -->
+    <div class="shelf-section" *ngIf="albumResults.length > 0">
+      <h2 class="section-heading">
+        <svg lucideDisc3 [attr.size]="18"></svg>
+        Albums
+        <span class="count">{{ albumResults.length }}</span>
+      </h2>
+      <div class="media-shelf">
+        <div
+          class="media-card"
+          *ngFor="let album of albumResults; let i = index"
+          [style.animation-delay.ms]="i * 30"
+          (click)="onPlay(album)"
+          (contextmenu)="onRightClick($event, album)">
+          <div class="media-thumbnail">
+            <img
+              [src]="album.thumbnailHigh || album.thumbnail"
+              [alt]="album.title"
+              loading="lazy"
+              decoding="async"
+              (error)="onImgError($event, album)"
+              referrerpolicy="no-referrer"
+            />
+            <div class="play-overlay">
+              <svg lucidePlay [attr.size]="22"></svg>
+            </div>
+          </div>
+          <p class="media-title">{{ album.title }}</p>
+          <p class="media-sub">{{ album.channelTitle }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Playlists Section -->
+    <div class="shelf-section" *ngIf="playlistResults.length > 0">
+      <h2 class="section-heading">
+        <svg lucideLibrary [attr.size]="18"></svg>
+        Playlists
+        <span class="count">{{ playlistResults.length }}</span>
+      </h2>
+      <div class="media-shelf">
+        <div
+          class="media-card"
+          *ngFor="let playlist of playlistResults; let i = index"
+          [style.animation-delay.ms]="i * 30"
+          (click)="onPlay(playlist)"
+          (contextmenu)="onRightClick($event, playlist)">
+          <div class="media-thumbnail">
+            <img
+              [src]="playlist.thumbnailHigh || playlist.thumbnail"
+              [alt]="playlist.title"
+              loading="lazy"
+              decoding="async"
+              (error)="onImgError($event, playlist)"
+              referrerpolicy="no-referrer"
+            />
+            <div class="play-overlay">
+              <svg lucidePlay [attr.size]="22"></svg>
+            </div>
+          </div>
+          <p class="media-title">{{ playlist.title }}</p>
+          <p class="media-sub">{{ playlist.channelTitle }}</p>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- "Songs" Filter View: Pure List -->
+  <ng-container *ngIf="currentFilter === 'songs'">
+    <div class="pure-list-section">
+      <div class="song-list">
+        <div
+          class="song-list-item"
+          *ngFor="let track of songResults; let i = index"
+          [style.animation-delay.ms]="i * 25"
+          [class.active]="isCurrentTrack(track)"
+          (click)="onPlay(track)"
+          (contextmenu)="onRightClick($event, track)">
+          <div class="item-index" *ngIf="!isCurrentTrack(track)">{{ i + 1 }}</div>
+          <div class="play-ripple small" *ngIf="isCurrentTrack(track)">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          </div>
+          <div class="item-thumbnail">
+            <img
+              [src]="track.thumbnail"
+              [alt]="track.title"
+              loading="lazy"
+              decoding="async"
+              (error)="onImgError($event, track)"
+              referrerpolicy="no-referrer"
+            />
+            <div class="item-overlay">
+              <svg lucidePlay [attr.size]="18"></svg>
+            </div>
+          </div>
+          <div class="item-info">
+            <h4 class="item-title">{{ track.title }}</h4>
+            <p class="item-artist">{{ track.channelTitle }}</p>
+          </div>
+          <span class="item-duration" *ngIf="track.duration">{{ formatDuration(track.duration) }}</span>
         </div>
       </div>
     </div>
   </ng-container>
 
-  <!-- "Songs" or Other Filters View: Pure List -->
-  <ng-container *ngIf="currentFilter !== 'all'">
-    <div class="pure-list-section">
-      <div class="song-list">
-        <div 
-          class="song-list-item" 
-          *ngFor="let track of otherResults" 
-          [class.active]="isCurrentTrack(track)"
-          (click)="onPlay(track)"
-          (contextmenu)="onRightClick($event, track)"
-        >
-          <div class="item-thumbnail">
-            <img 
-              [src]="track.thumbnail" 
-              [alt]="track.title"
-              (error)="onImgError($event, track)"
-              referrerpolicy="no-referrer"
-            />
-            <div class="item-overlay">
-              <svg lucidePlay [attr.size]="20" *ngIf="!isCurrentTrack(track)"></svg>
-              <div class="play-ripple small" *ngIf="isCurrentTrack(track)">
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-              </div>
+  <!-- "Albums" Filter View: Responsive Grid -->
+  <ng-container *ngIf="currentFilter === 'albums'">
+    <div class="media-grid" *ngIf="albumResults.length > 0">
+      <div
+        class="media-card"
+        *ngFor="let album of albumResults; let i = index"
+        [style.animation-delay.ms]="i * 25"
+        [class.active]="isCurrentTrack(album)"
+        (click)="onPlay(album)"
+        (contextmenu)="onRightClick($event, album)">
+        <div class="media-thumbnail">
+          <img
+            [src]="album.thumbnailHigh || album.thumbnail"
+            [alt]="album.title"
+            loading="lazy"
+            decoding="async"
+            (error)="onImgError($event, album)"
+            referrerpolicy="no-referrer"
+          />
+          <div class="play-overlay">
+            <svg lucidePlay [attr.size]="26" *ngIf="!isCurrentTrack(album)"></svg>
+            <div class="play-ripple" *ngIf="isCurrentTrack(album)">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
           </div>
-          <div class="item-info">
-            <h4 class="item-title">{{ track.title }}</h4>
-            <p class="item-artist">{{ track.channelTitle }}</p>
+        </div>
+        <p class="media-title">{{ album.title }}</p>
+        <p class="media-sub">{{ album.channelTitle }}</p>
+      </div>
+    </div>
+    <div class="filter-empty" *ngIf="albumResults.length === 0">
+      <svg lucideDisc3 [attr.size]="48"></svg>
+      <h3>No albums found</h3>
+      <p>Try the "All" tab to see songs and playlists</p>
+    </div>
+  </ng-container>
+
+  <!-- "Playlists" Filter View: Responsive Grid -->
+  <ng-container *ngIf="currentFilter === 'playlists'">
+    <div class="media-grid" *ngIf="playlistResults.length > 0">
+      <div
+        class="media-card"
+        *ngFor="let playlist of playlistResults; let i = index"
+        [style.animation-delay.ms]="i * 25"
+        (click)="onPlay(playlist)"
+        (contextmenu)="onRightClick($event, playlist)">
+        <div class="media-thumbnail">
+          <img
+            [src]="playlist.thumbnailHigh || playlist.thumbnail"
+            [alt]="playlist.title"
+            loading="lazy"
+            decoding="async"
+            (error)="onImgError($event, playlist)"
+            referrerpolicy="no-referrer"
+          />
+          <div class="play-overlay">
+            <svg lucidePlay [attr.size]="26"></svg>
           </div>
         </div>
+        <p class="media-title">{{ playlist.title }}</p>
+        <p class="media-sub">{{ playlist.channelTitle }}</p>
       </div>
+    </div>
+    <div class="filter-empty" *ngIf="playlistResults.length === 0">
+      <svg lucideLibrary [attr.size]="48"></svg>
+      <h3>No playlists found</h3>
+      <p>Try the "All" tab to see songs and albums</p>
     </div>
   </ng-container>
 
