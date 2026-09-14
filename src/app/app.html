@@ -12,6 +12,10 @@
         <svg lucideHome [attr.size]="24"></svg>
         <span class="sidebar-label">Home</span>
       </div>
+      <div class="sidebar-item" (click)="openRoomsPage()" [class.active]="currentPage() === 'rooms'">
+        <svg lucideRadio [attr.size]="24"></svg>
+        <span class="sidebar-label">Rooms</span>
+      </div>
       <div class="sidebar-item" (click)="openShortsPage()" [class.active]="currentPage() === 'shorts'">
         <svg lucideFlame [attr.size]="24"></svg>
         <span class="sidebar-label">Shorts</span>

@@ -227,6 +227,25 @@ export class AlgorithmService {
     return this.profile.liked_songs.includes(videoId);
   }
 
+  // Regional genres belong to their own language (bollywood -> Hindi,
+  // punjabi -> Punjabi). If the selected language differs, drop/swap the
+  // genre so queries always return songs of the selected language.
+  private sanitizeGenreForLanguage(genre: string, language: string): string {
+    if (!genre) return '';
+    const lang = language.toLowerCase();
+    const g = genre.toLowerCase();
+    const regionalOwners: Record<string, string[]> = {
+      'hindi': ['bollywood'],
+      'punjabi': ['punjabi']
+    };
+    for (const [ownerLang, genres] of Object.entries(regionalOwners)) {
+      if (genres.includes(g) && ownerLang !== lang) {
+        return lang === 'english' ? 'pop' : '';
+      }
+    }
+    return genre;
+  }
+
   public getVariableRewardShelves(language: string = 'Hindi'): Observable<ShelfDefinition[]> {
     // Ensure taste_profile exists to prevent crashes
     if (!this.profile.taste_profile) {
@@ -254,15 +273,22 @@ export class AlgorithmService {
     const randomVibe = ['hits', 'trending', 'viral', 'best of', 'top', 'chartbusters', 'mashup', 'jukebox', 'chill', 'party'][Math.floor(Math.random() * 10)];
     
     // Pick 1-2 random top artists to mix up the suggestions
+    // Language guard: global top artists (mostly Hindi) must not bleed into
+    // English/other-language queries — YouTube search is dominated by the
+    // artist name, so "trending English songs Arijit Singh" returns Hindi songs.
     let mixModifier = '';
-    if (topArtists.length > 0) {
+    if (language === 'Hindi' && topArtists.length > 0) {
       const shuffledArtists = [...topArtists].sort(() => 0.5 - Math.random());
       mixModifier = Math.random() > 0.5 && shuffledArtists.length > 1
         ? ` ${shuffledArtists[0]} & ${shuffledArtists[1]}`
         : ` ${shuffledArtists[0]}`;
     }
-    
-    const genreModifier = topGenres.length > 0 ? ` ${topGenres[Math.floor(Math.random() * topGenres.length)]}` : '';
+
+    // Language guard: regional genres (bollywood/punjabi) return Hindi songs
+    // even when English is selected — swap them for a language-neutral genre.
+    const randomTopGenre = topGenres.length > 0 ? topGenres[Math.floor(Math.random() * topGenres.length)] : '';
+    const safeGenre = this.sanitizeGenreForLanguage(randomTopGenre, language);
+    const genreModifier = safeGenre ? ` ${safeGenre}` : '';
     
     // Add randomness to the query structure so it's not the same format every time
     const queryFormats = [
@@ -340,16 +366,15 @@ export class AlgorithmService {
           'bollywood': 'bollywood'
         };
         
-        let genreQuery = topGenres[0];
-        // Prevent regional genres from bleeding into English
-        if (language.toLowerCase() === 'english' && (genreQuery === 'bollywood' || genreQuery === 'punjabi')) {
-           genreQuery = 'pop'; 
-        } else {
-           genreQuery = genreLabels[genreQuery] || genreQuery;
+        // Regional genres only survive when they match the selected language
+        let genreQuery = this.sanitizeGenreForLanguage(topGenres[0], language);
+        if (genreQuery) {
+          genreQuery = genreLabels[genreQuery] || genreQuery;
+          madeForYouQuery = `best ${genreQuery} ${language} songs ${randomYear}`;
         }
-        
-        madeForYouQuery = `best ${genreQuery} ${language} songs ${randomYear}`;
-      } else {
+      }
+      
+      if (!madeForYouQuery) {
         const genericModifiers = ['top', 'trending', 'popular', 'best hits'];
         madeForYouQuery = `${genericModifiers[Math.floor(Math.random() * genericModifiers.length)]} ${language} songs ${randomYear}`;
       }
