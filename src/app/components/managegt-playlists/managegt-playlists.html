@@ -119,6 +119,10 @@
               </div>
             </div>
             <div class="form-actions">
+              <button class="action-btn outline" *ngIf="isYtPlaylistId(playlist.id)" (click)="refreshYtPlaylistSongs(playlist)" [disabled]="isRefreshingPlaylist">
+                <svg *ngIf="isRefreshingPlaylist" lucideRefreshCw class="spin" [attr.size]="16"></svg>
+                {{ isRefreshingPlaylist ? 'Refreshing...' : 'Refresh from YouTube' }}
+              </button>
               <button class="action-btn cancel" (click)="cancelEdit()">Cancel</button>
               <button class="action-btn primary" (click)="saveEdit(playlist)">Save Changes</button>
             </div>
@@ -172,10 +176,40 @@
 
       <div class="form-group full-width mt-4">
         <label class="flex-label">
-          <span>JSON Array of Songs</span>
-          <span class="hint">e.g. ["Song 1", "Song 2"]</span>
+          <span>Songs Source</span>
         </label>
-        <textarea [(ngModel)]="jsonInput" rows="4" placeholder='["Song 1", "Song 2"]' class="form-textarea"></textarea>
+        <div class="mode-toggle">
+          <button type="button" class="mode-btn" [class.active]="createMode === 'json'" (click)="createMode = 'json'">Songs JSON</button>
+          <button type="button" class="mode-btn" [class.active]="createMode === 'playlist'" (click)="createMode = 'playlist'">YT Playlist ID</button>
+        </div>
+
+        <div *ngIf="createMode === 'json'" class="mt-2">
+          <label class="flex-label">
+            <span>JSON Array of Songs</span>
+            <span class="hint">e.g. ["Song 1", "Song 2"]</span>
+          </label>
+          <textarea [(ngModel)]="jsonInput" rows="4" placeholder='["Song 1", "Song 2"]' class="form-textarea"></textarea>
+        </div>
+
+        <div *ngIf="createMode === 'playlist'" class="yt-playlist-mode mt-2">
+          <label class="flex-label">
+            <span>YouTube Playlist URL or ID</span>
+            <span class="hint">e.g. https://music.youtube.com/playlist?list=PLRlGpj3wHyRo OR PLRlGpj3wHyRo</span>
+          </label>
+          <div class="yt-input-row">
+            <input type="text" [(ngModel)]="ytPlaylistInput" placeholder="Paste YouTube Music playlist URL or just the ID" class="form-input" />
+            <button type="button" class="action-btn primary fetch-btn" [disabled]="isFetchingYtPlaylist || !ytPlaylistInput.trim()" (click)="fetchYtPlaylistDetails(ytPlaylistInput)">
+              <svg *ngIf="!isFetchingYtPlaylist" lucideSearch [attr.size]="16"></svg>
+              <svg *ngIf="isFetchingYtPlaylist" lucideRefreshCw class="spin" [attr.size]="16"></svg>
+              {{ isFetchingYtPlaylist ? 'Fetching...' : 'Fetch' }}
+            </button>
+          </div>
+          <div class="yt-link-preview" *ngIf="ytPlaylistId && fetchedYtSongs.length > 0">
+            <svg lucideCheck [attr.size]="14"></svg>
+            {{ fetchedYtSongs.length }} songs will be imported
+            <span class="preview-link">https://ganatube.in/playlist/{{ ytPlaylistId }}</span>
+          </div>
+        </div>
       </div>
 
       <div *ngIf="fetchError" class="error-box">

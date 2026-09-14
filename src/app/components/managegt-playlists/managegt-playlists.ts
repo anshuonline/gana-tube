@@ -41,6 +41,12 @@ export class ManagegtPlaylistsComponent implements OnInit {
   newPlaylistDate = '';
   jsonInput = '';
   newPlaylistCoverUrl = ''; // Replaced image upload with URL link
+  createMode: 'json' | 'playlist' = 'json'; // json = songs array, playlist = YouTube Playlist ID/URL
+  ytPlaylistInput = '';
+  ytPlaylistId = '';
+  fetchedYtSongs: YouTubeSearchResult[] = [];
+  isFetchingYtPlaylist = false;
+  isRefreshingPlaylist = false;
   
   // Edit State
   editingPlaylistId: string | null = null;
@@ -182,12 +188,170 @@ export class ManagegtPlaylistsComponent implements OnInit {
     }
   }
 
+  // --- YouTube Playlist ID helpers ---
+
+  isYtPlaylistId(id: string): boolean {
+    return /^(PL|RDCLAK|OLAK5uy_|VL)[a-zA-Z0-9_-]+$/.test((id || '').trim());
+  }
+
+  // Accepts a full YouTube Music URL (?list=...) or a raw playlist ID
+  extractPlaylistId(input: string): string {
+    const trimmed = (input || '').trim();
+    if (!trimmed) return '';
+    if (trimmed.includes('list=')) {
+      return trimmed.split('list=')[1].split('&')[0];
+    }
+    if (this.isYtPlaylistId(trimmed)) return trimmed;
+    return '';
+  }
+
+  // Fetches title, cover and songs from the YT playlist and auto-fills the form
+  async fetchYtPlaylistDetails(id: string): Promise<boolean> {
+    const playlistId = this.extractPlaylistId(id);
+    if (!playlistId) return false;
+    this.isFetchingYtPlaylist = true;
+    this.fetchError = '';
+    this.cdr.detectChanges();
+    try {
+      const res: any = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
+      const songs = (res && (res.preloadedSongs || res.songs)) || [];
+      if (songs.length === 0) {
+        this.fetchError = 'Could not fetch this playlist. Make sure it is public.';
+        this.isFetchingYtPlaylist = false;
+        this.cdr.detectChanges();
+        return false;
+      }
+      this.ytPlaylistId = (res && res.id) || playlistId;
+      this.fetchedYtSongs = songs;
+      // Auto-fill title and cover from the playlist (user can still edit them)
+      if (res && res.title && !this.newPlaylistTitle.trim()) {
+        this.newPlaylistTitle = res.title;
+      }
+      if (res && res.coverImage && !this.newPlaylistCoverUrl.trim()) {
+        this.newPlaylistCoverUrl = res.coverImage;
+      }
+      this.isFetchingYtPlaylist = false;
+      this.cdr.detectChanges();
+      return true;
+    } catch (e) {
+      this.fetchError = 'Could not fetch this playlist. Make sure it is public.';
+      this.isFetchingYtPlaylist = false;
+      this.cdr.detectChanges();
+      return false;
+    }
+  }
+
+  // Re-fetch songs from YouTube for a YT Playlist ID based playlist
+  async refreshYtPlaylistSongs(playlist: CustomPlaylist) {
+    if (!this.isYtPlaylistId(playlist.id)) return;
+    this.isRefreshingPlaylist = true;
+    this.cdr.detectChanges();
+    try {
+      const res: any = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlist.id));
+      const songs = (res && (res.preloadedSongs || res.songs)) || [];
+      if (songs.length > 0) {
+        playlist.songs = songs;
+        if (!playlist.coverImage && res.coverImage) playlist.coverImage = res.coverImage;
+        this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
+        await this.publishPlaylists();
+      } else {
+        this.fetchError = 'Could not refresh playlist. Make sure it is public.';
+      }
+      this.isRefreshingPlaylist = false;
+      this.cdr.detectChanges();
+    } catch (e) {
+      this.isRefreshingPlaylist = false;
+      this.fetchError = 'Failed to refresh playlist.';
+      this.cdr.detectChanges();
+    }
+  }
+
   async addPlaylist() {
     this.fetchError = '';
     this.publishMessage = '';
 
     if (!this.newPlaylistTitle.trim()) {
       this.fetchError = 'Please enter a playlist title';
+      return;
+    }
+
+    if (this.createMode === 'playlist') {
+      // ─── YouTube Playlist ID mode ───
+      if (!this.newPlaylistCoverUrl.trim()) {
+        this.fetchError = 'Please provide a cover photo link (or click Fetch to auto-fill it)';
+        return;
+      }
+
+      if (this.newPlaylistStatus === 'schedule' && !this.newPlaylistDate) {
+        this.fetchError = 'Please select a date and time for scheduled publish';
+        return;
+      }
+
+      this.isFetching = true;
+      this.fetchProgress = 0;
+      this.totalToFetch = 1;
+      this.cdr.detectChanges();
+
+      try {
+        // Fetch songs (and auto-fill title/cover) if not fetched yet
+        if (this.fetchedYtSongs.length === 0) {
+          const success = await this.fetchYtPlaylistDetails(this.ytPlaylistInput || this.ytPlaylistId);
+          if (!success) {
+            throw new Error('Could not fetch the playlist. Make sure it is public.');
+          }
+        }
+
+        const ytId = this.ytPlaylistId || this.extractPlaylistId(this.ytPlaylistInput);
+        const imageUrl = this.newPlaylistCoverUrl.trim();
+
+        if (this.editingPlaylistId) {
+          // Update existing playlist — keep name/status/cover edits
+          const index = this.currentPlaylists.findIndex(p => p.id === this.editingPlaylistId);
+          if (index > -1) {
+            this.currentPlaylists[index] = {
+              ...this.currentPlaylists[index],
+              title: this.newPlaylistTitle,
+              coverImage: imageUrl,
+              songs: this.fetchedYtSongs,
+              searchQueries: [],
+              status: this.newPlaylistStatus,
+              publishDate: this.newPlaylistStatus === 'schedule' ? new Date(this.newPlaylistDate).toISOString() : undefined
+            };
+            this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
+          }
+        } else {
+          // Create playlist using the YT Playlist ID as the playlist id so
+          // https://ganatube.in/playlist/{ytId} resolves to this playlist
+          const newPlaylist: CustomPlaylist = {
+            id: ytId,
+            title: this.newPlaylistTitle,
+            language: this.selectedLang,
+            coverImage: imageUrl,
+            searchQueries: [],
+            songs: this.fetchedYtSongs,
+            status: this.newPlaylistStatus,
+            publishDate: this.newPlaylistStatus === 'schedule' ? new Date(this.newPlaylistDate).toISOString() : undefined
+          };
+
+          if (!this.allPlaylistsData[this.selectedLang]) {
+            this.allPlaylistsData[this.selectedLang] = [];
+          }
+          this.allPlaylistsData[this.selectedLang].unshift(newPlaylist);
+          this.updateCurrentPlaylists();
+        }
+
+        this.cancelEdit();
+        this.fetchProgress = 1;
+
+        await this.publishPlaylists();
+
+        this.isFetching = false;
+        this.cdr.detectChanges();
+      } catch (e: any) {
+        this.isFetching = false;
+        this.fetchError = 'Failed to fetch playlist. ' + e.message;
+        this.cdr.detectChanges();
+      }
       return;
     }
 
@@ -397,8 +561,18 @@ export class ManagegtPlaylistsComponent implements OnInit {
       this.newPlaylistDate = '';
     }
     
-    this.jsonInput = JSON.stringify(playlist.searchQueries, null, 2);
-    
+    if (this.isYtPlaylistId(playlist.id)) {
+      // YT Playlist ID based playlist — show the ID in the YT field, no JSON needed
+      this.createMode = 'playlist';
+      this.ytPlaylistInput = playlist.id;
+      this.ytPlaylistId = playlist.id;
+      this.fetchedYtSongs = playlist.songs || [];
+      this.jsonInput = '';
+    } else {
+      this.createMode = 'json';
+      this.jsonInput = JSON.stringify(playlist.searchQueries, null, 2);
+    }
+
     // Scroll to top to see form (only if editing from main form, but we are editing inline now)
     // window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -420,6 +594,10 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.newPlaylistStatus = 'publish';
     this.newPlaylistDate = '';
     this.fetchError = '';
+    this.createMode = 'json';
+    this.ytPlaylistInput = '';
+    this.ytPlaylistId = '';
+    this.fetchedYtSongs = [];
   }
 
   drop(event: CdkDragDrop<CustomPlaylist[]>) {

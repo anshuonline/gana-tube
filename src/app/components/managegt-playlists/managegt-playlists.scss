@@ -477,6 +477,66 @@
     .form-textarea { font-family: monospace; resize: vertical; }
   }
 
+  .mode-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+
+    .mode-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { color: #fff; }
+
+      &.active {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.4);
+        color: #fff;
+      }
+    }
+  }
+
+  .yt-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+
+    .form-input { flex: 1; min-width: 0; }
+
+    .fetch-btn {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+
+  .yt-link-preview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #4ade80;
+
+    .preview-link {
+      color: rgba(255, 255, 255, 0.5);
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-left: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
   .submit-btn {
     width: 100%;
     background: #fff;
