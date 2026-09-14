@@ -251,14 +251,16 @@
 
       <!-- Progress Bar -->
       <div class="fs-progress-container">
-        <span class="fs-time">{{ formatTime(playerService.currentTime()) }}</span>
+        <span class="fs-time">{{ formatTime(displayCurrentTime) }}</span>
         <input 
           type="range" 
           class="fs-progress-bar" 
           min="0" 
           step="1"
           [max]="playerService.duration() || 100" 
-          [value]="playerService.currentTime()" 
+          [value]="displayCurrentTime" 
+          [style.background]="getProgressBackground()"
+          (input)="onScrubInput($event)"
           (change)="onSeek($event)"
         />
         <span class="fs-time">{{ formatTime(playerService.duration()) }}</span>

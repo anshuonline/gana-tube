@@ -598,9 +598,16 @@ export class PlayerService {
   }
 
   seekTo(seconds: number): void {
+    // Pin the UI at the seek position while the player buffers the new
+    // position — otherwise getCurrentTime() still reports the old time and
+    // the progress bar appears to jump back.
+    this.seekTargetTime = seconds;
+    this.seekTargetSetAt = Date.now();
+    this.currentTime.set(seconds);
+    this.broadcastToSync(true);
+    
     if (this.isPlayingOffline() && this.htmlAudio) {
       this.htmlAudio.currentTime = seconds;
-      this.broadcastToSync(true);
       if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
         this.roomService.adminSeek(seconds);
       }
@@ -609,7 +616,6 @@ export class PlayerService {
     
     if (this.ytPlayer) {
       this.ytPlayer.seekTo(seconds, true);
-      this.broadcastToSync(true);
       
       if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
         this.roomService.adminSeek(seconds);
@@ -976,6 +982,13 @@ export class PlayerService {
 
   private lastTickTime = 0;
 
+  // Seek pinning — keeps the displayed time at the seek target while buffering
+  private seekTargetTime = 0;
+  private seekTargetSetAt = 0;
+
+  // Buffered portion of the current track (0-100), like YouTube's preload bar
+  public bufferedPercent = signal<number>(0);
+
   private startProgressTracking(): void {
     this.stopProgressTracking();
     this.lastTickTime = Date.now();
@@ -990,8 +1003,23 @@ export class PlayerService {
             try {
               const cTime = typeof this.ytPlayer.getCurrentTime === 'function' ? this.ytPlayer.getCurrentTime() || 0 : 0;
               const dur = typeof this.ytPlayer.getDuration === 'function' ? this.ytPlayer.getDuration() || 0 : 0;
-              this.currentTime.set(cTime);
+              const loaded = typeof this.ytPlayer.getVideoLoadedFraction === 'function' ? (this.ytPlayer.getVideoLoadedFraction() || 0) : 0;
+
+              // While seeking, hold the UI at the seek target until the player
+              // catches up (buffering an unbuffered position reports the old time)
+              let displayTime = cTime;
+              if (this.seekTargetTime > 0) {
+                const elapsed = Date.now() - this.seekTargetSetAt;
+                if (elapsed < 5000 && Math.abs(cTime - this.seekTargetTime) > 1.5) {
+                  displayTime = this.seekTargetTime;
+                } else {
+                  this.seekTargetTime = 0;
+                }
+              }
+
+              this.currentTime.set(displayTime);
               this.duration.set(dur);
+              this.bufferedPercent.set(Math.round(loaded * 100));
             } catch (e) {
               console.error('Error reading time', e);
             }

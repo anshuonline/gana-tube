@@ -581,6 +581,15 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     return this.isScrubbing ? this.scrubTime : this.playerService.currentTime();
   }
 
+  // YouTube-style progress track: white = played, lighter = buffered/preloaded
+  getProgressBackground(): string {
+    const dur = this.playerService.duration() || 0;
+    if (dur <= 0) return 'rgba(255,255,255,0.2)';
+    const playedPct = Math.min(100, Math.max(0, (this.displayCurrentTime / dur) * 100));
+    const bufferedPct = Math.max(playedPct, Math.min(100, this.playerService.bufferedPercent()));
+    return `linear-gradient(to right, #fff 0%, #fff ${playedPct}%, rgba(255,255,255,0.4) ${playedPct}%, rgba(255,255,255,0.4) ${bufferedPct}%, rgba(255,255,255,0.2) ${bufferedPct}%, rgba(255,255,255,0.2) 100%)`;
+  }
+
   onScrubInput(event: any): void {
     this.isScrubbing = true;
     this.scrubTime = parseFloat(event.target.value);

@@ -147,6 +147,7 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       getPlayerState: () => this.players[this.activePlayerIndex]?.getPlayerState(),
       getCurrentTime: () => this.players[this.activePlayerIndex]?.getCurrentTime(),
       getDuration: () => this.players[this.activePlayerIndex]?.getDuration(),
+      getVideoLoadedFraction: () => this.players[this.activePlayerIndex]?.getVideoLoadedFraction?.() || 0,
       loadVideoById: (args: any) => {
         if (typeof args === 'string') {
           this.handleLoadVideo(args, 0);
