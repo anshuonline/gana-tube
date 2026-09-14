@@ -262,15 +262,6 @@ export class ManagegtSectionsComponent implements OnInit {
   }
 
   async addSectionFromPlaylist() {
-    if (!this.newSectionTitle.trim()) {
-      this.fetchError = 'Please provide a section title.';
-      return;
-    }
-    if (!this.ytPlaylistId.trim()) {
-      this.fetchError = 'Please provide a YouTube Playlist ID or URL.';
-      return;
-    }
-
     this.isFetching = true;
     this.fetchError = '';
     this.publishMessage = '';
@@ -281,12 +272,29 @@ export class ManagegtSectionsComponent implements OnInit {
         playlistId = playlistId.split('list=')[1].split('&')[0];
       }
 
-      const results = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
-      
-      if (results && results.length > 0) {
+      if (!playlistId) {
+        this.fetchError = 'Please provide a YouTube Playlist ID or URL.';
+        return;
+      }
+
+      // getYTPlaylist returns { id, title, coverImage, preloadedSongs }
+      const res: any = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
+      const songs = (res && (res.preloadedSongs || res.songs)) || [];
+
+      if (songs.length > 0) {
+        // Auto-fill section title from the YT playlist title (user can still edit)
+        if (!this.newSectionTitle.trim() && res && res.title) {
+          this.newSectionTitle = res.title;
+        }
+
+        if (!this.newSectionTitle.trim()) {
+          this.fetchError = 'Please provide a section title.';
+          return;
+        }
+
         this.currentSections.unshift({
           title: this.newSectionTitle.trim(),
-          songs: results,
+          songs,
           ytPlaylistId: playlistId
         });
         
@@ -322,9 +330,11 @@ export class ManagegtSectionsComponent implements OnInit {
     try {
       this.isPublishing = true;
       this.publishMessage = 'Fetching playlist...';
-      const results = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
-      if (results && results.length > 0) {
-        this.currentSections[index].songs = results;
+      // getYTPlaylist returns { id, title, coverImage, preloadedSongs }
+      const res: any = await firstValueFrom(this.youtubeApi.getYTPlaylist(playlistId));
+      const songs = (res && (res.preloadedSongs || res.songs)) || [];
+      if (songs.length > 0) {
+        this.currentSections[index].songs = songs;
         this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
         await this.publishSections();
         alert('Playlist synced successfully! Songs updated.');
