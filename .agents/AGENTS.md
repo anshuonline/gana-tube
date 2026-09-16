@@ -21,8 +21,14 @@ This project spans across two primary GitHub repositories:
 ## 4. Top-Class Engineering
 - Always act as a highly intelligent developer. Think deeply about the consequences of your actions and seek the absolute best implementation. Ask yourself "If I do this, what will happen? What is the absolute BEST way to achieve this?"
 
-## 5. UI / UX & Styling Rules
-- **Color Scheme**: Strictly maintain an **AMOLED Black** background (`#000000`) with **White** text and icons. No other colors should be used unless explicitly requested by the user, with the sole exception of **Delete buttons** (which should be red).
+## 5. UI / UX & Styling Rules (Official Design System)
+- **Official Color Palette Document**: For comprehensive guidelines, always refer to [COLOR_PALETTE.md](file:///f:/APPS/ganatube/.agents/COLOR_PALETTE.md).
+- **Color Scheme**:
+  - **Canvas / Background**: Strictly maintain an **AMOLED Black** background (`#000000`). Never use grays or light mode.
+  - **Cards & Surfaces**: AMOLED Deep Card (`#0a0a0f` / `#101016`) with subtle border `rgba(255, 255, 255, 0.08)` and glassmorphic blur.
+  - **Text Hierarchy**: Pure **White** (`#ffffff`) for primary headers/icons; `rgba(255, 255, 255, 0.7)` for secondary text; `rgba(255, 255, 255, 0.4)` for muted metadata.
+  - **Brand Accent Gradient**: Signature **Purple & Pink Gradient** (`linear-gradient(135deg, #a855f7 0%, #ec4899 100%)` / Tailwind: `from-purple-500 to-pink-500` or `from-purple-600 to-pink-600`) for primary buttons, active tabs, gradient text, and ambient glows.
+  - **Delete / Destructive Buttons (STRICT)**: **MUST ALWAYS** be **Red** (`#ef4444` / `bg-red-500/10 text-red-400 border border-red-500/20`).
 - **Component Encapsulation**: Every component must have its own dedicated `.scss` file. Do not write component-specific CSS globally inside `app.scss`.
 - **No Browser Native Popups**: **NEVER** use `alert()` or `prompt()` in production code (testing is okay, but must be removed). Always build or utilize custom UI input fields, modals, or toast notifications.
 

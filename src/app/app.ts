@@ -42,7 +42,9 @@ import { DiscoveryPageComponent } from './components/discovery-page/discovery-pa
 import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
 import { CuratedPlaylistsComponent } from './components/curated-playlists/curated-playlists';
-import { LanguageSelectModalComponent } from './components/language-select-modal/language-select-modal.component';
+  import { LanguageSelectModalComponent } from './components/language-select-modal/language-select-modal.component';
+  import { LoginPromptModalComponent } from './components/login-prompt-modal/login-prompt-modal.component';
+  import { PromoPopupModalComponent } from './components/promo-popup-modal/promo-popup-modal.component';
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { ReleaseNotesComponent } from './components/release-notes/release-notes.component';
@@ -113,6 +115,8 @@ export interface SponsoredAd {
     LucideGift,
     CuratedPlaylistsComponent,
     LanguageSelectModalComponent,
+    LoginPromptModalComponent,
+    PromoPopupModalComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
     ReleaseNotesComponent,
@@ -148,6 +152,8 @@ export class App implements OnInit {
   isRouteDone = signal<boolean>(false);
 
   showInstallModal = false;
+
+  showLoginPrompt = signal<boolean>(false);
 
   closeInstallModal() {
     this.showInstallModal = false;
@@ -1448,6 +1454,20 @@ export class App implements OnInit {
         this.showFeedbackPopup.set(true);
       }
     }, 60000);
+
+    // Login prompt popup — once every 12 hours for guests only
+    setTimeout(() => {
+      const user = this.authService.currentUser();
+      // Skip if another popup is already open to avoid stacking
+      if (user === null && !this.showInstallModal && !this.showLanguageModal()) {
+        const lastPrompt = parseInt(localStorage.getItem('gt_login_prompt_shown') || '0', 10);
+        const twelveHours = 12 * 60 * 60 * 1000;
+        if (!lastPrompt || Date.now() - lastPrompt > twelveHours) {
+          this.showLoginPrompt.set(true);
+          localStorage.setItem('gt_login_prompt_shown', Date.now().toString());
+        }
+      }
+    }, 10000);
   }
 
   fetchHeroData(): void {
@@ -2306,6 +2326,11 @@ export class App implements OnInit {
       }
       this.toastService.error("Error loading playlist");
     }
+  }
+
+  isAdminPage(): boolean {
+    const page = this.currentPage();
+    return page === 'managegt' || page === 'gtanalytic';
   }
 
   likedSongsCount(): number {

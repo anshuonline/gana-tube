@@ -1,0 +1,153 @@
+<div class="popups-page">
+
+  <header class="popups-header">
+    <div class="header-content">
+      <h2>Manage Popups</h2>
+      <p>Control the promotional popups users see across GanaTube. Each popup shows once per its frequency window.</p>
+    </div>
+    <div class="header-actions">
+      <button class="action-btn primary" (click)="startCreate()" *ngIf="!showForm">
+        <svg lucidePlus [attr.size]="16"></svg>
+        New Popup
+      </button>
+    </div>
+  </header>
+
+  <!-- Popup List -->
+  <div class="popups-list" *ngIf="!showForm">
+
+    <div class="popup-card" *ngFor="let popup of popups">
+      <div class="popup-thumb">
+        <img *ngIf="popup.imageUrl && !popup.customCode" [src]="popup.imageUrl" [alt]="popup.name" />
+        <div *ngIf="popup.customCode" class="code-badge">HTML</div>
+        <div class="image-fallback" *ngIf="!popup.imageUrl && !popup.customCode">
+          <svg lucideImage [attr.size]="22"></svg>
+        </div>
+      </div>
+
+      <div class="popup-info">
+        <div class="popup-title-row">
+          <h4>{{ popup.name }}</h4>
+          <span class="status-tag" [class.active]="popup.isActive">
+            {{ popup.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+        <p class="popup-link">
+          <svg lucideCheck [attr.size]="12"></svg>
+          {{ popup.linkUrl }}
+        </p>
+        <p class="popup-meta">Shows every {{ popup.frequencyHours }} hour(s) per user</p>
+      </div>
+
+      <div class="popup-actions">
+        <button class="icon-btn" (click)="togglePopupActive(popup)" [title]="popup.isActive ? 'Deactivate' : 'Activate'">
+          <svg lucideCheck [attr.size]="16"></svg>
+        </button>
+        <button class="icon-btn" (click)="startEdit(popup)" title="Edit Popup">
+          <svg lucideEdit3 [attr.size]="16"></svg>
+        </button>
+        <button class="icon-btn danger" (click)="deletePopup(popup.id)" title="Delete Popup">
+          <svg lucideTrash2 [attr.size]="16"></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="popups.length === 0">
+      <div class="empty-icon">
+        <svg lucideImage [attr.size]="32"></svg>
+      </div>
+      <h3>No popups configured</h3>
+      <p>Users see the default Rooms promo popup every 5 hours. Create a custom popup to override it.</p>
+      <button class="action-btn primary" (click)="startCreate()">
+        <svg lucidePlus [attr.size]="16"></svg>
+        Create First Popup
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Create / Edit Form -->
+  <div class="popup-form-container" *ngIf="showForm">
+
+    <div class="form-header">
+      <h3>{{ editingPopupId ? 'Edit Popup' : 'Create New Popup' }}</h3>
+      <button class="icon-btn" (click)="cancelForm()">
+        <svg lucideX [attr.size]="18"></svg>
+      </button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Popup Name</label>
+        <input type="text" [(ngModel)]="popupName" placeholder="e.g. Rooms Promo" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label>Frequency (Hours)</label>
+        <input type="number" min="1" max="168" [(ngModel)]="popupFrequencyHours" placeholder="5" class="form-input" />
+      </div>
+
+      <div class="form-group full-width">
+        <label class="flex-label">
+          <span>Popup Image</span>
+          <span class="hint">Upload or paste an image link</span>
+        </label>
+        <div class="image-row">
+          <input type="text" [(ngModel)]="popupImageUrl" placeholder="https://... or upload below" class="form-input" />
+          <label class="upload-btn" [class.uploading]="isUploading">
+            <svg lucideUpload [attr.size]="15"></svg>
+            {{ isUploading ? 'Uploading...' : 'Upload' }}
+            <input type="file" accept="image/*" (change)="uploadImage($event)" hidden />
+          </label>
+        </div>
+        <div class="image-preview" *ngIf="popupImageUrl">
+          <img [src]="popupImageUrl" alt="Preview" />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Link URL (where users land on click)</label>
+        <input type="text" [(ngModel)]="popupLinkUrl" placeholder="/rooms or https://..." class="form-input" />
+        <p class="field-hint">Internal links start with / (e.g. /rooms). External links open in a new tab.</p>
+      </div>
+
+      <div class="form-group full-width">
+        <label class="flex-label">
+          <span>Custom HTML Code (Optional — Advanced)</span>
+          <span class="hint">Overrides the image popup</span>
+        </label>
+        <textarea [(ngModel)]="popupCustomCode" rows="4" placeholder="<div>Custom popup content...</div>" class="form-textarea"></textarea>
+      </div>
+
+      <div class="form-group full-width toggle-row">
+        <div class="setting-info">
+          <h4>Active</h4>
+          <p>Only active popups are shown to users.</p>
+        </div>
+        <button class="toggle-switch" [class.on]="popupActive" (click)="popupActive = !popupActive">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="formError" class="error-box">
+      <svg lucideX [attr.size]="16"></svg>
+      {{ formError }}
+    </div>
+
+    <div *ngIf="saveMessage" class="success-box">
+      <svg lucideCheck [attr.size]="16"></svg>
+      {{ saveMessage }}
+    </div>
+
+    <button class="submit-btn" [disabled]="isSaving || isUploading" (click)="savePopup()">
+      <span *ngIf="!isSaving">Save Popup</span>
+      <span *ngIf="isSaving" class="loading-text">
+        <svg lucideRefreshCw class="spin" [attr.size]="18"></svg>
+        Saving...
+      </span>
+    </button>
+
+  </div>
+
+</div>

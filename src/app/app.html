@@ -927,3 +927,13 @@
   (close)="closeLanguageModal()"
   (select)="onLanguageSelect($event)">
 </app-language-select-modal>
+
+<!-- Login Prompt Modal (once every 12 hours for guests) -->
+<app-login-prompt-modal
+  *ngIf="showLoginPrompt()"
+  (close)="showLoginPrompt.set(false)"
+  (login)="showLoginPrompt.set(false); login()">
+</app-login-prompt-modal>
+
+<!-- Promo Popup (ManageGT controlled, frequency-based) -->
+<app-promo-popup-modal *ngIf="!isAdminPage()"></app-promo-popup-modal>

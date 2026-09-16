@@ -1,0 +1,15 @@
+<div class="ppm-backdrop" *ngIf="visible" (click)="dismiss()"></div>
+
+<div class="ppm-modal" *ngIf="visible" (click)="openLink()">
+  <button class="ppm-close" (click)="dismiss(); $event.stopPropagation()" aria-label="Close Popup">
+    <svg lucideX [attr.size]="16"></svg>
+  </button>
+
+  <!-- Custom HTML code override -->
+  <div class="ppm-custom" *ngIf="popup?.customCode" [innerHTML]="popup?.customCode"></div>
+
+  <!-- Image popup -->
+  <ng-container *ngIf="!popup?.customCode && popup?.imageUrl">
+    <img class="ppm-image" [src]="popup?.imageUrl" [alt]="popup?.name || 'GanaTube'" />
+  </ng-container>
+</div>
