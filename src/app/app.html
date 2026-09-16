@@ -116,10 +116,17 @@
   <!-- Main Content -->
   <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
-      
+
+      <!-- Ambient Background -->
+      <div class="profile-ambient" aria-hidden="true">
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+      </div>
+
       <!-- New Banner Layout -->
       <div class="profile-banner-wrapper">
         <div class="profile-banner" [ngClass]="'banner-bg-' + profileBannerIndex()">
+          <div class="banner-tint" aria-hidden="true"></div>
           <button class="change-banner-btn" (click)="changeProfileBanner()" title="Change Banner">
             <svg lucideImage [attr.size]="18"></svg>
           </button>
@@ -167,6 +174,25 @@
               </div>
               <p class="user-email">{{ authService.currentUser()?.email }}</p>
             </ng-container>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="profile-stats">
+          <div class="stat-chip">
+            <svg lucideHeart [attr.size]="14"></svg>
+            <span class="stat-num">{{ likedSongsCount() }}</span>
+            <span class="stat-label">Liked</span>
+          </div>
+          <div class="stat-chip">
+            <svg lucideClock [attr.size]="14"></svg>
+            <span class="stat-num">{{ recentPlaysCount() }}</span>
+            <span class="stat-label">Played</span>
+          </div>
+          <div class="stat-chip">
+            <svg lucideRadio [attr.size]="14"></svg>
+            <span class="stat-num">{{ preferredLanguages().length }}</span>
+            <span class="stat-label">Languages</span>
           </div>
         </div>
       </div>

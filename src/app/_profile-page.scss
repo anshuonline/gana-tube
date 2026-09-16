@@ -1,29 +1,72 @@
-/* --- PROFILE PAGE (New Banner Layout) --- */
+/* --- PROFILE PAGE (Ambient Black / White / Purple / Pink) --- */
 .profile-page-container {
+  position: relative;
   max-width: 100%;
   margin: 0;
-  padding: 60px 0 40px; /* Reduced top padding to let banner hit near top if possible */
+  padding: 48px 0 40px;
   animation: fadeIn 0.4s ease;
+  overflow-x: clip;
+}
+
+/* --- Ambient Background Glows --- */
+.profile-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+
+  .ambient-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.16;
+
+    &.glow-1 {
+      width: 480px;
+      height: 480px;
+      top: -180px;
+      left: -120px;
+      background: radial-gradient(circle, #8B5CF6 0%, transparent 70%);
+    }
+
+    &.glow-2 {
+      width: 420px;
+      height: 420px;
+      top: -140px;
+      right: -100px;
+      background: radial-gradient(circle, #EC4899 0%, transparent 70%);
+    }
+  }
 }
 
 /* --- Banner & Header --- */
 .profile-banner-wrapper {
   position: relative;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  z-index: 1;
 }
 
 .profile-banner {
   width: 100%;
   aspect-ratio: 21 / 9;
-  max-height: 250px;
+  max-height: 240px;
   background-size: cover;
   background-position: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
+
+  .banner-tint {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, rgba(139, 92, 246, 0.28) 0%, rgba(0, 0, 0, 0.1) 45%, rgba(236, 72, 153, 0.26) 100%);
+    mix-blend-mode: screen;
+  }
 }
 
 .banner-bg-1 {
@@ -38,10 +81,10 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: white;
   width: 36px;
   height: 36px;
@@ -52,9 +95,10 @@
   cursor: pointer;
   z-index: 10;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(139, 92, 246, 0.35);
+    border-color: rgba(139, 92, 246, 0.6);
     transform: scale(1.05);
   }
 }
@@ -63,34 +107,34 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -60px; /* Overlay on banner */
+  margin-top: -60px;
   position: relative;
   z-index: 5;
   padding: 0 24px;
-  
+
   @media (min-width: 768px) {
-    margin-top: -100px;
+    margin-top: -96px;
     padding: 0 40px;
-    /* Removed flex-direction: row and align-items: flex-end to keep it centered */
   }
 }
 
-/* --- Avatar Overlay --- */
+/* --- Avatar with Logo Gradient Ring --- */
 .avatar-wrapper {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   padding: 4px;
-  background: #000; /* Dark ring */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.35);
   flex-shrink: 0;
-  
+
   img, .avatar-placeholder {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    background: #1f1f1f;
+    background: #111;
+    border: 4px solid #000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -103,7 +147,7 @@
   text-align: center;
   margin-top: 16px;
   width: 100%;
-  
+
   @media (min-width: 768px) {
     display: flex;
     flex-direction: column;
@@ -115,10 +159,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    @media (min-width: 768px) {
-      justify-content: center;
-    }
   }
 
   .username-display {
@@ -135,7 +175,7 @@
     letter-spacing: -0.03em;
     line-height: 1.1;
   }
-  
+
   .user-email {
     color: rgba(255,255,255,0.5);
     font-size: 0.95rem;
@@ -153,27 +193,29 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    
+
     &:hover {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
+      background: rgba(236, 72, 153, 0.15);
+      color: #EC4899;
     }
   }
-  
+
   .login-action-btn {
-    padding: 10px 24px;
-    background: #fff;
-    color: #000;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    color: #fff;
     border: none;
-    border-radius: 20px;
+    border-radius: 24px;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     margin-top: 16px;
     transition: all 0.2s;
-    
+    box-shadow: 0 4px 18px rgba(236, 72, 153, 0.3);
+
     &:hover {
-      transform: scale(1.05);
+      transform: scale(1.04);
+      box-shadow: 0 6px 24px rgba(139, 92, 246, 0.4);
     }
   }
 }
@@ -185,17 +227,13 @@
   gap: 8px;
   width: 100%;
   justify-content: center;
-  
-  @media (min-width: 768px) {
-    justify-content: flex-start;
-  }
-  
+
   .edit-input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: white;
     padding: 10px 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 1.2rem;
     font-weight: 700;
     outline: none;
@@ -203,16 +241,16 @@
     transition: border-color 0.2s;
 
     &:focus {
-      border-color: #fff;
+      border-color: #EC4899;
     }
   }
 
   .save-btn {
-    background: #fff;
-    color: #000;
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    color: #fff;
     border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
     font-weight: 700;
     font-size: 0.9rem;
     cursor: pointer;
@@ -221,60 +259,121 @@
   }
 
   .cancel-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
     border: 1px solid transparent;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
     cursor: pointer;
-    &:hover { background: rgba(255,255,255,0.2); }
+    &:hover { background: rgba(255,255,255,0.16); }
   }
 }
 
+/* --- Quick Stats Chips --- */
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 0 24px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 5;
+
+  .stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 18px;
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: border-color 0.2s ease;
+
+    &:hover { border-color: rgba(236, 72, 153, 0.35); }
+
+    svg { color: #EC4899; }
+
+    .stat-num {
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+  }
+}
 
 /* --- Settings List --- */
 .profile-settings-container {
   padding: 24px;
-  max-width: 700px;
+  max-width: 720px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .settings-group {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .group-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.6);
   margin-bottom: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-left: 16px;
+  letter-spacing: 0.08em;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #8B5CF6 0%, #EC4899 100%);
+  }
 }
 
 .setting-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #111;
+  background: #0c0c0e;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  
+  border: 1px solid rgba(255,255,255,0.05);
+  border-bottom: none;
+  transition: background 0.2s ease;
+
   &:first-of-type {
-    border-radius: 12px 12px 0 0;
+    border-radius: 16px 16px 0 0;
   }
-  
+
   &:last-of-type {
-    border-radius: 0 0 12px 12px;
-    border-bottom: none;
+    border-radius: 0 0 16px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
   }
-  
+
   &.borderless {
     border-bottom: none;
-    border-radius: 12px 12px 0 0;
+    border-radius: 16px 16px 0 0;
   }
-  
+
+  &:hover {
+    background: #101013;
+  }
+
   @media (max-width: 600px) {
     flex-direction: column;
     align-items: flex-start;
@@ -283,30 +382,38 @@
 }
 
 .setting-item-full {
-  background: #111;
+  background: #0c0c0e;
   padding: 0 20px 20px;
-  border-radius: 0 0 12px 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
 }
 
-/* --- Colorful Backgrounds for Groups --- */
+/* --- Accent Tints per Group (purple / pink) --- */
 .group-audio .setting-item, .group-audio .setting-item-full {
-  background: linear-gradient(145deg, #07132e 0%, #000000 100%);
-  border-color: rgba(0, 102, 255, 0.1);
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.07) 0%, #0a0a0c 55%);
+  border-color: rgba(139, 92, 246, 0.14);
 }
 
 .group-playback .setting-item, .group-playback .setting-item-full {
-  background: linear-gradient(145deg, #0a0a0a 0%, #000000 100%);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.06) 0%, #0a0a0c 55%);
+  border-color: rgba(236, 72, 153, 0.12);
 }
 
 .group-preferences .setting-item, .group-preferences .setting-item-full {
-  background: linear-gradient(145deg, #052627 0%, #000000 100%);
-  border-color: rgba(0, 204, 204, 0.1);
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.07) 0%, #0a0a0c 55%);
+  border-color: rgba(139, 92, 246, 0.14);
 }
 
 .group-logout .setting-item {
-  background: linear-gradient(145deg, #2b0c0c 0%, #000000 100%);
-  border-color: rgba(255, 51, 51, 0.1);
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.08) 0%, #0a0a0c 55%);
+  border-color: rgba(239, 68, 68, 0.16);
+  border-radius: 16px !important;
+}
+
+.group-whatsnew .setting-item {
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.06) 0%, #0a0a0c 55%);
+  border-color: rgba(236, 72, 153, 0.12);
 }
 
 /* Toggle Switch */
@@ -339,26 +446,26 @@
   }
 
   &.on {
-    background: #fff;
-    border-color: #fff;
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    border-color: transparent;
 
     .toggle-knob {
       transform: translateX(21px);
-      background: #000;
+      background: #fff;
     }
   }
 }
 
 .setting-info {
   flex: 1;
-  
+
   h3 {
     margin: 0 0 4px 0;
     font-size: 1.1rem;
     color: #fff;
     font-weight: 600;
   }
-  
+
   p {
     margin: 0;
     font-size: 0.9rem;
@@ -371,7 +478,7 @@
 .fix-box {
   background: rgba(255,255,255,0.05);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.85rem;
   color: #e0e0e0;
   line-height: 1.6;
@@ -379,7 +486,7 @@
 }
 .warning-item {
   border-left: 4px solid #ff4d4d;
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 /* Quality Selector */
@@ -391,30 +498,32 @@
 
 .q-btn {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.16);
   padding: 8px 16px;
   border-radius: 20px;
-  color: #fff;
+  color: rgba(255,255,255,0.75);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
   }
-  
+
   &.active {
-    background: #fff;
-    color: #000;
-    border-color: #fff;
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 12px rgba(236, 72, 153, 0.35);
   }
 }
 
 /* Crossfade Duration Slider */
 .crossfade-duration {
   padding: 16px 20px 20px;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 16px 16px;
 
   .slider-header {
     display: flex;
@@ -445,7 +554,7 @@
     -webkit-appearance: none;
     height: 6px;
     border-radius: 6px;
-    background: linear-gradient(90deg, #EC4899 0%, #8B5CF6 100%);
+    background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 100%);
     outline: none;
     cursor: pointer;
 
@@ -501,16 +610,11 @@
   border-radius: 20px;
 }
 
-/* What's New Group */
-.group-whatsnew .setting-item {
-  background: linear-gradient(145deg, #0a0a0a 0%, #000000 100%);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
+/* What's New Badge */
 .new-badge {
   display: inline-block;
-  background: #fff;
-  color: #000;
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  color: #fff;
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -522,12 +626,12 @@
 
 /* Logout Item */
 .logout-item {
-  border-radius: 12px !important;
+  border-radius: 16px !important;
   cursor: pointer;
   transition: background 0.2s;
-  
+
   &:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(239, 68, 68, 0.12);
   }
 }
 

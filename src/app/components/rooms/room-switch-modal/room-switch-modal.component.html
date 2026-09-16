@@ -1,0 +1,96 @@
+<div class="rsw-backdrop" (click)="closeModal()"></div>
+<div class="rsw-modal">
+
+  <!-- Header -->
+  <div class="rsw-header">
+    <div class="rsw-title">
+      <span class="icon-badge">
+        <svg lucideArrowLeftRight [attr.size]="16"></svg>
+      </span>
+      <h3>Switch Room</h3>
+    </div>
+    <button class="btn-close" (click)="closeModal()">
+      <svg lucideX [attr.size]="18"></svg>
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="rsw-tabs">
+    <button class="rsw-tab" [class.active]="activeTab === 'public'" (click)="activeTab = 'public'">
+      <svg lucideRadio [attr.size]="14"></svg>
+      Public Rooms
+    </button>
+    <button class="rsw-tab" [class.active]="activeTab === 'code'" (click)="activeTab = 'code'">
+      <svg lucideKey [attr.size]="14"></svg>
+      Room Code
+    </button>
+  </div>
+
+  <!-- Public Rooms Tab -->
+  <div class="rsw-body" *ngIf="activeTab === 'public'">
+    <div class="rsw-search">
+      <svg lucideSearch [attr.size]="14"></svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+        placeholder="Search rooms..."
+        class="rsw-search-input"
+      />
+    </div>
+
+    <div class="rsw-rooms">
+      <div class="rsw-room" *ngFor="let room of filteredRooms()" (click)="switchToRoom(room.roomId)">
+        <div class="room-art" [class.is-playing]="!!room.currentTrack">
+          <img *ngIf="room.currentTrack" [src]="room.currentTrack.thumbnailHigh" alt="Cover">
+          <div *ngIf="!room.currentTrack" class="art-placeholder">
+            <svg lucideMusic [attr.size]="18"></svg>
+          </div>
+        </div>
+        <div class="room-info">
+          <h4 class="room-name">{{ room.name }}</h4>
+          <p class="room-host">Hosted by {{ room.adminName }}</p>
+          <p class="room-track" *ngIf="room.currentTrack">{{ room.currentTrack.title }}</p>
+        </div>
+        <div class="room-side">
+          <span class="members">
+            <svg lucideUsers [attr.size]="13"></svg>
+            {{ room.listenerCount }}
+          </span>
+          <button class="btn-switch">Switch</button>
+        </div>
+      </div>
+
+      <div class="rsw-empty" *ngIf="filteredRooms().length === 0">
+        <svg lucideRadio [attr.size]="28"></svg>
+        <p>No other public rooms live right now</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Room Code Tab -->
+  <div class="rsw-body" *ngIf="activeTab === 'code'">
+    <label class="rsw-label">Enter Room Code</label>
+    <div class="rsw-code-row">
+      <input
+        type="text"
+        [(ngModel)]="roomCode"
+        (keyup.enter)="switchByCode()"
+        placeholder="e.g. AB12CD"
+        maxlength="10"
+        class="rsw-code-input"
+      />
+    </div>
+    <button class="btn-switch-primary" (click)="switchByCode()" [disabled]="!roomCode.trim() || isSwitching">
+      {{ isSwitching ? 'Switching...' : 'Switch to Room' }}
+    </button>
+    <p class="rsw-hint">Private rooms will need the correct code. You will leave your current room.</p>
+  </div>
+
+  <!-- Status / Error -->
+  <div class="rsw-status" *ngIf="error">
+    <span class="status-dot"></span>
+    {{ error }}
+  </div>
+
+</div>

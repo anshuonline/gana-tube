@@ -32,8 +32,24 @@
 
   <div class="rooms-section" *ngIf="roomService.publicRooms().length > 0">
     <h3 class="section-label">Live Now</h3>
+
+    <!-- Room Search -->
+    <div class="rooms-search-bar">
+      <svg lucideSearch [attr.size]="16"></svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+        placeholder="Search rooms by name, host or code..."
+        class="rooms-search-input"
+      />
+      <button *ngIf="searchQuery" class="rooms-search-clear" (click)="searchQuery = ''; onSearchChange()">
+        <svg lucideX [attr.size]="14"></svg>
+      </button>
+    </div>
+
     <div class="rooms-list">
-      <div class="room-card" *ngFor="let room of roomService.publicRooms()" (click)="joinPublicRoom(room.roomId)">
+      <div class="room-card" *ngFor="let room of visibleRooms()" (click)="joinPublicRoom(room.roomId)">
 
         <div class="room-art" [class.is-playing]="!!room.currentTrack">
           <img *ngIf="room.currentTrack" [src]="room.currentTrack.thumbnailHigh" alt="Cover">
@@ -95,9 +111,26 @@
         <div class="step-text">
           <strong>Listen together</strong>
           <span>Synced music with live chat</span>
-        </div>
       </div>
     </div>
+
+    <!-- Load More (10 at a time, client-side slice of already-fetched list) -->
+    <div class="load-more-wrap" *ngIf="filteredRooms().length > visibleRooms().length">
+      <button class="btn-load-more" (click)="loadMoreRooms()" [disabled]="searchQuery.length > 0 && filteredRooms().length <= visibleRooms().length">
+        Load More
+        <span class="more-count">{{ filteredRooms().length - visibleRooms().length }} more</span>
+      </button>
+    </div>
+
+    <!-- No search results -->
+    <div class="empty-state" *ngIf="searchQuery && filteredRooms().length === 0">
+      <div class="empty-icon">
+        <svg lucideSearch [attr.size]="32"></svg>
+      </div>
+      <h3>No rooms found</h3>
+      <p>No live rooms match "{{ searchQuery }}". Try a different name or code.</p>
+    </div>
+  </div>
 
     <button class="btn-create-large" (click)="openCreateModal()">
       <svg lucidePlus [attr.size]="16"></svg>

@@ -16,6 +16,10 @@
       <button class="btn-icon-sm" (click)="showInfoModal.set(true)" title="Room Guide">
         <svg lucideInfo [attr.size]="20"></svg>
       </button>
+      <button class="btn-switch-room hide-mobile" (click)="showSwitchModal.set(true)" title="Switch Room">
+        <svg lucideArrowLeftRight [attr.size]="15"></svg>
+        Switch Room
+      </button>
       <button class="btn-members" (click)="showMembersPanel = true">
         <svg lucideUsers [attr.size]="18"></svg>
         <span>{{room.listenerCount}}</span>
@@ -31,6 +35,10 @@
         </button>
         <div class="dropdown-backdrop" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99;"></div>
         <div class="options-dropdown" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)" style="z-index: 100; position: absolute;">
+           <button class="dropdown-item" (click)="showSwitchModal.set(true)">
+             <svg lucideArrowLeftRight [attr.size]="16"></svg>
+             Switch Room
+           </button>
            <button class="dropdown-item" (click)="copyRoomCode()">
              <svg lucideCopy [attr.size]="16"></svg>
              Copy Room Code
@@ -445,5 +453,8 @@
       <p>Search for a song on YouTube to add it to the room.</p>
     </div>
   </div>
+</div>
 
+<!-- Room Switch Modal -->
+<app-room-switch-modal *ngIf="showSwitchModal()" (close)="showSwitchModal.set(false)"></app-room-switch-modal>
 

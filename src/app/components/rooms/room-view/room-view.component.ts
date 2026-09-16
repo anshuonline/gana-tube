@@ -29,12 +29,13 @@ import {
   LucideChevronUp,
   LucideInfo,
   LucideSearch,
-  LucideHeart, LucideLoader2, LucideThumbsUp
+  LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
 import { AppStateService } from '../../../services/app-state.service';
 import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.component';
+import { RoomSwitchModalComponent } from '../room-switch-modal/room-switch-modal.component';
 
 @Component({
   selector: 'app-room-view',
@@ -61,10 +62,11 @@ import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.co
     LucideChevronUp,
     LucideInfo,
     LucideSearch,
-    LucideHeart, LucideLoader2, LucideThumbsUp,
+    LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight,
     RoomMembersPanelComponent,
     TrackMenuComponent,
-    GuestNameModalComponent
+    GuestNameModalComponent,
+    RoomSwitchModalComponent
   ],
   templateUrl: './room-view.component.html',
   styleUrls: ['./room-view.component.scss']
@@ -87,6 +89,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   showEmojiPicker = false;
   mobileOptionsOpen = signal(false);
   showInfoModal = signal(false);
+  showSwitchModal = signal(false);
   showSearchModal = signal(false);
   searchQuery = '';
   searchResults: Track[] = [];

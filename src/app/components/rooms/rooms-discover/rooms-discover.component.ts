@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RoomService, RoomInfo } from '../../../services/room.service';
 import { PlayerService } from '../../../services/player.service';
@@ -7,12 +8,14 @@ import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { RoomsCreateModalComponent } from '../rooms-create-modal/rooms-create-modal.component';
 import { RoomsJoinModalComponent } from '../rooms-join-modal/rooms-join-modal.component';
-import { 
-  LucideRadio, 
-  LucideLock, 
-  LucidePlus, 
-  LucideMusic, 
-  LucideUsers 
+import {
+  LucideRadio,
+  LucideLock,
+  LucidePlus,
+  LucideMusic,
+  LucideUsers,
+  LucideSearch,
+  LucideX
 } from '@lucide/angular';
 
 import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.component';
@@ -21,12 +24,15 @@ import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.co
   selector: 'app-rooms-discover',
   standalone: true,
   imports: [
-    CommonModule, 
-    LucideRadio, 
-    LucideLock, 
-    LucidePlus, 
-    LucideMusic, 
+    CommonModule,
+    FormsModule,
+    LucideRadio,
+    LucideLock,
+    LucidePlus,
+    LucideMusic,
     LucideUsers,
+    LucideSearch,
+    LucideX,
     RoomsCreateModalComponent,
     RoomsJoinModalComponent,
     GuestNameModalComponent
@@ -44,6 +50,31 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   showCreateModal = false;
   showJoinModal = false;
   showGuestModal = false;
+
+  // Search + paginated Load More (client-side — no extra API calls, optimized)
+  searchQuery = '';
+  visibleCount = 10;
+
+  filteredRooms = computed(() => {
+    const q = this.searchQuery.trim().toLowerCase();
+    const rooms = this.roomService.publicRooms();
+    if (!q) return rooms;
+    return rooms.filter(r =>
+      (r.name || '').toLowerCase().includes(q) ||
+      (r.adminName || '').toLowerCase().includes(q) ||
+      (r.roomId || '').toLowerCase().includes(q)
+    );
+  });
+
+  visibleRooms = computed(() => this.filteredRooms().slice(0, this.visibleCount));
+
+  onSearchChange() {
+    this.visibleCount = 10;
+  }
+
+  loadMoreRooms() {
+    this.visibleCount += 10;
+  }
 
   totalListeners = computed(() =>
     this.roomService.publicRooms().reduce((sum, room) => sum + (room.listenerCount || 0), 0)
