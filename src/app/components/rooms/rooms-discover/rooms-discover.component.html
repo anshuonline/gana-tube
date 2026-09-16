@@ -38,12 +38,12 @@
       <svg lucideSearch [attr.size]="16"></svg>
       <input
         type="text"
-        [(ngModel)]="searchQuery"
-        (input)="onSearchChange()"
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
         placeholder="Search rooms by name, host or code..."
         class="rooms-search-input"
       />
-      <button *ngIf="searchQuery" class="rooms-search-clear" (click)="searchQuery = ''; onSearchChange()">
+      <button *ngIf="searchQuery()" class="rooms-search-clear" (click)="searchQuery.set(''); visibleCount.set(20)">
         <svg lucideX [attr.size]="14"></svg>
       </button>
     </div>
@@ -116,19 +116,19 @@
 
     <!-- Load More (10 at a time, client-side slice of already-fetched list) -->
     <div class="load-more-wrap" *ngIf="filteredRooms().length > visibleRooms().length">
-      <button class="btn-load-more" (click)="loadMoreRooms()" [disabled]="searchQuery.length > 0 && filteredRooms().length <= visibleRooms().length">
+      <button class="btn-load-more" (click)="loadMoreRooms()">
         Load More
         <span class="more-count">{{ filteredRooms().length - visibleRooms().length }} more</span>
       </button>
     </div>
 
     <!-- No search results -->
-    <div class="empty-state" *ngIf="searchQuery && filteredRooms().length === 0">
+    <div class="empty-state" *ngIf="searchQuery() && filteredRooms().length === 0">
       <div class="empty-icon">
         <svg lucideSearch [attr.size]="32"></svg>
       </div>
       <h3>No rooms found</h3>
-      <p>No live rooms match "{{ searchQuery }}". Try a different name or code.</p>
+      <p>No live rooms match "{{ searchQuery() }}". Try a different name or code.</p>
     </div>
   </div>
 

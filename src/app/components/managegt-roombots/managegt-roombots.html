@@ -1,40 +1,36 @@
-<div class="p-6 max-w-5xl mx-auto pb-32">
-  
-  <div class="flex items-center justify-between mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-white mb-2">Manage RoomBots</h1>
-      <p class="text-white/50">Map each bot room to a specific YouTube Playlist ID.</p>
+<div class="rb-page">
+
+  <header class="rb-header">
+    <div class="header-content">
+      <h2>Manage RoomBots</h2>
+      <p>Map each bot room to a specific YouTube Playlist ID. Bots auto-play from their mapped playlist.</p>
     </div>
-    
-    <div class="flex gap-4">
-      <button (click)="fetchConfig()" [disabled]="isFetching" 
-              class="flex items-center px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors">
-        <svg lucideRefreshCw [class.animate-spin]="isFetching" class="w-5 h-5 mr-2" [attr.size]="20"></svg>
-        Refresh
+    <div class="header-actions">
+      <button class="action-btn secondary" (click)="fetchConfig()" [disabled]="isFetching">
+        <svg lucideRefreshCw class="spin-anim" [class.spinning]="isFetching" [attr.size]="15"></svg>
+        {{ isFetching ? 'Refreshing...' : 'Refresh' }}
       </button>
-      <button (click)="saveConfig()" [disabled]="isPublishing"
-              class="flex items-center px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white transition-colors disabled:opacity-50">
-        <svg lucideSave class="w-5 h-5 mr-2" [attr.size]="20"></svg>
+      <button class="action-btn primary" (click)="saveConfig()" [disabled]="isPublishing">
+        <svg lucideSave [attr.size]="15"></svg>
         {{ isPublishing ? 'Saving...' : 'Save Config' }}
       </button>
     </div>
-  </div>
+  </header>
 
-  <div *ngIf="publishMessage" class="mb-6 p-4 rounded-xl bg-white/10 border border-white/20 text-white text-center">
+  <div class="rb-message" *ngIf="publishMessage" [class.success]="publishMessage === 'Saved successfully!'" [class.error]="publishMessage !== 'Saved successfully!'">
     {{ publishMessage }}
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div *ngFor="let id of roomPlaylists; let i = index; trackBy: trackByIndex" class="p-5 rounded-2xl bg-[#0a0a0c] border border-white/5 flex flex-col gap-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-lg font-medium text-white">Bot Room {{ i + 1 }}</h3>
+  <div class="rb-grid">
+    <div class="rb-card" *ngFor="let id of roomPlaylists; let i = index; trackBy: trackByIndex">
+      <div class="rb-card-head">
+        <span class="bot-num">{{ i + 1 }}</span>
+        <h3>Bot Room {{ i + 1 }}</h3>
       </div>
-      <div>
-        <label class="block text-sm text-white/50 mb-1">YouTube Playlist ID</label>
-        <input type="text" [(ngModel)]="roomPlaylists[i]" 
-               placeholder="e.g. PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG"
-               class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 transition-colors" />
-      </div>
+      <label class="rb-label">YouTube Playlist ID</label>
+      <input type="text" [(ngModel)]="roomPlaylists[i]"
+             placeholder="e.g. PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG"
+             class="rb-input" />
     </div>
   </div>
 

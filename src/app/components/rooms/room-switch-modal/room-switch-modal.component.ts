@@ -32,6 +32,7 @@ export class RoomSwitchModalComponent implements OnInit, OnDestroy {
   private refreshInterval: any;
 
   currentRoomId: string | null = null;
+  private targetRoomId: string | null = null;
 
   filteredRooms = signal<RoomInfo[]>([]);
 
@@ -44,7 +45,10 @@ export class RoomSwitchModalComponent implements OnInit, OnDestroy {
       this.isSwitching = false;
       this.cdr.detectChanges();
     };
+    // Only react to the TARGET room's state — the auto-join effect may
+    // briefly re-join the old room after leave, which must not navigate us back
     this.stateHandler = (state: any) => {
+      if (!this.targetRoomId || state.roomId !== this.targetRoomId) return;
       this.isSwitching = false;
       this.close.emit();
       this.router.navigate(['/rooms', state.roomId]);
@@ -104,6 +108,7 @@ export class RoomSwitchModalComponent implements OnInit, OnDestroy {
 
   private leaveAndJoin(roomId: string, joinCode: string | null) {
     this.isSwitching = true;
+    this.targetRoomId = roomId;
     this.error = 'Leaving current room...';
     this.cdr.detectChanges();
 

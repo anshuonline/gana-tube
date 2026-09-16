@@ -126,7 +126,14 @@ function setupRoomHandlers(io, socket) {
       clearTimeout(disconnectTimeouts.get(user.uid));
       disconnectTimeouts.delete(user.uid);
     }
-    
+
+    // Room switching: if the socket is already in another room, leave it first
+    // so the old room stops emitting events to this socket
+    const activeRoomId = socketToRoom.get(socket.id);
+    if (activeRoomId && activeRoomId !== roomId) {
+      handleRoomDisconnect(io, socket.id, true);
+    }
+
     let room = rooms.get(roomId);
     if (!room) {
       for (const [rid, r] of rooms.entries()) {

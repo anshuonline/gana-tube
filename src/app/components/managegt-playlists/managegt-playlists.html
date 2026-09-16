@@ -1,38 +1,37 @@
-<div class="page-container">
-  
+<div class="pl-page">
+
   <!-- MASTER VIEW (List of Playlists) -->
   <ng-container *ngIf="activePlaylistIndex === null">
-    <header class="page-header">
+    <header class="pl-header">
       <div class="header-content">
         <h2>Manage Custom Playlists</h2>
         <p>Curate custom playlists with your own cover arts and release schedules.</p>
       </div>
+      <div class="header-actions">
+        <button class="action-btn secondary" (click)="saveOrder()" *ngIf="currentPlaylists.length > 0">
+          <svg lucideSave [attr.size]="15"></svg>
+          Save Order
+        </button>
+        <button class="action-btn danger" (click)="deleteAllPlaylists()">
+          <svg lucideTrash [attr.size]="15"></svg>
+          Delete All
+        </button>
+      </div>
     </header>
 
-    <div class="controls-bar">
+    <div class="pl-controls">
       <div class="lang-selector">
-        <button 
-          *ngFor="let lang of languages" 
+        <button
+          *ngFor="let lang of languages"
           (click)="onLangChange(lang)"
           [class.active]="selectedLang === lang"
           class="lang-btn">
           {{ lang }}
         </button>
       </div>
-      
-      <div class="header-actions">
-        <button class="action-btn outline" (click)="saveOrder()" *ngIf="currentPlaylists.length > 0">
-          <svg lucideSave [attr.size]="18"></svg>
-          Save Order
-        </button>
-        <button class="action-btn danger outline" (click)="deleteAllPlaylists()">
-          <svg lucideTrash [attr.size]="18"></svg>
-          Delete All
-        </button>
-      </div>
     </div>
 
-    <div class="playlists-list-container">
+    <div class="pl-list-container">
       <div class="list-header">
         <div class="header-left">
           <span class="count-badge">{{ currentPlaylists.length }}</span>
@@ -40,56 +39,56 @@
         </div>
         <div class="header-right" *ngIf="publishMessage">
           <span class="success-msg">
-            <svg lucideCheck [attr.size]="16"></svg>
+            <svg lucideCheck [attr.size]="14"></svg>
             {{ publishMessage }}
           </span>
         </div>
       </div>
 
       <div class="playlists-list" cdkDropList (cdkDropListDropped)="drop($event)">
-        
-        <div *ngFor="let playlist of currentPlaylists; let pIndex = index" 
+
+        <div *ngFor="let playlist of currentPlaylists; let pIndex = index"
              cdkDrag
-             class="playlist-card" 
+             class="playlist-card"
              [class.editing]="editingPlaylistId === playlist.id"
              (click)="editingPlaylistId !== playlist.id ? openPlaylist(pIndex) : null">
-             
+
           <!-- Playlist Header (when not editing) -->
           <div class="playlist-header" *ngIf="editingPlaylistId !== playlist.id">
             <div class="header-left">
               <div cdkDragHandle class="drag-handle" (click)="$event.stopPropagation()">
-                <svg lucideGripVertical [attr.size]="20"></svg>
+                <svg lucideGripVertical [attr.size]="18"></svg>
               </div>
               <img [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover">
               <div class="title-group">
                 <h4>{{ playlist.title }}</h4>
                 <div class="meta-tags">
                   <span class="tag songs-tag">
-                    <svg lucideMusic [attr.size]="12"></svg>
+                    <svg lucideMusic [attr.size]="11"></svg>
                     {{ playlist.songs.length }} songs
                   </span>
                   <span class="tag status-tag" [ngClass]="playlist.status">
-                    <svg *ngIf="playlist.status === 'schedule'" lucideClock [attr.size]="12"></svg>
+                    <svg *ngIf="playlist.status === 'schedule'" lucideClock [attr.size]="11"></svg>
                     {{ playlist.status | titlecase }}
                     <span *ngIf="playlist.status === 'schedule' && playlist.publishDate">
                       - {{ playlist.publishDate | date:'medium' }}
                     </span>
                   </span>
                   <span class="tag copy-tag" (click)="copyShareLink(playlist.id, $event)">
-                    <svg *ngIf="copiedPlaylistId() !== playlist.id" lucideCopy [attr.size]="12"></svg>
-                    <svg *ngIf="copiedPlaylistId() === playlist.id" lucideCheck [attr.size]="12"></svg>
+                    <svg *ngIf="copiedPlaylistId() !== playlist.id" lucideCopy [attr.size]="11"></svg>
+                    <svg *ngIf="copiedPlaylistId() === playlist.id" lucideCheck [attr.size]="11"></svg>
                     {{ copiedPlaylistId() === playlist.id ? 'Copied!' : 'Copy Link' }}
                   </span>
                 </div>
               </div>
             </div>
-            
+
             <div class="header-right" (click)="$event.stopPropagation()">
               <button class="icon-btn" (click)="startEdit(playlist)" title="Edit Settings">
-                <svg lucideEdit2 [attr.size]="20"></svg>
+                <svg lucideEdit2 [attr.size]="16"></svg>
               </button>
               <button class="icon-btn danger" (click)="deletePlaylist(playlist.id)" title="Delete Playlist">
-                <svg lucideTrash2 [attr.size]="20"></svg>
+                <svg lucideTrash2 [attr.size]="16"></svg>
               </button>
             </div>
           </div>
@@ -119,8 +118,8 @@
               </div>
             </div>
             <div class="form-actions">
-              <button class="action-btn outline" *ngIf="isYtPlaylistId(playlist.id)" (click)="refreshYtPlaylistSongs(playlist)" [disabled]="isRefreshingPlaylist">
-                <svg *ngIf="isRefreshingPlaylist" lucideRefreshCw class="spin" [attr.size]="16"></svg>
+              <button class="action-btn secondary" *ngIf="isYtPlaylistId(playlist.id)" (click)="refreshYtPlaylistSongs(playlist)" [disabled]="isRefreshingPlaylist">
+                <svg *ngIf="isRefreshingPlaylist" lucideRefreshCw class="pl-spinning" [attr.size]="14"></svg>
                 {{ isRefreshingPlaylist ? 'Refreshing...' : 'Refresh from YouTube' }}
               </button>
               <button class="action-btn cancel" (click)="cancelEdit()">Cancel</button>
@@ -129,21 +128,22 @@
           </div>
 
         </div>
-        
+
       </div>
 
-      <div *ngIf="currentPlaylists.length === 0" class="empty-state">
+      <div class="pl-empty" *ngIf="currentPlaylists.length === 0">
         <div class="empty-icon">
-          <svg lucideMusic [attr.size]="32"></svg>
+          <svg lucideMusic [attr.size]="30"></svg>
         </div>
         <p>No custom playlists for {{ selectedLang }}. Create one below!</p>
       </div>
     </div>
 
-    <div class="create-playlist-container">
+    <!-- Create New Playlist -->
+    <div class="pl-create-container">
       <div class="create-header">
         <div class="create-icon">
-          <svg lucidePlus [attr.size]="20"></svg>
+          <svg lucidePlus [attr.size]="16"></svg>
         </div>
         <h3>Create New Playlist</h3>
       </div>
@@ -174,7 +174,7 @@
         </div>
       </div>
 
-      <div class="form-group full-width mt-4">
+      <div class="form-group full-width">
         <label class="flex-label">
           <span>Songs Source</span>
         </label>
@@ -183,7 +183,7 @@
           <button type="button" class="mode-btn" [class.active]="createMode === 'playlist'" (click)="createMode = 'playlist'">YT Playlist ID</button>
         </div>
 
-        <div *ngIf="createMode === 'json'" class="mt-2">
+        <div *ngIf="createMode === 'json'">
           <label class="flex-label">
             <span>JSON Array of Songs</span>
             <span class="hint">e.g. ["Song 1", "Song 2"]</span>
@@ -191,7 +191,7 @@
           <textarea [(ngModel)]="jsonInput" rows="4" placeholder='["Song 1", "Song 2"]' class="form-textarea"></textarea>
         </div>
 
-        <div *ngIf="createMode === 'playlist'" class="yt-playlist-mode mt-2">
+        <div *ngIf="createMode === 'playlist'" class="yt-playlist-mode">
           <label class="flex-label">
             <span>YouTube Playlist URL or ID</span>
             <span class="hint">e.g. https://music.youtube.com/playlist?list=PLRlGpj3wHyRo OR PLRlGpj3wHyRo</span>
@@ -199,13 +199,13 @@
           <div class="yt-input-row">
             <input type="text" [(ngModel)]="ytPlaylistInput" placeholder="Paste YouTube Music playlist URL or just the ID" class="form-input" />
             <button type="button" class="action-btn primary fetch-btn" [disabled]="isFetchingYtPlaylist || !ytPlaylistInput.trim()" (click)="fetchYtPlaylistDetails(ytPlaylistInput)">
-              <svg *ngIf="!isFetchingYtPlaylist" lucideSearch [attr.size]="16"></svg>
-              <svg *ngIf="isFetchingYtPlaylist" lucideRefreshCw class="spin" [attr.size]="16"></svg>
+              <svg *ngIf="!isFetchingYtPlaylist" lucideSearch [attr.size]="14"></svg>
+              <svg *ngIf="isFetchingYtPlaylist" lucideRefreshCw class="pl-spinning" [attr.size]="14"></svg>
               {{ isFetchingYtPlaylist ? 'Fetching...' : 'Fetch' }}
             </button>
           </div>
           <div class="yt-link-preview" *ngIf="ytPlaylistId && fetchedYtSongs.length > 0">
-            <svg lucideCheck [attr.size]="14"></svg>
+            <svg lucideCheck [attr.size]="13"></svg>
             {{ fetchedYtSongs.length }} songs will be imported
             <span class="preview-link">https://ganatube.in/playlist/{{ ytPlaylistId }}</span>
           </div>
@@ -213,7 +213,7 @@
       </div>
 
       <div *ngIf="fetchError" class="error-box">
-        <svg lucideX [attr.size]="18"></svg>
+        <svg lucideX [attr.size]="15"></svg>
         {{ fetchError }}
       </div>
 
@@ -227,7 +227,7 @@
       <button class="submit-btn" [disabled]="isFetching || isUploading || isPublishing" (click)="addPlaylist()">
         <span *ngIf="!isFetching && !isUploading && !isPublishing">Create Playlist</span>
         <span *ngIf="isFetching || isUploading || isPublishing" class="loading-text">
-          <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          <svg lucideRefreshCw class="spin" [attr.size]="17"></svg>
           Processing...
         </span>
       </button>
@@ -236,12 +236,12 @@
 
   <!-- DETAIL VIEW (Split Screen) -->
   <div class="detail-view" *ngIf="activePlaylistIndex !== null">
-    
+
     <!-- LEFT PANEL: Playlist Contents -->
     <div class="detail-left">
       <div class="detail-header">
         <button class="back-btn" (click)="closePlaylist()">
-          <svg lucideArrowLeft [attr.size]="24"></svg>
+          <svg lucideArrowLeft [attr.size]="18"></svg>
         </button>
         <div class="title-group-detail">
           <img [src]="currentPlaylists[activePlaylistIndex].coverImage" class="detail-cover" />
@@ -262,11 +262,11 @@
               <div class="song-artist">{{ song.channelTitle }}</div>
             </div>
             <button class="icon-btn danger-subtle" (click)="deleteSongFromPlaylist(songIndex)" title="Remove Song">
-              <svg lucideTrash2 [attr.size]="18"></svg>
+              <svg lucideTrash2 [attr.size]="15"></svg>
             </button>
           </div>
 
-          <div *ngIf="currentPlaylists[activePlaylistIndex].songs.length === 0" class="empty-state">
+          <div class="empty-state-small" *ngIf="currentPlaylists[activePlaylistIndex].songs.length === 0">
             <p>No songs in this playlist. Search and add from the right panel.</p>
           </div>
         </div>
@@ -282,41 +282,41 @@
 
         <div class="search-bar-wrapper">
           <div class="search-input-box">
-            <svg lucideSearch class="search-icon" [attr.size]="20"></svg>
-            <input 
-              type="text" 
-              [(ngModel)]="searchQuery" 
+            <svg lucideSearch class="search-icon" [attr.size]="16"></svg>
+            <input
+              type="text"
+              [(ngModel)]="searchQuery"
               (keyup.enter)="performSongSearch()"
-              placeholder="Search YouTube..." 
+              placeholder="Search YouTube..."
               class="search-input"
               autofocus
             />
             <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; searchResults = []">
-              <svg lucideX [attr.size]="16"></svg>
+              <svg lucideX [attr.size]="13"></svg>
             </button>
           </div>
           <button class="search-btn" (click)="performSongSearch()" [disabled]="isSearchingSongs || !searchQuery.trim()">
             <span *ngIf="!isSearchingSongs">Search</span>
-            <svg *ngIf="isSearchingSongs" lucideRefreshCw class="spin" [attr.size]="20"></svg>
+            <svg *ngIf="isSearchingSongs" lucideRefreshCw class="spin" [attr.size]="16"></svg>
           </button>
         </div>
 
         <div class="search-results-area">
-          <div *ngIf="!hasSearchedSongs" class="empty-state-small">
-            <svg lucideSearch [attr.size]="40"></svg>
+          <div class="empty-state-small" *ngIf="!hasSearchedSongs">
+            <svg lucideSearch [attr.size]="32"></svg>
             <p>Search for a song to add it to "{{ currentPlaylists[activePlaylistIndex].title }}"</p>
           </div>
 
-          <div *ngIf="isSearchingSongs" class="loading-state">
-            <svg lucideRefreshCw class="spin big" [attr.size]="40"></svg>
+          <div class="loading-state" *ngIf="isSearchingSongs">
+            <svg lucideRefreshCw class="spin" [attr.size]="28"></svg>
             <p>Searching...</p>
           </div>
 
-          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length === 0" class="empty-state-small">
+          <div class="empty-state-small" *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length === 0">
             <p>No results found for "{{searchQuery}}".</p>
           </div>
 
-          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length > 0" class="results-list">
+          <div class="results-list" *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length > 0">
             <div class="result-item" *ngFor="let result of searchResults">
               <img [src]="result.thumbnail" [alt]="result.title" class="result-thumb">
               <div class="result-info">
@@ -324,7 +324,7 @@
                 <div class="result-artist">{{ result.channelTitle }}</div>
               </div>
               <button class="add-btn" (click)="addSongToPlaylist(result)">
-                <svg lucidePlus [attr.size]="18"></svg>
+                <svg lucidePlus [attr.size]="14"></svg>
                 Add
               </button>
             </div>

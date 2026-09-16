@@ -1,75 +1,85 @@
-<div class="page-container">
-  
+<div class="sec-page">
+
   <!-- MASTER VIEW (List of Sections) -->
   <ng-container *ngIf="activeSectionIndex === null">
-    <header class="page-header">
+    <header class="sec-header">
       <div class="header-content">
         <h2>Manage Custom Sections</h2>
         <p>Create and curate custom music sections for the homepage.</p>
       </div>
+      <div class="header-actions">
+        <button class="action-btn danger" (click)="deleteAllSections()">
+          <svg lucideTrash [attr.size]="15"></svg>
+          Delete All
+        </button>
+      </div>
     </header>
 
-    <div class="controls-bar">
+    <div class="sec-controls">
       <div class="lang-selector">
-        <button 
-          *ngFor="let lang of languages" 
+        <button
+          *ngFor="let lang of languages"
           (click)="selectedLanguage = lang; updateCurrentSections()"
           [class.active]="selectedLanguage === lang"
           class="lang-btn">
           {{ lang }}
         </button>
       </div>
-      
-      <button class="delete-all-btn" (click)="deleteAllSections()">
-        <svg lucideTrash [attr.size]="18"></svg>
-        Delete All
-      </button>
     </div>
 
-    <div class="sections-list-container">
-      <div class="section-count">
-        <span class="count-badge">{{ currentSections.length }}</span>
-        <h3>Active Sections</h3>
+    <div class="sec-list-container">
+      <div class="list-header">
+        <div class="header-left">
+          <span class="count-badge">{{ currentSections.length }}</span>
+          <h3>Active Sections</h3>
+        </div>
+        <div class="header-right" *ngIf="publishMessage">
+          <span class="success-msg">{{ publishMessage }}</span>
+        </div>
       </div>
 
       <div class="sections-list" cdkDropList (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let section of currentSections; let secIndex = index" 
+        <div *ngFor="let section of currentSections; let secIndex = index"
              cdkDrag
              class="section-card"
              (click)="openSection(secIndex)">
-             
-          <div class="section-header">
-            <div class="header-left">
+
+          <div class="section-row">
+            <div class="row-left">
               <div cdkDragHandle class="drag-handle" (click)="$event.stopPropagation()">
-                <svg lucideGripVertical [attr.size]="20"></svg>
+                <svg lucideGripVertical [attr.size]="18"></svg>
               </div>
               <div class="title-group">
                 <h4>{{ section.title }}</h4>
-                <span class="song-count">{{ section.songs.length }} songs</span>
+                <span class="song-count">
+                  <svg lucideMusic [attr.size]="11"></svg>
+                  {{ section.songs.length }} songs
+                </span>
               </div>
             </div>
-            
-            <div class="header-right" (click)="$event.stopPropagation()">
+
+            <div class="row-right" (click)="$event.stopPropagation()">
               <button class="icon-btn danger" (click)="deleteSection(secIndex)" title="Delete Section">
-                <svg lucideTrash2 [attr.size]="20"></svg>
+                <svg lucideTrash2 [attr.size]="15"></svg>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div *ngIf="currentSections.length === 0" class="empty-state">
+      <div class="sec-empty" *ngIf="currentSections.length === 0">
         <div class="empty-icon">
-          <svg lucideSearch [attr.size]="32"></svg>
+          <svg lucideSearch [attr.size]="30"></svg>
         </div>
         <p>No custom sections for {{ selectedLanguage }}. Create one below!</p>
       </div>
     </div>
 
-    <div class="create-section-container">
+    <!-- Create New Section -->
+    <div class="sec-create-container">
       <div class="create-header">
         <div class="create-icon">
-          <svg lucidePlus [attr.size]="20"></svg>
+          <svg lucidePlus [attr.size]="16"></svg>
         </div>
         <h3>Create New Section</h3>
       </div>
@@ -90,11 +100,20 @@
           <span>JSON Array or Objects</span>
           <span class="hint">e.g. ["Song 1"] OR [{{ '{' }}"section_name": "Name", "songs": ["Song 1"]{{ '}' }}]</span>
         </label>
-        <textarea [(ngModel)]="jsonInput" rows="6" placeholder='e.g. ["Song 1"] OR [{"section_name": "Name", "songs": ["Song 1"]}]' class="form-textarea"></textarea>
+        <textarea [(ngModel)]="jsonInput" rows="5" placeholder='e.g. ["Song 1"] OR [{"section_name": "Name", "songs": ["Song 1"]}]' class="form-textarea"></textarea>
+      </div>
+
+      <!-- Playlist Mode Inputs -->
+      <div class="form-group" *ngIf="createMode === 'playlist'">
+        <label class="flex-label">
+          <span>YouTube Playlist URL or ID</span>
+          <span class="hint">Songs are imported from the playlist</span>
+        </label>
+        <input type="text" [(ngModel)]="ytPlaylistId" placeholder="e.g. https://music.youtube.com/playlist?list=PL... or just the ID" class="form-input" />
       </div>
 
       <div *ngIf="fetchError" class="error-box">
-        <svg lucideX [attr.size]="18"></svg>
+        <svg lucideX [attr.size]="15"></svg>
         {{ fetchError }}
       </div>
 
@@ -109,22 +128,16 @@
       <button *ngIf="createMode === 'json'" class="submit-btn" [disabled]="isFetching || isPublishing" (click)="addSection()">
         <span *ngIf="!isFetching && !isPublishing">Fetch & Publish Section</span>
         <span *ngIf="isFetching || isPublishing" class="loading-text">
-          <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          <svg lucideRefreshCw class="spin" [attr.size]="17"></svg>
           Processing...
         </span>
       </button>
-
-      <!-- Playlist Mode Inputs -->
-      <div class="form-group" *ngIf="createMode === 'playlist'">
-        <label>YouTube Playlist ID or URL</label>
-        <input type="text" [(ngModel)]="ytPlaylistId" placeholder="e.g. PL... or https://youtube.com/playlist?list=PL..." class="form-input" />
-      </div>
 
       <!-- Button for Playlist mode -->
       <button *ngIf="createMode === 'playlist'" class="submit-btn" [disabled]="isFetching || isPublishing" (click)="addSectionFromPlaylist()">
         <span *ngIf="!isFetching && !isPublishing">Import & Publish Playlist</span>
         <span *ngIf="isFetching || isPublishing" class="loading-text">
-          <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
+          <svg lucideRefreshCw class="spin" [attr.size]="17"></svg>
           Processing...
         </span>
       </button>
@@ -138,28 +151,32 @@
 
   <!-- DETAIL VIEW (Split Screen) -->
   <div class="detail-view" *ngIf="activeSectionIndex !== null">
-    
+
     <!-- LEFT PANEL: Section Contents -->
     <div class="detail-left">
       <div class="detail-header">
         <button class="back-btn" (click)="closeSection()">
-          <svg lucideArrowLeft [attr.size]="24"></svg>
+          <svg lucideArrowLeft [attr.size]="18"></svg>
         </button>
-        <div class="title-group">
+        <div class="title-group-detail">
           <h2>{{ currentSections[activeSectionIndex].title }}</h2>
           <span class="badge">{{ currentSections[activeSectionIndex].songs.length }} Songs</span>
         </div>
       </div>
 
-      <div class="section-playlist-link">
-         <label style="display:block; margin-bottom: 8px; font-weight: 500;">Linked YT Playlist (Optional)</label>
-         <div style="display:flex; gap:10px; margin-bottom: 20px;">
-            <input type="text" [(ngModel)]="currentSections[activeSectionIndex].ytPlaylistId" placeholder="Paste YT Playlist Link/ID to sync" class="form-input" style="margin-bottom:0;">
-            <button class="submit-btn" style="width:auto; padding: 0 16px; margin-top:0;" [disabled]="isPublishing" (click)="syncSectionWithPlaylist(activeSectionIndex)">
-              <span *ngIf="!isPublishing">Sync / Fetch</span>
-              <span *ngIf="isPublishing">Syncing...</span>
-            </button>
-         </div>
+      <!-- Linked YT Playlist -->
+      <div class="playlist-link-box">
+        <label class="link-label">Linked YT Playlist (Optional)</label>
+        <div class="link-row">
+          <input type="text" [(ngModel)]="currentSections[activeSectionIndex].ytPlaylistId" placeholder="Paste YT Playlist Link/ID to sync" class="form-input" />
+          <button class="sync-btn" [disabled]="isPublishing" (click)="syncSectionWithPlaylist(activeSectionIndex)">
+            <span *ngIf="!isPublishing">Sync / Fetch</span>
+            <span *ngIf="isPublishing" class="loading-text">
+              <svg lucideRefreshCw class="spin" [attr.size]="14"></svg>
+              Syncing...
+            </span>
+          </button>
+        </div>
       </div>
 
       <div class="songs-list-container">
@@ -171,12 +188,12 @@
               <div class="song-title">{{ song.title }}</div>
               <div class="song-artist">{{ song.channelTitle }}</div>
             </div>
-            <button class="icon-btn danger-subtle" (click)="deleteSongFromSection(songIndex)" title="Remove Song">
-              <svg lucideTrash2 [attr.size]="18"></svg>
+            <button class="icon-btn danger" (click)="deleteSongFromSection(songIndex)" title="Remove Song">
+              <svg lucideTrash2 [attr.size]="15"></svg>
             </button>
           </div>
 
-          <div *ngIf="currentSections[activeSectionIndex].songs.length === 0" class="empty-state">
+          <div class="empty-state-small" *ngIf="currentSections[activeSectionIndex].songs.length === 0">
             <p>No songs in this section. Search and add from the right panel.</p>
           </div>
         </div>
@@ -192,41 +209,46 @@
 
         <div class="search-bar-wrapper">
           <div class="search-input-box">
-            <svg lucideSearch class="search-icon" [attr.size]="20"></svg>
-            <input 
-              type="text" 
-              [(ngModel)]="searchQuery" 
+            <svg lucideSearch class="search-icon" [attr.size]="16"></svg>
+            <input
+              type="text"
+              [(ngModel)]="searchQuery"
               (keyup.enter)="performSongSearch()"
-              placeholder="Search YouTube..." 
+              placeholder="Search YouTube..."
               class="search-input"
               autofocus
             />
             <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; searchResults = []">
-              <svg lucideX [attr.size]="16"></svg>
+              <svg lucideX [attr.size]="13"></svg>
             </button>
           </div>
           <button class="search-btn" (click)="performSongSearch()" [disabled]="isSearchingSongs || !searchQuery.trim()">
             <span *ngIf="!isSearchingSongs">Search</span>
-            <svg *ngIf="isSearchingSongs" lucideRefreshCw class="spin" [attr.size]="20"></svg>
+            <svg *ngIf="isSearchingSongs" lucideRefreshCw class="spin" [attr.size]="16"></svg>
           </button>
         </div>
 
         <div class="search-results-area" (scroll)="onSearchScroll($event)">
-          <div *ngIf="!hasSearchedSongs" class="empty-state-small">
-            <svg lucideSearch [attr.size]="40"></svg>
+          <div class="empty-state-small" *ngIf="!hasSearchedSongs">
+            <svg lucideSearch [attr.size]="32"></svg>
             <p>Search for a song to add it to "{{ currentSections[activeSectionIndex].title }}"</p>
           </div>
 
-          <div *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length === 0" class="empty-state-small">
+          <div class="loading-state" *ngIf="isSearchingSongs">
+            <svg lucideRefreshCw class="spin" [attr.size]="28"></svg>
+            <p>Searching...</p>
+          </div>
+
+          <div class="empty-state-small" *ngIf="hasSearchedSongs && !isSearchingSongs && searchResults.length === 0">
             <p>No results found for "{{searchQuery}}".</p>
           </div>
 
-          <div *ngIf="hasSearchedSongs && searchResults.length > 0" class="results-list compact">
-            <div class="result-item" *ngFor="let result of searchResults" 
+          <div class="results-list" *ngIf="hasSearchedSongs && searchResults.length > 0">
+            <div class="result-item" *ngFor="let result of searchResults"
                  [class.selected]="selectedSongs.has(result.videoId)"
                  (click)="toggleSongSelection(result)">
               <div class="checkbox">
-                <svg *ngIf="selectedSongs.has(result.videoId)" lucideCheck [attr.size]="14"></svg>
+                <svg *ngIf="selectedSongs.has(result.videoId)" lucideCheck [attr.size]="13"></svg>
               </div>
               <img [src]="result.thumbnail" [alt]="result.title" class="result-thumb">
               <div class="result-info">
@@ -234,9 +256,9 @@
                 <div class="result-artist">{{ result.channelTitle }}</div>
               </div>
             </div>
-            
-            <div *ngIf="isSearchingSongs" class="loading-state lazy-loader">
-              <svg lucideRefreshCw class="spin" [attr.size]="24"></svg>
+
+            <div class="lazy-loader" *ngIf="isSearchingSongs">
+              <svg lucideRefreshCw class="spin" [attr.size]="20"></svg>
               <p>Loading more...</p>
             </div>
           </div>
@@ -244,9 +266,9 @@
 
         <!-- Sticky Bulk Add Bar -->
         <div class="bulk-add-bar" *ngIf="selectedSongs.size > 0">
-          <span>{{ selectedSongs.size }} selected</span>
+          <span class="bulk-count">{{ selectedSongs.size }} selected</span>
           <button class="add-selected-btn" (click)="addSelectedSongsToSection()">
-            <svg lucidePlus [attr.size]="18"></svg>
+            <svg lucidePlus [attr.size]="15"></svg>
             Add Selected
           </button>
         </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { LucideUsers, LucideMail, LucideCalendar, LucideMusic, LucideHeart, LucideLanguages, LucideChevronDown, LucideChevronUp } from '@lucide/angular';
+  import { LucideUsers, LucideMail, LucideCalendar, LucideMusic, LucideHeart, LucideLanguages, LucideChevronDown, LucideChevronUp, LucideRefreshCw } from '@lucide/angular';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
@@ -17,8 +17,9 @@ interface UserData {
 @Component({
   selector: 'app-managegt-users',
   standalone: true,
-  imports: [CommonModule, LucideUsers, LucideMail, LucideCalendar, LucideMusic, LucideHeart, LucideLanguages, LucideChevronDown, LucideChevronUp],
-  templateUrl: './managegt-users.html'
+  imports: [CommonModule, LucideUsers, LucideMail, LucideCalendar, LucideMusic, LucideHeart, LucideLanguages, LucideChevronDown, LucideChevronUp, LucideRefreshCw],
+  templateUrl: './managegt-users.html',
+  styleUrls: ['./managegt-users.scss']
 })
 export class ManagegtUsersComponent implements OnInit {
   users = signal<UserData[]>([]);

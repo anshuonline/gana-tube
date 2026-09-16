@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -52,11 +52,11 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
   showGuestModal = false;
 
   // Search + paginated Load More (client-side — no extra API calls, optimized)
-  searchQuery = '';
-  visibleCount = 10;
+  searchQuery = signal<string>('');
+  visibleCount = signal<number>(20);
 
   filteredRooms = computed(() => {
-    const q = this.searchQuery.trim().toLowerCase();
+    const q = this.searchQuery().trim().toLowerCase();
     const rooms = this.roomService.publicRooms();
     if (!q) return rooms;
     return rooms.filter(r =>
@@ -66,14 +66,15 @@ export class RoomsDiscoverComponent implements OnInit, OnDestroy {
     );
   });
 
-  visibleRooms = computed(() => this.filteredRooms().slice(0, this.visibleCount));
+  visibleRooms = computed(() => this.filteredRooms().slice(0, this.visibleCount()));
 
-  onSearchChange() {
-    this.visibleCount = 10;
+  onSearchInput(event: any) {
+    this.searchQuery.set(event.target.value);
+    this.visibleCount.set(20);
   }
 
   loadMoreRooms() {
-    this.visibleCount += 10;
+    this.visibleCount.update(v => v + 10);
   }
 
   totalListeners = computed(() =>

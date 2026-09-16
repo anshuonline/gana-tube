@@ -27,6 +27,14 @@ export class ManagegtLayoutComponent implements OnInit {
 
   groups: SidebarGroup[] = [
     {
+      key: 'dashboard',
+      label: 'Dashboard',
+      icon: 'home',
+      links: [
+        { path: '/managegt/dashboard', label: 'Overview', icon: 'home' }
+      ]
+    },
+    {
       key: 'content',
       label: 'Content',
       icon: 'layers',

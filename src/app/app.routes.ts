@@ -24,12 +24,13 @@ export const routes: Routes = [
   { path: 'gtanalytic', loadComponent: () => import('./components/analytics-page/analytics-page.component').then(m => m.AnalyticsPageComponent) },
   { path: ':id', children: [] },
 
-  { 
-    path: 'managegt', 
+  {
+    path: 'managegt',
     loadComponent: () => import('./components/managegt-layout/managegt-layout').then(m => m.ManagegtLayoutComponent),
     children: [
-      { path: '', redirectTo: 'sections', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'login', loadComponent: () => import('./components/managegt-login/managegt-login').then(m => m.ManagegtLoginComponent) },
+      { path: 'dashboard', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-dashboard/managegt-dashboard').then(m => m.ManagegtDashboardComponent) },
       { path: 'sections/discovery', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-discovery/managegt-discovery').then(m => m.ManagegtDiscoveryComponent) },
       { path: 'sections', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-sections/managegt-sections').then(m => m.ManagegtSectionsComponent) },
       { path: 'roombots', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-roombots/managegt-roombots').then(m => m.ManagegtRoombotsComponent) },

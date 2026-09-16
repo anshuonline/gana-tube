@@ -1,0 +1,164 @@
+<div class="dash-page">
+
+  <!-- Page Header -->
+  <header class="dash-header">
+    <div>
+      <h2>Dashboard</h2>
+      <p>Overview of your content, promos and publishing status across GanaTube.</p>
+    </div>
+    <button class="action-btn secondary" (click)="loadDashboard()" [disabled]="isLoading">
+      <svg lucideRefreshCw class="spin-anim" [class.spinning]="isLoading" [attr.size]="15"></svg>
+      {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+    </button>
+  </header>
+
+  <!-- Loading -->
+  <div class="dash-loading" *ngIf="isLoading">
+    <svg lucideRefreshCw class="spinning big" [attr.size]="32"></svg>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="dash-error" *ngIf="loadError && !isLoading">
+    {{ loadError }}
+  </div>
+
+  <ng-container *ngIf="!isLoading && !loadError">
+
+    <!-- Stat Cards -->
+    <div class="stat-grid">
+      <div class="stat-card accent-purple">
+        <div class="stat-icon">
+          <svg lucideMusic [attr.size]="20"></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ totalPlaylists }}</span>
+          <span class="stat-label">Total Playlists</span>
+          <span class="stat-sub">{{ publishedPlaylists }} published · {{ scheduledPlaylists }} scheduled</span>
+        </div>
+      </div>
+
+      <div class="stat-card accent-pink">
+        <div class="stat-icon">
+          <svg lucideLayoutGrid [attr.size]="20"></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ totalSections }}</span>
+          <span class="stat-label">Custom Sections</span>
+          <span class="stat-sub">{{ totalSectionSongs }} songs curated</span>
+        </div>
+      </div>
+
+      <div class="stat-card accent-violet">
+        <div class="stat-icon">
+          <svg lucideImage [attr.size]="20"></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ totalPopups }}</span>
+          <span class="stat-label">Popups</span>
+          <span class="stat-sub">{{ activePopups }} active</span>
+        </div>
+      </div>
+
+      <div class="stat-card accent-blue">
+        <div class="stat-icon">
+          <svg lucideUsers [attr.size]="20"></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">Users</span>
+          <span class="stat-label">Analytics</span>
+          <span class="stat-sub">View registered users</span>
+        </div>
+        <a routerLink="/managegt/users" class="stat-link-overlay" aria-label="Open Users"></a>
+      </div>
+    </div>
+
+    <!-- Lists + Quick Actions -->
+    <div class="dash-grid">
+
+      <!-- Recently Published -->
+      <div class="dash-card">
+        <div class="card-head">
+          <h3>
+            <svg lucideMusic [attr.size]="15"></svg>
+            Recently Published
+          </h3>
+          <a routerLink="/managegt/playlists" class="card-action">Manage
+            <svg lucideArrowRight [attr.size]="13"></svg>
+          </a>
+        </div>
+
+        <div class="row-list">
+          <div class="data-row" *ngFor="let p of recentPlaylists" (click)="openPlaylistRow(p.id)">
+            <span class="row-title">{{ p.title }}</span>
+            <span class="row-tag published">Published</span>
+          </div>
+          <div class="row-empty" *ngIf="recentPlaylists.length === 0">
+            <p>No published playlists yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Schedule -->
+      <div class="dash-card">
+        <div class="card-head">
+          <h3>
+            <svg lucideClock [attr.size]="15"></svg>
+            Upcoming Schedule
+          </h3>
+          <a routerLink="/managegt/playlists" class="card-action">Manage
+            <svg lucideArrowRight [attr.size]="13"></svg>
+          </a>
+        </div>
+
+        <div class="row-list">
+          <div class="data-row" *ngFor="let p of upcomingScheduled">
+            <span class="row-title">{{ p.title }}</span>
+            <span class="row-tag scheduled">{{ p.publishDate | date:'MMM d, h:mm a' }}</span>
+          </div>
+          <div class="row-empty" *ngIf="upcomingScheduled.length === 0">
+            <p>No scheduled playlists.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3 class="qa-title">Quick Actions</h3>
+      <div class="qa-grid">
+        <a routerLink="/managegt/playlists" class="qa-card">
+          <span class="qa-icon pink">
+            <svg lucideMusic [attr.size]="18"></svg>
+          </span>
+          <span class="qa-name">Manage Playlists</span>
+          <span class="qa-sub">Create, edit and publish</span>
+        </a>
+        <a routerLink="/managegt/sections" class="qa-card">
+          <span class="qa-icon purple">
+            <svg lucideLayoutGrid [attr.size]="18"></svg>
+          </span>
+          <span class="qa-name">Manage Sections</span>
+          <span class="qa-sub">Curate homepage sections</span>
+        </a>
+        <a routerLink="/managegt/popups" class="qa-card">
+          <span class="qa-icon violet">
+            <svg lucideImage [attr.size]="18"></svg>
+          </span>
+          <span class="qa-name">Manage Popups</span>
+          <span class="qa-sub">Promo popups control</span>
+        </a>
+        <a routerLink="/managegt/roombots" class="qa-card">
+          <span class="qa-icon blue">
+            <svg lucideRadio [attr.size]="18"></svg>
+          </span>
+          <span class="qa-name">Manage RoomBots</span>
+          <span class="qa-sub">Bot room playlists</span>
+        </a>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>
