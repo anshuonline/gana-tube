@@ -153,7 +153,41 @@ async function getBotSongs() {
   return mapped;
 }
 
-initBotRooms(io, getBotSongs);
+  async function fetchRoombotsConfig() {
+    try {
+      const response = await fetch('http://localhost/manageads/managegt-api.php?action=get_roombots');
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      console.warn('Failed to fetch roombots config from API, using fallback', e.message);
+      return [];
+    }
+  }
+
+  async function getPlaylistSongs(playlistId) {
+    if (!playlistId) return [];
+    try {
+      const yt = await getYTMusic();
+      let pid = playlistId.startsWith('VL') ? playlistId.substring(2) : playlistId;
+      const videos = await yt.getPlaylistVideos(pid);
+      return (videos || []).map(song => ({
+        videoId: song.videoId,
+        title: song.name || song.title,
+        channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : 'Unknown Artist'),
+        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
+        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
+        duration: parseDurationToSeconds(song.duration),
+        publishedAt: new Date().toISOString()
+      }));
+    } catch (e) {
+      console.warn(`Failed to fetch playlist ${playlistId} for bots:`, e.message);
+      return [];
+    }
+  }
+
+  fetchRoombotsConfig().then(roombotsConfig => {
+    initBotRooms(io, getBotSongs, roombotsConfig, getPlaylistSongs);
+  });
 
 // ─── Smart Query Enhancement ────────────────────────────────────────────────
 // ytmusic-api's search is biased toward the server's regional language (Hindi).

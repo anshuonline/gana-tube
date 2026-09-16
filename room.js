@@ -504,7 +504,16 @@ const BOT_NAMES = [
   'Harsh', 'Anaya', 'Rishi', 'Kiara', 'Mohit', 'Aisha', 'Sameer', 'Trisha',
   'Abhay', 'Nandini', 'Kunal', 'Ira', 'Parth', 'Myra', 'Dhruv', 'Sara',
   // A few foreign names in the mix
-  'Liam', 'Emma', 'Noah', 'Sofia', 'Lucas', 'Mia', 'Ethan', 'Chloe', 'Aiden', 'Zoe', 'Leo', 'Ivy'
+  'Liam', 'Emma', 'Noah', 'Sofia', 'Lucas', 'Mia', 'Ethan', 'Chloe', 'Aiden', 'Zoe', 'Leo', 'Ivy',
+  // New names to reach 120
+  'Armaan', 'Roshni', 'Sahil', 'Mehak', 'Ayaan', 'Gauri', 'Reyansh', 'Ishita',
+  'Vedant', 'Navya', 'Vihaan', 'Avni', 'Rudra', 'Tanvi', 'Shaurya', 'Diya',
+  'Kiaan', 'Sanya', 'Arnav', 'Riddhi', 'Ahaan', 'Shruti', 'Ishaan', 'Jiya',
+  'Darsh', 'Tara', 'Ayush', 'Raina', 'Ritik', 'Prisha', 'Samar', 'Kriti',
+  'Aakash', 'Suhana', 'Nakul', 'Aadhya', 'Ranveer', 'Niharika', 'Sanjay', 'Payal',
+  'Vijay', 'Mahi', 'Ajay', 'Aarti', 'Amit', 'Swati', 'Suraj', 'Sonam',
+  'Raj', 'Anita', 'Sunil', 'Jyoti', 'Anand', 'Seema', 'Suresh', 'Bhumika',
+  'Gaurav', 'Pallavi', 'Akshay', 'Ritika', 'Manoj', 'Neelam'
 ];
 
 const ROOM_NAME_PATTERNS = [
@@ -524,7 +533,7 @@ const BOT_CHAT_LINES = [
   'old is gold', 'this playlist never disappoints'
 ];
 
-const BOT_ROOM_COUNT = 6;
+const BOT_ROOM_COUNT = 10;
 const BOT_POOL_REFRESH_MS = 30 * 60 * 1000; // refresh song pool every 30 min
 
 const botRooms = new Set(); // roomIds managed by bots
@@ -532,6 +541,9 @@ let botTrackPool = [];
 let botSongsProvider = null;
 let botPoolRefreshedAt = 0;
 let botTickerStarted = false;
+let botPlaylistProvider = null;
+let botRoomsConfig = [];
+let botPlaylistCache = {};
 
 // ytmusic-api returns "3:30" style strings, frontend uses seconds — normalize here
 function parseDurationToSeconds(d) {
@@ -563,17 +575,26 @@ function fallbackBotTracks() {
   }));
 }
 
-function pickBotTracks() {
+function pickBotTracks(roomIndex) {
+  if (roomIndex !== undefined && botPlaylistCache[roomIndex] && botPlaylistCache[roomIndex].length > 0) {
+    return botPlaylistCache[roomIndex];
+  }
   return botTrackPool.length > 0 ? botTrackPool : fallbackBotTracks();
 }
 
 function createBotRoom(io, admin, listeners, namePatternIdx, roomIndex) {
   const roomId = nanoid(6).toUpperCase();
   roomStats.totalCreated++;
-  // Rotate the shared pool so every bot room starts on a DIFFERENT track
-  const shuffled = [...pickBotTracks()].sort(() => 0.5 - Math.random());
-  const offset = shuffled.length > 0 ? roomIndex % shuffled.length : 0;
-  const pool = [...shuffled.slice(offset), ...shuffled.slice(0, offset)];
+  const allTaken = new Set();
+  for (const rId of botRooms) {
+    const r = rooms.get(rId);
+    if (r) {
+      if (r.currentTrack) allTaken.add(r.currentTrack.videoId);
+      r.queue.forEach(t => allTaken.add(t.videoId));
+    }
+  }
+  const available = pickBotTracks(roomIndex).filter(t => !allTaken.has(t.videoId));
+  const pool = available.length > 6 ? available.sort(() => 0.5 - Math.random()) : pickBotTracks(roomIndex).sort(() => 0.5 - Math.random());
   const room = {
     roomId,
     name: ROOM_NAME_PATTERNS[namePatternIdx % ROOM_NAME_PATTERNS.length](admin.displayName),
@@ -594,7 +615,8 @@ function createBotRoom(io, admin, listeners, namePatternIdx, roomIndex) {
     chat: [],
     recommendations: [],
     listenerCount: listeners.length + 1,
-    _isBotRoom: true
+    _isBotRoom: true,
+    _botRoomIndex: roomIndex
   };
   rooms.set(roomId, room);
   botRooms.add(roomId);
@@ -604,23 +626,41 @@ function createBotRoom(io, admin, listeners, namePatternIdx, roomIndex) {
 async function refreshBotPool(force = false) {
   if (!botSongsProvider) return;
   if (!force && botPoolRefreshedAt > 0 && Date.now() - botPoolRefreshedAt < BOT_POOL_REFRESH_MS) return;
+  
   try {
     const tracks = await botSongsProvider();
     if (tracks && tracks.length > 0) {
       botTrackPool = tracks;
-      botPoolRefreshedAt = Date.now();
     }
   } catch (e) {
-    console.warn('Bot track pool refresh failed, keeping old pool:', e.message);
+    console.warn('Bot track pool refresh failed:', e.message);
   }
+
+  if (botPlaylistProvider && botRoomsConfig && botRoomsConfig.length > 0) {
+    for (let i = 0; i < botRoomsConfig.length; i++) {
+      const pid = botRoomsConfig[i];
+      if (!pid) continue;
+      try {
+        const pTracks = await botPlaylistProvider(pid);
+        if (pTracks && pTracks.length > 0) {
+          botPlaylistCache[i] = pTracks;
+        }
+      } catch (e) {}
+    }
+  }
+
+  botPoolRefreshedAt = Date.now();
 }
 
 function hasRealListeners(room) {
   return room.members.some(m => !m.uid.startsWith('bot_'));
 }
 
-function initBotRooms(io, provider) {
+function initBotRooms(io, provider, config = [], playlistProvider = null) {
   botSongsProvider = provider;
+  botRoomsConfig = config;
+  botPlaylistProvider = playlistProvider;
+  
   refreshBotPool(true).then(() => {
     // 60 bots shuffled, distributed across 6 rooms (7-13 per room, leftovers join random rooms)
     const bots = [...BOT_NAMES].sort(() => 0.5 - Math.random())
@@ -661,25 +701,29 @@ function startBotTicker(io) {
       room.currentTime += 1;
       if (room.currentTime >= dur) {
         // Track ended — play next (queue first, then random from pool)
-        const pool = pickBotTracks();
+        const pool = pickBotTracks(room._botRoomIndex);
+        const taken = new Set();
+        for (const otherId of botRooms) {
+          if (otherId === roomId) continue;
+          const other = rooms.get(otherId);
+          if (other) {
+            if (other.currentTrack) taken.add(other.currentTrack.videoId);
+            other.queue.forEach(t => taken.add(t.videoId));
+          }
+        }
+
         if (room.queue.length > 0) {
           room.currentTrack = room.queue.shift();
         } else {
-          // Prefer a track that NO other bot room is currently playing (keeps rooms varied)
-          const taken = new Set();
-          for (const otherId of botRooms) {
-            if (otherId === roomId) continue;
-            const other = rooms.get(otherId);
-            if (other?.currentTrack) taken.add(other.currentTrack.videoId);
-          }
           const free = pool.filter(t => !taken.has(t.videoId) && t.videoId !== room.currentTrack?.videoId);
           const candidates = free.length > 0 ? free : pool;
           room.currentTrack = candidates[Math.floor(Math.random() * candidates.length)];
         }
-        const nextUp = pool[Math.floor(Math.random() * pool.length)];
-        if (!room.queue.some(t => t.videoId === nextUp.videoId) && nextUp.videoId !== room.currentTrack.videoId) {
-          room.queue.push(nextUp);
-        }
+        
+        const freeForQueue = pool.filter(t => !taken.has(t.videoId) && t.videoId !== room.currentTrack?.videoId && !room.queue.some(q => q.videoId === t.videoId));
+        const qCandidates = freeForQueue.length > 0 ? freeForQueue : pool;
+        const nextUp = qCandidates[Math.floor(Math.random() * qCandidates.length)];
+        room.queue.push(nextUp);
         room.currentTime = 0;
         // Keep real listeners in sync with the new track
         io.to(roomId).emit('room:track_changed', { track: room.currentTrack });
@@ -696,8 +740,13 @@ function startBotTicker(io) {
     const moveCount = 1 + Math.floor(Math.random() * 2);
     for (let i = 0; i < moveCount; i++) {
       const fromId = roomIds[Math.floor(Math.random() * roomIds.length)];
+      const toId = roomIds[Math.floor(Math.random() * roomIds.length)];
+      if (fromId === toId) continue;
+
       const from = rooms.get(fromId);
-      if (!from) continue;
+      const to = rooms.get(toId);
+      if (!from || !to) continue;
+
       const botMembers = from.members.filter(m => m.uid.startsWith('bot_') && !m.isAdmin);
       if (botMembers.length <= 4) continue; // keep a minimum crowd in every room
 
@@ -706,13 +755,9 @@ function startBotTicker(io) {
       from.listenerCount = from.members.length;
       io.to(fromId).emit('room:member_left', { members: from.members, listenerCount: from.listenerCount });
 
-      const toId = roomIds[Math.floor(Math.random() * roomIds.length)];
-      const to = rooms.get(toId);
-      if (to && toId !== fromId) {
-        to.members.push(mover);
-        to.listenerCount = to.members.length;
-        io.to(toId).emit('room:member_joined', { members: to.members, listenerCount: to.listenerCount });
-      }
+      to.members.push(mover);
+      to.listenerCount = to.members.length;
+      io.to(toId).emit('room:member_joined', { members: to.members, listenerCount: to.listenerCount });
     }
 
     // 2) Random bot drops a chat message

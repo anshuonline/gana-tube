@@ -32,6 +32,7 @@ export const routes: Routes = [
       { path: 'login', loadComponent: () => import('./components/managegt-login/managegt-login').then(m => m.ManagegtLoginComponent) },
       { path: 'sections/discovery', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-discovery/managegt-discovery').then(m => m.ManagegtDiscoveryComponent) },
       { path: 'sections', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-sections/managegt-sections').then(m => m.ManagegtSectionsComponent) },
+      { path: 'roombots', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-roombots/managegt-roombots').then(m => m.ManagegtRoombotsComponent) },
       { path: 'playlists', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-playlists/managegt-playlists').then(m => m.ManagegtPlaylistsComponent) },
       { path: 'header', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-header/managegt-header').then(m => m.ManagegtHeaderComponent) },
       { path: 'users', canActivate: [managegtAuthGuard], loadComponent: () => import('./components/managegt-users/managegt-users').then(m => m.ManagegtUsersComponent) }
