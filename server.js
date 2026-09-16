@@ -469,6 +469,32 @@ app.get('/api/playlist', async (req, res) => {
       playlistId = playlistId.substring(2);
     }
     
+    if (playlistId.startsWith('RD')) {
+      const data = await yt.constructRequest('next', { playlistId, isAudioOnly: true });
+      const queueRenderer = data.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer;
+      const contents = queueRenderer?.content?.playlistPanelRenderer?.contents || [];
+      const subtitle = queueRenderer?.header?.musicQueueHeaderRenderer?.subtitle?.runs?.[0]?.text || 'YouTube Mix';
+      
+      let songs = contents.map(item => item.playlistPanelVideoRenderer).filter(Boolean).map(item => ({
+        videoId: item.videoId,
+        title: item.title?.runs?.[0]?.text || 'Unknown',
+        channelTitle: item.shortBylineText?.runs?.map(r => r.text).join('') || 'Unknown Artist',
+        thumbnail: item.thumbnail?.thumbnails?.[0]?.url || '',
+        thumbnailHigh: item.thumbnail?.thumbnails?.at(-1)?.url || '',
+        duration: parseDurationToSeconds(item.lengthText?.runs?.[0]?.text || '0:00'),
+        publishedAt: new Date().toISOString()
+      }));
+
+      return res.json({
+        id: playlistId,
+        title: subtitle,
+        creator: 'YouTube Music',
+        coverImage: songs.length > 0 ? songs[0].thumbnailHigh : '',
+        searchQueries: [],
+        preloadedSongs: songs
+      });
+    }
+
     // Get playlist metadata
     const playlist = await yt.getPlaylist(playlistId);
     
