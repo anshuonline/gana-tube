@@ -177,7 +177,22 @@ async function getBotSongs() {
       if (pid.startsWith('VL')) {
         pid = pid.substring(2);
       }
-      const videos = await yt.getPlaylistVideos(pid);
+      
+      let videos = [];
+      if (pid.startsWith('RD')) {
+        const data = await yt.constructRequest('next', { playlistId: pid, isAudioOnly: true });
+        const contents = data.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents || [];
+        videos = contents.map(item => item.playlistPanelVideoRenderer).filter(Boolean).map(item => ({
+          videoId: item.videoId,
+          name: item.title?.runs?.[0]?.text || 'Unknown',
+          artist: item.shortBylineText?.runs?.map(r => r.text).join('') || 'Unknown Artist',
+          thumbnails: item.thumbnail?.thumbnails || [],
+          duration: item.lengthText?.runs?.[0]?.text || '0:00'
+        }));
+      } else {
+        videos = await yt.getPlaylistVideos(pid);
+      }
+      
       return (videos || []).map(song => ({
         videoId: song.videoId,
         title: song.name || song.title,
