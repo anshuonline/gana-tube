@@ -20,9 +20,10 @@ import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { AnalyticsService } from './services/analytics.service';
 import { AppStateService } from './services/app-state.service';
+import { SearchHistoryService } from './services/search-history.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil, filter, catchError } from 'rxjs/operators';
+import { takeUntil, filter, catchError } from 'rxjs/operators';
 import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, RouterModule, ActivatedRoute } from '@angular/router';
 import { PAGE_CONTENT } from './data/static-pages';
 import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
@@ -142,6 +143,8 @@ export class App implements OnInit {
   results = signal<YouTubeSearchResult[]>([]);
   isLoading = signal<boolean>(false);
   hasSearched = signal<boolean>(false);
+  hasMoreSongs = signal<boolean>(true);
+  noMoreResultsCount = 0;
   isFullScreenPlayerVisible = signal<boolean>(false);
   isCarModeVisible = signal<boolean>(false);
   apiKeyMissing = false;
@@ -319,7 +322,6 @@ export class App implements OnInit {
   carouselIndex = 0;
   private carouselInterval: any;
 
-  private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
   private hoverPreviewAudio: HTMLAudioElement | null = null;
@@ -709,6 +711,7 @@ export class App implements OnInit {
     private cdr: ChangeDetectorRef,
     public userService: UserService,
     public appState: AppStateService,
+    public searchHistory: SearchHistoryService,
     private domSanitizer: DomSanitizer
   ) {
     this.router.events.subscribe(event => {
@@ -1405,17 +1408,6 @@ export class App implements OnInit {
 
     this.apiKeyMissing = false;
 
-    this.searchSubject
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((query) => {
-        if (!query) {
-          this.results.set([]);
-          this.hasSearched.set(false);
-          return;
-        }
-        this.performSearch(query);
-      });
-
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const videoId = params.get('v') || params.get('play');
       if (videoId) {
@@ -1770,7 +1762,11 @@ export class App implements OnInit {
   }
 
   onSearch(query: string): void {
-    this.searchSubject.next(query);
+    const q = query.trim();
+    if (!q) return;
+    this.searchHistory.add(q);
+    this.executeSearchApi(q);
+    this.performSearch(q);
   }
 
   onSuggestSearch(query: string): void {
@@ -1885,9 +1881,11 @@ export class App implements OnInit {
   executeSearchApi(query: string): void {
     this.currentQuery = query;
     this.lazyLoadPage = 0;
+    this.noMoreResultsCount = 0;
     this.isLoading.set(true);
     this.hasSearched.set(true);
     this.results.set([]);
+    this.hasMoreSongs.set(true);
 
     if (this.searchFilter() === 'albums') {
       this.youtubeApi.searchMusic(query, 50, 'album').pipe(takeUntil(this.destroy$)).subscribe({
@@ -1932,6 +1930,7 @@ export class App implements OnInit {
       });
 
       Promise.all([communityPromise, ytPromise]).then(([communityResults, ytResults]) => {
+        if (this.currentQuery !== query) return;
         // Interleave or just concat
         this.results.set([...communityResults, ...ytResults]);
         this.isLoading.set(false);
@@ -1941,14 +1940,39 @@ export class App implements OnInit {
 
     // Default YouTube Search (Songs / All)
     if (this.searchFilter() === 'all') {
-      // In "All" mode, fetch songs + albums + playlists in parallel for a structured overview
-      const songsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
-        this.youtubeApi.searchMusic(query, 40, 'song').pipe(takeUntil(this.destroy$)).subscribe({
-          next: (res) => resolve(res),
-          error: () => resolve([])
-        });
+      // Optimized streaming: render Songs the moment they arrive, then enrich
+      // with Albums & Playlists in the background instead of blocking on all 4 requests.
+      let songsList: YouTubeSearchResult[] = [];
+      let albumsList: YouTubeSearchResult[] = [];
+      let plsList: YouTubeSearchResult[] = [];
+
+      const merge = () => {
+        const topPlaylist = plsList[0] || null;
+        const restPlaylists = plsList.slice(1);
+        const combined = topPlaylist
+          ? [topPlaylist, ...songsList, ...albumsList, ...restPlaylists]
+          : [...songsList, ...albumsList, ...plsList];
+        this.results.set(combined);
+      };
+
+      // 1. Songs first — fastest perceived results
+      this.youtubeApi.searchMusic(query, 50, 'song').pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => {
+          if (this.currentQuery !== query) return; // stale response guard
+          songsList = res || [];
+          this.hasMoreSongs.set(songsList.length >= 40);
+          merge();
+          this.isLoading.set(false);
+        },
+        error: () => {
+          if (this.currentQuery !== query) return;
+          songsList = [];
+          merge();
+          this.isLoading.set(false);
+        },
       });
 
+      // 2. Album matches
       const albumsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
         this.youtubeApi.searchMusic(query, 20, 'album').pipe(takeUntil(this.destroy$)).subscribe({
           next: (res) => resolve(res),
@@ -1956,7 +1980,7 @@ export class App implements OnInit {
         });
       });
 
-      // Fetch playlist matches (community + YT Music)
+      // 3. Playlist matches (community + YT Music)
       const playlistUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
 
       const communityPlaylistPromise = fetch(`${playlistUrl}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
@@ -1983,22 +2007,18 @@ export class App implements OnInit {
         });
       });
 
-      Promise.all([songsPromise, albumsPromise, communityPlaylistPromise, ytPlaylistsPromise]).then(([songs, albums, communityPls, ytPls]) => {
-        // Structured order: best playlist (top result) first, then songs, albums, remaining playlists
-        const allPlaylists = [...communityPls, ...ytPls];
-        const topPlaylist = allPlaylists[0] || null;
-        const restPlaylists = allPlaylists.slice(1);
-        const combined = topPlaylist
-          ? [topPlaylist, ...songs, ...albums, ...restPlaylists]
-          : [...songs, ...albums, ...allPlaylists];
-        this.results.set(combined);
-        this.isLoading.set(false);
+      Promise.all([albumsPromise, communityPlaylistPromise, ytPlaylistsPromise]).then(([albums, communityPls, ytPls]) => {
+        if (this.currentQuery !== query) return; // stale response guard
+        albumsList = albums;
+        plsList = [...communityPls, ...ytPls];
+        merge();
       });
     } else {
       // Songs-only filter
       this.youtubeApi.searchMusic(query, 50, 'song').pipe(takeUntil(this.destroy$)).subscribe({
         next: (res) => {
-          this.results.set(res);
+          this.results.set(res || []);
+          this.hasMoreSongs.set((res || []).length >= 40);
           this.isLoading.set(false);
         },
         error: () => {
@@ -2478,7 +2498,7 @@ export class App implements OnInit {
 
 
   loadMoreResults(): void {
-    if (!this.currentQuery) {
+    if (!this.currentQuery || this.isLazyLoading()) {
       return;
     }
 
@@ -2499,7 +2519,15 @@ export class App implements OnInit {
         const existingIds = new Set(currentItems.map(item => item.videoId));
         const uniqueNewItems = newItems.filter(item => !existingIds.has(item.videoId));
 
-        this.results.set([...currentItems, ...uniqueNewItems]);
+        if (uniqueNewItems.length === 0) {
+          this.noMoreResultsCount++;
+          if (this.noMoreResultsCount >= 2) {
+            this.hasMoreSongs.set(false);
+          }
+        } else {
+          this.noMoreResultsCount = 0;
+          this.results.set([...currentItems, ...uniqueNewItems]);
+        }
         this.isLazyLoading.set(false);
       },
       error: () => {

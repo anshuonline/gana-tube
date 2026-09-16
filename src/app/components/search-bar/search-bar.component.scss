@@ -110,6 +110,12 @@
       color: #ff3b30;
       background: rgba(255, 59, 48, 0.1);
     }
+
+    &.loading {
+      color: #a855f7;
+      cursor: wait;
+      background: rgba(168, 85, 247, 0.12);
+    }
   }
 }
 
@@ -148,12 +154,92 @@
     .item-icon {
       color: rgba(255, 255, 255, 0.4);
       margin-right: 14px;
+      flex-shrink: 0;
     }
 
     .suggestion-text {
       color: #fff;
       font-size: 1rem;
       font-weight: 500;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+/* ── Search History Dropdown (YouTube-style) ── */
+.history-dropdown {
+  background: rgba(16, 16, 20, 0.98);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+
+  .history-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    .history-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .history-clear-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 100px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.12);
+        border-color: rgba(239, 68, 68, 0.35);
+        color: #f87171;
+      }
+    }
+  }
+
+  .history-item {
+    .history-clock {
+      color: rgba(255, 255, 255, 0.35);
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .history-remove-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.35);
+      padding: 6px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-left: 10px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+      }
     }
   }
 }

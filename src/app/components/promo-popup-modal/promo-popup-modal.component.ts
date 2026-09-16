@@ -30,16 +30,6 @@ export class PromoPopupModalComponent implements OnInit {
   popup: PromoPopup | null = null;
   visible = false;
 
-  // Fallback popup (used until the admin configures popups in ManageGT)
-  private defaultPopup: PromoPopup = {
-    id: 'default_rooms_promo',
-    name: 'Rooms Promo',
-    imageUrl: 'https://i.ibb.co/tTfJR3Pw/d8ec335e-5014-44ce-9386-e853a6208041.png',
-    linkUrl: '/rooms',
-    frequencyHours: 5,
-    isActive: true
-  };
-
   private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost')
     ? 'http://localhost/manageads/managegt-api.php'
     : 'https://manageads.ganatube.in/managegt-api.php';
@@ -61,12 +51,12 @@ export class PromoPopupModalComponent implements OnInit {
         popups = list;
       }
     } catch (e) {
-      // API not available — fall through to default popup
+      return; // API not available — no popup
     }
 
     const activePopups = popups.filter(p => p && p.isActive && (p.imageUrl || p.customCode));
     if (activePopups.length === 0) {
-      activePopups.push(this.defaultPopup);
+      return; // No active popups configured — no popup
     }
 
     // Rotate through active popups — one per frequency window

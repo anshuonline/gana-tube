@@ -75,8 +75,8 @@
       <div class="song-list">
         <div
           class="song-list-item"
-          *ngFor="let track of songResults; let i = index"
-          [style.animation-delay.ms]="i * 25"
+          *ngFor="let track of visibleSongResults; let i = index"
+          [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
           [class.active]="isCurrentTrack(track)"
           (click)="onPlay(track)"
           (contextmenu)="onRightClick($event, track)">
@@ -104,6 +104,18 @@
           <span class="item-duration" *ngIf="track.duration">{{ formatDuration(track.duration) }}</span>
         </div>
       </div>
+
+      <!-- Load More Button -->
+      <button
+        class="load-more-btn"
+        *ngIf="hiddenSongCount > 0 || hasMoreSongs"
+        (click)="onLoadMore()"
+        [disabled]="isLoadingMore">
+        <svg *ngIf="!isLoadingMore" lucideChevronDown [attr.size]="18"></svg>
+        <svg *ngIf="isLoadingMore" lucideLoader2 class="spinner" [attr.size]="18"></svg>
+        {{ isLoadingMore ? 'Loading more songs...' : 'Load More Songs' }}
+        <span class="load-more-count" *ngIf="!isLoadingMore && hiddenSongCount > 0">{{ hiddenSongCount }} more</span>
+      </button>
     </div>
 
     <!-- Albums Section -->
@@ -172,6 +184,28 @@
       </div>
     </div>
 
+    <!-- Artists Section (Bottom) -->
+    <div class="artists-section" *ngIf="artistTabs.length > 0">
+      <h2 class="section-heading">
+        <svg lucideUser [attr.size]="18"></svg>
+        Artists
+        <span class="count">{{ artistTabs.length }}</span>
+      </h2>
+      <div class="artist-list">
+        <div
+          class="artist-row"
+          *ngFor="let artist of artistTabs; let i = index"
+          [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
+          (click)="searchArtist(artist)">
+          <div class="artist-avatar" [style.background]="getArtistGradient(artist)">
+            {{ getArtistInitials(artist) }}
+          </div>
+          <span class="artist-name">{{ artist }}</span>
+          <svg lucideChevronRight class="artist-chevron" [attr.size]="16"></svg>
+        </div>
+      </div>
+    </div>
+
   </ng-container>
 
   <!-- "Songs" Filter View: Pure List -->
@@ -180,8 +214,8 @@
       <div class="song-list">
         <div
           class="song-list-item"
-          *ngFor="let track of songResults; let i = index"
-          [style.animation-delay.ms]="i * 25"
+          *ngFor="let track of visibleSongResults; let i = index"
+          [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
           [class.active]="isCurrentTrack(track)"
           (click)="onPlay(track)"
           (contextmenu)="onRightClick($event, track)">
@@ -207,6 +241,40 @@
             <p class="item-artist">{{ track.channelTitle }}</p>
           </div>
           <span class="item-duration" *ngIf="track.duration">{{ formatDuration(track.duration) }}</span>
+        </div>
+      </div>
+
+      <!-- Load More Button -->
+      <button
+        class="load-more-btn"
+        *ngIf="hiddenSongCount > 0 || hasMoreSongs"
+        (click)="onLoadMore()"
+        [disabled]="isLoadingMore">
+        <svg *ngIf="!isLoadingMore" lucideChevronDown [attr.size]="18"></svg>
+        <svg *ngIf="isLoadingMore" lucideLoader2 class="spinner" [attr.size]="18"></svg>
+        {{ isLoadingMore ? 'Loading more songs...' : 'Load More Songs' }}
+        <span class="load-more-count" *ngIf="!isLoadingMore && hiddenSongCount > 0">{{ hiddenSongCount }} more</span>
+      </button>
+    </div>
+
+    <!-- Artists Section (Bottom) -->
+    <div class="artists-section" *ngIf="artistTabs.length > 0">
+      <h2 class="section-heading">
+        <svg lucideUser [attr.size]="18"></svg>
+        Artists
+        <span class="count">{{ artistTabs.length }}</span>
+      </h2>
+      <div class="artist-list">
+        <div
+          class="artist-row"
+          *ngFor="let artist of artistTabs; let i = index"
+          [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
+          (click)="searchArtist(artist)">
+          <div class="artist-avatar" [style.background]="getArtistGradient(artist)">
+            {{ getArtistInitials(artist) }}
+          </div>
+          <span class="artist-name">{{ artist }}</span>
+          <svg lucideChevronRight class="artist-chevron" [attr.size]="16"></svg>
         </div>
       </div>
     </div>

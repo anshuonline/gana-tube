@@ -1,83 +1,325 @@
-.managegt-container {
+/* --- GTManage Admin Layout --- */
+.gtadmin-shell {
   display: flex;
   min-height: 100vh;
-  background-color: #0f0f0f;
-  color: white;
-  font-family: 'Inter', 'Roboto', sans-serif;
+  background: #000;
+  color: #fff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.sidebar {
-  width: 250px;
-  background-color: #1a1a1a;
-  border-right: 1px solid #333;
-  padding: 20px 0;
+/* ─── Mobile Topbar ─── */
+.gtadmin-topbar {
+  display: none;
+}
+
+/* ─── Overlay (Mobile Drawer) ─── */
+.gtadmin-overlay {
+  display: none;
+}
+
+/* ─── Sidebar ─── */
+.gtadmin-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #050508;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 50;
+}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 20px 30px;
-    border-bottom: 1px solid #333;
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
-    img {
-      height: 32px;
-    }
-    
-    span {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #1db954;
-    }
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
   }
 
-  nav {
-    margin-top: 20px;
+  .brand-text {
+    display: flex;
+    flex-direction: column;
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .brand-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
 
-      li {
-        a {
-          display: block;
-          padding: 15px 20px;
-          color: #aaa;
-          text-decoration: none;
-          font-weight: 500;
-          transition: all 0.2s ease;
-          cursor: pointer;
-
-          &:hover, &.active {
-            background-color: #333;
-            color: white;
-            border-left: 4px solid #1db954;
-          }
-
-          &.logout-btn {
-            color: #ff4d4d;
-            &:hover {
-              background-color: rgba(255, 77, 77, 0.1);
-              border-left-color: #ff4d4d;
-            }
-          }
-        }
-      }
+    .brand-sub {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   }
 }
 
-.content-area {
+.sidebar-nav {
   flex: 1;
-  padding: 30px;
   overflow-y: auto;
-  height: 100vh;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 
-  &.full-width {
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+}
+
+/* Group Toggle (dropdown header / direct item) */
+.group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  .group-icon {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+
+  .group-label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: transform 0.25s ease;
+
+    &.open { transform: rotate(180deg); }
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+
+    .group-icon { color: #fff; }
+  }
+
+  &.active {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.14) 0%, rgba(236, 72, 153, 0.1) 100%);
+    color: #fff;
+
+    .group-icon {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%);
+      border-color: rgba(236, 72, 153, 0.4);
+      color: #EC4899;
+    }
+  }
+}
+
+/* Group Links (dropdown items) */
+.group-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 6px 16px;
+  margin-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.group-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  .link-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+  }
+
+  &.active {
+    background: rgba(236, 72, 153, 0.1);
+    color: #fff;
+    font-weight: 700;
+
+    .link-dot {
+      background: #EC4899;
+      box-shadow: 0 0 8px rgba(236, 72, 153, 0.6);
+    }
+  }
+}
+
+/* Footer */
+.sidebar-footer {
+  padding: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  .sidebar-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 11px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+  }
+}
+
+/* ─── Main Content ─── */
+.gtadmin-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  background: #000;
+  overflow-x: hidden;
+}
+
+/* ─── Responsive (Mobile) ─── */
+@media (max-width: 1024px) {
+  .gtadmin-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: rgba(5, 5, 8, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 60;
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .topbar-menu-btn {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 8px;
+        display: flex;
+        transition: all 0.2s;
+
+        &:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+      }
+
+      .topbar-logo { width: 26px; height: 26px; object-fit: contain; }
+
+      .topbar-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #fff;
+      }
+    }
+
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.65);
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.35); color: #ef4444; }
+    }
+  }
+
+  .gtadmin-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 55;
+  }
+
+  .gtadmin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6);
+
+    &.open { transform: translateX(0); }
+  }
+
+  .gtadmin-main {
+    padding-top: 60px;
   }
 }

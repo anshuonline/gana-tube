@@ -1,10 +1,11 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, OnDestroy, Input, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, switchMap } from 'rxjs/operators';
-import { LucideSearch, LucideX, LucideMic, LucideLoader2 } from '@lucide/angular';
+import { LucideSearch, LucideX, LucideMic, LucideLoader2, LucideClock, LucideTrash2, LucideArrowUpLeft } from '@lucide/angular';
 import { YoutubeApiService } from '../../services/youtube-api.service';
+import { SearchHistoryService } from '../../services/search-history.service';
 
 // Declare SpeechRecognition for TypeScript
 declare var SpeechRecognition: any;
@@ -13,7 +14,7 @@ declare var webkitSpeechRecognition: any;
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideSearch, LucideX, LucideMic, LucideLoader2],
+  imports: [CommonModule, FormsModule, LucideSearch, LucideX, LucideMic, LucideLoader2, LucideClock, LucideTrash2, LucideArrowUpLeft],
   template: `
     <div class="search-wrapper">
       <div class="search-bar" [class.focused]="isFocused">
@@ -40,9 +41,34 @@ declare var webkitSpeechRecognition: any;
         <button 
           class="voice-btn search-submit-btn" 
           (click)="onSearch()" 
-          title="Search">
-          <svg lucideSearch [attr.size]="20"></svg>
+          title="Search"
+          [class.loading]="isSearching">
+          <svg *ngIf="!isSearching" lucideSearch [attr.size]="20"></svg>
+          <svg *ngIf="isSearching" lucideLoader2 class="spinner" [attr.size]="20"></svg>
         </button>
+      </div>
+
+      <!-- Search History Dropdown (YouTube-style) -->
+      <div class="suggestions-dropdown history-dropdown" *ngIf="isFocused && showHistory && searchHistory.history().length > 0">
+        <div class="history-header-row">
+          <span class="history-label">Recent searches</span>
+          <button class="history-clear-btn" (mousedown)="onSuggestionMousedown($event)" (click)="clearHistory()">
+            <svg lucideTrash2 [attr.size]="13"></svg>
+            Clear all
+          </button>
+        </div>
+        <div
+          class="suggestion-item history-item"
+          *ngFor="let item of searchHistory.history()"
+          (mousedown)="onSuggestionMousedown($event)"
+          (click)="selectSuggestion(item)"
+        >
+          <svg lucideClock class="item-icon history-clock" [attr.size]="16"></svg>
+          <span class="suggestion-text">{{ item }}</span>
+          <button class="history-remove-btn" (mousedown)="onSuggestionMousedown($event)" (click)="removeHistoryItem(item, $event)" title="Remove">
+            <svg lucideX [attr.size]="15"></svg>
+          </button>
+        </div>
       </div>
 
       <!-- Suggestions Dropdown -->
@@ -53,7 +79,7 @@ declare var webkitSpeechRecognition: any;
           (mousedown)="onSuggestionMousedown($event)"
           (click)="selectSuggestion(suggestion)"
         >
-          <svg lucideSearch class="item-icon" [attr.size]="16"></svg>
+          <svg lucideArrowUpLeft class="item-icon" [attr.size]="16"></svg>
           <span class="suggestion-text">{{ suggestion }}</span>
         </div>
       </div>
@@ -63,11 +89,13 @@ declare var webkitSpeechRecognition: any;
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   @Output() search = new EventEmitter<string>();
+  @Input() isSearching = false;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   query = '';
   isFocused = false;
   showSuggestions = false;
+  showHistory = false;
   suggestions: string[] = [];
   private isSelectingSuggestion = false;
 
@@ -77,8 +105,18 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   private querySubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  constructor(private youtubeApi: YoutubeApiService) {
+  constructor(private youtubeApi: YoutubeApiService, public searchHistory: SearchHistoryService) {
     this.initSpeechRecognition();
+  }
+
+  removeHistoryItem(item: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.searchHistory.remove(item);
+  }
+
+  clearHistory(): void {
+    this.searchHistory.clear();
+    this.showHistory = false;
   }
 
   private initSpeechRecognition() {
@@ -162,6 +200,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.isFocused = true;
     if (this.query.trim().length >= 2) {
       this.showSuggestions = true;
+    } else if (this.searchHistory.history().length > 0) {
+      this.showHistory = true;
     }
   }
 
@@ -173,6 +213,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.isFocused = false;
       this.showSuggestions = false;
+      this.showHistory = false;
     }, 150);
   }
 
@@ -180,7 +221,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     if (!value.trim()) {
       this.suggestions = [];
       this.showSuggestions = false;
+      if (this.searchHistory.history().length > 0) {
+        this.showHistory = true;
+      }
     } else {
+      this.showHistory = false;
       this.showSuggestions = true;
       this.querySubject.next(value);
     }
@@ -196,8 +241,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.isSelectingSuggestion = false;
     this.query = suggestion;
     this.showSuggestions = false;
+    this.showHistory = false;
     this.isFocused = false;
-    // Directly emit so we bypass the 300ms debounce in app.ts
+    // Directly emit so we bypass any debounce in app.ts
     this.search.emit(suggestion.trim());
   }
 
@@ -206,6 +252,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     if (trimmed) {
       this.search.emit(trimmed);
       this.showSuggestions = false;
+      this.showHistory = false;
       if (this.searchInput && this.searchInput.nativeElement) {
         this.searchInput.nativeElement.blur();
       }
@@ -216,6 +263,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.query = '';
     this.suggestions = [];
     this.showSuggestions = false;
+    if (this.searchHistory.history().length > 0) {
+      this.showHistory = true;
+    }
     this.focusInput();
   }
 }

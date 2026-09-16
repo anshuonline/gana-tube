@@ -1,13 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucidePlay, LucideMoreVertical, LucideMusic2, LucideAudioLines, LucideDisc3, LucideLibrary } from '@lucide/angular';
+import { LucidePlay, LucideMoreVertical, LucideMusic2, LucideAudioLines, LucideDisc3, LucideLibrary, LucideLoader2, LucideChevronDown, LucideChevronRight, LucideUser } from '@lucide/angular';
 import { YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, LucidePlay, LucideMoreVertical, LucideMusic2, LucideAudioLines, LucideDisc3, LucideLibrary],
+  imports: [CommonModule, LucidePlay, LucideMoreVertical, LucideMusic2, LucideAudioLines, LucideDisc3, LucideLibrary, LucideLoader2, LucideChevronDown, LucideChevronRight, LucideUser],
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.scss']
 })
@@ -16,18 +16,24 @@ export class SearchResultsComponent implements OnChanges {
   @Input() isLoading = false;
   @Input() hasSearched = false;
   @Input() currentFilter: 'all' | 'songs' | 'albums' | 'playlists' = 'all';
+  @Input() isLoadingMore = false;
+  @Input() hasMoreSongs = false;
 
   @Output() suggestSearch = new EventEmitter<string>();
   @Output() playTrack = new EventEmitter<YouTubeSearchResult>();
   @Output() ambientBgFound = new EventEmitter<string>();
   @Output() toggleMenu = new EventEmitter<{track: YouTubeSearchResult, event: MouseEvent}>();
+  @Output() loadMore = new EventEmitter<void>();
 
   skeletons = Array(8).fill(0);
+  readonly songPageSize = 50;
+  visibleSongCount = this.songPageSize;
 
   topResult: YouTubeSearchResult | null = null;
   songResults: YouTubeSearchResult[] = [];
   albumResults: YouTubeSearchResult[] = [];
   playlistResults: YouTubeSearchResult[] = [];
+  artistTabs: string[] = [];
 
   constructor(private playerService: PlayerService) {}
 
@@ -37,6 +43,8 @@ export class SearchResultsComponent implements OnChanges {
     }
   }
 
+  private lastFirstSongId: string | null = null;
+
   processResults() {
     const results = this.results || [];
     if (results.length === 0) {
@@ -44,6 +52,9 @@ export class SearchResultsComponent implements OnChanges {
       this.songResults = [];
       this.albumResults = [];
       this.playlistResults = [];
+      this.artistTabs = [];
+      this.visibleSongCount = this.songPageSize;
+      this.lastFirstSongId = null;
       this.ambientBgFound.emit('');
       return;
     }
@@ -51,6 +62,16 @@ export class SearchResultsComponent implements OnChanges {
     this.albumResults = results.filter(r => r.type === 'album');
     this.playlistResults = results.filter(r => r.type === 'playlist' || r.type === 'community-playlist');
     this.songResults = results.filter(r => r.type !== 'album' && r.type !== 'playlist' && r.type !== 'community-playlist');
+    this.artistTabs = this.extractArtists(this.songResults);
+
+    // Reset pagination on new search, expand on Load More batches
+    const firstSongId = this.songResults[0]?.videoId || null;
+    if (firstSongId !== this.lastFirstSongId) {
+      this.visibleSongCount = this.songPageSize;
+      this.lastFirstSongId = firstSongId;
+    } else if (this.songResults.length > this.visibleSongCount) {
+      this.visibleSongCount += this.songPageSize;
+    }
 
     if (this.currentFilter === 'all') {
       // Top result: best playlist match, otherwise first song
@@ -108,5 +129,60 @@ export class SearchResultsComponent implements OnChanges {
       img.src = `https://img.youtube.com/vi/${track.videoId}/mqdefault.jpg`;
     }
     img.style.visibility = 'hidden';
+  }
+
+  get visibleSongResults(): YouTubeSearchResult[] {
+    return this.songResults.slice(0, this.visibleSongCount);
+  }
+
+  get hiddenSongCount(): number {
+    return Math.max(0, this.songResults.length - this.visibleSongCount);
+  }
+
+  onLoadMore(): void {
+    if (!this.isLoadingMore) {
+      this.loadMore.emit();
+    }
+  }
+
+  searchArtist(artist: string): void {
+    this.suggestSearch.emit(`${artist} songs`);
+  }
+
+  private extractArtists(songs: YouTubeSearchResult[]): string[] {
+    const seen = new Set<string>();
+    const artists: string[] = [];
+    for (const song of songs) {
+      let name = (song.channelTitle || '').trim();
+      if (!name) continue;
+      name = name.replace(/\s*-\s*Topic$/i, '').replace(/\s*VEVO\s*/gi, '').replace(/Official/gi, '').trim();
+      if (!name || name.toLowerCase() === 'artist' || name.toLowerCase() === 'various artists') continue;
+      const key = name.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      artists.push(name);
+    }
+    return artists.slice(0, 24);
+  }
+
+  getArtistInitials(name: string): string {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
+
+  getArtistGradient(name: string): string {
+    const colors = [
+      ['#a855f7', '#ec4899'],
+      ['#8b5cf6', '#d946ef'],
+      ['#9333ea', '#db2777'],
+      ['#7c3aed', '#c026d3'],
+      ['#a855f7', '#f43f5e'],
+      ['#8b5cf6', '#ec4899']
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const pair = colors[Math.abs(hash) % colors.length];
+    return `linear-gradient(135deg, ${pair[0]} 0%, ${pair[1]} 100%)`;
   }
 }
