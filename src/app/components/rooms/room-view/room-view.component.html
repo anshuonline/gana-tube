@@ -126,13 +126,13 @@
           <svg lucideMonitor [attr.size]="13"></svg>
           <span>{{ playerService.isVideoMode() ? 'Back to Audio' : 'Switch to Video' }}</span>
         </button>
-        <button class="np-btn" (click)="copyRoomCode()" title="Copy Room Code">
-          <svg lucideCopy [attr.size]="13"></svg>
-          <span>Room Code</span>
+        <button class="np-btn" (click)="toggleLike()" title="Like">
+          <svg lucideHeart [attr.size]="13" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+          <span>{{ isCurrentTrackLiked() ? 'Liked' : 'Like' }}</span>
         </button>
-        <button class="np-btn" (click)="shareRoom()" title="Share Room">
-          <svg lucideUsers [attr.size]="13"></svg>
-          <span>Share Room</span>
+        <button class="np-btn" (click)="openSaveToPlaylist.emit(playerService.currentTrack())" title="Save to Playlist">
+          <svg lucideFolderPlus [attr.size]="13"></svg>
+          <span>Save to Playlist</span>
         </button>
       </div>
 

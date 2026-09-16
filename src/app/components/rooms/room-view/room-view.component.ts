@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, Output, EventEmitter, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -8,6 +8,8 @@ import { PlayerService, Track } from '../../../services/player.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { YoutubeApiService } from '../../../services/youtube-api.service';
+import { UserService } from '../../../services/user.service';
+import { AlgorithmService } from '../../../services/algorithm.service';
 import { 
   LucideUsers, 
   LucideLogOut,
@@ -29,7 +31,7 @@ import {
   LucideChevronUp,
   LucideInfo,
   LucideSearch,
-  LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight, LucideMonitor
+  LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight, LucideMonitor, LucideFolderPlus
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -62,7 +64,7 @@ import { RoomSwitchModalComponent } from '../room-switch-modal/room-switch-modal
     LucideChevronUp,
     LucideInfo,
     LucideSearch,
-    LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight, LucideMonitor,
+    LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight, LucideMonitor, LucideFolderPlus,
     RoomMembersPanelComponent,
     TrackMenuComponent,
     GuestNameModalComponent,
@@ -80,6 +82,10 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   private toastService = inject(ToastService);
   private appState = inject(AppStateService);
   private youtubeApi = inject(YoutubeApiService);
+  private userService = inject(UserService);
+  private algorithmService = inject(AlgorithmService);
+
+  @Output() openSaveToPlaylist = new EventEmitter<any>();
 
   @ViewChild('chatScroll') private chatScrollContainer!: ElementRef;
 
@@ -342,6 +348,28 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     const url = `${window.location.origin}/share.php?v=${track.videoId}`;
     navigator.clipboard.writeText(url);
     this.toastService.show('Song link copied!');
+  }
+
+  isCurrentTrackLiked(): boolean {
+    const track = this.playerService.currentTrack();
+    if (!track) return false;
+
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      return this.userService.likedSongs().some(song => (typeof song === 'string' ? song : song.videoId) === track.videoId);
+    }
+    return this.algorithmService.isLiked(track.videoId);
+  }
+
+  toggleLike() {
+    const track = this.playerService.currentTrack();
+    if (!track) return;
+
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      this.userService.toggleLike(user.email, track, this.userService.preferredLanguages ? this.userService.preferredLanguages() : []);
+    }
+    this.algorithmService.toggleLike(track);
   }
 
   toggleVisibility() {

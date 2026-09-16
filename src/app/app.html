@@ -350,7 +350,8 @@
     </app-rooms-discover>
 
     <app-room-view
-      *ngIf="currentPage() === 'rooms-view'">
+      *ngIf="currentPage() === 'rooms-view'"
+      (openSaveToPlaylist)="openSaveToPlaylist($event)">
     </app-room-view>
 
     <div *ngIf="currentPage() === 'socials'" class="socials-page">
