@@ -728,6 +728,7 @@ export class PlayerService {
           if (this.isCrossfadeEnabled() && this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function' && (this.ytPlayer.getCurrentTime() || 0) < 1) {
             if (typeof this.ytPlayer.setVolume === 'function') {
               this.ytPlayer.setVolume(0);
+              (this as any)._lastSetVolume = 0;
             }
           }
         } catch (e) {
