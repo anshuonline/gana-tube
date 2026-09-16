@@ -36,6 +36,32 @@ declare var YT: any;
         opacity: 0.01;
         overflow: hidden;
       }
+      .yt-player-container .video-active {
+        position: fixed !important;
+        top: auto !important;
+        left: auto !important;
+        bottom: 120px !important;
+        right: 24px !important;
+        width: 400px !important;
+        height: 225px !important;
+        min-width: 0 !important;
+        z-index: 1200 !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        border-radius: 14px;
+        border: 1px solid rgba(236, 72, 153, 0.35);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(139, 92, 246, 0.2);
+        overflow: hidden;
+      }
+      @media (max-width: 768px) {
+        .yt-player-container .video-active {
+          bottom: 90px !important;
+          right: 16px !important;
+          left: 16px !important;
+          width: calc(100vw - 32px) !important;
+          height: 200px !important;
+        }
+      }
     `,
   ],
 })
@@ -55,6 +81,12 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.playersReadyCount === this.totalPlayers && q.length > 0 && idx >= 0) {
         this.schedulePreloading(q, idx);
       }
+    });
+
+    // Video mode — show the active player's video in a floating window
+    effect(() => {
+      const on = this.playerService.isVideoMode();
+      this.applyVideoMode(on);
     });
   }
 
@@ -206,6 +238,19 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     return 'hd720';
   }
 
+  private applyVideoMode(on: boolean): void {
+    for (let i = 0; i < this.totalPlayers; i++) {
+      const el = typeof document !== 'undefined' ? document.getElementById(`yt-player-element-${i}`) : null;
+      if (el) {
+        if (on && i === this.activePlayerIndex) {
+          el.classList.add('video-active');
+        } else {
+          el.classList.remove('video-active');
+        }
+      }
+    }
+  }
+
   private handleLoadVideo(videoId: string, startSeconds: number = 0): void {
     // Check if the video is already cued in one of the background players
     let foundIndex = -1;
@@ -222,6 +267,7 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (foundIndex !== -1 && foundIndex !== this.activePlayerIndex) {
       // It's preloaded! Swap active player
       this.activePlayerIndex = foundIndex;
+      this.applyVideoMode(this.playerService.isVideoMode());
       
       // Stop the old active player to save bandwidth
       if (typeof this.players[oldActiveIndex].stopVideo === 'function') {

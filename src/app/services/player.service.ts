@@ -40,6 +40,13 @@ export class PlayerService {
   // When true, this instance of the player is just a remote control for another device
   public isRemoteControl = signal<boolean>(false);
 
+  // Video mode — shows the active player's video in a floating window (rooms, admin only)
+  public isVideoMode = signal<boolean>(false);
+
+  toggleVideoMode(): void {
+    this.isVideoMode.update(v => !v);
+  }
+
   constructor() {
     this.setupSocketListeners();
     this.setupDeviceSyncListeners();

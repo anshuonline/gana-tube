@@ -29,7 +29,7 @@ import {
   LucideChevronUp,
   LucideInfo,
   LucideSearch,
-  LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight
+  LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight, LucideMonitor
 } from '@lucide/angular';
 import { RoomMembersPanelComponent } from '../room-members-panel/room-members-panel.component';
 import { TrackMenuComponent } from '../../track-menu/track-menu.component';
@@ -62,7 +62,7 @@ import { RoomSwitchModalComponent } from '../room-switch-modal/room-switch-modal
     LucideChevronUp,
     LucideInfo,
     LucideSearch,
-    LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight,
+    LucideHeart, LucideLoader2, LucideThumbsUp, LucideArrowLeftRight, LucideMonitor,
     RoomMembersPanelComponent,
     TrackMenuComponent,
     GuestNameModalComponent,
@@ -325,13 +325,23 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   leaveRoom() {
     this.roomService.leaveRoom();
+    this.playerService.isVideoMode.set(false);
     this.playerService.pause();
     this.router.navigate(['/rooms']);
   }
 
   minimizeRoom() {
     // Navigate away without leaving the room — music keeps playing
+    this.playerService.isVideoMode.set(false);
     this.router.navigate(['/']);
+  }
+
+  shareCurrentSong() {
+    const track = this.playerService.currentTrack();
+    if (!track) return;
+    const url = `${window.location.origin}/share.php?v=${track.videoId}`;
+    navigator.clipboard.writeText(url);
+    this.toastService.show('Song link copied!');
   }
 
   toggleVisibility() {

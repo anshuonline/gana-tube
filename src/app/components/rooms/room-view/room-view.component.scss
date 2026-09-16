@@ -285,6 +285,49 @@
   }
 }
 
+// Now Playing Options (below track info)
+.np-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+
+  .np-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.65);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(236, 72, 153, 0.15);
+      border-color: rgba(236, 72, 153, 0.4);
+      color: #fff;
+    }
+
+    &.accent {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+      border-color: rgba(236, 72, 153, 0.4);
+      color: #fff;
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.32) 0%, rgba(236, 72, 153, 0.32) 100%);
+        border-color: rgba(236, 72, 153, 0.7);
+      }
+    }
+  }
+}
+
 // Main Layout
 .main-layout {
   display: flex;
