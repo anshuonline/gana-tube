@@ -155,7 +155,7 @@ async function getBotSongs() {
 
   async function fetchRoombotsConfig() {
     try {
-      const response = await fetch('http://localhost/manageads/managegt-api.php?action=get_roombots');
+      const response = await fetch('https://manageads.ganatube.in/managegt-api.php?action=get_roombots');
       const data = await response.json();
       return Array.isArray(data) ? data : [];
     } catch (e) {
@@ -168,7 +168,15 @@ async function getBotSongs() {
     if (!playlistId) return [];
     try {
       const yt = await getYTMusic();
-      let pid = playlistId.startsWith('VL') ? playlistId.substring(2) : playlistId;
+      let pid = playlistId;
+      if (pid.includes('list=')) {
+        try { pid = new URL(pid).searchParams.get('list') || pid; } catch(e){}
+      } else if (pid.includes('/playlist/')) {
+        pid = pid.split('/playlist/')[1].split('?')[0];
+      }
+      if (pid.startsWith('VL')) {
+        pid = pid.substring(2);
+      }
       const videos = await yt.getPlaylistVideos(pid);
       return (videos || []).map(song => ({
         videoId: song.videoId,
