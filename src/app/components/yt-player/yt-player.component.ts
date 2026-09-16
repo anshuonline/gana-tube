@@ -213,6 +213,8 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     return 'hd720';
   }
 
+  private videoOverlay: HTMLElement | null = null;
+
   private applyVideoMode(on: boolean): void {
     // The container (opacity 0.01, z-index -9999) creates a stacking context —
     // children can never escape it. So in video mode we raise the container
@@ -225,18 +227,36 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!el) continue;
 
       if (on && i === this.activePlayerIndex) {
-        const isMobile = window.innerWidth <= 768;
-
         // Nudge the player to re-layout and render video at a real size
         const p = this.players[i];
         if (p && typeof p.setSize === 'function') {
-          p.setSize(isMobile ? 640 : 480, isMobile ? 360 : 270);
+          p.setSize(640, 360);
         }
 
-        // Floating window (YouTube miniplayer style)
-        el.style.cssText = isMobile
-          ? 'position:fixed;top:auto;left:16px;right:16px;bottom:90px;width:calc(100vw - 32px);height:200px;z-index:1200;opacity:1;pointer-events:auto;border-radius:14px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 12px 40px rgba(0,0,0,0.7);overflow:hidden;'
-          : 'position:fixed;top:auto;left:auto;right:24px;bottom:120px;width:400px;height:225px;z-index:1200;opacity:1;pointer-events:auto;border-radius:14px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 12px 40px rgba(0,0,0,0.7),0 0 30px rgba(139,92,246,0.2);overflow:hidden;';
+        // Position over the room's cover art (center), larger, YouTube miniplayer style
+        let top: number, left: number, w: number, h: number;
+        const anchor = typeof document !== 'undefined' ? (document.querySelector('.room-video-anchor') as HTMLElement | null) : null;
+        if (anchor) {
+          const rect = anchor.getBoundingClientRect();
+          w = Math.min(Math.round(rect.width * 1.5), window.innerWidth - 48);
+          h = Math.round(w * 9 / 16);
+          top = Math.round(rect.top + rect.height / 2 - h / 2);
+          left = Math.round(rect.left + rect.width / 2 - w / 2);
+        } else {
+          w = 400; h = 225;
+          top = Math.round(window.innerHeight - h - 120);
+          left = Math.round(window.innerWidth - w - 24);
+        }
+
+        el.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;z-index:1200;opacity:1;pointer-events:none;border-radius:16px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(139,92,246,0.25);overflow:hidden;`;
+
+        // Transparent overlay blocks hover/clicks so YouTube's controls,
+        // share buttons and branding never appear (cross-origin, can't style inside)
+        if (!this.videoOverlay) {
+          this.videoOverlay = document.createElement('div');
+          document.body.appendChild(this.videoOverlay);
+        }
+        this.videoOverlay.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;background:transparent;pointer-events:auto;z-index:1201;border-radius:16px;cursor:pointer;`;
       } else {
         el.classList.remove('video-active');
         el.style.cssText = on ? 'display:none;' : '';
@@ -254,10 +274,22 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         container.style.overflow = '';
       }
     }
+
+    if (!on && this.videoOverlay) {
+      this.videoOverlay.remove();
+      this.videoOverlay = null;
+    }
   }
 
   @HostListener('window:resize')
   onWindowResize() {
+    if (this.playerService.isVideoMode()) {
+      this.applyVideoMode(true);
+    }
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
     if (this.playerService.isVideoMode()) {
       this.applyVideoMode(true);
     }

@@ -87,7 +87,7 @@
     
     <!-- Left: Player Section -->
     <section class="player-section" [class.mobile-hidden]="!isPlayerVisibleMobile">
-      <div class="album-art-container" 
+      <div class="album-art-container room-video-anchor"
            [class.playing]="playerService.playerState() === 'playing'"
            [class.clickable]="roomService.isAdmin()"
            (click)="togglePlay()">
@@ -122,7 +122,7 @@
           <svg lucideShare2 [attr.size]="13"></svg>
           <span>Music Share</span>
         </button>
-        <button class="np-btn accent" *ngIf="roomService.isAdmin()" (click)="playerService.toggleVideoMode()" title="Switch to Video">
+        <button class="np-btn accent" (click)="playerService.toggleVideoMode()" title="Switch to Video">
           <svg lucideMonitor [attr.size]="13"></svg>
           <span>{{ playerService.isVideoMode() ? 'Back to Audio' : 'Switch to Video' }}</span>
         </button>
