@@ -90,6 +90,7 @@
       <div class="album-art-container room-video-anchor"
            [class.playing]="playerService.playerState() === 'playing'"
            [class.clickable]="roomService.isAdmin()"
+           [class.video-on]="playerService.isVideoMode()"
            (click)="togglePlay()">
         <img *ngIf="playerService.currentTrack()" [src]="playerService.currentTrack()?.thumbnailHigh" alt="Cover Art">
         

@@ -236,7 +236,19 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         // Position over the room's cover art (center), larger, YouTube miniplayer style
         let top: number, left: number, w: number, h: number;
         const anchor = typeof document !== 'undefined' ? (document.querySelector('.room-video-anchor') as HTMLElement | null) : null;
-        if (anchor) {
+        const section = typeof document !== 'undefined' ? (document.querySelector('.player-section') as HTMLElement | null) : null;
+        if (section) {
+          const srect = section.getBoundingClientRect();
+          w = Math.min(Math.round(srect.width - 48), window.innerWidth - 48);
+          h = Math.round(w * 9 / 16);
+          if (anchor) {
+            const arect = anchor.getBoundingClientRect();
+            top = Math.round(arect.top + arect.height / 2 - h / 2);
+          } else {
+            top = Math.round(srect.top + 24);
+          }
+          left = Math.round(srect.left + 24 + Math.max(0, (srect.width - 48 - w) / 2));
+        } else if (anchor) {
           const rect = anchor.getBoundingClientRect();
           w = Math.min(Math.round(rect.width * 1.5), window.innerWidth - 48);
           h = Math.round(w * 9 / 16);
