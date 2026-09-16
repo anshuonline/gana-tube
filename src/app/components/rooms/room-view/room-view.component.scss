@@ -14,6 +14,15 @@
   height: 100%;
   background: #000;
   color: #F5F5F7;
+
+  // Video mode — the whole room UI paints ABOVE the video container so the
+  // header, options, controls and modals stay visible and clickable, while the
+  // video shows through the (transparent) cover art area
+  &.video-on {
+    position: relative;
+    z-index: 1202;
+    background: transparent;
+  }
 }
 
 // Header

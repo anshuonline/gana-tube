@@ -1,4 +1,4 @@
-<div class="room-container" *ngIf="roomService.currentRoomInfo() as room">
+<div class="room-container" [class.video-on]="playerService.isVideoMode()" *ngIf="roomService.currentRoomInfo() as room">
   
   <!-- Header -->
   <header class="room-header">

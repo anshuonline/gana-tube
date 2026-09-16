@@ -213,8 +213,6 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     return 'hd720';
   }
 
-  private videoOverlay: HTMLElement | null = null;
-
   private applyVideoMode(on: boolean): void {
     // The container (opacity 0.01, z-index -9999) creates a stacking context —
     // children can never escape it. So in video mode we raise the container
@@ -261,14 +259,6 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         }
 
         el.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;z-index:1200;opacity:1;pointer-events:none;border-radius:16px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(139,92,246,0.25);overflow:hidden;`;
-
-        // Transparent overlay blocks hover/clicks so YouTube's controls,
-        // share buttons and branding never appear (cross-origin, can't style inside)
-        if (!this.videoOverlay) {
-          this.videoOverlay = document.createElement('div');
-          document.body.appendChild(this.videoOverlay);
-        }
-        this.videoOverlay.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;background:transparent;pointer-events:auto;z-index:1201;border-radius:16px;cursor:pointer;`;
       } else {
         el.classList.remove('video-active');
         el.style.cssText = on ? 'display:none;' : '';
@@ -285,11 +275,6 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         container.style.zIndex = '';
         container.style.overflow = '';
       }
-    }
-
-    if (!on && this.videoOverlay) {
-      this.videoOverlay.remove();
-      this.videoOverlay = null;
     }
   }
 
