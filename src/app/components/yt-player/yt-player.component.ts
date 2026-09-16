@@ -214,9 +214,10 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private applyVideoMode(on: boolean): void {
-    // The container's opacity (0.01) hides ALL players and cannot be
-    // overridden by a child — so we control the container itself and use
-    // inline styles on the active player (scoped CSS can't reach the iframe).
+    // The container (opacity 0.01, z-index -9999) creates a stacking context —
+    // children can never escape it. So in video mode we raise the container
+    // itself and use inline styles on the active player (scoped CSS can't
+    // reach the iframe — it has no Angular content attribute).
     const container = typeof document !== 'undefined' ? (document.querySelector('.yt-player-container') as HTMLElement | null) : null;
 
     for (let i = 0; i < this.totalPlayers; i++) {
@@ -225,6 +226,14 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
 
       if (on && i === this.activePlayerIndex) {
         const isMobile = window.innerWidth <= 768;
+
+        // Nudge the player to re-layout and render video at a real size
+        const p = this.players[i];
+        if (p && typeof p.setSize === 'function') {
+          p.setSize(isMobile ? 640 : 480, isMobile ? 360 : 270);
+        }
+
+        // Floating window (YouTube miniplayer style)
         el.style.cssText = isMobile
           ? 'position:fixed;top:auto;left:16px;right:16px;bottom:90px;width:calc(100vw - 32px);height:200px;z-index:1200;opacity:1;pointer-events:auto;border-radius:14px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 12px 40px rgba(0,0,0,0.7);overflow:hidden;'
           : 'position:fixed;top:auto;left:auto;right:24px;bottom:120px;width:400px;height:225px;z-index:1200;opacity:1;pointer-events:auto;border-radius:14px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 12px 40px rgba(0,0,0,0.7),0 0 30px rgba(139,92,246,0.2);overflow:hidden;';
@@ -237,9 +246,11 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (container) {
       if (on) {
         container.style.opacity = '1';
+        container.style.zIndex = '1199'; // Escape the -9999 stacking context
         container.style.overflow = 'visible';
       } else {
         container.style.opacity = '';
+        container.style.zIndex = '';
         container.style.overflow = '';
       }
     }
