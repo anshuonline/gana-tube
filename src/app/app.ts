@@ -961,8 +961,9 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         this.isFullScreenPlayerVisible.set(false);
         return;
-      } else if (event.urlAfterRedirects.startsWith('/advertise')) {
-        this.currentPage.set('advertise');
+      } else if (event.urlAfterRedirects.startsWith('/advertise') || event.urlAfterRedirects.startsWith('/ad-booking') || event.urlAfterRedirects.startsWith('/ad-terms') || event.urlAfterRedirects.startsWith('/ad-prohibited')) {
+        this.currentPage.set('home');
+        this.router.navigate(['/home'], { replaceUrl: true });
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
 
@@ -1172,7 +1173,7 @@ export class App implements OnInit {
   }
 
   openAdvertisePage(): void {
-    this.router.navigate(['/advertise']);
+    this.router.navigate(['/home']);
     this.isSearchMode.set(false);
   }
 

@@ -131,29 +131,27 @@
         </div>
       </div>
       
-      <div class="track-info" *ngIf="playerService.currentTrack() as track">
-        <h3>{{track.title}}</h3>
-        <p>{{track.channelTitle}}</p>
-      </div>
+      <!-- Track Meta & Options Bar (YouTube Style) -->
+      <div class="track-meta-bar" *ngIf="playerService.currentTrack() as track">
+        <div class="track-info">
+          <h3 [title]="track.title">{{track.title}}</h3>
+          <p [title]="track.channelTitle">{{track.channelTitle}}</p>
+        </div>
 
-      <!-- Now Playing Options -->
-      <div class="np-options" *ngIf="playerService.currentTrack()">
-        <button class="np-btn" (click)="shareCurrentSong()" title="Share this song">
-          <svg lucideShare2 [attr.size]="13"></svg>
-          <span>Music Share</span>
-        </button>
-        <button class="np-btn btn-video-toggle" [class.video-active]="playerService.isVideoMode()" (click)="playerService.toggleVideoMode()" [title]="playerService.isVideoMode() ? 'Switch to Audio' : 'Switch to Video'">
-          <svg lucideMonitor [attr.size]="13"></svg>
-          <span>{{ playerService.isVideoMode() ? 'Back to Audio' : 'Switch to Video' }}</span>
-        </button>
-        <button class="np-btn btn-like" [class.liked]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
-          <svg lucideHeart [attr.size]="13" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
-          <span>{{ isCurrentTrackLiked() ? 'Liked' : 'Like' }}</span>
-        </button>
-        <button class="np-btn" (click)="openSaveToPlaylist.emit(playerService.currentTrack())" title="Save to Playlist">
-          <svg lucideFolderPlus [attr.size]="13"></svg>
-          <span>Save to Playlist</span>
-        </button>
+        <div class="np-options">
+          <button class="np-btn btn-video-toggle" [class.video-active]="playerService.isVideoMode()" (click)="playerService.toggleVideoMode()" [title]="playerService.isVideoMode() ? 'Switch to Audio' : 'Switch to Video'">
+            <svg lucideMonitor [attr.size]="18"></svg>
+          </button>
+          <button class="np-btn btn-like" [class.liked]="isCurrentTrackLiked()" (click)="toggleLike()" [title]="isCurrentTrackLiked() ? 'Liked' : 'Like'">
+            <svg lucideHeart [attr.size]="18" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+          </button>
+          <button class="np-btn" (click)="openSaveToPlaylist.emit(track)" title="Save to Playlist">
+            <svg lucideFolderPlus [attr.size]="18"></svg>
+          </button>
+          <button class="np-btn" (click)="shareCurrentSong()" title="Share this song">
+            <svg lucideShare2 [attr.size]="18"></svg>
+          </button>
+        </div>
       </div>
 
       <!-- Progress (visible to all, interactive only for admin) -->

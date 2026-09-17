@@ -37,11 +37,6 @@
         <span class="sidebar-label">Discovery</span>
       </div>
 
-      <div class="sidebar-item" (click)="openRoomsPage()" [class.active]="currentPage() === 'rooms'">
-        <svg lucideRadio [attr.size]="24"></svg>
-        <span class="sidebar-label">Rooms</span>
-      </div>
-
       <div class="sidebar-item" (click)="openCuratedPlaylistsPage()" [class.active]="currentPage() === 'curated-playlists'">
         <svg lucideMusic [attr.size]="24"></svg>
         <span class="sidebar-label">Curated Playlists</span>
@@ -802,7 +797,7 @@
         <div class="footer-col">
           <h3 class="col-title">Corporate & Legal</h3>
           <ul class="col-links">
-            <li><a routerLink="/advertise">Advertise With Us</a></li>
+            <!-- <li><a routerLink="/advertise">Advertise With Us</a></li> -->
             <li><a routerLink="/about">About Us</a></li>
             <li><a routerLink="/privacy-policy">Privacy Policy</a></li>
             <li><a routerLink="/terms-of-service">Terms of Service</a></li>
@@ -825,7 +820,7 @@
   </main>
 
   <!-- Global Sponsored Ad Banner (Only shown if active) -->
-  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive && currentPage() !== 'managegt' && currentPage() !== 'admin'">
+  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive && currentPage() !== 'managegt' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms'">
     
     <!-- Show Image if no custom code -->
     <a *ngIf="!sponsoredAd()?.customCode" [href]="sponsoredAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">

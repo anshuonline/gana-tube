@@ -1,4 +1,5 @@
-const { nanoid } = require('nanoid');
+const { nanoid, customAlphabet } = require('nanoid');
+const generateRoomId = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
 
 // --- Storage ---
 const rooms = new Map();
@@ -86,7 +87,7 @@ function checkSpam(uid, content, socket) {
 function setupRoomHandlers(io, socket) {
 
   socket.on('room:create', ({ name, isPublic, adminUser }) => {
-    const roomId = nanoid(6).toUpperCase();
+    const roomId = generateRoomId();
     roomStats.totalCreated++;
     
     const room = {
@@ -127,6 +128,9 @@ function setupRoomHandlers(io, socket) {
       disconnectTimeouts.delete(user.uid);
     }
 
+    if (roomId) roomId = roomId.trim().toUpperCase();
+    if (joinCode) joinCode = joinCode.trim().toUpperCase();
+
     // Room switching: if the socket is already in another room, leave it first
     // so the old room stops emitting events to this socket
     const activeRoomId = socketToRoom.get(socket.id);
@@ -137,7 +141,7 @@ function setupRoomHandlers(io, socket) {
     let room = rooms.get(roomId);
     if (!room) {
       for (const [rid, r] of rooms.entries()) {
-        if (r.joinCode === roomId || r.roomId === roomId) {
+        if (r.joinCode?.toUpperCase() === roomId || r.roomId?.toUpperCase() === roomId) {
           room = r;
           roomId = rid;
           break;
@@ -150,7 +154,7 @@ function setupRoomHandlers(io, socket) {
     
     if (!room.isPublic) {
       const codeToCheck = joinCode || roomId;
-      if (room.joinCode !== codeToCheck) {
+      if (room.joinCode?.toUpperCase() !== codeToCheck) {
         return socket.emit('room:error', 'Invalid room code');
       }
     }
@@ -590,7 +594,7 @@ function pickBotTracks(roomIndex) {
 }
 
 function createBotRoom(io, admin, listeners, namePatternIdx, roomIndex) {
-  const roomId = nanoid(6).toUpperCase();
+  const roomId = generateRoomId();
   roomStats.totalCreated++;
   const allTaken = new Set();
   for (const rId of botRooms) {

@@ -21,6 +21,10 @@ export const routes: Routes = [
   { path: 'rooms', children: [] },
   { path: 'rooms/:roomId', children: [] },
   { path: 'release-notes', children: [] },
+  { path: 'advertise', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'ad-booking', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'ad-terms', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'ad-prohibited', redirectTo: 'home', pathMatch: 'full' },
   { path: 'gtanalytic', loadComponent: () => import('./components/analytics-page/analytics-page.component').then(m => m.AnalyticsPageComponent) },
   { path: ':id', children: [] },
 

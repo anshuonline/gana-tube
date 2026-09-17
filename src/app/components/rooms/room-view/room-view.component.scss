@@ -6,6 +6,8 @@
     height: 100dvh;
   }
   overflow: hidden;
+  position: relative;
+  z-index: auto !important;
 }
 
 .room-container {
@@ -15,13 +17,20 @@
   background: #000;
   color: #F5F5F7;
   position: relative;
-  z-index: 10;
+  z-index: auto !important;
 
   // Video mode
   &.video-on {
     position: relative;
-    z-index: 10;
+    z-index: auto !important;
     background: transparent;
+
+    .player-section {
+      .track-meta-bar,
+      .progress-container {
+        max-width: 640px;
+      }
+    }
   }
 }
 
@@ -34,7 +43,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
   position: relative;
-  z-index: 200;
+  z-index: 1000;
   background: #000000;
 
   .header-left {
@@ -363,121 +372,6 @@
   }
 }
 
-// Now Playing Options (below track info)
-.np-options {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: nowrap;
-  max-width: 520px;
-  width: 100%;
-  margin: 2px auto 0;
-
-  @media (max-width: 480px) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px 8px;
-    max-width: 320px;
-  }
-
-  .np-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.82);
-    padding: 5px 12px;
-    border-radius: 9999px;
-    font-size: 0.74rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    @media (max-width: 480px) {
-      width: 100%;
-      padding: 6px 8px;
-      font-size: 0.72rem;
-    }
-
-    svg {
-      flex-shrink: 0;
-      transition: transform 0.2s ease, color 0.2s ease;
-    }
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.22);
-      color: #ffffff;
-      transform: translateY(-1px);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-
-      svg {
-        transform: scale(1.08);
-      }
-    }
-
-    &:active {
-      transform: translateY(0) scale(0.98);
-    }
-
-    // Video Mode Toggle Button
-    &.btn-video-toggle {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(236, 72, 153, 0.35);
-      color: #ffffff;
-
-      &:hover {
-        background: rgba(236, 72, 153, 0.15);
-        border-color: rgba(236, 72, 153, 0.6);
-        box-shadow: 0 3px 12px rgba(236, 72, 153, 0.25);
-      }
-
-      &.video-active {
-        background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: #ffffff;
-        font-weight: 700;
-        box-shadow: 0 3px 12px rgba(236, 72, 153, 0.4);
-
-        &:hover {
-          background: linear-gradient(135deg, #a855f7 0%, #f43f5e 100%);
-          border-color: rgba(255, 255, 255, 0.4);
-          box-shadow: 0 5px 18px rgba(236, 72, 153, 0.55);
-          transform: translateY(-1px);
-        }
-      }
-    }
-
-    // Like Button
-    &.btn-like {
-      &.liked {
-        background: rgba(244, 63, 94, 0.15);
-        border-color: rgba(244, 63, 94, 0.4);
-        color: #fb7185;
-
-        svg {
-          color: #fb7185;
-          fill: #fb7185;
-        }
-
-        &:hover {
-          background: rgba(244, 63, 94, 0.25);
-          border-color: rgba(244, 63, 94, 0.6);
-          color: #fff;
-          box-shadow: 0 3px 12px rgba(244, 63, 94, 0.3);
-        }
-      }
-    }
-  }
-}
-
 // Main Layout
 .main-layout {
   display: flex;
@@ -498,7 +392,7 @@
   min-height: 0;
   overflow-y: auto;
   position: relative;
-  z-index: 100;
+  z-index: 10;
 
   .album-art-container {
     width: 320px;
@@ -632,28 +526,158 @@
     }
   }
 
-  .track-info {
-    text-align: center;
-    max-width: 480px;
+  .track-meta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
+    max-width: 420px;
+    gap: 14px;
+    margin: 2px auto 0;
+    transition: max-width 0.3s ease;
 
-    h3 {
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0 0 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: #ffffff;
+    .track-info {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+
+      h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #ffffff;
+      }
+
+      p {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
-    p {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
-      margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .np-options {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+
+      .np-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.85);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0;
+        flex-shrink: 0;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+
+        svg {
+          flex-shrink: 0;
+          transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(255, 255, 255, 0.24);
+          color: #ffffff;
+          transform: translateY(-2px) scale(1.06);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+
+          svg {
+            transform: scale(1.1);
+          }
+        }
+
+        &:active {
+          transform: translateY(0) scale(0.96);
+        }
+
+        // Video Mode Toggle Button
+        &.btn-video-toggle {
+          border-color: rgba(236, 72, 153, 0.35);
+
+          &:hover {
+            background: rgba(236, 72, 153, 0.15);
+            border-color: rgba(236, 72, 153, 0.6);
+            box-shadow: 0 3px 12px rgba(236, 72, 153, 0.3);
+          }
+
+          &.video-active {
+            background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            box-shadow: 0 3px 14px rgba(236, 72, 153, 0.45);
+
+            &:hover {
+              background: linear-gradient(135deg, #a855f7 0%, #f43f5e 100%);
+              border-color: rgba(255, 255, 255, 0.45);
+              box-shadow: 0 5px 18px rgba(236, 72, 153, 0.6);
+              transform: translateY(-2px) scale(1.06);
+            }
+          }
+        }
+
+        // Like Button
+        &.btn-like {
+          &.liked {
+            background: rgba(244, 63, 94, 0.18);
+            border-color: rgba(244, 63, 94, 0.45);
+            color: #fb7185;
+
+            svg {
+              color: #fb7185;
+              fill: #fb7185;
+            }
+
+            &:hover {
+              background: rgba(244, 63, 94, 0.28);
+              border-color: rgba(244, 63, 94, 0.7);
+              color: #fff;
+              box-shadow: 0 3px 14px rgba(244, 63, 94, 0.35);
+            }
+          }
+        }
+      }
+    }
+
+    @media (max-width: 480px) {
+      gap: 8px;
+
+      .track-info {
+        h3 {
+          font-size: 14.5px;
+        }
+        p {
+          font-size: 12px;
+        }
+      }
+
+      .np-options {
+        gap: 6px;
+
+        .np-btn {
+          width: 34px;
+          height: 34px;
+
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
     }
   }
 
