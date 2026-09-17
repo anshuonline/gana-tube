@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, Output, EventEmitter, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, effect, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, Output, EventEmitter, signal, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -84,6 +84,20 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   private youtubeApi = inject(YoutubeApiService);
   private userService = inject(UserService);
   private algorithmService = inject(AlgorithmService);
+
+  @Input() set playerCoverAd(val: any) {
+    this._playerCoverAd = val;
+    this.restartAdLoop();
+  }
+  get playerCoverAd() {
+    return this._playerCoverAd;
+  }
+  private _playerCoverAd: any = null;
+
+  @Input() safePlayerCoverAdUrl: any = null;
+
+  showCoverAd = false;
+  private adTimers: any[] = [];
 
   @Output() openSaveToPlaylist = new EventEmitter<any>();
 
@@ -192,6 +206,13 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
       }
     }, { allowSignalWrites: true });
+
+    // Manage Cover Ad Timers (active when not in video mode)
+    effect(() => {
+      const track = this.playerService.currentTrack();
+      const isVideo = this.playerService.isVideoMode();
+      this.restartAdLoop();
+    }, { allowSignalWrites: true });
   }
 
   onGuestNameConfirmed(name: string) {
@@ -289,6 +310,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnDestroy() {
+    this.clearAdTimers();
     this.roomService.getSocket().off('room:error', this.errorHandler);
     if (this.likeSub) {
       this.likeSub.unsubscribe();
@@ -303,6 +325,48 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.playerService.isVideoMode.set(false);
     }
     // Do NOT leave room on destroy — room persists while navigating
+  }
+
+  clearAdTimers(): void {
+    this.adTimers.forEach(t => clearTimeout(t));
+    this.adTimers = [];
+  }
+
+  restartAdLoop(): void {
+    this.clearAdTimers();
+    this.showCoverAd = false;
+    this.cdr.detectChanges();
+
+    const track = this.playerService.currentTrack();
+    const isVideo = this.playerService.isVideoMode();
+
+    if (track && !isVideo && this.playerCoverAd && this.playerCoverAd.isActive) {
+      const loopAd = () => {
+        // Wait 5 seconds before showing ad
+        const t1 = setTimeout(() => {
+          if (this.playerCoverAd && this.playerCoverAd.isActive && !this.playerService.isVideoMode()) {
+            this.showCoverAd = true;
+            this.cdr.detectChanges();
+          } else {
+            this.showCoverAd = false;
+            this.cdr.detectChanges();
+          }
+
+          // Wait 5 seconds before hiding (total cycle = 10s)
+          const t2 = setTimeout(() => {
+            this.showCoverAd = false;
+            this.cdr.detectChanges();
+
+            // Start next cycle
+            loopAd();
+          }, 5000);
+          this.adTimers.push(t2);
+        }, 5000);
+        this.adTimers.push(t1);
+      };
+
+      loopAd();
+    }
   }
 
   isUserScrolledUp = false;
@@ -343,6 +407,13 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     // Navigate away without leaving the room — music keeps playing
     this.playerService.isVideoMode.set(false);
     this.router.navigate(['/']);
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  togglePlayerMobile() {
+    this.isPlayerVisibleMobile = !this.isPlayerVisibleMobile;
+    window.dispatchEvent(new Event('resize'));
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
   }
 
   shareCurrentSong() {

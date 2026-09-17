@@ -76,16 +76,31 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  private resizeObserver?: ResizeObserver;
+
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.initYouTubePlayers();
+    this.setupResizeObserver();
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
     this.players.forEach(p => {
       if (p && typeof p.destroy === 'function') p.destroy();
     });
+  }
+
+  private setupResizeObserver(): void {
+    if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.playerService.isVideoMode()) {
+          this.applyVideoMode(true);
+        }
+      });
+      this.resizeObserver.observe(document.body);
+    }
   }
 
   private initYouTubePlayers(): void {
@@ -235,28 +250,27 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         let top: number, left: number, w: number, h: number;
         const anchor = typeof document !== 'undefined' ? (document.querySelector('.room-video-anchor') as HTMLElement | null) : null;
 
+        let isAnchorVisible = false;
+        let arect: DOMRect | null = null;
         if (anchor && anchor.offsetParent !== null) {
-          const arect = anchor.getBoundingClientRect();
+          arect = anchor.getBoundingClientRect();
           if (arect.width > 0 && arect.height > 0) {
-            w = Math.round(arect.width);
-            h = Math.round(arect.height);
-            top = Math.round(arect.top);
-            left = Math.round(arect.left);
-          } else {
-            // Anchor is hidden (e.g. mobile player collapsed)
-            el.style.display = 'none';
-            continue;
+            const style = window.getComputedStyle(anchor);
+            if (style.display !== 'none' && style.visibility !== 'hidden') {
+              isAnchorVisible = true;
+            }
           }
-        } else if (anchor) {
-          // Anchor exists in DOM but not displayed
+        }
+
+        if (anchor && isAnchorVisible && arect) {
+          w = Math.round(arect.width);
+          h = Math.round(arect.height);
+          top = Math.round(arect.top);
+          left = Math.round(arect.left);
+        } else {
+          // Anchor does not exist or is hidden (e.g. mobile player collapsed or room minimized)
           el.style.display = 'none';
           continue;
-        } else {
-          // Floating mini-player fallback when outside room
-          w = 400;
-          h = 225;
-          top = Math.round(window.innerHeight - h - 120);
-          left = Math.round(window.innerWidth - w - 24);
         }
 
         // Nudge the player to re-layout and render video at real size

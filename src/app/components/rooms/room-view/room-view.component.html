@@ -29,23 +29,23 @@
       </button>
       
       <!-- Mobile Options Menu -->
-      <div class="mobile-options hide-desktop" style="position: relative;">
-        <button class="btn-options" (click)="mobileOptionsOpen.set(!mobileOptionsOpen())">
+      <div class="mobile-options hide-desktop">
+        <button class="btn-options" (click)="mobileOptionsOpen.set(!mobileOptionsOpen())" aria-label="Room Options">
           <svg lucideMoreVertical [attr.size]="20"></svg>
         </button>
-        <div class="dropdown-backdrop" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99;"></div>
-        <div class="options-dropdown" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)" style="z-index: 100; position: absolute;">
+        <div class="dropdown-backdrop" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)"></div>
+        <div class="options-dropdown" *ngIf="mobileOptionsOpen()" (click)="mobileOptionsOpen.set(false)">
            <button class="dropdown-item" (click)="showSwitchModal.set(true)">
              <svg lucideArrowLeftRight [attr.size]="16"></svg>
-             Switch Room
+             <span>Switch Room</span>
            </button>
            <button class="dropdown-item" (click)="copyRoomCode()">
              <svg lucideCopy [attr.size]="16"></svg>
-             Copy Room Code
+             <span>Copy Room Code</span>
            </button>
            <button class="dropdown-item" (click)="shareRoom()">
              <svg lucideShare2 [attr.size]="16"></svg>
-             Share Room
+             <span>Share Room</span>
            </button>
         </div>
       </div>
@@ -101,9 +101,28 @@
         </div>
 
         <!-- Loading Overlay -->
-        <div class="art-overlay" *ngIf="playerService.playerState() === 'loading'" style="opacity: 1; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; gap: 12px;">
+        <div class="art-overlay" *ngIf="playerService.playerState() === 'loading'" style="opacity: 1; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; gap: 12px; z-index: 10;">
           <svg lucideLoader2 [attr.size]="40" class="spin-animation" style="color: white;"></svg>
           <p style="font-size: 14px; font-weight: 500;">Loading...</p>
+        </div>
+
+        <!-- Animated Cover Ad Overlay (Active when video is off) -->
+        <div class="room-cover-ad-container" [class.active]="showCoverAd && !playerService.isVideoMode()" *ngIf="playerCoverAd?.isActive && !playerService.isVideoMode()">
+          <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" 
+             [href]="playerCoverAd?.linkUrl" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             (click)="$event.stopPropagation()">
+            <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="room-cover-ad-media" />
+          </a>
+          <iframe *ngIf="playerCoverAd?.customCode" 
+                  [src]="safePlayerCoverAdUrl"
+                  class="room-cover-ad-media"
+                  scrolling="no"
+                  frameborder="0"
+                  (click)="$event.stopPropagation()">
+          </iframe>
+          <span class="room-cover-ad-label">Sponsored</span>
         </div>
 
         <div *ngIf="!playerService.currentTrack() && playerService.playerState() !== 'loading'" class="empty-art">
@@ -120,19 +139,19 @@
       <!-- Now Playing Options -->
       <div class="np-options" *ngIf="playerService.currentTrack()">
         <button class="np-btn" (click)="shareCurrentSong()" title="Share this song">
-          <svg lucideShare2 [attr.size]="15"></svg>
+          <svg lucideShare2 [attr.size]="13"></svg>
           <span>Music Share</span>
         </button>
         <button class="np-btn btn-video-toggle" [class.video-active]="playerService.isVideoMode()" (click)="playerService.toggleVideoMode()" [title]="playerService.isVideoMode() ? 'Switch to Audio' : 'Switch to Video'">
-          <svg lucideMonitor [attr.size]="15"></svg>
+          <svg lucideMonitor [attr.size]="13"></svg>
           <span>{{ playerService.isVideoMode() ? 'Back to Audio' : 'Switch to Video' }}</span>
         </button>
         <button class="np-btn btn-like" [class.liked]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
-          <svg lucideHeart [attr.size]="15" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+          <svg lucideHeart [attr.size]="13" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
           <span>{{ isCurrentTrackLiked() ? 'Liked' : 'Like' }}</span>
         </button>
         <button class="np-btn" (click)="openSaveToPlaylist.emit(playerService.currentTrack())" title="Save to Playlist">
-          <svg lucideFolderPlus [attr.size]="15"></svg>
+          <svg lucideFolderPlus [attr.size]="13"></svg>
           <span>Save to Playlist</span>
         </button>
       </div>
@@ -171,7 +190,7 @@
     <div class="mobile-tabs hide-desktop">
       <button [class.active]="activeMobileTab === 'queue'" (click)="activeMobileTab = 'queue'">Queue</button>
       <button [class.active]="activeMobileTab === 'chat'" (click)="activeMobileTab = 'chat'">Chat</button>
-      <button class="toggle-player-btn" (click)="isPlayerVisibleMobile = !isPlayerVisibleMobile" title="Toggle Player" style="flex: 0 0 auto; padding: 0 16px; border-left: 1px solid rgba(255, 255, 255, 0.08);">
+      <button class="toggle-player-btn" (click)="togglePlayerMobile()" title="Toggle Player" style="flex: 0 0 auto; padding: 0 16px; border-left: 1px solid rgba(255, 255, 255, 0.08);">
         <svg *ngIf="isPlayerVisibleMobile" lucideChevronDown [attr.size]="20"></svg>
         <svg *ngIf="!isPlayerVisibleMobile" lucideChevronUp [attr.size]="20"></svg>
       </button>

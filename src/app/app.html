@@ -351,6 +351,8 @@
 
     <app-room-view
       *ngIf="currentPage() === 'rooms-view'"
+      [playerCoverAd]="playerCoverAd()"
+      [safePlayerCoverAdUrl]="safePlayerCoverAdUrl"
       (openSaveToPlaylist)="openSaveToPlaylist($event)">
     </app-room-view>
 
