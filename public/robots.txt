@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /managegt
+Disallow: /admin
+
+Sitemap: https://ganatube.in/sitemap.xml
