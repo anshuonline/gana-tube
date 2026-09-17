@@ -62,6 +62,17 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     effect(() => {
       const on = this.playerService.isVideoMode();
       this.applyVideoMode(on);
+      if (on) {
+        requestAnimationFrame(() => {
+          this.applyVideoMode(true);
+        });
+        setTimeout(() => {
+          this.applyVideoMode(true);
+        }, 50);
+        setTimeout(() => {
+          this.applyVideoMode(true);
+        }, 300);
+      }
     });
   }
 
@@ -214,10 +225,6 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private applyVideoMode(on: boolean): void {
-    // The container (opacity 0.01, z-index -9999) creates a stacking context —
-    // children can never escape it. So in video mode we raise the container
-    // itself and use inline styles on the active player (scoped CSS can't
-    // reach the iframe — it has no Angular content attribute).
     const container = typeof document !== 'undefined' ? (document.querySelector('.yt-player-container') as HTMLElement | null) : null;
 
     for (let i = 0; i < this.totalPlayers; i++) {
@@ -225,40 +232,40 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!el) continue;
 
       if (on && i === this.activePlayerIndex) {
-        // Nudge the player to re-layout and render video at a real size
-        const p = this.players[i];
-        if (p && typeof p.setSize === 'function') {
-          p.setSize(640, 360);
-        }
-
-        // Position over the room's cover art (center), larger, YouTube miniplayer style
         let top: number, left: number, w: number, h: number;
         const anchor = typeof document !== 'undefined' ? (document.querySelector('.room-video-anchor') as HTMLElement | null) : null;
-        const section = typeof document !== 'undefined' ? (document.querySelector('.player-section') as HTMLElement | null) : null;
-        if (section) {
-          const srect = section.getBoundingClientRect();
-          w = Math.min(Math.round(srect.width - 48), window.innerWidth - 48);
-          h = Math.round(w * 9 / 16);
-          if (anchor) {
-            const arect = anchor.getBoundingClientRect();
-            top = Math.round(arect.top + arect.height / 2 - h / 2);
+
+        if (anchor && anchor.offsetParent !== null) {
+          const arect = anchor.getBoundingClientRect();
+          if (arect.width > 0 && arect.height > 0) {
+            w = Math.round(arect.width);
+            h = Math.round(arect.height);
+            top = Math.round(arect.top);
+            left = Math.round(arect.left);
           } else {
-            top = Math.round(srect.top + 24);
+            // Anchor is hidden (e.g. mobile player collapsed)
+            el.style.display = 'none';
+            continue;
           }
-          left = Math.round(srect.left + 24 + Math.max(0, (srect.width - 48 - w) / 2));
         } else if (anchor) {
-          const rect = anchor.getBoundingClientRect();
-          w = Math.min(Math.round(rect.width * 1.5), window.innerWidth - 48);
-          h = Math.round(w * 9 / 16);
-          top = Math.round(rect.top + rect.height / 2 - h / 2);
-          left = Math.round(rect.left + rect.width / 2 - w / 2);
+          // Anchor exists in DOM but not displayed
+          el.style.display = 'none';
+          continue;
         } else {
-          w = 400; h = 225;
+          // Floating mini-player fallback when outside room
+          w = 400;
+          h = 225;
           top = Math.round(window.innerHeight - h - 120);
           left = Math.round(window.innerWidth - w - 24);
         }
 
-        el.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;z-index:1200;opacity:1;pointer-events:none;border-radius:16px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(139,92,246,0.25);overflow:hidden;`;
+        // Nudge the player to re-layout and render video at real size
+        const p = this.players[i];
+        if (p && typeof p.setSize === 'function') {
+          p.setSize(w, h);
+        }
+
+        el.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;z-index:51;opacity:1;pointer-events:none;border-radius:16px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 16px 48px rgba(0,0,0,0.8),0 0 32px rgba(139,92,246,0.25);overflow:hidden;`;
       } else {
         el.classList.remove('video-active');
         el.style.cssText = on ? 'display:none;' : '';
@@ -268,7 +275,7 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (container) {
       if (on) {
         container.style.opacity = '1';
-        container.style.zIndex = '1199'; // Escape the -9999 stacking context
+        container.style.zIndex = '50';
         container.style.overflow = 'visible';
       } else {
         container.style.opacity = '';

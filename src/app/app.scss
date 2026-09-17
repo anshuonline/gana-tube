@@ -908,6 +908,7 @@
     width: 100%;
     margin: 0;
     padding: 0 0 0 70px !important;
+    z-index: auto !important;
     @media (max-width: 768px) {
       padding: 0 !important;
     }

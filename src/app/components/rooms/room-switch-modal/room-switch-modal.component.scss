@@ -5,7 +5,7 @@
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  z-index: 200;
+  z-index: 10000;
 }
 
 .rsw-modal {
@@ -19,7 +19,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 22px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(139, 92, 246, 0.12);
-  z-index: 201;
+  z-index: 10001;
   display: flex;
   flex-direction: column;
   overflow: hidden;

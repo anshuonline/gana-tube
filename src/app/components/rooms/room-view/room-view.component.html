@@ -120,19 +120,19 @@
       <!-- Now Playing Options -->
       <div class="np-options" *ngIf="playerService.currentTrack()">
         <button class="np-btn" (click)="shareCurrentSong()" title="Share this song">
-          <svg lucideShare2 [attr.size]="13"></svg>
+          <svg lucideShare2 [attr.size]="15"></svg>
           <span>Music Share</span>
         </button>
-        <button class="np-btn accent" (click)="playerService.toggleVideoMode()" title="Switch to Video">
-          <svg lucideMonitor [attr.size]="13"></svg>
+        <button class="np-btn btn-video-toggle" [class.video-active]="playerService.isVideoMode()" (click)="playerService.toggleVideoMode()" [title]="playerService.isVideoMode() ? 'Switch to Audio' : 'Switch to Video'">
+          <svg lucideMonitor [attr.size]="15"></svg>
           <span>{{ playerService.isVideoMode() ? 'Back to Audio' : 'Switch to Video' }}</span>
         </button>
-        <button class="np-btn" (click)="toggleLike()" title="Like">
-          <svg lucideHeart [attr.size]="13" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+        <button class="np-btn btn-like" [class.liked]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
+          <svg lucideHeart [attr.size]="15" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
           <span>{{ isCurrentTrackLiked() ? 'Liked' : 'Like' }}</span>
         </button>
         <button class="np-btn" (click)="openSaveToPlaylist.emit(playerService.currentTrack())" title="Save to Playlist">
-          <svg lucideFolderPlus [attr.size]="13"></svg>
+          <svg lucideFolderPlus [attr.size]="15"></svg>
           <span>Save to Playlist</span>
         </button>
       </div>

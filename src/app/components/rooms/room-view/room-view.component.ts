@@ -299,6 +299,9 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (this.heartInterval) {
       clearInterval(this.heartInterval);
     }
+    if (this.playerService.isVideoMode()) {
+      this.playerService.isVideoMode.set(false);
+    }
     // Do NOT leave room on destroy — room persists while navigating
   }
 
