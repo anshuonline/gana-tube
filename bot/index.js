@@ -7,8 +7,7 @@ const config = require('./config');
 function createBotClient(usePrivileged = true) {
   const intents = [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildVoiceStates
+    GatewayIntentBits.GuildMessages
   ];
 
   if (usePrivileged) {
