@@ -1401,14 +1401,38 @@ export class App implements OnInit {
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const videoId = params.get('v') || params.get('play');
       if (videoId) {
-        // Simple search by videoId or fetch details to play
-        this.youtubeApi.searchMusic(videoId, 1).subscribe({
+        // Fetch exact video details by ID instead of performing a fuzzy text search
+        this.youtubeApi.getVideoDetails([videoId]).subscribe({
           next: (res) => {
             if (res && res.length > 0) {
-              // Only play if it's not already the current track to prevent loops
               if (this.playerService.currentTrack()?.videoId !== videoId) {
                 this.playerService.playTrack(res[0]);
               }
+            } else {
+              // Guaranteed fallback: play the exact videoId directly
+              if (this.playerService.currentTrack()?.videoId !== videoId) {
+                this.playerService.playTrack({
+                  videoId: videoId,
+                  title: 'Playing from link...',
+                  channelTitle: 'GanaTube',
+                  thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+                  thumbnailHigh: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+                  publishedAt: new Date().toISOString()
+                });
+              }
+            }
+          },
+          error: () => {
+            // Guaranteed fallback on error: play the exact videoId directly
+            if (this.playerService.currentTrack()?.videoId !== videoId) {
+              this.playerService.playTrack({
+                videoId: videoId,
+                title: 'Playing from link...',
+                channelTitle: 'GanaTube',
+                thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+                thumbnailHigh: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+                publishedAt: new Date().toISOString()
+              });
             }
           }
         });
