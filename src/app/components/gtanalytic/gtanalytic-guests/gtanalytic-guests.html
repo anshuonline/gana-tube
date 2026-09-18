@@ -10,12 +10,26 @@
       <p class="page-desc">Track anonymous audience size, active guest sessions, and unauthenticated listening trends</p>
     </div>
 
-    <!-- Time Filter Pills -->
-    <div class="filter-pill-group">
-      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'today'" (click)="setFilter('today')">Today</button>
-      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'yesterday'" (click)="setFilter('yesterday')">Yesterday</button>
-      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'last_7_days'" (click)="setFilter('last_7_days')">7 Days</button>
-      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'all_time'" (click)="setFilter('all_time')">All Time</button>
+    <!-- Header Actions -->
+    <div class="header-action-row">
+      <!-- Geography Button -->
+      <button class="geo-action-btn" (click)="openGeoModal()" title="View Top 50 Active Locations">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>Geography</span>
+        <span class="geo-top-pill">Top 50</span>
+      </button>
+
+      <!-- Time Filter Pills -->
+      <div class="filter-pill-group">
+        <button class="filter-pill" [class.active]="dataService.currentFilter() === 'today'" (click)="setFilter('today')">Today</button>
+        <button class="filter-pill" [class.active]="dataService.currentFilter() === 'yesterday'" (click)="setFilter('yesterday')">Yesterday</button>
+        <button class="filter-pill" [class.active]="dataService.currentFilter() === 'last_7_days'" (click)="setFilter('last_7_days')">7 Days</button>
+        <button class="filter-pill" [class.active]="dataService.currentFilter() === 'all_time'" (click)="setFilter('all_time')">All Time</button>
+      </div>
     </div>
   </div>
 
@@ -451,5 +465,204 @@
     </div>
   </div>
 
+  <!-- ── AUDIENCE GEOGRAPHY DEMOGRAPHICS MODAL ── -->
+  <div class="guest-modal-backdrop" *ngIf="isGeoModalOpen()" (click)="closeGeoModal()">
+    <div class="guest-modal-card geo-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-head">
+        <div class="modal-head-left">
+          <div class="geo-modal-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="geo-modal-title-row">
+              <h2 class="modal-title">Audience Geography & Cities</h2>
+              <span class="geo-top-pill">Top 50 Locations</span>
+            </div>
+            <p class="modal-sub">Real-time breakdown of active cities and regions tuning into GanaTube</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeGeoModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Filter Bar: DAU / WAU / MAU / YAU / All Time + Search -->
+      <div class="geo-controls-bar">
+        <!-- Range Filter Pills -->
+        <div class="geo-range-pills">
+          <button 
+            class="geo-range-pill" 
+            [class.active]="geoRange() === 'dau'" 
+            (click)="setGeoRange('dau')">
+            <span>DAU</span>
+            <span class="range-sub-txt">(24h)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="geoRange() === 'wau'" 
+            (click)="setGeoRange('wau')">
+            <span>WAU</span>
+            <span class="range-sub-txt">(7d)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="geoRange() === 'mau'" 
+            (click)="setGeoRange('mau')">
+            <span>MAU</span>
+            <span class="range-sub-txt">(30d)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="geoRange() === 'yau'" 
+            (click)="setGeoRange('yau')">
+            <span>YAU</span>
+            <span class="range-sub-txt">(365d)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="geoRange() === 'all'" 
+            (click)="setGeoRange('all')">
+            <span>All Time</span>
+          </button>
+        </div>
+
+        <!-- Filter / Search by City / Country -->
+        <div class="geo-search-box">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input 
+            type="text" 
+            [ngModel]="geoSearchQuery()" 
+            (ngModelChange)="geoSearchQuery.set($event)"
+            placeholder="Filter city, state, country..." 
+            class="geo-search-input"
+          />
+          <button *ngIf="geoSearchQuery()" (click)="geoSearchQuery.set('')" class="btn-clear">&times;</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body geo-modal-body">
+        
+        <!-- Summary KPI Cards -->
+        <div class="geo-kpi-grid" *ngIf="geoData()?.summary">
+          <div class="geo-kpi-card pink-kpi">
+            <span class="geo-kpi-lbl">Active Listeners ({{ geoData().range_label }})</span>
+            <span class="geo-kpi-val">{{ geoData().summary.total_active_guests | number }}</span>
+          </div>
+          <div class="geo-kpi-card purple-kpi">
+            <span class="geo-kpi-lbl">Total Streams Played</span>
+            <span class="geo-kpi-val">{{ geoData().summary.total_plays | number }}</span>
+          </div>
+          <div class="geo-kpi-card cyan-kpi">
+            <span class="geo-kpi-lbl">Total Listen Time</span>
+            <span class="geo-kpi-val">{{ formatSeconds(geoData().summary.total_time_seconds) }}</span>
+          </div>
+          <div class="geo-kpi-card emerald-kpi">
+            <span class="geo-kpi-lbl">Cities / Locations Tracked</span>
+            <span class="geo-kpi-val">{{ geoData().summary.total_cities_count | number }}</span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="geo-loading-state" *ngIf="geoLoading()">
+          <div class="geo-spinner"></div>
+          <p>Analyzing audience location demographics ({{ geoRange().toUpperCase() }})...</p>
+        </div>
+
+        <!-- Top 50 Locations Table -->
+        <div class="table-responsive geo-table-responsive" *ngIf="!geoLoading()">
+          <table class="guest-table geo-table">
+            <thead>
+              <tr>
+                <th style="width: 55px; text-align: center;">Rank</th>
+                <th>Location / City</th>
+                <th>Active Guests</th>
+                <th style="width: 170px;">Traffic Share</th>
+                <th>Total Streams</th>
+                <th>Listen Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="!filteredGeoLocations().length">
+                <td colspan="6" class="empty-state">
+                  <p>No active location data found for {{ geoRange().toUpperCase() }}.</p>
+                </td>
+              </tr>
+              <tr *ngFor="let loc of filteredGeoLocations()">
+                <!-- Rank -->
+                <td style="text-align: center;">
+                  <span class="rank-badge" [class.rank-1]="loc.rank === 1" [class.rank-2]="loc.rank === 2" [class.rank-3]="loc.rank === 3">
+                    <ng-container *ngIf="loc.rank === 1">🥇</ng-container>
+                    <ng-container *ngIf="loc.rank === 2">🥈</ng-container>
+                    <ng-container *ngIf="loc.rank === 3">🥉</ng-container>
+                    <ng-container *ngIf="loc.rank > 3">#{{ loc.rank }}</ng-container>
+                  </span>
+                </td>
+
+                <!-- Location / City -->
+                <td>
+                  <div class="geo-city-cell">
+                    <span class="geo-flag">{{ getCountryFlag(loc.country_code) }}</span>
+                    <div class="geo-city-meta">
+                      <span class="geo-city-name">{{ loc.city || 'Unknown' }}</span>
+                      <span class="geo-region-country">
+                        <ng-container *ngIf="loc.region">{{ loc.region }}, </ng-container>{{ loc.country }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Active Guests -->
+                <td>
+                  <span class="geo-guest-count">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <strong>{{ loc.active_guests | number }}</strong>
+                    <span class="unit-txt">guests</span>
+                  </span>
+                </td>
+
+                <!-- Traffic Share % & Bar -->
+                <td>
+                  <div class="geo-share-cell">
+                    <div class="geo-share-header">
+                      <span class="geo-share-pct">{{ loc.percentage }}%</span>
+                    </div>
+                    <div class="geo-progress-track">
+                      <div class="geo-progress-bar" [style.width.%]="loc.percentage"></div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Total Streams -->
+                <td>
+                  <span class="geo-plays-badge">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    {{ loc.total_plays | number }}
+                  </span>
+                </td>
+
+                <!-- Listen Time -->
+                <td>
+                  <span class="geo-time-txt">{{ formatSeconds(loc.total_time_seconds) }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-foot">
+        <span class="geo-footer-hint">Top 50 highest traffic locations</span>
+        <button class="modal-action-btn" (click)="closeGeoModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
 
 </div>

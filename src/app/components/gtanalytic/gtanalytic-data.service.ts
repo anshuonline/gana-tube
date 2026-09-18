@@ -93,6 +93,11 @@ export class GtanalyticDataService {
     });
   }
 
+  getGuestGeography(range: string = 'dau') {
+    const pwd = this.getPassword();
+    return this.analyticsService.getGuestGeography(pwd, range);
+  }
+
   startAutoRefresh() {
     if (this.autoRefreshTimer) return;
     this.autoRefreshTimer = setInterval(() => {

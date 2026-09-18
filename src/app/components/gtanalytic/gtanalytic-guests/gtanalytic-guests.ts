@@ -146,4 +146,53 @@ export class GtanalyticGuestsComponent {
       year: 'numeric'
     });
   }
+
+  // ── Audience Geography Demographics Modal ──
+  isGeoModalOpen = signal<boolean>(false);
+  geoRange = signal<'dau' | 'wau' | 'mau' | 'yau' | 'all'>('dau');
+  geoLoading = signal<boolean>(false);
+  geoData = signal<any>(null);
+  geoSearchQuery = signal<string>('');
+
+  filteredGeoLocations = computed(() => {
+    const data = this.geoData();
+    const list = data?.locations || [];
+    const q = this.geoSearchQuery().toLowerCase().trim();
+    if (!q) return list;
+    return list.filter((l: any) =>
+      (l.city || '').toLowerCase().includes(q) ||
+      (l.region || '').toLowerCase().includes(q) ||
+      (l.country || '').toLowerCase().includes(q)
+    );
+  });
+
+  openGeoModal() {
+    this.isGeoModalOpen.set(true);
+    this.loadGeoData();
+  }
+
+  closeGeoModal() {
+    this.isGeoModalOpen.set(false);
+  }
+
+  setGeoRange(range: 'dau' | 'wau' | 'mau' | 'yau' | 'all') {
+    if (this.geoRange() === range) return;
+    this.geoRange.set(range);
+    this.loadGeoData();
+  }
+
+  loadGeoData() {
+    this.geoLoading.set(true);
+    this.dataService.getGuestGeography(this.geoRange()).subscribe({
+      next: (res) => {
+        if (res.status === 'success') {
+          this.geoData.set(res.data);
+        }
+        this.geoLoading.set(false);
+      },
+      error: () => {
+        this.geoLoading.set(false);
+      }
+    });
+  }
 }
