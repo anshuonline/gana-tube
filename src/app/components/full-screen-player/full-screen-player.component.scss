@@ -125,12 +125,12 @@
 
 .fs-artwork-container {
   position: relative;
-  width: 100%;
-  max-width: 500px;
+  width: min(100%, calc(100dvh - 330px), 500px);
   aspect-ratio: 1 / 1;
   border-radius: 0; // Fixed "round ho raha" issue to match Spotify's perfectly square cover art
   overflow: hidden;
   transition: transform 0.4s ease;
+  margin: 0 auto;
 
   .fs-album-art {
     width: 100%;
@@ -151,10 +151,13 @@
     width: 100%;
     height: 100%;
     background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
-    transform: scale(1.05);
+    transform: scale(0.96);
     pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
     z-index: 5;
     
     &.active {
@@ -162,11 +165,20 @@
       transform: scale(1);
       pointer-events: auto;
     }
+
+    a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+    }
     
     .fs-cover-ad-media {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
     
@@ -804,8 +816,8 @@
   }
 
   .fs-artwork-container {
-    width: auto;
-    height: 100%;
+    width: min(100%, calc(100dvh - 310px), 500px);
+    height: auto;
     max-width: 100%;
     max-height: 100%;
     aspect-ratio: 1 / 1;
