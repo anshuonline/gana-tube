@@ -1364,49 +1364,27 @@ export class App implements OnInit {
       ? 'http://localhost/manageads/api.php' 
       : 'https://manageads.ganatube.in/api.php';
 
-    // Fetch Bottom Banner
-    fetch(`${adApiUrl}?placeholder=bottom_player_banner`)
+    // Combined Ads Fetch: 4 requests → 1 (Performance Optimization)
+    fetch(`${adApiUrl}?action=app_ads`)
       .then(res => res.json())
       .then(data => {
-        if (data && data.isActive) {
-          this.sponsoredAd.set(data);
+        if (data && data.ads) {
+          const bottom = data.ads['bottom_player_banner'];
+          if (bottom && bottom.isActive) this.sponsoredAd.set(bottom);
+          const inFeed = data.ads['home_feed_banner'];
+          if (inFeed && inFeed.isActive) this.inFeedAd.set(inFeed);
+          const cover = data.ads['player_cover_ad'];
+          if (cover && cover.isActive) this.playerCoverAd.set(cover);
         }
-      })
-      .catch(err => console.error('Failed to load bottom banner', err));
-
-    // Fetch In-Feed Banner
-    fetch(`${adApiUrl}?placeholder=home_feed_banner`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.isActive) {
-          this.inFeedAd.set(data);
-        }
-      })
-      .catch(err => console.error('Failed to load in-feed banner', err));
-
-    // Fetch Player Cover Ad
-    fetch(`${adApiUrl}?placeholder=player_cover_ad`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.isActive) {
-          this.playerCoverAd.set(data);
-        }
-      })
-      .catch(err => console.error('Failed to load player cover banner', err));
-
-    // Fetch and Inject Header Scripts
-    fetch(`${adApiUrl}?action=header_scripts`)
-      .then(res => res.json())
-      .then(scripts => {
-        if (Array.isArray(scripts)) {
-          scripts.forEach(script => {
+        if (data && Array.isArray(data.header_scripts)) {
+          data.header_scripts.forEach((script: any) => {
             if (script && script.custom_code) {
               this.injectHeaderScript(script.custom_code);
             }
           });
         }
       })
-      .catch(err => console.error('Failed to load header scripts', err));
+      .catch(err => console.error('Failed to load ads', err));
 
     this.apiKeyMissing = false;
 
@@ -1465,15 +1443,11 @@ export class App implements OnInit {
   }
 
   fetchHeroData(): void {
-    const url = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
-    fetch(`${url}?action=get_header&t=${Date.now()}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && typeof data === 'object' && !Array.isArray(data)) {
-          this.heroData.set(data);
-        }
-      })
-      .catch(err => console.warn('Could not load custom header data:', err));
+    this.youtubeApi.getAppInitHeader().subscribe(data => {
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        this.heroData.set(data);
+      }
+    });
   }
 
   loadInitialShelves(language?: string): void {

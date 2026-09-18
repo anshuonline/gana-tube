@@ -20,11 +20,11 @@ export class AnalyticsService {
     this.currentUserEmail = email;
     this.currentDisplayName = displayName;
     
-    // Record time every 120 seconds (skip if tab is inactive/hidden)
+    // Record time every 180 seconds (skip if tab is inactive/hidden)
     this.timeTrackingInterval = setInterval(() => {
       if (typeof document !== 'undefined' && document.hidden) return;
-      this.recordTime(120);
-    }, 120000);
+      this.recordTime(180);
+    }, 180000);
   }
 
   stopTrackingTime() {
@@ -50,11 +50,11 @@ export class AnalyticsService {
       clearInterval(this.timeTrackingInterval);
     }
     const guestId = this.getGuestId();
-    // Heartbeat every 120 seconds (skip if tab is inactive/hidden to avoid server load)
+    // Heartbeat every 180 seconds (skip if tab is inactive/hidden to avoid server load)
     this.timeTrackingInterval = setInterval(() => {
       if (typeof document !== 'undefined' && document.hidden) return;
-      this.recordGuestPing(guestId, 120);
-    }, 120000);
+      this.recordGuestPing(guestId, 180);
+    }, 180000);
     // Initial active ping
     this.recordGuestPing(guestId, 0);
   }

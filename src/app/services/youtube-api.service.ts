@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, forkJoin } from 'rxjs';
-import { catchError, map, timeout } from 'rxjs/operators';
+import { Observable, of, forkJoin, ReplaySubject } from 'rxjs';
+import { catchError, map, take, timeout } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface YouTubeSearchResult {
@@ -22,22 +22,69 @@ export class YoutubeApiService {
   private dynamicCuratedSongs: Record<string, any[]> | null = null;
   private cacheDuration = 24 * 60 * 60 * 1000; // 24 hours
 
+  // Cached app_init data (Performance: 4 API calls → 1)
+  private _appInitData: any = null;
+  private _appInitLoaded = new ReplaySubject<any>(1);
+  private _manageUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost')
+    ? 'http://localhost/manageads/managegt-api.php'
+    : 'https://manageads.ganatube.in/managegt-api.php';
+
   constructor(private http: HttpClient) {
     this.fetchLiveCuratedSongs();
+    this.preloadAppInit();
+  }
+
+  /** Preload all app settings (sections, playlists, header, popups) in ONE request */
+  private preloadAppInit() {
+    this.http.get<any>(`${this._manageUrl}?action=app_init`).pipe(
+      catchError(() => of(null))
+    ).subscribe(data => {
+      this._appInitData = data;
+      this._appInitLoaded.next(data);
+    });
   }
 
   getCustomSections(): Observable<Record<string, any[]>> {
-    const fetchUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php?action=get_sections' : 'https://manageads.ganatube.in/managegt-api.php?action=get_sections';
-    return this.http.get<Record<string, any[]>>(fetchUrl).pipe(
+    if (this._appInitData?.sections) {
+      return of(this._appInitData.sections as Record<string, any[]>);
+    }
+    // Wait for app_init to complete
+    return this._appInitLoaded.pipe(
+      take(1),
+      map(data => (data?.sections || {}) as Record<string, any[]>),
       catchError(() => of({}))
     );
   }
 
   getCustomPlaylists(): Observable<Record<string, any[]>> {
-    const fetchUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php?action=get_playlists' : 'https://manageads.ganatube.in/managegt-api.php?action=get_playlists';
-    // Use a timestamp to bypass browser caching, just like in the admin panel
-    const cacheBuster = new Date().getTime();
-    return this.http.get<Record<string, any[]>>(`${fetchUrl}&t=${cacheBuster}`).pipe(
+    if (this._appInitData?.playlists) {
+      return of(this._appInitData.playlists as Record<string, any[]>);
+    }
+    return this._appInitLoaded.pipe(
+      take(1),
+      map(data => (data?.playlists || {}) as Record<string, any[]>),
+      catchError(() => of({}))
+    );
+  }
+
+  getAppInitHeader(): Observable<any> {
+    if (this._appInitData?.header) {
+      return of(this._appInitData.header);
+    }
+    return this._appInitLoaded.pipe(
+      take(1),
+      map(data => data?.header || {}),
+      catchError(() => of({}))
+    );
+  }
+
+  getAppInitPopups(): Observable<any> {
+    if (this._appInitData?.popups) {
+      return of(this._appInitData.popups);
+    }
+    return this._appInitLoaded.pipe(
+      take(1),
+      map(data => data?.popups || {}),
       catchError(() => of({}))
     );
   }
