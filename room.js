@@ -184,13 +184,19 @@ function setupRoomHandlers(io, socket) {
       
       socketToRoom.delete(oldSocketId);
     } else {
+      const isFirstAdmin = !room.adminUid || room.members.length === 0;
       const newMember = {
         socketId: socket.id,
         uid: user.uid,
         displayName: user.displayName || 'Listener',
         photoURL: user.photoURL,
-        isAdmin: false
+        isAdmin: isFirstAdmin
       };
+      if (isFirstAdmin) {
+        room.adminUid = socket.id;
+        room.adminFirebaseUid = user.uid;
+        room.adminName = newMember.displayName;
+      }
       room.members.push(newMember);
       room.listenerCount = room.members.length;
     }
@@ -843,9 +849,57 @@ function getRoomAnalytics() {
   };
 }
 
+function createDiscordRoom({ name, initialTrack = null }) {
+  const roomId = generateRoomId();
+  roomStats.totalCreated++;
+
+  const room = {
+    roomId,
+    name: (name || 'Discord Vibe Lounge').substring(0, 40),
+    isPublic: false, // 100% PRIVATE: Never listed on website public discovery
+    joinCode: roomId,
+    adminUid: null,
+    adminFirebaseUid: null,
+    adminName: 'Discord Host',
+    maxMembers: 50,
+    members: [],
+    currentTrack: initialTrack || null,
+    queue: initialTrack ? [initialTrack] : [],
+    currentTime: 0,
+    isPlaying: !!initialTrack,
+    chat: [{
+      id: nanoid(10),
+      senderUid: 'system',
+      senderName: 'GanaTube Bot',
+      message: '🎧 Discord Vibe Room is active! The first listener to join becomes the Host & DJ.',
+      time: Date.now(),
+      type: 'system'
+    }],
+    recommendations: [],
+    listenerCount: 0,
+    isDiscordRoom: true,
+    createdAt: Date.now()
+  };
+
+  rooms.set(roomId, room);
+  return room;
+}
+
+function deleteDiscordRoom(roomId) {
+  if (roomId && rooms.has(roomId)) {
+    rooms.delete(roomId);
+    roomStats.dismissed++;
+    return true;
+  }
+  return false;
+}
+
 module.exports = {
   setupRoomHandlers,
   handleRoomDisconnect,
   initBotRooms,
-  getRoomAnalytics
+  getRoomAnalytics,
+  createDiscordRoom,
+  deleteDiscordRoom
 };
+

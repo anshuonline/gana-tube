@@ -2114,8 +2114,12 @@
 .socials-page {
   max-width: 860px;
   margin: 0 auto;
-  padding: 48px 20px 60px;
+  padding: 130px 20px 60px;
   animation: fadeIn 0.35s ease-out;
+
+  @media (max-width: 768px) {
+    padding-top: 96px;
+  }
 }
 
 .socials-header {
@@ -2166,8 +2170,12 @@
 
 .socials-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;

@@ -22,7 +22,33 @@ const PORT = process.env.PORT || 3000;
 
 const userDevices = new Map(); // email -> [{socketId, deviceId, deviceName, isMobile, isActive}]
 
-const { setupRoomHandlers, handleRoomDisconnect, initBotRooms, getRoomAnalytics } = require('./room.js');
+const { setupRoomHandlers, handleRoomDisconnect, initBotRooms, getRoomAnalytics, createDiscordRoom, deleteDiscordRoom } = require('./room.js');
+
+app.use(express.json());
+
+// ── Discord Bot Room Creation Endpoint ──
+app.post('/api/rooms/create-discord-room', (req, res) => {
+  const { name, initialTrack } = req.body || {};
+  try {
+    const room = createDiscordRoom({ name, initialTrack });
+    res.json({
+      success: true,
+      roomId: room.roomId,
+      name: room.name,
+      roomUrl: `https://ganatube.in/rooms/${room.roomId}`
+    });
+  } catch (err) {
+    console.error('Failed to create discord room:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/rooms/delete-discord-room', (req, res) => {
+  const { roomId } = req.body || {};
+  const deleted = deleteDiscordRoom(roomId);
+  res.json({ success: deleted });
+});
+
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -750,4 +776,15 @@ server.listen(PORT, async () => {
   } catch (err) {
     console.error('Failed to pre-initialize YTMusic:', err);
   }
+
+  // ── Auto-start GanaTube Discord Bot ──
+  try {
+    if (process.env.DISCORD_BOT_TOKEN) {
+      const { startBot } = require('./bot/index.js');
+      startBot();
+    }
+  } catch (botErr) {
+    console.warn('[GanaTube Server] Discord Bot start skipped:', botErr.message);
+  }
 });
+
