@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect, ChangeDetectorRef, signal, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, ViewChild, ElementRef, effect, ChangeDetectorRef, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { YoutubeApiService } from '../../services/youtube-api.service';
@@ -142,13 +142,30 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   useLowQualityCover: boolean = false;
   coverLoadingTimeout: any;
 
+  // Effective track that prioritizes live resolved metadata over placeholder values
+  effectiveTrack = computed(() => {
+    const dt = this.displayTrack();
+    const ct = this.playerService.currentTrack();
+    if (!ct) return dt;
+    if (!dt) return ct;
+    if (dt.videoId === ct.videoId) {
+      const isDtPlaceholder = !dt.title || dt.title.includes('Loading Track') || dt.title.includes('Playing from link');
+      const isCtReal = ct.title && !ct.title.includes('Loading Track') && !ct.title.includes('Playing from link');
+      if (isDtPlaceholder && isCtReal) {
+        return ct;
+      }
+    }
+    return dt;
+  });
+
   constructor() {
     // Automatically fetch lyrics when track changes if lyrics view is open
     // Also trigger track transition animation
     effect(() => {
       const track = this.playerService.currentTrack();
+      const current = this.displayTrack();
       
-      if (track && track.videoId !== this.displayTrack()?.videoId) {
+      if (track && (!current || track.videoId !== current.videoId)) {
         // Reset quality fallback for new track
         this.useLowQualityCover = false;
         clearTimeout(this.coverLoadingTimeout);
@@ -158,7 +175,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }, 4000);
 
-        if (!this.displayTrack()) {
+        if (!current) {
           // First load, don't animate, just set it
           this.displayTrack.set(track);
         } else {
@@ -169,12 +186,26 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
           clearTimeout(this.changeTimeout);
           this.changeTimeout = setTimeout(() => {
             // Swap data while opacity is 0
-            this.displayTrack.set(track);
+            this.displayTrack.set(this.playerService.currentTrack());
             // Fade in new track
             this.isChanging = false;
             this.cdr.detectChanges();
           }, 300); // 300ms matches the CSS transition time
         }
+      } else if (track && current && track.videoId === current.videoId) {
+        // Same video ID: update metadata in place (title, artist, thumbnails) if changed
+        if (
+          current.title !== track.title ||
+          current.channelTitle !== track.channelTitle ||
+          current.thumbnail !== track.thumbnail ||
+          current.thumbnailHigh !== track.thumbnailHigh
+        ) {
+          this.displayTrack.set({ ...track });
+          this.cdr.detectChanges();
+        }
+      } else if (!track && current) {
+        this.displayTrack.set(null);
+        this.cdr.detectChanges();
       }
       if (track && this.activeView === 'lyrics') {
         this.fetchLyrics();

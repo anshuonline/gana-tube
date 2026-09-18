@@ -474,6 +474,14 @@ export class PlayerService {
     this.isRemoteUpdate = false;
     
     if (tracks[startIndex]) {
+      const first = tracks[startIndex];
+      if (typeof localStorage !== 'undefined' && first && first.videoId) {
+        try {
+          if (first.title && !first.title.includes('Playing from link') && !first.title.includes('Loading Track')) {
+            localStorage.setItem('gt_last_track', JSON.stringify(first));
+          }
+        } catch (e) {}
+      }
       this.location.replaceState('/play?v=' + tracks[startIndex].videoId);
       this.loadInPlayer(tracks[startIndex].videoId);
     }
@@ -872,6 +880,13 @@ export class PlayerService {
     this.startLoadTimeout();
     
     if (current) {
+      if (typeof localStorage !== 'undefined' && current.videoId) {
+        try {
+          if (current.title && !current.title.includes('Playing from link') && !current.title.includes('Loading Track')) {
+            localStorage.setItem('gt_last_track', JSON.stringify(current));
+          }
+        } catch (e) {}
+      }
       this.analyticsService.recordPlay(current);
       // Proactively fetch more tracks if we are near the end of the queue
       const q = this.queue();

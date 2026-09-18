@@ -1420,6 +1420,11 @@ export class App implements OnInit {
         if (savedTrack) {
           if (this.playerService.currentTrack()?.videoId !== videoId) {
             this.playerService.playTrack(savedTrack);
+          } else {
+            const cur = this.playerService.currentTrack();
+            if (cur && (!cur.title || cur.title.includes('Loading Track') || cur.title.includes('Playing from link'))) {
+              this.playerService.updateTrackInfo(videoId, savedTrack.title, savedTrack.channelTitle);
+            }
           }
           return;
         }
@@ -1427,9 +1432,11 @@ export class App implements OnInit {
         // 2. Fetch exact video details by ID
         this.youtubeApi.getVideoDetails([videoId]).subscribe({
           next: (res) => {
-            if (res && res.length > 0 && res[0].title && !res[0].title.includes('Playing from link')) {
+            if (res && res.length > 0 && res[0].title && !res[0].title.includes('Playing from link') && !res[0].title.includes('Loading Track')) {
               if (this.playerService.currentTrack()?.videoId !== videoId) {
                 this.playerService.playTrack(res[0]);
+              } else {
+                this.playerService.updateTrackInfo(videoId, res[0].title, res[0].channelTitle);
               }
             } else {
               this.fetchFallbackOEmbedAndPlay(videoId);
@@ -1448,11 +1455,27 @@ export class App implements OnInit {
   }
 
   private fetchFallbackOEmbedAndPlay(videoId: string) {
+    let fallbackTitle = 'Loading Track...';
+    let fallbackArtist = 'GanaTube';
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('gt_last_track');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.videoId === videoId && parsed.title && !parsed.title.includes('Playing from link') && !parsed.title.includes('Loading Track')) {
+            fallbackTitle = parsed.title;
+            fallbackArtist = parsed.channelTitle;
+          }
+        }
+      } catch (e) {}
+    }
+
     if (this.playerService.currentTrack()?.videoId !== videoId) {
       this.playerService.playTrack({
         videoId: videoId,
-        title: 'Loading Track...',
-        channelTitle: 'GanaTube',
+        title: fallbackTitle,
+        channelTitle: fallbackArtist,
         thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
         thumbnailHigh: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
         publishedAt: new Date().toISOString()
@@ -1464,8 +1487,18 @@ export class App implements OnInit {
       catchError(() => of(null))
     ).subscribe(data => {
       if (data && data.title) {
-        const title = data.title.replace(/ - Topic/g, '').replace(/\[Official.*?\]/gi, '').replace(/\(Official.*?\)/gi, '').trim();
-        const channelTitle = data.author_name || 'YouTube Music';
+        let title = data.title.replace(/ - Topic/g, '').replace(/\[Official.*?\]/gi, '').replace(/\(Official.*?\)/gi, '').trim();
+        let channelTitle = data.author_name || 'YouTube Music';
+        if (typeof document !== 'undefined') {
+          try {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = title;
+            title = txt.value;
+            const txt2 = document.createElement('textarea');
+            txt2.innerHTML = channelTitle;
+            channelTitle = txt2.value;
+          } catch (e) {}
+        }
         this.playerService.updateTrackInfo(videoId, title, channelTitle);
       }
     });
