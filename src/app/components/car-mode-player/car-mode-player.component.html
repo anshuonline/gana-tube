@@ -18,9 +18,237 @@
       <div class="cm-header-spacer"></div>
     </div>
 
-    <!-- Main Content: Two Column Layout -->
-    <div class="cm-content">
-      
+    <!-- ====================================================
+         MOBILE TABBED PANELS (YouTube-style screen switching)
+    ===================================================== -->
+    <div class="cm-mobile">
+      <!-- PLAYER PANEL -->
+      <div class="cm-mobile-panel" [class.active]="activePanel() === 'player'">
+        <div class="cm-now-playing cm-mobile-now-playing">
+          <!-- Album Art -->
+          <div class="cm-artwork-wrapper">
+            <div class="cm-artwork" [class.ad-active]="showCoverAd">
+              <img 
+                *ngIf="!imageLoadError"
+                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatubenewlogo.png'" 
+                [alt]="playerService.currentTrack()?.title"
+                (error)="onImageError()"
+                class="cm-album-art"
+              />
+              <div *ngIf="imageLoadError" class="cm-artwork-fallback">
+                <span>GanaTube</span>
+              </div>
+              
+              <!-- Ad Overlay -->
+              <div class="cm-ad-overlay" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
+                <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" [href]="playerCoverAd?.linkUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
+                  <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="cm-ad-media" />
+                </a>
+                <iframe *ngIf="playerCoverAd?.customCode" 
+                        [src]="safePlayerCoverAdUrl"
+                        class="cm-ad-media"
+                        scrolling="no"
+                        frameborder="0">
+                </iframe>
+                <span class="cm-ad-label">Ad</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Track Info + Controls -->
+          <div class="cm-controls-area">
+            <div class="cm-track-info">
+              <h2 class="cm-track-title">{{ playerService.currentTrack()?.title || 'Not Playing' }}</h2>
+              <p class="cm-track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</p>
+            </div>
+
+            <!-- Progress -->
+            <div class="cm-progress">
+              <div class="cm-progress-bar" (mousedown)="onScrubStart($event)" (touchstart)="onScrubStart($event)">
+                <div class="cm-progress-fill" [style.width.%]="displayProgressPercent"></div>
+                <div class="cm-progress-thumb" [style.left.%]="displayProgressPercent"></div>
+              </div>
+              <div class="cm-time-row">
+                <span>{{ formatTime(playerService.currentTime()) }}</span>
+                <span>{{ formatTime(playerService.duration()) }}</span>
+              </div>
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="cm-controls">
+              <button class="cm-btn cm-btn-secondary" [class.active]="playerService.isShuffled()" (click)="playerService.toggleShuffle()">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              </button>
+
+              <button class="cm-btn cm-btn-skip" (click)="playerService.previous()" [disabled]="playerService.currentIndex() <= 0">
+                <svg lucideSkipBack [attr.size]="36" fill="currentColor"></svg>
+              </button>
+              
+              <button class="cm-btn cm-btn-play" (click)="playerService.togglePlayPause()">
+                <svg lucidePause [attr.size]="44" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
+                <svg lucidePlay [attr.size]="44" fill="currentColor" style="margin-left: 4px;" *ngIf="!playerService.isPlaying()"></svg>
+              </button>
+              
+              <button class="cm-btn cm-btn-skip" (click)="playerService.next()" [disabled]="playerService.currentIndex() >= playerService.queue().length - 1">
+                <svg lucideSkipForward [attr.size]="36" fill="currentColor"></svg>
+              </button>
+
+              <button class="cm-btn cm-btn-secondary" (click)="playerService.toggleRepeat()">
+                <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="28" style="stroke: #9333ea"></svg>
+                <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="28" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile queue peek bar (minimized queue) -->
+        <button class="cm-queue-peek" (click)="openPanel('queue')">
+          <div class="cm-queue-peek-left">
+            <svg lucideRepeat [attr.size]="20"></svg>
+            <span class="cm-queue-peek-title">Up Next</span>
+            <span class="cm-queue-peek-count">{{ playerService.queue().length }} songs</span>
+          </div>
+          <div class="cm-queue-peek-right">
+            <span class="cm-queue-peek-dots"><span></span><span></span><span></span></span>
+          </div>
+        </button>
+      </div>
+
+      <!-- QUEUE PANEL (bottom sheet / full screen) -->
+      <div class="cm-queue-sheet" [class.open]="activePanel() === 'queue'" [class.fullscreen]="queueFullScreen()">
+        <div class="cm-sheet-handle" (click)="toggleQueueFullScreen()">
+          <span class="cm-handle-bar"></span>
+        </div>
+        <div class="cm-sheet-header">
+          <div class="cm-sheet-title-row">
+            <span class="cm-queue-header">Up Next</span>
+            <span class="cm-queue-count">{{ playerService.queue().length }} songs</span>
+          </div>
+          <div class="cm-sheet-actions">
+            <button class="cm-sheet-icon-btn" (click)="openPanel('search')" title="Voice Search">
+              <svg lucideMic [attr.size]="20"></svg>
+            </button>
+            <button class="cm-sheet-icon-btn" (click)="toggleQueueFullScreen()" title="Minimize / Fullscreen">
+              <svg *ngIf="!queueFullScreen()" lucideChevronDown [attr.size]="20" style="transform: rotate(180deg)"></svg>
+              <svg *ngIf="queueFullScreen()" lucideChevronDown [attr.size]="20"></svg>
+            </button>
+          </div>
+        </div>
+        <div class="cm-queue-scroll cm-sheet-scroll">
+          <div *ngIf="playerService.queue().length === 0" class="cm-empty-state">
+            <p>Queue is empty</p>
+          </div>
+          <div 
+            class="cm-queue-item" 
+            *ngFor="let track of playerService.queue(); let i = index"
+            [class.active]="playerService.currentIndex() === i"
+            (click)="playQueueTrack(i)"
+          >
+            <div class="cm-q-thumb">
+              <img [src]="track.thumbnail" [alt]="track.title" />
+              <div class="cm-q-playing" *ngIf="playerService.currentIndex() === i && playerService.isPlaying()">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="cm-q-info">
+              <div class="cm-q-title">{{ track.title }}</div>
+              <div class="cm-q-artist">{{ track.channelTitle }}</div>
+            </div>
+            <button class="cm-q-like" (click)="toggleLike(track, $event)">
+              <svg lucideHeart [attr.size]="22" [attr.fill]="isLiked(track) ? 'currentColor' : 'none'"></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEARCH PANEL (full screen, voice search) -->
+      <div class="cm-search-sheet" [class.open]="activePanel() === 'search'" [class.fullscreen]="searchFullScreen()">
+        <div class="cm-sheet-handle" (click)="toggleSearchFullScreen()">
+          <span class="cm-handle-bar"></span>
+        </div>
+        <div class="cm-sheet-header">
+          <div class="cm-sheet-title-row">
+            <span class="cm-queue-header">{{ showSearchResults ? 'Search Results' : 'Search Songs' }}</span>
+          </div>
+          <div class="cm-sheet-actions">
+            <button class="cm-sheet-icon-btn" (click)="toggleSearchFullScreen()" title="Minimize / Fullscreen">
+              <svg *ngIf="!searchFullScreen()" lucideChevronDown [attr.size]="20" style="transform: rotate(180deg)"></svg>
+              <svg *ngIf="searchFullScreen()" lucideChevronDown [attr.size]="20"></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="cm-search">
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (keyup.enter)="performSearch(searchQuery)"
+            placeholder="Search songs..." 
+            class="cm-search-input"
+          />
+          <button class="cm-search-clear" *ngIf="searchQuery" (click)="clearSearch()">
+            <svg lucideX [attr.size]="20"></svg>
+          </button>
+          <button class="cm-voice-btn" [class.listening]="isListening" (click)="startVoiceSearch()">
+            <svg lucideMic [attr.size]="24" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
+          </button>
+        </div>
+
+        <div class="cm-queue-scroll cm-sheet-scroll">
+          <div *ngIf="isSearching" class="cm-empty-state">
+            <svg lucideRefreshCw [attr.size]="32" class="spin"></svg>
+            <p>Searching...</p>
+          </div>
+
+          <div *ngIf="showSearchResults && !isSearching">
+            <div 
+              class="cm-queue-item" 
+              *ngFor="let track of searchResults"
+              (click)="playSearchResult(track)"
+            >
+              <div class="cm-q-thumb">
+                <img [src]="track.thumbnail" [alt]="track.title" />
+              </div>
+              <div class="cm-q-info">
+                <div class="cm-q-title">{{ track.title }}</div>
+                <div class="cm-q-artist">{{ track.channelTitle }}</div>
+              </div>
+            </div>
+            
+            <div *ngIf="searchResults.length === 0" class="cm-empty-state">
+              <p>No results for "{{ searchQuery }}"</p>
+            </div>
+          </div>
+
+          <div *ngIf="!showSearchResults && !isSearching" class="cm-empty-state">
+            <svg lucideMic [attr.size]="40" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
+            <p>{{ isListening ? 'Listening...' : 'Tap the mic and say a song name' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile bottom tab bar -->
+      <div class="cm-tab-bar">
+        <button class="cm-tab-btn" [class.active]="activePanel() === 'player'" (click)="openPanel('player')">
+          <svg lucidePlay [attr.size]="22" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
+          <svg lucidePause [attr.size]="22" fill="currentColor" *ngIf="!playerService.isPlaying()"></svg>
+          <span>Now Playing</span>
+        </button>
+        <button class="cm-tab-btn" [class.active]="activePanel() === 'queue'" (click)="openPanel('queue')">
+          <svg lucideRepeat [attr.size]="22"></svg>
+          <span>Queue</span>
+        </button>
+        <button class="cm-tab-btn" [class.active]="activePanel() === 'search'" (click)="openPanel('search')">
+          <svg lucideMic [attr.size]="22" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
+          <span>Search</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         DESKTOP TWO-COLUMN LAYOUT
+    ===================================================== -->
+    <div class="cm-desktop">
       <!-- LEFT: Now Playing -->
       <div class="cm-player-col">
         

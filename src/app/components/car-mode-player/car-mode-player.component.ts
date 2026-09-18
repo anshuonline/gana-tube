@@ -61,11 +61,38 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   isSearching = false;
   showSearchResults = false;
   imageLoadError = false;
+
+  // Mobile tabbed navigation (YouTube-style)
+  activePanel = signal<'player' | 'queue' | 'search'>('player');
+  queueFullScreen = signal<boolean>(false);
+  searchFullScreen = signal<boolean>(false);
   
   showCoverAd = false;
   private adTimers: any[] = [];
   
   private recognition: any;
+
+  get isMobile(): boolean {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 768;
+  }
+
+  openPanel(panel: 'player' | 'queue' | 'search') {
+    this.activePanel.set(panel);
+    if (panel === 'search') {
+      this.searchFullScreen.set(true);
+    } else if (panel === 'queue') {
+      this.queueFullScreen.set(true);
+    }
+  }
+
+  toggleQueueFullScreen() {
+    this.queueFullScreen.update(v => !v);
+  }
+
+  toggleSearchFullScreen() {
+    this.searchFullScreen.update(v => !v);
+  }
 
   constructor() {
     effect(() => {
@@ -226,6 +253,12 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     // Hide search results view so it shows the Up Next queue (which now contains the search results)
     // but keep the searchQuery text so the user knows what they searched for.
     this.showSearchResults = false;
+    
+    // On mobile, return to the now-playing panel after playing
+    if (this.isMobile) {
+      this.activePanel.set('player');
+      this.searchFullScreen.set(false);
+    }
   }
 
   playQueueTrack(index: number) {
