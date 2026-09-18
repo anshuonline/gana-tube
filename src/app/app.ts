@@ -863,6 +863,15 @@ export class App implements OnInit {
     }, { allowSignalWrites: true });
 
     this.fetchCustomPlaylists();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('offline', () => {
+        this.toastService.error('You are currently offline. Check your internet connection.');
+      });
+      window.addEventListener('online', () => {
+        this.toastService.success('Back online!');
+      });
+    }
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
@@ -873,6 +882,7 @@ export class App implements OnInit {
 
       let url = event.urlAfterRedirects.split('/')[1] || 'home';
       url = url.split('?')[0]; // Ignore query params
+      this.analyticsService.setCurrentPage(event.urlAfterRedirects);
       
       // Clear tracking if navigating away from playlist page
       if (url !== 'playlist') {
@@ -1740,6 +1750,7 @@ export class App implements OnInit {
   onSearch(query: string): void {
     const q = query.trim();
     if (!q) return;
+    this.analyticsService.setLastSearch(q);
     this.searchHistory.add(q);
     this.executeSearchApi(q);
     this.performSearch(q);
@@ -1747,6 +1758,9 @@ export class App implements OnInit {
 
   onSuggestSearch(query: string): void {
     if (!query) return;
+    if (query !== 'All') {
+      this.analyticsService.setLastSearch(query);
+    }
     
     // If not "All", execute search directly on the home page instead of routing
     if (query !== 'All') {

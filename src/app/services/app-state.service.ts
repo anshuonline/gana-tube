@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class AppStateService {
-  musicQuality = signal<'High' | 'Standard' | 'Data Saver'>('High');
+  musicQuality = signal<'High' | 'Standard' | 'Data Saver'>('Standard');
   isListenTogetherVisible = signal<boolean>(false);
 
   setMusicQuality(quality: 'High' | 'Standard' | 'Data Saver') {

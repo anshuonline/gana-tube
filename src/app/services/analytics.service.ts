@@ -45,6 +45,17 @@ export class AnalyticsService {
     return gid;
   }
 
+  private currentPage: string = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/home';
+  private lastSearchQuery: string = '';
+
+  setCurrentPage(page: string) {
+    this.currentPage = page;
+  }
+
+  setLastSearch(query: string) {
+    this.lastSearchQuery = query;
+  }
+
   startGuestTracking() {
     if (this.timeTrackingInterval) {
       clearInterval(this.timeTrackingInterval);
@@ -61,10 +72,16 @@ export class AnalyticsService {
 
   async recordGuestPing(guestId: string, seconds: number = 60) {
     try {
+      const page = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : this.currentPage;
       await fetch(`${this.apiUrl}?action=recordGuestPing`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guest_id: guestId, seconds }),
+        body: JSON.stringify({ 
+          guest_id: guestId, 
+          seconds,
+          current_page: page,
+          last_search: this.lastSearchQuery
+        }),
         keepalive: true
       });
     } catch(e) {
@@ -93,6 +110,8 @@ export class AnalyticsService {
     if (!track || !track.videoId) return;
     const isGuest = !this.currentUserEmail;
     const guestId = isGuest ? this.getGuestId() : null;
+    const page = '/play?v=' + track.videoId;
+    this.currentPage = page;
     try {
       await fetch(`${this.apiUrl}?action=recordPlay`, {
         method: 'POST',
@@ -103,7 +122,8 @@ export class AnalyticsService {
           thumbnail: track.thumbnailHigh || track.thumbnail || '',
           artist: track.channelTitle || track.artist || '',
           is_guest: isGuest,
-          guest_id: guestId
+          guest_id: guestId,
+          current_page: page
         })
       });
     } catch(e) {

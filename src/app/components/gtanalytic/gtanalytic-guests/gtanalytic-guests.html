@@ -84,16 +84,24 @@
 
   </div>
 
-  <!-- Tabs Bar: "Guests Ka Gana" vs "Guest Activity Log" -->
+  <!-- Tabs Bar: "Active Guests" vs "Guests Ka Gana" vs "Guest Activity" -->
   <div class="panel-container">
     <div class="panel-nav-bar">
       <div class="tab-buttons">
         <button 
           class="tab-btn" 
+          [class.active]="activeTab() === 'active'" 
+          (click)="activeTab.set('active')">
+          <span class="live-pulse-dot"></span>
+          <span>Active Guests</span>
+          <span class="badge-count green-badge">{{ onlineGuests().length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
           [class.active]="activeTab() === 'songs'" 
           (click)="activeTab.set('songs')">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          <span>Guests Ka Gana (Top Songs)</span>
+          <span>Guests Ka Gana</span>
           <span class="badge-count">{{ guestTopSongs().length }}</span>
         </button>
         <button 
@@ -101,7 +109,7 @@
           [class.active]="activeTab() === 'activity'" 
           (click)="activeTab.set('activity')">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          <span>Live Guest Activity Log</span>
+          <span>Guest Activity</span>
           <span class="badge-count">{{ recentGuests().length }}</span>
         </button>
       </div>
@@ -113,14 +121,84 @@
           type="text" 
           [ngModel]="searchQuery()" 
           (ngModelChange)="searchQuery.set($event)"
-          [placeholder]="activeTab() === 'songs' ? 'Search guest songs...' : 'Search guest ID or track...'" 
+          placeholder="Search by ID, IP, location, page or search..." 
           class="search-input"
         />
         <button *ngIf="searchQuery()" (click)="searchQuery.set('')" class="btn-clear">&times;</button>
       </div>
     </div>
 
-    <!-- TAB 1: Guests Ka Gana (Top Songs Played by Guests) -->
+    <!-- TAB 1: ONLY ACTIVE GUESTS (Live <15 mins) -->
+    <div *ngIf="activeTab() === 'active'" class="tab-content">
+      <div class="table-responsive">
+        <table class="guest-table">
+          <thead>
+            <tr>
+              <th>Guest Device</th>
+              <th>IP Address</th>
+              <th>Location</th>
+              <th>Current Page</th>
+              <th>What They Searched</th>
+              <th>Now / Last Playing</th>
+              <th>Last Active</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!onlineGuests().length">
+              <td colspan="8" class="empty-state">
+                <p>No active guests online in the last 15 minutes.</p>
+              </td>
+            </tr>
+
+            <tr *ngFor="let g of onlineGuests()" class="clickable-row" (click)="openGuestModal(g)">
+              <td>
+                <div class="guest-id-pill">
+                  <span class="guest-dot active-dot"></span>
+                  <code>{{ g.guest_id }}</code>
+                </div>
+              </td>
+              <td>
+                <span class="ip-badge">{{ g.ip_address || 'Hidden/Internal' }}</span>
+              </td>
+              <td>
+                <div class="location-cell">
+                  <span class="flag-icon">{{ getCountryFlag(g.country_code) }}</span>
+                  <span class="location-text" [title]="g.location">{{ g.location || 'Detecting...' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="page-badge" [title]="g.current_page || '/home'">
+                  <span class="page-dot"></span>
+                  <span>{{ g.current_page || '/home' }}</span>
+                </div>
+              </td>
+              <td>
+                <span *ngIf="g.last_search" class="search-query-pill" [title]="g.last_search">
+                  🔍 "{{ g.last_search }}"
+                </span>
+                <span *ngIf="!g.last_search" class="text-muted">—</span>
+              </td>
+              <td>
+                <span class="last-song-name" [title]="g.last_song_title">
+                  {{ g.last_song_title || 'Browsing...' }}
+                </span>
+              </td>
+              <td style="color: #10b981; font-weight: 500; font-size: 12px;">
+                {{ formatRelativeTime(g.last_active) }}
+              </td>
+              <td style="text-align: right;">
+                <button class="inspect-btn" (click)="$event.stopPropagation(); openGuestModal(g)">
+                  Inspect
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: Guests Ka Gana (Top Songs Played by Guests) -->
     <div *ngIf="activeTab() === 'songs'" class="tab-content">
       <div class="table-responsive">
         <table class="guest-table">
@@ -171,39 +249,57 @@
       </div>
     </div>
 
-    <!-- TAB 2: Recent Guest Activity Logs -->
+    <!-- TAB 3: Guest Activity Logs -->
     <div *ngIf="activeTab() === 'activity'" class="tab-content">
       <div class="table-responsive">
         <table class="guest-table">
           <thead>
             <tr>
-              <th>Guest Device ID</th>
-              <th>First Visit</th>
-              <th>Last Active</th>
-              <th>Total Songs Played</th>
-              <th>Total Listen Time</th>
+              <th>Guest Device</th>
+              <th>IP Address</th>
+              <th>Location</th>
+              <th>Page</th>
+              <th>Search</th>
+              <th>Total Plays</th>
+              <th>Listen Time</th>
               <th>Last Played Song</th>
+              <th>Last Active</th>
+              <th style="text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngIf="!recentGuests().length">
-              <td colspan="6" class="empty-state">
+              <td colspan="10" class="empty-state">
                 <p>No guest activity records found.</p>
               </td>
             </tr>
 
-            <tr *ngFor="let g of recentGuests()">
+            <tr *ngFor="let g of recentGuests()" class="clickable-row" (click)="openGuestModal(g)">
               <td>
                 <div class="guest-id-pill">
                   <span class="guest-dot"></span>
                   <code>{{ g.guest_id }}</code>
                 </div>
               </td>
-              <td style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
-                {{ formatISTDate(g.first_seen) }}
+              <td>
+                <span class="ip-badge">{{ g.ip_address || '—' }}</span>
               </td>
-              <td style="color: #10b981; font-weight: 500; font-size: 12px;">
-                {{ formatIST(g.last_active) }}
+              <td>
+                <div class="location-cell">
+                  <span class="flag-icon">{{ getCountryFlag(g.country_code) }}</span>
+                  <span class="location-text" [title]="g.location">{{ g.location || 'Unknown' }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="page-badge-small" [title]="g.current_page || '/home'">
+                  {{ g.current_page || '/home' }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="g.last_search" class="search-query-pill" [title]="g.last_search">
+                  🔍 "{{ g.last_search }}"
+                </span>
+                <span *ngIf="!g.last_search" class="text-muted">—</span>
               </td>
               <td>
                 <span class="stat-highlight">{{ g.total_plays || 0 }} songs</span>
@@ -216,6 +312,14 @@
                   {{ g.last_song_title || 'Browsing...' }}
                 </span>
               </td>
+              <td style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
+                {{ formatRelativeTime(g.last_active) }}
+              </td>
+              <td style="text-align: right;">
+                <button class="inspect-btn" (click)="$event.stopPropagation(); openGuestModal(g)">
+                  Inspect
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -223,5 +327,129 @@
     </div>
 
   </div>
+
+  <!-- Guest Live Inspector Modal (AMOLED Dark) -->
+  <div class="guest-modal-backdrop" *ngIf="selectedGuest()" (click)="closeGuestModal()">
+    <div class="guest-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-head">
+        <div class="modal-head-left">
+          <div class="modal-badge-row">
+            <span class="modal-tag">Guest Device Inspector</span>
+            <span class="modal-live-status">
+              <span class="live-pulse-dot"></span>
+              Live Activity
+            </span>
+          </div>
+          <h2 class="modal-title">{{ selectedGuest().guest_id }}</h2>
+        </div>
+        <button class="modal-close-btn" (click)="closeGuestModal()">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        
+        <!-- Key Highlights Grid -->
+        <div class="modal-grid">
+          
+          <!-- IP & Geolocation Box -->
+          <div class="detail-box">
+            <div class="detail-box-head">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>IP Address & Location</span>
+            </div>
+            <div class="detail-val-large">{{ selectedGuest().ip_address || 'Not Recorded' }}</div>
+            <div class="detail-sub-row">
+              <span class="flag-large">{{ getCountryFlag(selectedGuest().country_code) }}</span>
+              <span class="geo-text">{{ selectedGuest().location || 'Location Not Available' }}</span>
+            </div>
+          </div>
+
+          <!-- Current Page & Navigation Box -->
+          <div class="detail-box">
+            <div class="detail-box-head">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <span>Current Screen / Route</span>
+            </div>
+            <div class="detail-page-box">
+              <span class="route-tag">URL</span>
+              <code>{{ selectedGuest().current_page || '/home' }}</code>
+            </div>
+            <div class="detail-sub-meta">
+              Last seen {{ formatRelativeTime(selectedGuest().last_active) }} ({{ formatIST(selectedGuest().last_active) }})
+            </div>
+          </div>
+
+          <!-- Search History Box -->
+          <div class="detail-box">
+            <div class="detail-box-head">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>Recent Search Query</span>
+            </div>
+            <div *ngIf="selectedGuest().last_search" class="detail-search-val">
+              "{{ selectedGuest().last_search }}"
+            </div>
+            <div *ngIf="!selectedGuest().last_search" class="text-muted" style="font-size: 13px; padding-top: 4px;">
+              No searches performed yet in this session
+            </div>
+          </div>
+
+          <!-- Listening Metrics Box -->
+          <div class="detail-box">
+            <div class="detail-box-head">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>Session Engagement</span>
+            </div>
+            <div class="engagement-row">
+              <div class="eng-stat">
+                <span class="eng-num">{{ selectedGuest().total_plays || 0 }}</span>
+                <span class="eng-lbl">Songs Streamed</span>
+              </div>
+              <div class="eng-stat">
+                <span class="eng-num">{{ formatSeconds(selectedGuest().total_time_seconds) }}</span>
+                <span class="eng-lbl">Total Time</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Now / Last Played Song Banner -->
+        <div class="last-song-card" *ngIf="selectedGuest().last_song_title">
+          <div class="song-card-label">Last Played Track</div>
+          <div class="song-card-content">
+            <div class="song-card-icon">🎵</div>
+            <div class="song-card-details">
+              <div class="song-card-title">{{ selectedGuest().last_song_title }}</div>
+              <div class="song-card-sub" *ngIf="selectedGuest().last_video_id">
+                Video ID: <code>{{ selectedGuest().last_video_id }}</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Device Timeline -->
+        <div class="timeline-row">
+          <div class="timeline-item">
+            <span class="tl-label">First Seen (IST):</span>
+            <span class="tl-val">{{ formatIST(selectedGuest().first_seen) }}</span>
+          </div>
+          <div class="timeline-item">
+            <span class="tl-label">Last Active (IST):</span>
+            <span class="tl-val highlight">{{ formatIST(selectedGuest().last_active) }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-foot">
+        <button class="modal-action-btn" (click)="closeGuestModal()">Close Inspector</button>
+      </div>
+
+    </div>
+  </div>
+
 
 </div>

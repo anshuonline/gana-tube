@@ -173,13 +173,13 @@ export class PlayerService {
     typeof localStorage !== 'undefined' ? Math.min(10, Math.max(1, parseInt(localStorage.getItem('gt_crossfade_duration') || '5', 10) || 5)) : 5
   );
 
-  // Audio Quality
+  // Audio Quality (Default to 'Standard' / Low for fast buffering and instant playback)
   musicQuality = signal<'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'>(
-    (typeof localStorage !== 'undefined' ? localStorage.getItem('gt_music_quality') : null) as any || 'High'
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('gt_music_quality') : null) as any || 'Standard'
   );
 
   // Network-resolved quality used when musicQuality is 'Auto'
-  private effectiveQuality = signal<'Data Saver' | 'Standard' | 'High' | 'Max'>('High');
+  private effectiveQuality = signal<'Data Saver' | 'Standard' | 'High' | 'Max'>('Standard');
   resolvedQuality = computed<'Data Saver' | 'Standard' | 'High' | 'Max'>(() => {
     const q = this.musicQuality();
     return q === 'Auto' ? this.effectiveQuality() : (q as 'Data Saver' | 'Standard' | 'High' | 'Max');
