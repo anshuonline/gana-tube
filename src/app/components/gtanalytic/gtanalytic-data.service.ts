@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { of, Observable } from 'rxjs';
 import { AnalyticsService } from '../../services/analytics.service';
 
 @Injectable({
@@ -93,8 +94,11 @@ export class GtanalyticDataService {
     });
   }
 
-  getGuestGeography(range: string = 'dau') {
+  getGuestGeography(range: string = 'dau'): Observable<any> {
     const pwd = this.getPassword();
+    if (!pwd) {
+      return of({ status: 'error', message: 'Unauthorized: Admin password required' });
+    }
     return this.analyticsService.getGuestGeography(pwd, range);
   }
 

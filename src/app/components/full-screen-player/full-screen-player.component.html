@@ -1,5 +1,15 @@
 <div class="fs-player-overlay" [class.visible]="isVisible">
   
+  <!-- Shared SVG gradient defs (purple-pink brand gradient for hearts) -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="gtHeartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#a855f7"/>
+        <stop offset="100%" stop-color="#ec4899"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  
   <!-- Ambient blurred background -->
   <div class="fs-bg-ambient" [style.background-image]="'url(' + displayTrack()?.thumbnailHigh + ')'"></div>
   <div class="fs-bg-overlay"></div>
@@ -82,9 +92,9 @@
           <!-- Heart Animation Overlay -->
           <div class="heart-animation-overlay" *ngIf="showLikeAnimation"
                [style.left.%]="heartX" [style.top.%]="heartY">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/A_perfect_SVG_heart.svg/3840px-A_perfect_SVG_heart.svg.png" 
-                 alt="heart" 
-                 class="animated-heart-img" />
+            <svg viewBox="0 0 24 24" class="animated-heart-svg">
+              <path fill="url(#gtHeartGradient)" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
           </div>
         </div>
       </div>
@@ -245,7 +255,7 @@
           <p class="fs-artist track-transition" [class.track-changing]="isChanging">{{ displayTrack()?.channelTitle }}</p>
         </div>
         <button class="fs-toggle-btn like-btn" [class.active]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
-          <svg lucideHeart [attr.size]="28" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
+          <svg lucideHeart [attr.size]="28" [attr.stroke]="isCurrentTrackLiked() ? 'url(#gtHeartGradient)' : 'currentColor'" [attr.fill]="isCurrentTrackLiked() ? 'url(#gtHeartGradient)' : 'none'"></svg>
         </button>
       </div>
 

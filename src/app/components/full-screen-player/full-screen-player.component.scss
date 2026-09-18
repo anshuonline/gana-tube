@@ -229,11 +229,11 @@
     pointer-events: none;
     transform: translate(-50%, -50%);
 
-    .animated-heart-img {
+    .animated-heart-svg {
       width: 160px;
       height: auto;
       animation: likeBounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 12px 24px rgba(168, 85, 247, 0.45));
     }
   }
 }
@@ -799,27 +799,26 @@
   }
 
   .fs-main {
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     min-height: 0; /* Let flex item shrink */
   }
 
   .fs-artwork-container {
-    max-width: 100%;
     width: auto;
-    height: auto;
-    max-height: clamp(200px, 45vh, 350px);
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     aspect-ratio: 1 / 1;
     margin: 0 auto;
   }
 
   .fs-bottom {
-    gap: 16px;
+    gap: 14px;
     padding: 0;
-    margin-bottom: auto; /* Push it slightly up if extra space */
   }
 
   .fs-track-info-row {
-    margin-bottom: -4px;
+    margin-bottom: 0;
   }
 
   .fs-track-text .fs-title {
@@ -836,7 +835,7 @@
   }
 
   .fs-controls-row {
-    margin-top: -8px;
+    margin-top: 0;
     .fs-main-controls {
       gap: 16px;
 

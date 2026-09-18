@@ -3,8 +3,10 @@ import { appConfig } from './app/app.config';
 import { App } from './app/app';
 
 const CACHE_KEY = 'gt_env_config';
+let isOfflinePageRendered = false;
 
 function renderOfflinePage() {
+  isOfflinePageRendered = true;
   document.body.innerHTML = `
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -179,9 +181,12 @@ function renderOfflinePage() {
 
 function startApp(config: any) {
   (window as any).__env = config;
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(config));
-  } catch (e) {}
+  // Only cache valid config to prevent poisoning from broken server responses
+  if (config && config.firebase && config.firebase.apiKey) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(config));
+    } catch (e) {}
+  }
 
   bootstrapApplication(App, appConfig).catch(err => {
     console.error('Bootstrap error:', err);
@@ -231,10 +236,12 @@ function tryBootstrap() {
   }, 400);
 };
 
-// Auto-reload as soon as internet connection is restored
+// Auto-reload ONLY when offline page is displayed, not during active music playback
 window.addEventListener('online', () => {
-  console.info('Network connection restored. Reloading GanaTube...');
-  window.location.reload();
+  if (isOfflinePageRendered) {
+    console.info('Network restored while on offline screen. Reloading GanaTube...');
+    window.location.reload();
+  }
 });
 
 // Initial boot attempt

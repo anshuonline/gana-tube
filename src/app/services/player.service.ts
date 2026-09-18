@@ -175,7 +175,11 @@ export class PlayerService {
 
   // Audio Quality (Default to 'Standard' / Low for fast buffering and instant playback)
   musicQuality = signal<'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'>(
-    (typeof localStorage !== 'undefined' ? localStorage.getItem('gt_music_quality') : null) as any || 'Standard'
+    (() => {
+      const valid = ['Auto', 'Data Saver', 'Standard', 'High', 'Max'] as const;
+      const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('gt_music_quality') : null;
+      return valid.includes(saved as any) ? (saved as 'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max') : 'Standard';
+    })()
   );
 
   // Network-resolved quality used when musicQuality is 'Auto'

@@ -1,4 +1,5 @@
 import { Component, inject, computed, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GtanalyticDataService } from '../gtanalytic-data.service';
@@ -153,6 +154,8 @@ export class GtanalyticGuestsComponent {
   geoLoading = signal<boolean>(false);
   geoData = signal<any>(null);
   geoSearchQuery = signal<string>('');
+  geoError = signal<string>('');
+  private geoSub?: Subscription;
 
   filteredGeoLocations = computed(() => {
     const data = this.geoData();
@@ -160,19 +163,22 @@ export class GtanalyticGuestsComponent {
     const q = this.geoSearchQuery().toLowerCase().trim();
     if (!q) return list;
     return list.filter((l: any) =>
-      (l.city || '').toLowerCase().includes(q) ||
-      (l.region || '').toLowerCase().includes(q) ||
-      (l.country || '').toLowerCase().includes(q)
+      (l?.city || '').toLowerCase().includes(q) ||
+      (l?.region || '').toLowerCase().includes(q) ||
+      (l?.country || '').toLowerCase().includes(q)
     );
   });
 
   openGeoModal() {
+    this.geoSearchQuery.set('');
+    this.geoError.set('');
     this.isGeoModalOpen.set(true);
     this.loadGeoData();
   }
 
   closeGeoModal() {
     this.isGeoModalOpen.set(false);
+    this.geoSub?.unsubscribe();
   }
 
   setGeoRange(range: 'dau' | 'wau' | 'mau' | 'yau' | 'all') {
@@ -182,15 +188,20 @@ export class GtanalyticGuestsComponent {
   }
 
   loadGeoData() {
+    this.geoSub?.unsubscribe();
     this.geoLoading.set(true);
-    this.dataService.getGuestGeography(this.geoRange()).subscribe({
-      next: (res) => {
+    this.geoError.set('');
+    this.geoSub = this.dataService.getGuestGeography(this.geoRange()).subscribe({
+      next: (res: any) => {
         if (res.status === 'success') {
           this.geoData.set(res.data);
+        } else {
+          this.geoError.set(res.message || 'Failed to load geography data');
         }
         this.geoLoading.set(false);
       },
-      error: () => {
+      error: (err: any) => {
+        this.geoError.set('Network error loading geography data');
         this.geoLoading.set(false);
       }
     });
