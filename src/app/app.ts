@@ -733,6 +733,7 @@ export class App implements OnInit {
         this.analyticsService.startTrackingTime(user.email, user.displayName || user.email);
       } else {
         this.analyticsService.stopTrackingTime();
+        this.analyticsService.startGuestTracking();
       }
     });
 

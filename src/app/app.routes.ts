@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { App } from './app';
 import { PlaylistPageComponent } from './components/playlist-page/playlist-page.component';
 import { managegtAuthGuard } from './guards/managegt-auth.guard';
+import { gtanalyticAuthGuard } from './guards/gtanalytic-auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -25,7 +26,19 @@ export const routes: Routes = [
   { path: 'ad-booking', redirectTo: 'home', pathMatch: 'full' },
   { path: 'ad-terms', redirectTo: 'home', pathMatch: 'full' },
   { path: 'ad-prohibited', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'gtanalytic', loadComponent: () => import('./components/analytics-page/analytics-page.component').then(m => m.AnalyticsPageComponent) },
+  {
+    path: 'gtanalytic',
+    loadComponent: () => import('./components/gtanalytic/gtanalytic-layout/gtanalytic-layout').then(m => m.GtanalyticLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'overview', pathMatch: 'full' },
+      { path: 'login', loadComponent: () => import('./components/gtanalytic/gtanalytic-login/gtanalytic-login').then(m => m.GtanalyticLoginComponent) },
+      { path: 'overview', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-overview/gtanalytic-overview').then(m => m.GtanalyticOverviewComponent) },
+      { path: 'streamanalytics', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-streams/gtanalytic-streams').then(m => m.GtanalyticStreamsComponent) },
+      { path: 'guests', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-guests/gtanalytic-guests').then(m => m.GtanalyticGuestsComponent) },
+      { path: 'users', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-users/gtanalytic-users').then(m => m.GtanalyticUsersComponent) },
+      { path: 'rooms', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-rooms/gtanalytic-rooms').then(m => m.GtanalyticRoomsComponent) }
+    ]
+  },
   { path: ':id', children: [] },
 
   {

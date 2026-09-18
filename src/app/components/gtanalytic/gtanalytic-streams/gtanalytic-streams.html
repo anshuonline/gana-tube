@@ -1,0 +1,143 @@
+﻿<div class="streams-page">
+
+  <!-- Header & Filter Bar -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Stream Analytics</h1>
+      <p class="page-desc">Comprehensive playback statistics and audience streaming metrics</p>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="filter-pill-group">
+      <button 
+        class="filter-pill" 
+        [class.active]="dataService.currentFilter() === 'today'" 
+        (click)="setFilter('today')">
+        Today
+      </button>
+      <button 
+        class="filter-pill" 
+        [class.active]="dataService.currentFilter() === 'yesterday'" 
+        (click)="setFilter('yesterday')">
+        Yesterday
+      </button>
+      <button 
+        class="filter-pill" 
+        [class.active]="dataService.currentFilter() === 'last_7_days'" 
+        (click)="setFilter('last_7_days')">
+        Last 7 Days
+      </button>
+      <button 
+        class="filter-pill" 
+        [class.active]="dataService.currentFilter() === 'all_time'" 
+        (click)="setFilter('all_time')">
+        All Time
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="dataService.loading()" class="loading-bar">
+    <div class="loading-progress"></div>
+  </div>
+
+  <!-- Chart Card -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <div class="chart-titles">
+        <h2 class="chart-title">Top 10 Most Streamed Tracks</h2>
+        <span class="chart-tag">{{ dataService.currentFilter() | uppercase }}</span>
+      </div>
+      <span class="chart-badge">Volume Leaderboard</span>
+    </div>
+    <div class="chart-canvas-wrapper">
+      <canvas baseChart
+        [datasets]="barChartData()"
+        [labels]="barChartLabels()"
+        [options]="barChartOptions"
+        [type]="'bar'">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- Detailed Songs Table Panel -->
+  <div class="table-panel">
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <h2 class="table-title">All Track Stream Records</h2>
+        <span class="count-badge">{{ filteredSongs().length }} Tracks</span>
+      </div>
+
+      <!-- Live Search Filter -->
+      <div class="table-search-box">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input 
+          type="text" 
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Search by title, artist, ID..." 
+          class="search-input"
+        />
+        <button *ngIf="searchQuery()" (click)="searchQuery.set('')" class="btn-clear-search">&times;</button>
+      </div>
+    </div>
+
+    <!-- Responsive Table -->
+    <div class="table-responsive">
+      <table class="streams-table">
+        <thead>
+          <tr>
+            <th class="col-rank">#</th>
+            <th class="col-cover">Track</th>
+            <th class="col-plays">Total Plays</th>
+            <th class="col-split">User vs Guest</th>
+            <th class="col-shares">Shares</th>
+            <th class="col-actions">Video ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="!filteredSongs().length">
+            <td colspan="6" class="empty-cell">No streaming data found for this filter.</td>
+          </tr>
+
+          <tr *ngFor="let song of filteredSongs(); let i = index">
+            <td class="col-rank">
+              <span class="rank-chip" [class.top3]="i < 3">{{ i + 1 }}</span>
+            </td>
+
+            <td class="col-cover">
+              <div class="track-cell">
+                <img [src]="song.thumbnail || '/ganatubenewlogo.png'" alt="Art" class="track-thumb" />
+                <div class="track-text">
+                  <span class="track-title" [title]="song.title">{{ song.title || 'Unknown Title' }}</span>
+                  <span class="track-sub">{{ song.artist || song.video_id }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td class="col-plays">
+              <span class="plays-highlight">{{ song.play_count | number }}</span>
+            </td>
+
+            <td class="col-split">
+              <div class="split-pill-container" *ngIf="song.guest_play_count !== undefined">
+                <span class="split-badge user" title="Registered User Plays">{{ song.user_play_count | number }} User</span>
+                <span class="split-badge guest" title="Guest Plays">{{ song.guest_play_count | number }} Guest</span>
+              </div>
+              <span *ngIf="song.guest_play_count === undefined" class="text-muted">-</span>
+            </td>
+
+            <td class="col-shares">
+              <span class="shares-text">{{ song.share_count || 0 }}</span>
+            </td>
+
+            <td class="col-actions">
+              <code class="vid-code">{{ song.video_id }}</code>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

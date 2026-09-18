@@ -34,6 +34,41 @@ export class AnalyticsService {
     this.currentUserEmail = null;
   }
 
+  getGuestId(): string {
+    if (typeof localStorage === 'undefined') return 'guest_temp';
+    let gid = localStorage.getItem('gt_guest_id');
+    if (!gid) {
+      gid = 'guest_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
+      localStorage.setItem('gt_guest_id', gid);
+    }
+    return gid;
+  }
+
+  startGuestTracking() {
+    if (this.timeTrackingInterval) {
+      clearInterval(this.timeTrackingInterval);
+    }
+    const guestId = this.getGuestId();
+    // Heartbeat every 60 seconds
+    this.timeTrackingInterval = setInterval(() => {
+      this.recordGuestPing(guestId, 60);
+    }, 60000);
+    // Initial active ping
+    this.recordGuestPing(guestId, 0);
+  }
+
+  async recordGuestPing(guestId: string, seconds: number = 60) {
+    try {
+      await fetch(`${this.apiUrl}?action=recordGuestPing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guest_id: guestId, seconds })
+      });
+    } catch(e) {
+      // silent
+    }
+  }
+
   private async recordTime(seconds: number) {
     if (!this.currentUserEmail) return;
     try {
@@ -53,6 +88,8 @@ export class AnalyticsService {
 
   async recordPlay(track: any) {
     if (!track || !track.videoId) return;
+    const isGuest = !this.currentUserEmail;
+    const guestId = isGuest ? this.getGuestId() : null;
     try {
       await fetch(`${this.apiUrl}?action=recordPlay`, {
         method: 'POST',
@@ -60,7 +97,10 @@ export class AnalyticsService {
         body: JSON.stringify({
           video_id: track.videoId,
           title: track.title,
-          thumbnail: track.thumbnailHigh || track.thumbnail || ''
+          thumbnail: track.thumbnailHigh || track.thumbnail || '',
+          artist: track.channelTitle || track.artist || '',
+          is_guest: isGuest,
+          guest_id: guestId
         })
       });
     } catch(e) {

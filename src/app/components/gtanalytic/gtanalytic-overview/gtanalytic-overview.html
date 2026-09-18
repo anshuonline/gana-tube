@@ -1,0 +1,245 @@
+<div class="overview-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Executive Dashboard</h1>
+      <p class="page-desc">Comprehensive streaming performance, user metrics, and guest activity</p>
+    </div>
+    <div class="header-tags">
+      <span class="live-tag">
+        <span class="pulse"></span> System Live
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="dataService.loading() && !dataService.analyticsData()" class="loading-state-card">
+    <div class="spinner"></div>
+    <p>Loading analytics data...</p>
+  </div>
+
+  <div *ngIf="dataService.analyticsData()">
+
+    <!-- Primary KPI Grid -->
+    <div class="kpi-grid">
+      
+      <!-- Total Streams -->
+      <div class="kpi-card purple-gradient">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Streams</span>
+          <div class="kpi-icon-pill">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          </div>
+        </div>
+        <div class="kpi-number">{{ summary().total_plays || 0 | number }}</div>
+        <div class="kpi-subtext">
+          <span>{{ guestSummary().total_guest_plays || 0 | number }} by Guests</span>
+        </div>
+      </div>
+
+      <!-- Guest Listeners (Crucial Highlight) -->
+      <div class="kpi-card pink-gradient">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Unique Guests</span>
+          <div class="kpi-icon-pill">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          </div>
+        </div>
+        <div class="kpi-number">{{ guestSummary().total_guests || 0 | number }}</div>
+        <div class="kpi-subtext">
+          <span class="highlight-green">{{ guestSummary().active_guests_today || 0 | number }} Active Today</span>
+        </div>
+      </div>
+
+      <!-- Registered Users -->
+      <div class="kpi-card blue-gradient">
+        <div class="kpi-header">
+          <span class="kpi-label">Registered Accounts</span>
+          <div class="kpi-icon-pill">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+        </div>
+        <div class="kpi-number">{{ summary().total_users || 0 | number }}</div>
+        <div class="kpi-subtext">
+          <span>{{ summary().daily_active_users || 0 | number }} Active in 24h</span>
+        </div>
+      </div>
+
+      <!-- Online / Active Right Now -->
+      <div class="kpi-card emerald-gradient">
+        <div class="kpi-header">
+          <span class="kpi-label">Online Guests (Now)</span>
+          <div class="kpi-icon-pill pulse-emerald">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          </div>
+        </div>
+        <div class="kpi-number highlight-emerald">{{ guestSummary().online_guests_now || 0 | number }}</div>
+        <div class="kpi-subtext">
+          <span>Active in past 15 mins</span>
+        </div>
+      </div>
+
+      <!-- Total Listening Time -->
+      <div class="kpi-card amber-gradient">
+        <div class="kpi-header">
+          <span class="kpi-label">Registered Listen Time</span>
+          <div class="kpi-icon-pill">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+        </div>
+        <div class="kpi-number">{{ formatSeconds(summary().total_time_seconds || 0) }}</div>
+        <div class="kpi-subtext">
+          <span>Cumulative time logged</span>
+        </div>
+      </div>
+
+      <!-- Total Likes -->
+      <div class="kpi-card rose-gradient">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Liked Songs</span>
+          <div class="kpi-icon-pill">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+        </div>
+        <div class="kpi-number">{{ summary().total_likes || 0 | number }}</div>
+        <div class="kpi-subtext">
+          <span>Saved to libraries</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Middle Split Section -->
+    <div class="overview-grid-2">
+      
+      <!-- Stream Distribution Chart -->
+      <div class="dashboard-panel">
+        <div class="panel-header">
+          <div class="panel-titles">
+            <h2 class="panel-title">Audience Distribution</h2>
+            <p class="panel-subtitle">Registered Users vs Unauthenticated Guests</p>
+          </div>
+          <a routerLink="/gtanalytic/guests" class="panel-action-link">View Guest Insights &rarr;</a>
+        </div>
+        <div class="chart-container-doughnut">
+          <canvas baseChart
+            [datasets]="streamsSplitData()"
+            [labels]="streamsSplitLabels"
+            [options]="streamsSplitOptions"
+            [type]="'doughnut'">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Live Room Snapshot -->
+      <div class="dashboard-panel">
+        <div class="panel-header">
+          <div class="panel-titles">
+            <h2 class="panel-title">Listening Rooms Status</h2>
+            <p class="panel-subtitle">Current real-time synced sessions</p>
+          </div>
+          <a routerLink="/gtanalytic/rooms" class="panel-action-link">Open Room Monitor &rarr;</a>
+        </div>
+
+        <div class="room-stats-summary">
+          <div class="room-stat-box">
+            <span class="room-stat-val">{{ roomStats()?.activeRoomCount || 0 }}</span>
+            <span class="room-stat-lbl">Active Rooms</span>
+          </div>
+          <div class="room-stat-box">
+            <span class="room-stat-val">{{ roomStats()?.totalActiveMembers || 0 }}</span>
+            <span class="room-stat-lbl">Live Listeners</span>
+          </div>
+          <div class="room-stat-box">
+            <span class="room-stat-val">{{ roomStats()?.totalCreated || 0 }}</span>
+            <span class="room-stat-lbl">Total Rooms Created</span>
+          </div>
+        </div>
+
+        <div class="live-rooms-preview">
+          <div *ngIf="!roomStats()?.activeRooms?.length" class="empty-state">
+            <p>No active listening rooms right now</p>
+          </div>
+
+          <div *ngFor="let rm of (roomStats()?.activeRooms || []).slice(0, 3)" class="room-preview-card">
+            <div class="rm-left">
+              <span class="rm-badge" [class.bot]="rm.isBot">{{ rm.isBot ? 'Bot' : 'Live Host' }}</span>
+              <span class="rm-title">{{ rm.name }}</span>
+            </div>
+            <div class="rm-right">
+              <span class="rm-listeners">{{ rm.listenerCount }} / {{ rm.maxMembers }} members</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Lists: Top Overall vs Guests Ka Gana -->
+    <div class="overview-grid-2">
+      
+      <!-- Top 5 Overall -->
+      <div class="dashboard-panel">
+        <div class="panel-header">
+          <div class="panel-titles">
+            <h2 class="panel-title">Top Streamed Tracks</h2>
+            <p class="panel-subtitle">Across all listeners on GanaTube</p>
+          </div>
+          <a routerLink="/gtanalytic/streamanalytics" class="panel-action-link">All 50 Tracks &rarr;</a>
+        </div>
+
+        <div class="song-list">
+          <div *ngFor="let s of topSongs(); let idx = index" class="song-item">
+            <span class="song-rank">{{ idx + 1 }}</span>
+            <img [src]="s.thumbnail || '/ganatubenewlogo.png'" alt="Thumb" class="song-thumb" />
+            <div class="song-meta">
+              <span class="song-title">{{ s.title }}</span>
+              <span class="song-artist">{{ s.artist || s.video_id }}</span>
+            </div>
+            <div class="song-plays">
+              <span class="play-num">{{ s.play_count | number }}</span>
+              <span class="play-lbl">plays</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top 5 "Guests Ka Gana" -->
+      <div class="dashboard-panel highlight-guest-panel">
+        <div class="panel-header">
+          <div class="panel-titles">
+            <div class="title-with-pill">
+              <h2 class="panel-title">Guests Ka Gana (Top Unregistered Tracks)</h2>
+              <span class="guest-pill">Guests Only</span>
+            </div>
+            <p class="panel-subtitle">Songs played without logging in</p>
+          </div>
+          <a routerLink="/gtanalytic/guests" class="panel-action-link">Full Guest Stats &rarr;</a>
+        </div>
+
+        <div class="song-list">
+          <div *ngIf="!guestTopSongs().length" class="empty-state">
+            <p>Guest song plays will display here as visitors stream music</p>
+          </div>
+
+          <div *ngFor="let s of guestTopSongs(); let idx = index" class="song-item">
+            <span class="song-rank rank-pink">{{ idx + 1 }}</span>
+            <img [src]="s.thumbnail || '/ganatubenewlogo.png'" alt="Thumb" class="song-thumb" />
+            <div class="song-meta">
+              <span class="song-title">{{ s.title }}</span>
+              <span class="song-artist">{{ s.artist || 'Guest Visitor' }}</span>
+            </div>
+            <div class="song-plays">
+              <span class="play-num pink-text">{{ s.play_count | number }}</span>
+              <span class="play-lbl">guest plays</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

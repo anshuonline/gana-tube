@@ -1,0 +1,226 @@
+<div class="users-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="header-badge-row">
+        <h1 class="page-title">User Growth & Retention</h1>
+        <span class="pill-users-tag">Registered Members</span>
+      </div>
+      <p class="page-desc">Track member acquisition velocity, daily active users, and listener retention logs</p>
+    </div>
+
+    <!-- Time Filter Pills -->
+    <div class="filter-pill-group">
+      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'today'" (click)="setFilter('today')">Today</button>
+      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'yesterday'" (click)="setFilter('yesterday')">Yesterday</button>
+      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'last_7_days'" (click)="setFilter('last_7_days')">7 Days</button>
+      <button class="filter-pill" [class.active]="dataService.currentFilter() === 'all_time'" (click)="setFilter('all_time')">All Time</button>
+    </div>
+  </div>
+
+  <!-- User Metrics Grid -->
+  <div class="user-metrics-grid">
+    <!-- Total Registered Users -->
+    <div class="metric-card purple-card">
+      <div class="metric-head">
+        <span class="metric-lbl">Total Registered Users</span>
+        <div class="metric-icon-box">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+      <div class="metric-val">{{ summary().total_users | number }}</div>
+      <div class="metric-sub">Lifetime signed-up accounts</div>
+    </div>
+
+    <!-- Daily Active Users -->
+    <div class="metric-card emerald-card">
+      <div class="metric-head">
+        <span class="metric-lbl">Daily Active Users</span>
+        <div class="metric-icon-box pulse-box">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+        </div>
+      </div>
+      <div class="metric-val highlight-green">{{ summary().daily_active_users | number }}</div>
+      <div class="metric-sub">Active in the past 24 hours</div>
+    </div>
+
+    <!-- Total Registered Streams -->
+    <div class="metric-card pink-card">
+      <div class="metric-head">
+        <span class="metric-lbl">User Total Plays</span>
+        <div class="metric-icon-box">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        </div>
+      </div>
+      <div class="metric-val">{{ summary().total_plays | number }}</div>
+      <div class="metric-sub">Songs played by authenticated users</div>
+    </div>
+
+    <!-- Total User Listening Time -->
+    <div class="metric-card cyan-card">
+      <div class="metric-head">
+        <span class="metric-lbl">User Listening Time</span>
+        <div class="metric-icon-box">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+      <div class="metric-val">{{ formatSeconds(summary().total_time_seconds) }}</div>
+      <div class="metric-sub">Accumulated authenticated listen time</div>
+    </div>
+  </div>
+
+  <!-- User Growth Chart Panel -->
+  <div class="chart-panel" *ngIf="growthChartLabels().length">
+    <div class="chart-header">
+      <div class="chart-titles">
+        <h2 class="chart-title">Member Acquisition Timeline</h2>
+        <span class="chart-tag">Signups</span>
+      </div>
+      <span class="chart-badge">Daily Growth</span>
+    </div>
+    <div class="chart-canvas-wrapper">
+      <canvas 
+        baseChart 
+        [datasets]="growthChartData()" 
+        [labels]="growthChartLabels()" 
+        [options]="growthChartOptions" 
+        [type]="'line'">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- Users Tabs Panel -->
+  <div class="panel-container">
+    <div class="panel-nav-bar">
+      <div class="tab-buttons">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab() === 'directory'" 
+          (click)="activeTab.set('directory')">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>User Directory</span>
+          <span class="badge-count">{{ filteredDetailedUsers().length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab() === 'top_active'" 
+          (click)="activeTab.set('top_active')">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Top Active Listeners</span>
+          <span class="badge-count">{{ topUsers().length }}</span>
+        </button>
+      </div>
+
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input 
+          type="text" 
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Search by name or email..." 
+          class="search-input"
+        />
+        <button *ngIf="searchQuery()" (click)="searchQuery.set('')" class="btn-clear">&times;</button>
+      </div>
+    </div>
+
+    <!-- TAB 1: User Directory -->
+    <div *ngIf="activeTab() === 'directory'" class="tab-content">
+      <div class="table-responsive">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Email Address</th>
+              <th>Joined Date</th>
+              <th>Last Active / Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!filteredDetailedUsers().length">
+              <td colspan="4" class="empty-state">
+                <p>No user profile records found.</p>
+              </td>
+            </tr>
+
+            <tr *ngFor="let user of filteredDetailedUsers()">
+              <td>
+                <div class="user-cell">
+                  <div class="avatar-circle">
+                    {{ user.display_name ? user.display_name.charAt(0).toUpperCase() : 'U' }}
+                  </div>
+                  <span class="user-display-name">{{ user.display_name || 'Anonymous User' }}</span>
+                </div>
+              </td>
+              <td>
+                <code class="email-pill">{{ user.email }}</code>
+              </td>
+              <td style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
+                {{ user.created_at ? (user.created_at | date:'mediumDate') : 'N/A' }}
+              </td>
+              <td style="color: #34d399; font-weight: 500; font-size: 12px;">
+                {{ user.updated_at ? (user.updated_at | date:'medium') : 'N/A' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: Top Active Listeners -->
+    <div *ngIf="activeTab() === 'top_active'" class="tab-content">
+      <div class="table-responsive">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center;">#</th>
+              <th>User</th>
+              <th>Listening Time</th>
+              <th>Songs Played</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!topUsers().length">
+              <td colspan="5" class="empty-state">
+                <p>No user activity stats recorded yet.</p>
+              </td>
+            </tr>
+
+            <tr *ngFor="let u of topUsers(); let i = index">
+              <td style="text-align: center;">
+                <span class="rank-badge" [class.top-rank]="i < 3">{{ i + 1 }}</span>
+              </td>
+              <td>
+                <div class="user-cell">
+                  <div class="avatar-circle">
+                    {{ u.display_name ? u.display_name.charAt(0).toUpperCase() : (u.email ? u.email.charAt(0).toUpperCase() : 'U') }}
+                  </div>
+                  <div class="user-info">
+                    <span class="user-display-name">{{ u.display_name || 'GanaTube Listener' }}</span>
+                    <span class="user-email-sub">{{ u.email }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="time-highlight-pill">
+                  {{ formatSeconds(u.total_time_spent_seconds) }}
+                </div>
+              </td>
+              <td>
+                <span class="plays-count-badge">{{ u.total_plays || 0 }} plays</span>
+              </td>
+              <td style="color: rgba(255, 255, 255, 0.5); font-size: 12px;">
+                {{ u.last_active ? (u.last_active | date:'medium') : 'Recently' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
