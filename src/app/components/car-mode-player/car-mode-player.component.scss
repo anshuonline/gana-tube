@@ -859,6 +859,16 @@
     }
   }
 
+  // ----- Backdrop for bottom sheets -----
+  .cm-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 18;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
   // ----- Queue / Search bottom sheets -----
   .cm-queue-sheet,
   .cm-search-sheet {

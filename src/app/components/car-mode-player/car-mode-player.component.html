@@ -114,12 +114,15 @@
         </button>
       </div>
 
+      <!-- Backdrop above sheet for tap-to-close -->
+      <div class="cm-sheet-backdrop" *ngIf="activePanel() !== 'player'" (click)="closeSheet()"></div>
+
       <!-- QUEUE PANEL (bottom sheet / full screen) -->
       <div class="cm-queue-sheet" [class.open]="activePanel() === 'queue'" [class.fullscreen]="queueFullScreen()">
-        <div class="cm-sheet-handle" (click)="toggleQueueFullScreen()">
+        <div class="cm-sheet-handle" (click)="closeSheet()" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
           <span class="cm-handle-bar"></span>
         </div>
-        <div class="cm-sheet-header">
+        <div class="cm-sheet-header" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
           <div class="cm-sheet-title-row">
             <span class="cm-queue-header">Up Next</span>
             <span class="cm-queue-count">{{ playerService.queue().length }} songs</span>
@@ -128,9 +131,8 @@
             <button class="cm-sheet-icon-btn" (click)="openPanel('search')" title="Voice Search">
               <svg lucideMic [attr.size]="20"></svg>
             </button>
-            <button class="cm-sheet-icon-btn" (click)="toggleQueueFullScreen()" title="Minimize / Fullscreen">
-              <svg *ngIf="!queueFullScreen()" lucideChevronDown [attr.size]="20" style="transform: rotate(180deg)"></svg>
-              <svg *ngIf="queueFullScreen()" lucideChevronDown [attr.size]="20"></svg>
+            <button class="cm-sheet-icon-btn" (click)="closeSheet()" title="Close Queue">
+              <svg lucideChevronDown [attr.size]="24"></svg>
             </button>
           </div>
         </div>
@@ -163,17 +165,16 @@
 
       <!-- SEARCH PANEL (full screen, voice search) -->
       <div class="cm-search-sheet" [class.open]="activePanel() === 'search'" [class.fullscreen]="searchFullScreen()">
-        <div class="cm-sheet-handle" (click)="toggleSearchFullScreen()">
+        <div class="cm-sheet-handle" (click)="closeSheet()" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
           <span class="cm-handle-bar"></span>
         </div>
-        <div class="cm-sheet-header">
+        <div class="cm-sheet-header" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
           <div class="cm-sheet-title-row">
             <span class="cm-queue-header">{{ showSearchResults ? 'Search Results' : 'Search Songs' }}</span>
           </div>
           <div class="cm-sheet-actions">
-            <button class="cm-sheet-icon-btn" (click)="toggleSearchFullScreen()" title="Minimize / Fullscreen">
-              <svg *ngIf="!searchFullScreen()" lucideChevronDown [attr.size]="20" style="transform: rotate(180deg)"></svg>
-              <svg *ngIf="searchFullScreen()" lucideChevronDown [attr.size]="20"></svg>
+            <button class="cm-sheet-icon-btn" (click)="closeSheet()" title="Close Search">
+              <svg lucideChevronDown [attr.size]="24"></svg>
             </button>
           </div>
         </div>

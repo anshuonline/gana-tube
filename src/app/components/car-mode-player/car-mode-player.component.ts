@@ -86,12 +86,35 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     }
   }
 
+  closeSheet() {
+    this.activePanel.set('player');
+    this.queueFullScreen.set(false);
+    this.searchFullScreen.set(false);
+  }
+
   toggleQueueFullScreen() {
-    this.queueFullScreen.update(v => !v);
+    this.closeSheet();
   }
 
   toggleSearchFullScreen() {
-    this.searchFullScreen.update(v => !v);
+    this.closeSheet();
+  }
+
+  private touchStartY = 0;
+  onTouchStart(event: TouchEvent) {
+    if (event.touches && event.touches.length > 0) {
+      this.touchStartY = event.touches[0].clientY;
+    }
+  }
+
+  onTouchEnd(event: TouchEvent) {
+    if (event.changedTouches && event.changedTouches.length > 0) {
+      const deltaY = event.changedTouches[0].clientY - this.touchStartY;
+      // If user swiped down by 40px or more, slide down and close
+      if (deltaY > 40) {
+        this.closeSheet();
+      }
+    }
   }
 
   constructor() {
