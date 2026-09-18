@@ -403,10 +403,11 @@
     flex-shrink: 0;
     transition: width 0.3s ease, height 0.3s ease;
     position: relative;
-    padding: 2px;
+    padding: 2.5px;
     background: #0d0d14;
+    isolation: isolate;
 
-    // Zero-lag GPU composite animated gradient border
+    // Moving Border Beam Animation (Continuous Loop, 100% GPU accelerated, 0 lag on phones)
     &::before {
       content: '';
       position: absolute;
@@ -416,20 +417,17 @@
       height: 200%;
       background: conic-gradient(
         from 0deg,
-        #a855f7 0deg,
-        #ec4899 90deg,
-        #8b5cf6 180deg,
-        #ec4899 270deg,
-        #a855f7 360deg
+        rgba(255, 255, 255, 0.07) 0deg,
+        rgba(255, 255, 255, 0.07) 230deg,
+        rgba(168, 85, 247, 0.3) 260deg,
+        #a855f7 290deg,
+        #ec4899 330deg,
+        #f472b6 350deg,
+        rgba(255, 255, 255, 0.07) 360deg
       );
-      animation: rotateArtBorder 8s linear infinite;
+      animation: rotateArtBorder 3.5s linear infinite;
       will-change: transform;
       z-index: 0;
-    }
-
-    &:not(.playing)::before {
-      animation-play-state: paused;
-      opacity: 0.5;
     }
 
     &.clickable {
@@ -482,14 +480,15 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 14px;
+      border-radius: 13.5px;
       display: block;
+      background: #0a0a0f;
     }
 
     .art-overlay {
       position: absolute;
-      inset: 2px;
-      background: rgba(0,0,0,0.5);
+      inset: 2.5px;
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -497,7 +496,7 @@
       transition: opacity 0.2s;
       color: white;
       z-index: 2;
-      border-radius: 14px;
+      border-radius: 13.5px;
     }
 
     .empty-art {
@@ -512,7 +511,7 @@
       background: #0d0d14;
       color: rgba(255, 255, 255, 0.3);
       gap: 8px;
-      border-radius: 14px;
+      border-radius: 13.5px;
 
       p {
         font-size: 13px;
@@ -522,14 +521,14 @@
 
     .room-cover-ad-container {
       position: absolute;
-      inset: 2px;
+      inset: 2.5px;
       background: #000;
       opacity: 0;
       transform: scale(1.05);
       pointer-events: none;
       transition: opacity 0.5s ease, transform 0.5s ease;
       z-index: 5;
-      border-radius: 14px;
+      border-radius: 13.5px;
       overflow: hidden;
 
       &.active {
