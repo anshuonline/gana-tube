@@ -24,10 +24,10 @@
     <!-- Primary KPI Grid -->
     <div class="kpi-grid">
       
-      <!-- Total Streams -->
+      <!-- Total Plays -->
       <div class="kpi-card purple-gradient">
         <div class="kpi-header">
-          <span class="kpi-label">Total Streams</span>
+          <span class="kpi-label">Total Plays</span>
           <div class="kpi-icon-pill">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
           </div>
@@ -80,17 +80,17 @@
         </div>
       </div>
 
-      <!-- Total Listening Time -->
+      <!-- Total Time Spent -->
       <div class="kpi-card amber-gradient">
         <div class="kpi-header">
-          <span class="kpi-label">Registered Listen Time</span>
+          <span class="kpi-label">Total Time Spent</span>
           <div class="kpi-icon-pill">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
         </div>
-        <div class="kpi-number">{{ formatSeconds(summary().total_time_seconds || 0) }}</div>
+        <div class="kpi-number">{{ formatSeconds((summary().total_time_seconds || 0) + (guestSummary().total_guest_time_seconds || 0)) }}</div>
         <div class="kpi-subtext">
-          <span>Cumulative time logged</span>
+          <span>{{ formatSeconds(summary().total_time_seconds || 0) }} Users · {{ formatSeconds(guestSummary().total_guest_time_seconds || 0) }} Guests</span>
         </div>
       </div>
 
