@@ -19,8 +19,8 @@ export class GtanalyticOverviewComponent {
   guestSummary = computed(() => this.dataService.analyticsData()?.guest_summary || {});
   roomStats = computed(() => this.dataService.roomAnalytics());
 
-  // Streams split chart (Registered vs Guest)
-  streamsSplitLabels = ['Registered Users', 'Guest Visitors'];
+  // Streams split chart (Registered Plays vs Guest Plays)
+  streamsSplitLabels = ['User Plays', 'Guest Plays'];
   streamsSplitOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -28,6 +28,15 @@ export class GtanalyticOverviewComponent {
       legend: {
         position: 'bottom' as const,
         labels: { color: '#ffffff', boxWidth: 12, padding: 16 }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            return ` ${label}: ${value.toLocaleString()} plays`;
+          }
+        }
       }
     }
   };

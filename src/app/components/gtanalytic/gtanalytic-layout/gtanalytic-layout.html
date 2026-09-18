@@ -1,7 +1,7 @@
 <div class="gtanalytic-shell">
 
   <!-- Topbar Header -->
-  <header class="gtanalytic-topbar">
+  <header class="gtanalytic-topbar" *ngIf="isLoggedIn">
     <div class="topbar-left">
       <button class="menu-toggle-btn" (click)="toggleMobileMenu()" aria-label="Toggle navigation">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -55,13 +55,13 @@
   </header>
 
   <!-- Mobile Overlay -->
-  <div class="mobile-overlay" *ngIf="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+  <div class="mobile-overlay" *ngIf="isLoggedIn && isMobileMenuOpen" (click)="closeMobileMenu()"></div>
 
   <!-- Layout Body -->
   <div class="gtanalytic-body">
     
     <!-- Sidebar Navigation -->
-    <aside class="gtanalytic-sidebar" [class.open]="isMobileMenuOpen">
+    <aside class="gtanalytic-sidebar" *ngIf="isLoggedIn" [class.open]="isMobileMenuOpen">
       <div class="sidebar-header-mobile">
         <span class="mobile-menu-title">Analytics Navigation</span>
         <button class="btn-close-mobile" (click)="closeMobileMenu()">&times;</button>
@@ -99,7 +99,7 @@
     </aside>
 
     <!-- Main Router Outlet Page Container -->
-    <main class="gtanalytic-content">
+    <main class="gtanalytic-content" [class.no-nav]="!isLoggedIn">
       <router-outlet></router-outlet>
     </main>
 

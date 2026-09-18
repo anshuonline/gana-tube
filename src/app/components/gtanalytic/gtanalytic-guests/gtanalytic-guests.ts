@@ -56,4 +56,40 @@ export class GtanalyticGuestsComponent {
     if (hrs > 0) return `${hrs}h ${mins}m`;
     return `${mins} mins`;
   }
+
+  formatIST(dateStr: string | null): string {
+    if (!dateStr) return 'N/A';
+    let dStr = dateStr;
+    if (!dStr.includes('Z') && !dStr.includes('+')) {
+      dStr = dStr.replace(' ', 'T') + 'Z';
+    }
+    const d = new Date(dStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  }
+
+  formatISTDate(dateStr: string | null): string {
+    if (!dateStr) return 'N/A';
+    let dStr = dateStr;
+    if (!dStr.includes('Z') && !dStr.includes('+')) {
+      dStr = dStr.replace(' ', 'T') + 'Z';
+    }
+    const d = new Date(dStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
 }

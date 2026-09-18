@@ -158,10 +158,10 @@
                 <code class="email-pill">{{ user.email }}</code>
               </td>
               <td style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
-                {{ user.created_at ? (user.created_at | date:'mediumDate') : 'N/A' }}
+                {{ formatISTDate(user.created_at) }}
               </td>
               <td style="color: #34d399; font-weight: 500; font-size: 12px;">
-                {{ user.updated_at ? (user.updated_at | date:'medium') : 'N/A' }}
+                {{ formatIST(user.updated_at) }}
               </td>
             </tr>
           </tbody>
@@ -213,7 +213,7 @@
                 <span class="plays-count-badge">{{ u.total_plays || 0 }} plays</span>
               </td>
               <td style="color: rgba(255, 255, 255, 0.5); font-size: 12px;">
-                {{ u.last_active ? (u.last_active | date:'medium') : 'Recently' }}
+                {{ formatIST(u.last_active) }}
               </td>
             </tr>
           </tbody>

@@ -20,10 +20,11 @@ export class AnalyticsService {
     this.currentUserEmail = email;
     this.currentDisplayName = displayName;
     
-    // Record time every 60 seconds
+    // Record time every 120 seconds (skip if tab is inactive/hidden)
     this.timeTrackingInterval = setInterval(() => {
-      this.recordTime(60);
-    }, 60000);
+      if (typeof document !== 'undefined' && document.hidden) return;
+      this.recordTime(120);
+    }, 120000);
   }
 
   stopTrackingTime() {
@@ -49,10 +50,11 @@ export class AnalyticsService {
       clearInterval(this.timeTrackingInterval);
     }
     const guestId = this.getGuestId();
-    // Heartbeat every 60 seconds
+    // Heartbeat every 120 seconds (skip if tab is inactive/hidden to avoid server load)
     this.timeTrackingInterval = setInterval(() => {
-      this.recordGuestPing(guestId, 60);
-    }, 60000);
+      if (typeof document !== 'undefined' && document.hidden) return;
+      this.recordGuestPing(guestId, 120);
+    }, 120000);
     // Initial active ping
     this.recordGuestPing(guestId, 0);
   }
@@ -62,10 +64,11 @@ export class AnalyticsService {
       await fetch(`${this.apiUrl}?action=recordGuestPing`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guest_id: guestId, seconds })
+        body: JSON.stringify({ guest_id: guestId, seconds }),
+        keepalive: true
       });
     } catch(e) {
-      // silent
+      // Silent catch - don't pollute console
     }
   }
 

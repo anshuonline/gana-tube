@@ -160,7 +160,7 @@
                 </div>
               </td>
               <td style="color: rgba(255, 255, 255, 0.5); font-size: 12px;">
-                {{ s.last_played ? (s.last_played | date:'medium') : 'Recently' }}
+                {{ formatIST(s.last_played) }}
               </td>
               <td>
                 <code class="code-id">{{ s.video_id }}</code>
@@ -200,10 +200,10 @@
                 </div>
               </td>
               <td style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
-                {{ g.first_seen ? (g.first_seen | date:'mediumDate') : 'N/A' }}
+                {{ formatISTDate(g.first_seen) }}
               </td>
               <td style="color: #10b981; font-weight: 500; font-size: 12px;">
-                {{ g.last_active ? (g.last_active | date:'medium') : 'N/A' }}
+                {{ formatIST(g.last_active) }}
               </td>
               <td>
                 <span class="stat-highlight">{{ g.total_plays || 0 }} songs</span>

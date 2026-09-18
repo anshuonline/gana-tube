@@ -14,6 +14,7 @@ export class GtanalyticDataService {
   roomLoading = signal<boolean>(false);
   error = signal<string>('');
   lastUpdated = signal<Date>(new Date());
+  private autoRefreshTimer: any = null;
 
   getPassword(): string {
     if (typeof sessionStorage !== 'undefined') {
@@ -29,6 +30,7 @@ export class GtanalyticDataService {
   }
 
   clearPassword(): void {
+    this.stopAutoRefresh();
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.removeItem('gtanalytic_pwd');
     }
@@ -71,6 +73,7 @@ export class GtanalyticDataService {
     });
 
     this.loadRooms();
+    this.startAutoRefresh();
   }
 
   loadRooms() {
@@ -88,5 +91,30 @@ export class GtanalyticDataService {
         this.roomLoading.set(false);
       }
     });
+  }
+
+  startAutoRefresh() {
+    if (this.autoRefreshTimer) return;
+    this.autoRefreshTimer = setInterval(() => {
+      if (this.isAuthenticated()) {
+        const pwd = this.getPassword();
+        if (!pwd) return;
+        this.analyticsService.getAnalytics(pwd, this.currentFilter()).subscribe({
+          next: (res) => {
+            if (res.status === 'success') {
+              this.analyticsData.set(res.data);
+              this.lastUpdated.set(new Date());
+            }
+          }
+        });
+      }
+    }, 20000);
+  }
+
+  stopAutoRefresh() {
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
+    }
   }
 }

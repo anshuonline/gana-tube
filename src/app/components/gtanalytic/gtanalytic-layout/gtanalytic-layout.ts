@@ -25,6 +25,10 @@ export class GtanalyticLayoutComponent implements OnInit {
   isMobileMenuOpen = false;
   selectedNavPath = '/gtanalytic/overview';
 
+  get isLoggedIn(): boolean {
+    return this.dataService.isAuthenticated() && !this.router.url.includes('/login');
+  }
+
   navItems: NavItem[] = [
     { path: '/gtanalytic/overview', label: 'Overview', icon: 'dashboard' },
     { path: '/gtanalytic/streamanalytics', label: 'Stream Analytics', icon: 'activity' },
