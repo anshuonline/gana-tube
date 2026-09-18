@@ -12,8 +12,9 @@ import { PlaylistMenuComponent } from './components/playlist-menu/playlist-menu'
 import { SavePlaylistModalComponent } from './components/save-playlist-modal/save-playlist-modal';
 import { ToastComponent } from './components/toast/toast.component';
 import { ToastService } from './services/toast.service';
+import { HttpClient } from '@angular/common/http';
 import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
-import { PlayerService } from './services/player.service';
+import { PlayerService, Track } from './services/player.service';
 import { RoomService } from './services/room.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
 import { AuthService } from './services/auth.service';
@@ -323,6 +324,7 @@ export class App implements OnInit {
   private carouselInterval: any;
 
   private destroy$ = new Subject<void>();
+  private http = inject(HttpClient);
 
   private hoverPreviewAudio: HTMLAudioElement | null = null;
   private hoverPreviewTimeout: any = null;
@@ -1401,39 +1403,40 @@ export class App implements OnInit {
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const videoId = params.get('v') || params.get('play');
       if (videoId) {
-        // Fetch exact video details by ID instead of performing a fuzzy text search
+        // 1. Check if the user was already playing this song before refreshing
+        let savedTrack: Track | null = null;
+        if (typeof localStorage !== 'undefined') {
+          try {
+            const raw = localStorage.getItem('gt_last_track');
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed && parsed.videoId === videoId && parsed.title && !parsed.title.includes('Playing from link') && !parsed.title.includes('Loading Track')) {
+                savedTrack = parsed;
+              }
+            }
+          } catch (e) {}
+        }
+
+        if (savedTrack) {
+          if (this.playerService.currentTrack()?.videoId !== videoId) {
+            this.playerService.playTrack(savedTrack);
+          }
+          return;
+        }
+
+        // 2. Fetch exact video details by ID
         this.youtubeApi.getVideoDetails([videoId]).subscribe({
           next: (res) => {
-            if (res && res.length > 0) {
+            if (res && res.length > 0 && res[0].title && !res[0].title.includes('Playing from link')) {
               if (this.playerService.currentTrack()?.videoId !== videoId) {
                 this.playerService.playTrack(res[0]);
               }
             } else {
-              // Guaranteed fallback: play the exact videoId directly
-              if (this.playerService.currentTrack()?.videoId !== videoId) {
-                this.playerService.playTrack({
-                  videoId: videoId,
-                  title: 'Playing from link...',
-                  channelTitle: 'GanaTube',
-                  thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-                  thumbnailHigh: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-                  publishedAt: new Date().toISOString()
-                });
-              }
+              this.fetchFallbackOEmbedAndPlay(videoId);
             }
           },
           error: () => {
-            // Guaranteed fallback on error: play the exact videoId directly
-            if (this.playerService.currentTrack()?.videoId !== videoId) {
-              this.playerService.playTrack({
-                videoId: videoId,
-                title: 'Playing from link...',
-                channelTitle: 'GanaTube',
-                thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-                thumbnailHigh: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-                publishedAt: new Date().toISOString()
-              });
-            }
+            this.fetchFallbackOEmbedAndPlay(videoId);
           }
         });
       }
@@ -1442,6 +1445,30 @@ export class App implements OnInit {
     this.loadInitialShelves();
     this.startCarouselTimer();
     this.fetchHeroData(); // Fetch dynamic hero header from admin
+  }
+
+  private fetchFallbackOEmbedAndPlay(videoId: string) {
+    if (this.playerService.currentTrack()?.videoId !== videoId) {
+      this.playerService.playTrack({
+        videoId: videoId,
+        title: 'Loading Track...',
+        channelTitle: 'GanaTube',
+        thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        thumbnailHigh: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+        publishedAt: new Date().toISOString()
+      });
+    }
+
+    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+    this.http.get<any>(oembedUrl).pipe(
+      catchError(() => of(null))
+    ).subscribe(data => {
+      if (data && data.title) {
+        const title = data.title.replace(/ - Topic/g, '').replace(/\[Official.*?\]/gi, '').replace(/\(Official.*?\)/gi, '').trim();
+        const channelTitle = data.author_name || 'YouTube Music';
+        this.playerService.updateTrackInfo(videoId, title, channelTitle);
+      }
+    });
 
     // Prevent focus from getting trapped in iframes (e.g. YouTube player)
     // This ensures global keyboard shortcuts (Ctrl+K, Space, Arrows) always work

@@ -424,11 +424,34 @@ export class PlayerService {
     this.location.replaceState('/play?v=' + track.videoId);
     this.loadInPlayer(track.videoId);
 
+    if (typeof localStorage !== 'undefined' && track && track.videoId) {
+      try {
+        if (track.title && !track.title.includes('Playing from link') && !track.title.includes('Loading Track')) {
+          localStorage.setItem('gt_last_track', JSON.stringify(track));
+        }
+      } catch (e) {}
+    }
+
     if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
       this.roomService.adminQueueUpdate(this.queue(), this.currentIndex());
       this.roomService.adminPlayTrack(track);
     }
     this.isRemoteUpdate = false;
+  }
+
+  updateTrackInfo(videoId: string, title: string, channelTitle: string): void {
+    const q = this.queue();
+    const idx = q.findIndex(t => t.videoId === videoId);
+    if (idx >= 0) {
+      const updated = [...q];
+      updated[idx] = { ...updated[idx], title, channelTitle };
+      this.queue.set(updated);
+      if (typeof localStorage !== 'undefined') {
+        try {
+          localStorage.setItem('gt_last_track', JSON.stringify(updated[idx]));
+        } catch (e) {}
+      }
+    }
   }
 
   setQueue(tracks: Track[], startIndex = 0): void {
