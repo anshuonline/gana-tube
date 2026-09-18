@@ -695,44 +695,52 @@ app.get('/api/yt-search', async (req, res) => {
   }
 });
 
-// Proxy for YouTube Data API Videos details
+// Proxy for YouTube Data API Videos details: Primary = Free YTMusic Scraper (0 Quota), Fallback = YouTube Data API
 app.get('/api/yt-videos', async (req, res) => {
-  const apiKey = process.env.YOUTUBE_API_KEY;
   const ids = (req.query.id || '').split(',').filter(Boolean);
-  
-  if (!apiKey) {
-    try {
-      const yt = await getYTMusic();
-      const results = await Promise.all(ids.map(async (id) => {
-        try {
-          const song = await yt.getSong(id);
-          if (!song) return null;
-          return {
-            id: song.videoId,
-            snippet: {
-              title: song.name,
-              channelTitle: song.artist?.name || 'Unknown Artist',
-              publishedAt: new Date().toISOString(),
-              thumbnails: {
-                medium: { url: `https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg` },
-                maxres: { url: `https://img.youtube.com/vi/${song.videoId}/maxresdefault.jpg` },
-                standard: { url: `https://img.youtube.com/vi/${song.videoId}/hqdefault.jpg` },
-                high: { url: `https://img.youtube.com/vi/${song.videoId}/hqdefault.jpg` }
-              }
-            },
-            contentDetails: {
-              duration: `PT${song.duration}S`
+  if (ids.length === 0) return res.json({ items: [] });
+
+  // 1. PRIMARY: Free YTMusic scraper (Zero API quota used)
+  try {
+    const yt = await getYTMusic();
+    const results = await Promise.all(ids.map(async (id) => {
+      try {
+        const song = await yt.getSong(id);
+        if (!song) return null;
+        return {
+          id: song.videoId,
+          snippet: {
+            title: song.name,
+            channelTitle: song.artist?.name || 'Unknown Artist',
+            publishedAt: new Date().toISOString(),
+            thumbnails: {
+              medium: { url: `https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg` },
+              maxres: { url: `https://img.youtube.com/vi/${song.videoId}/maxresdefault.jpg` },
+              standard: { url: `https://img.youtube.com/vi/${song.videoId}/hqdefault.jpg` },
+              high: { url: `https://img.youtube.com/vi/${song.videoId}/hqdefault.jpg` }
             }
-          };
-        } catch (e) {
-          return null;
-        }
-      }));
-      return res.json({ items: results.filter(Boolean) });
-    } catch(e) {
-      console.error('Error in fallback yt-videos:', e);
-      return res.status(500).json({ error: 'Failed to fetch from fallback YT API' });
+          },
+          contentDetails: {
+            duration: `PT${song.duration}S`
+          }
+        };
+      } catch (e) {
+        return null;
+      }
+    }));
+
+    const validItems = results.filter(Boolean);
+    if (validItems.length > 0) {
+      return res.json({ items: validItems });
     }
+  } catch (ytError) {
+    console.warn('[yt-videos] Primary scraper failed, checking fallback API key:', ytError.message);
+  }
+
+  // 2. FALLBACK: Only if free scraper fails and YOUTUBE_API_KEY is configured
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Failed to fetch video details and no fallback API key configured' });
   }
 
   try {
@@ -747,7 +755,7 @@ app.get('/api/yt-videos', async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    console.error('Error fetching yt-videos:', error);
+    console.error('Error fetching yt-videos fallback:', error);
     res.status(500).json({ error: 'Failed to fetch from YouTube Videos API' });
   }
 });
