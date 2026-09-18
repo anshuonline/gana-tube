@@ -21,8 +21,6 @@ import {
   LucideShare2,
   LucideMoon,
   LucideMonitor,
-  LucideDownload,
-  LucideCheck,
   LucideActivity,
   LucideMoreVertical
 } from '@lucide/angular';
@@ -61,8 +59,6 @@ import { SyncService } from '../../services/sync.service';
     LucideShare2,
     LucideMoon,
     LucideMonitor,
-    LucideDownload,
-    LucideCheck,
     LucideActivity,
     LucideMoreVertical
   ],
@@ -132,20 +128,6 @@ import { SyncService } from '../../services/sync.service';
             *ngIf="playerService.currentTrack() !== null"
           >
             <svg lucideHeart [attr.size]="20" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
-          </button>
-          <button
-            class="ctrl-btn secondary"
-            [class.active]="isDownloaded()"
-            [class.loading]="isDownloading()"
-            (click)="toggleDownload($event)"
-            [title]="isDownloaded() ? 'Downloaded (Available Offline)' : 'Download for Offline'"
-            *ngIf="playerService.currentTrack() !== null"
-          >
-            <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;" *ngIf="isDownloading()"></div>
-            <ng-container *ngIf="!isDownloading()">
-              <svg *ngIf="!isDownloaded()" lucideDownload [attr.size]="20"></svg>
-              <svg *ngIf="isDownloaded()" lucideCheck [attr.size]="20" class="text-green-500" stroke="#10b981"></svg>
-            </ng-container>
           </button>
           <button
             class="ctrl-btn secondary"
