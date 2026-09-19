@@ -97,7 +97,7 @@ export class GtanalyticUsersComponent {
     if (!dateStr) return 'N/A';
     let dStr = dateStr;
     if (!dStr.includes('Z') && !dStr.includes('+')) {
-      dStr = dStr.replace(' ', 'T') + 'Z';
+      dStr = dStr.replace(' ', 'T') + '+05:30';
     }
     const d = new Date(dStr);
     if (isNaN(d.getTime())) return dateStr;
@@ -117,7 +117,7 @@ export class GtanalyticUsersComponent {
     if (!dateStr) return 'N/A';
     let dStr = dateStr;
     if (!dStr.includes('Z') && !dStr.includes('+')) {
-      dStr = dStr.replace(' ', 'T') + 'Z';
+      dStr = dStr.replace(' ', 'T') + '+05:30';
     }
     const d = new Date(dStr);
     if (isNaN(d.getTime())) return dateStr;
