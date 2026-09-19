@@ -225,10 +225,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 16px 28px 16px 24px;
   gap: 20px;
-  max-width: 1800px;
-  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
 
   @media (max-width: 768px) {
     padding: 10px 12px;
@@ -552,9 +553,9 @@
 }
 
 .home-content .hero-inner-wrap {
-  width: 90vw;
-  max-width: 90vw;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   position: relative;
   z-index: 2;
 
@@ -877,10 +878,10 @@
 // ---- Main Content ----
 .main-content {
   flex: 1;
-  max-width: 90%;
-  width: 90%;
-  margin: 0 auto;
-  padding: 0 24px 32px;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0 28px 32px 94px;
   transition: padding-bottom 0.4s;
   position: relative;
   z-index: 1;
