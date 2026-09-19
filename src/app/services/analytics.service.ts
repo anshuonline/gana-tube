@@ -177,4 +177,112 @@ export class AnalyticsService {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     return this.http.get<{status: string, data?: any, message?: string}>(`${backendUrl}/room-analytics?pwd=${encodeURIComponent(password)}`);
   }
+
+  // ── Search Analytics Tracking & API ───────────────────────────────────────
+  activeSearchId: number | null = null;
+  activeSearchQuery: string = '';
+
+  async recordSearch(query: string, category: string = 'songs', resultCount: number = 0, searchType: string = 'manual') {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    this.activeSearchQuery = trimmed;
+    const isGuest = !this.currentUserEmail;
+    const userIdentifier = isGuest ? this.getGuestId() : this.currentUserEmail!;
+
+    try {
+      const res = await fetch(`${this.apiUrl}?action=recordSearch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: trimmed,
+          category,
+          result_count: resultCount,
+          search_type: searchType,
+          is_guest: isGuest,
+          user_identifier: userIdentifier
+        }),
+        keepalive: true
+      });
+      const data = await res.json();
+      if (data && data.search_id) {
+        this.activeSearchId = data.search_id;
+      }
+    } catch(e) {
+      // Silent catch
+    }
+  }
+
+  async recordSearchClick(itemId: string, itemTitle: string) {
+    if (!this.activeSearchQuery) return;
+    try {
+      await fetch(`${this.apiUrl}?action=recordSearchClick`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          search_id: this.activeSearchId,
+          query: this.activeSearchQuery,
+          item_id: itemId,
+          item_title: itemTitle
+        }),
+        keepalive: true
+      });
+    } catch(e) {
+      // Silent catch
+    }
+  }
+
+  async recordSearchPlay(videoId: string) {
+    if (!this.activeSearchQuery) return;
+    try {
+      await fetch(`${this.apiUrl}?action=recordSearchPlay`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          search_id: this.activeSearchId,
+          query: this.activeSearchQuery,
+          video_id: videoId
+        }),
+        keepalive: true
+      });
+    } catch(e) {
+      // Silent catch
+    }
+  }
+
+  getSearchAnalytics(password: string, params: {
+    period?: string;
+    from_date?: string;
+    to_date?: string;
+    category?: string;
+    search_type?: string;
+    min_volume?: number;
+    search_term?: string;
+    page?: number;
+    page_size?: number;
+    sort_by?: string;
+    sort_order?: string;
+  } = {}) {
+    let queryParams = new URLSearchParams({
+      action: 'getSearchAnalytics',
+      pwd: password,
+      period: params.period || 'last_30_days'
+    });
+
+    if (params.from_date) queryParams.set('from_date', params.from_date);
+    if (params.to_date) queryParams.set('to_date', params.to_date);
+    if (params.category && params.category !== 'all') queryParams.set('category', params.category);
+    if (params.search_type && params.search_type !== 'all') queryParams.set('search_type', params.search_type);
+    if (params.min_volume) queryParams.set('min_volume', params.min_volume.toString());
+    if (params.search_term) queryParams.set('search_term', params.search_term);
+    if (params.page) queryParams.set('page', params.page.toString());
+    if (params.page_size) queryParams.set('page_size', params.page_size.toString());
+    if (params.sort_by) queryParams.set('sort_by', params.sort_by);
+    if (params.sort_order) queryParams.set('sort_order', params.sort_order);
+
+    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?${queryParams.toString()}`);
+  }
+
+  getQueryDetails(password: string, query: string) {
+    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getQueryDetails&pwd=${encodeURIComponent(password)}&query=${encodeURIComponent(query)}`);
+  }
 }

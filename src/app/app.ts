@@ -1874,6 +1874,11 @@ export class App implements OnInit {
   }
 
   onPlaySearchTrack(track: YouTubeSearchResult): void {
+    if (track && track.videoId) {
+      this.analyticsService.recordSearchClick(track.videoId, track.title || '');
+      this.analyticsService.recordSearchPlay(track.videoId);
+    }
+
     if (track.videoId.startsWith('pl_') || track.type === 'community-playlist') {
       // It's a community playlist
       this.currentLoadingPlaylistId = track.videoId;
@@ -1966,10 +1971,12 @@ export class App implements OnInit {
         next: (res) => {
           this.results.set(res);
           this.isLoading.set(false);
+          this.analyticsService.recordSearch(query, 'albums', (res || []).length);
         },
         error: () => {
           this.results.set([]);
           this.isLoading.set(false);
+          this.analyticsService.recordSearch(query, 'albums', 0);
         },
       });
       return;
@@ -2006,8 +2013,10 @@ export class App implements OnInit {
       Promise.all([communityPromise, ytPromise]).then(([communityResults, ytResults]) => {
         if (this.currentQuery !== query) return;
         // Interleave or just concat
-        this.results.set([...communityResults, ...ytResults]);
+        const totalList = [...communityResults, ...ytResults];
+        this.results.set(totalList);
         this.isLoading.set(false);
+        this.analyticsService.recordSearch(query, 'playlists', totalList.length);
       });
       return;
     }
@@ -2037,6 +2046,7 @@ export class App implements OnInit {
           this.hasMoreSongs.set(songsList.length >= 40);
           merge();
           this.isLoading.set(false);
+          this.analyticsService.recordSearch(query, 'songs', songsList.length);
         },
         error: () => {
           if (this.currentQuery !== query) return;

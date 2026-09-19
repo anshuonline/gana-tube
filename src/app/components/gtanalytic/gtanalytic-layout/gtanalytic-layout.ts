@@ -31,6 +31,7 @@ export class GtanalyticLayoutComponent implements OnInit {
 
   navItems: NavItem[] = [
     { path: '/gtanalytic/overview', label: 'Overview', icon: 'dashboard' },
+    { path: '/gtanalytic/search', label: 'Search Analytics', icon: 'search', badge: 'New' },
     { path: '/gtanalytic/streamanalytics', label: 'Stream Analytics', icon: 'activity' },
     { path: '/gtanalytic/guests', label: 'Guest Analytics', icon: 'users-guest', badge: 'Hot' },
     { path: '/gtanalytic/users', label: 'User Growth', icon: 'user-check' },

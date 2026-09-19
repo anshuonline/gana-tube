@@ -1,0 +1,959 @@
+<div class="search-analytics-page">
+
+  <!-- Page Header & Global Controls -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="title-row">
+        <h1 class="page-title">Search Analytics</h1>
+        <span class="live-tag">
+          <span class="pulse"></span> Live Sync
+        </span>
+      </div>
+      <p class="page-desc">Comprehensive insights into user searches, trending music queries, conversions & content demand</p>
+    </div>
+
+    <!-- Actions & Global Date Filter -->
+    <div class="header-right">
+      
+      <!-- Time Period Selector -->
+      <div class="filter-pill-container">
+        <svg class="filter-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <select 
+          class="period-select" 
+          [ngModel]="currentPeriod()" 
+          (ngModelChange)="setPeriod($event)">
+          <option *ngFor="let p of timePeriods" [value]="p.id">{{ p.label }}</option>
+        </select>
+      </div>
+
+      <!-- Category Filter Dropdown -->
+      <div class="filter-pill-container">
+        <svg class="filter-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <select 
+          class="period-select" 
+          [ngModel]="categoryFilter()" 
+          (ngModelChange)="onCategoryChange($event)">
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.label }}</option>
+        </select>
+      </div>
+
+      <!-- Export Dropdown -->
+      <div class="export-dropdown-wrapper">
+        <button class="btn-action-pill" title="Export Analytics">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Export</span>
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="export-menu">
+          <button (click)="exportCSV()" class="export-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Export to CSV
+          </button>
+          <button (click)="exportExcel()" class="export-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            Export to Excel (.xls)
+          </button>
+          <button (click)="exportPDF()" class="export-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Export / Print PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Refresh Button -->
+      <button class="btn-icon-refresh" (click)="loadSearchAnalytics()" [class.spinning]="loading()" title="Refresh Data">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Custom Date Range Picker Bar (Shown only when 'custom' is selected) -->
+  <div class="custom-range-bar" *ngIf="currentPeriod() === 'custom'">
+    <div class="custom-range-inputs">
+      <span class="custom-range-label">From:</span>
+      <input type="date" class="date-input" [ngModel]="customFromDate()" (ngModelChange)="customFromDate.set($event)" />
+      <span class="custom-range-label">To:</span>
+      <input type="date" class="date-input" [ngModel]="customToDate()" (ngModelChange)="customToDate.set($event)" />
+      <button class="btn-apply-range" (click)="applyCustomRange()">Apply Range</button>
+    </div>
+  </div>
+
+  <!-- Global Loading Indicator -->
+  <div class="loading-bar-wrapper" *ngIf="loading()">
+    <div class="loading-bar-animated"></div>
+  </div>
+
+  <!-- Error Alert -->
+  <div class="error-banner" *ngIf="error()">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>{{ error() }}</span>
+  </div>
+
+  <!-- ── 1. MAIN KPI CARDS (8 CARDS) ────────────────────────────────────────── -->
+  <div class="kpi-grid" *ngIf="kpis()">
+
+    <!-- Card 1: Total Searches -->
+    <div class="kpi-card purple-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">TOTAL SEARCHES</span>
+        <div class="kpi-icon-bubble purple">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ kpis()?.total_searches?.current | number }}</div>
+      <div class="kpi-footer">
+        <span class="delta-badge" [class.positive]="kpis()?.total_searches?.percentage >= 0" [class.negative]="kpis()?.total_searches?.percentage < 0">
+          <span *ngIf="kpis()?.total_searches?.percentage >= 0">↑</span>
+          <span *ngIf="kpis()?.total_searches?.percentage < 0">↓</span>
+          {{ kpis()?.total_searches?.percentage >= 0 ? '+' : '' }}{{ kpis()?.total_searches?.percentage }}%
+        </span>
+        <span class="comparison-note">vs {{ searchData()?.prev_period_label || 'previous' }}</span>
+      </div>
+    </div>
+
+    <!-- Card 2: Unique Searchers -->
+    <div class="kpi-card pink-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">UNIQUE SEARCHERS</span>
+        <div class="kpi-icon-bubble pink">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ kpis()?.unique_users?.current | number }}</div>
+      <div class="kpi-footer">
+        <span class="delta-badge" [class.positive]="kpis()?.unique_users?.percentage >= 0" [class.negative]="kpis()?.unique_users?.percentage < 0">
+          <span>{{ kpis()?.unique_users?.percentage >= 0 ? '↑' : '↓' }}</span>
+          {{ kpis()?.unique_users?.percentage >= 0 ? '+' : '' }}{{ kpis()?.unique_users?.percentage }}%
+        </span>
+        <span class="comparison-note">unique listeners</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Unique Queries -->
+    <div class="kpi-card blue-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">DISTINCT QUERIES</span>
+        <div class="kpi-icon-bubble blue">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ kpis()?.unique_queries?.current | number }}</div>
+      <div class="kpi-footer">
+        <span class="delta-badge" [class.positive]="kpis()?.unique_queries?.percentage >= 0" [class.negative]="kpis()?.unique_queries?.percentage < 0">
+          <span>{{ kpis()?.unique_queries?.percentage >= 0 ? '↑' : '↓' }}</span>
+          {{ kpis()?.unique_queries?.percentage >= 0 ? '+' : '' }}{{ kpis()?.unique_queries?.percentage }}%
+        </span>
+        <span class="comparison-note">distinct search terms</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Searches Today -->
+    <div class="kpi-card emerald-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">SEARCHES TODAY</span>
+        <div class="kpi-icon-bubble emerald">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value text-emerald">{{ kpis()?.searches_today?.current | number }}</div>
+      <div class="kpi-footer">
+        <span class="delta-badge" [class.positive]="kpis()?.searches_today?.percentage >= 0" [class.negative]="kpis()?.searches_today?.percentage < 0">
+          <span>{{ kpis()?.searches_today?.percentage >= 0 ? '↑' : '↓' }}</span>
+          {{ kpis()?.searches_today?.percentage >= 0 ? '+' : '' }}{{ kpis()?.searches_today?.percentage }}%
+        </span>
+        <span class="comparison-note">vs yesterday</span>
+      </div>
+    </div>
+
+    <!-- Card 5: Top Search Query -->
+    <div class="kpi-card amber-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">TOP SEARCH QUERY</span>
+        <div class="kpi-icon-bubble amber">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value query-truncate" [title]="kpis()?.top_search?.query">{{ kpis()?.top_search?.query || 'None' }}</div>
+      <div class="kpi-footer">
+        <span class="stat-highlight text-amber">{{ kpis()?.top_search?.count | number }} searches</span>
+        <span class="comparison-note">#1 highest volume</span>
+      </div>
+    </div>
+
+    <!-- Card 6: Trending Search -->
+    <div class="kpi-card rose-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">TRENDING BREAKOUT</span>
+        <div class="kpi-icon-bubble rose">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value query-truncate" [title]="kpis()?.trending_search?.query">{{ kpis()?.trending_search?.query || 'None' }}</div>
+      <div class="kpi-footer">
+        <span class="delta-badge positive">
+          ↑ +{{ kpis()?.trending_search?.growth_pct }}%
+        </span>
+        <span class="comparison-note">fastest velocity</span>
+      </div>
+    </div>
+
+    <!-- Card 7: Zero-Result Searches -->
+    <div class="kpi-card red-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">ZERO-RESULT SEARCHES</span>
+        <div class="kpi-icon-bubble red">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value text-red">{{ kpis()?.zero_result_searches?.current | number }}</div>
+      <div class="kpi-footer">
+        <span class="content-gap-badge">Content Gaps</span>
+        <span class="comparison-note">queries with 0 results</span>
+      </div>
+    </div>
+
+    <!-- Card 8: Avg Searches Per User -->
+    <div class="kpi-card indigo-glow">
+      <div class="kpi-top">
+        <span class="kpi-title">AVG SEARCHES / USER</span>
+        <div class="kpi-icon-bubble indigo">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ kpis()?.avg_searches_per_user?.current }}</div>
+      <div class="kpi-footer">
+        <span class="comparison-note">Search engagement frequency</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 2. INTERACTIVE SEARCH TREND TIME-SERIES CHART ────────────────────── -->
+  <div class="dashboard-panel chart-panel">
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <h2 class="panel-title">Search Activity Over Time</h2>
+        <span class="granularity-badge">{{ searchData()?.granularity | uppercase }} RESOLUTION</span>
+      </div>
+
+      <div class="chart-controls">
+        <!-- Metric Selector -->
+        <div class="metric-toggle-group">
+          <button 
+            class="metric-btn" 
+            [class.active]="activeChartMetric() === 'searches'" 
+            (click)="setChartMetric('searches')">
+            Total Searches
+          </button>
+          <button 
+            class="metric-btn" 
+            [class.active]="activeChartMetric() === 'users'" 
+            (click)="setChartMetric('users')">
+            Unique Searchers
+          </button>
+          <button 
+            class="metric-btn" 
+            [class.active]="activeChartMetric() === 'queries'" 
+            (click)="setChartMetric('queries')">
+            Unique Queries
+          </button>
+        </div>
+
+        <!-- Previous Period Comparison Toggle -->
+        <button 
+          class="compare-toggle-btn" 
+          [class.active]="showPreviousComparison()" 
+          (click)="togglePreviousComparison()"
+          *ngIf="activeChartMetric() === 'searches'"
+          title="Toggle comparison with previous period">
+          <span class="checkbox-indicator"></span>
+          Compare vs Previous
+        </button>
+      </div>
+    </div>
+
+    <!-- Chart Canvas Container -->
+    <div class="chart-canvas-container">
+      <canvas 
+        baseChart 
+        [data]="activityChartData()" 
+        [options]="activityChartOptions" 
+        [type]="'line'">
+      </canvas>
+    </div>
+
+    <div class="chart-footer-legend">
+      <div class="legend-item">
+        <span class="legend-color-dot current"></span>
+        <span class="legend-label">{{ searchData()?.period_label || 'Current Period' }}</span>
+      </div>
+      <div class="legend-item" *ngIf="showPreviousComparison() && activeChartMetric() === 'searches'">
+        <span class="legend-color-dot previous"></span>
+        <span class="legend-label">{{ searchData()?.prev_period_label || 'Previous Period' }} (Dashed)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. TRENDING SEARCHES vs FASTEST GROWING ──────────────────────────── -->
+  <div class="two-col-grid">
+
+    <!-- Column A: Trending Searches (Velocity Algorithm) -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Trending Searches</h2>
+          <p class="panel-subtitle">Searches gaining popularity based on growth velocity & recent activity</p>
+        </div>
+        <span class="panel-badge gradient-badge">Velocity Ranked</span>
+      </div>
+
+      <div class="trending-list" *ngIf="trendingSearches().length > 0; else noTrending">
+        <div 
+          class="trending-card" 
+          *ngFor="let item of trendingSearches(); let idx = index"
+          (click)="openQueryDrilldown(item.display_query)">
+          
+          <div class="trending-rank-col">
+            <span class="rank-number" [class.top-three]="idx < 3">#{{ idx + 1 }}</span>
+          </div>
+
+          <div class="trending-info-col">
+            <div class="trending-query-line">
+              <span class="query-name">{{ item.display_query }}</span>
+              <span class="category-pill">{{ item.category }}</span>
+            </div>
+            <div class="trending-stats-line">
+              <span class="volume-stat">{{ item.search_count | number }} searches</span>
+              <span class="abs-gain text-emerald">+{{ item.abs_growth | number }} vs previous</span>
+            </div>
+          </div>
+
+          <div class="trending-growth-col">
+            <div class="growth-badge positive">
+              ↑ {{ item.growth_pct }}%
+            </div>
+            <span class="score-label">Score {{ item.trending_score }}</span>
+          </div>
+
+        </div>
+      </div>
+      <ng-template #noTrending>
+        <div class="empty-state-card">No trending searches found for this period.</div>
+      </ng-template>
+    </div>
+
+    <!-- Column B: Fastest Growing (Pure % Growth) -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Fastest Growing Searches</h2>
+          <p class="panel-subtitle">Highest surge percentage compared to previous equivalent period</p>
+        </div>
+        <span class="panel-badge green-badge">Breakout Surge</span>
+      </div>
+
+      <div class="trending-list" *ngIf="fastestGrowing().length > 0; else noGrowing">
+        <div 
+          class="trending-card" 
+          *ngFor="let item of fastestGrowing(); let idx = index"
+          (click)="openQueryDrilldown(item.display_query)">
+          
+          <div class="trending-rank-col">
+            <span class="rank-number" [class.top-three]="idx < 3">#{{ idx + 1 }}</span>
+          </div>
+
+          <div class="trending-info-col">
+            <div class="trending-query-line">
+              <span class="query-name">{{ item.display_query }}</span>
+              <span class="category-pill">{{ item.category }}</span>
+            </div>
+            <div class="trending-stats-line">
+              <span class="volume-stat">{{ item.search_count | number }} searches</span>
+              <span class="prev-stat">was {{ item.previous_count | number }}</span>
+            </div>
+          </div>
+
+          <div class="trending-growth-col">
+            <div class="growth-badge surge">
+              ↑ +{{ item.growth_pct }}%
+            </div>
+            <span class="score-label">{{ item.unique_users }} searchers</span>
+          </div>
+
+        </div>
+      </div>
+      <ng-template #noGrowing>
+        <div class="empty-state-card">No fast-growing search terms detected in this period.</div>
+      </ng-template>
+    </div>
+
+  </div>
+
+  <!-- ── 4. SEARCH CATEGORY ANALYTICS & TOP SEARCHES QUICK TABS ───────────── -->
+  <div class="two-col-grid">
+
+    <!-- Category Donut Chart -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Search Category Analytics</h2>
+          <p class="panel-subtitle">Search volume distribution across content types</p>
+        </div>
+      </div>
+
+      <div class="category-container">
+        <div class="donut-chart-box">
+          <canvas 
+            baseChart 
+            [data]="categoryChartData()" 
+            [options]="categoryChartOptions" 
+            [type]="'doughnut'">
+          </canvas>
+        </div>
+
+        <div class="category-legend-list">
+          <div class="cat-stat-row" *ngFor="let c of categoryBreakdown()">
+            <div class="cat-stat-left">
+              <span class="cat-title">{{ c.category }}</span>
+              <span class="cat-query-count">{{ c.queries }} unique queries</span>
+            </div>
+            <div class="cat-stat-right">
+              <span class="cat-volume">{{ c.total | number }}</span>
+              <span class="cat-pct">{{ c.percentage }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Searches by Period Tabs -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Top Searches by Period</h2>
+          <p class="panel-subtitle">Quickly switch between pre-computed timeframe rankings</p>
+        </div>
+      </div>
+
+      <!-- Period Tabs -->
+      <div class="period-tabs-bar">
+        <button 
+          *ngFor="let tab of periodTabs" 
+          class="tab-btn" 
+          [class.active]="selectedPeriodTab() === tab.id"
+          (click)="setPeriodTab(tab.id)">
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <!-- Tab Content List -->
+      <div class="top-period-list">
+        <div 
+          class="top-period-item" 
+          *ngFor="let item of searchData()?.top_by_period?.[selectedPeriodTab()] || []; let idx = index"
+          (click)="openQueryDrilldown(item.query)">
+          <span class="top-rank">#{{ item.rank }}</span>
+          <div class="top-name-col">
+            <span class="top-name">{{ item.query }}</span>
+            <span class="category-pill">{{ item.category }}</span>
+          </div>
+          <div class="top-vol-col">
+            <span class="top-vol">{{ item.searches | number }}</span>
+            <div class="conversion-pills">
+              <span class="mini-tag blue" title="Result Clicks">{{ item.clicks || 0 }} clicks</span>
+              <span class="mini-tag purple" title="Song Plays">{{ item.plays || 0 }} plays</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 5. SEARCH PERFORMANCE FUNNEL ────────────────────────────────────── -->
+  <div class="dashboard-panel funnel-panel" *ngIf="funnel()">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Search Performance Funnel</h2>
+        <p class="panel-subtitle">How effectively search queries lead users from discovery to song playback</p>
+      </div>
+      <div class="overall-conversion-box">
+        <span class="conversion-label">Overall Search-to-Play</span>
+        <span class="conversion-rate text-emerald">{{ funnel()?.overall_conversion_pct }}%</span>
+      </div>
+    </div>
+
+    <div class="funnel-steps-container">
+
+      <!-- Step 1: Searches Performed -->
+      <div class="funnel-step">
+        <div class="step-icon-circle purple">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="step-title">1. Search Performed</div>
+        <div class="step-count">{{ funnel()?.searches_performed | number }}</div>
+        <div class="step-bar"><div class="fill" style="width: 100%;"></div></div>
+        <div class="step-pct">100% of Total</div>
+      </div>
+
+      <div class="funnel-arrow">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="arrow-pct">{{ funnel()?.pct_results_returned }}%</span>
+      </div>
+
+      <!-- Step 2: Results Returned -->
+      <div class="funnel-step">
+        <div class="step-icon-circle pink">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="step-title">2. Results Returned</div>
+        <div class="step-count">{{ funnel()?.results_returned | number }}</div>
+        <div class="step-bar"><div class="fill" [style.width.%]="funnel()?.pct_results_returned"></div></div>
+        <div class="step-pct">{{ funnel()?.pct_results_returned }}% Available</div>
+      </div>
+
+      <div class="funnel-arrow">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="arrow-pct">{{ funnel()?.pct_result_clicked }}%</span>
+      </div>
+
+      <!-- Step 3: Result Clicked -->
+      <div class="funnel-step">
+        <div class="step-icon-circle blue">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="step-title">3. Result Clicked</div>
+        <div class="step-count">{{ funnel()?.result_clicked | number }}</div>
+        <div class="step-bar"><div class="fill" [style.width.%]="funnel()?.pct_result_clicked"></div></div>
+        <div class="step-pct">{{ funnel()?.pct_result_clicked }}% CTR</div>
+      </div>
+
+      <div class="funnel-arrow">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="arrow-pct">{{ funnel()?.pct_song_played }}%</span>
+      </div>
+
+      <!-- Step 4: Song Played -->
+      <div class="funnel-step">
+        <div class="step-icon-circle emerald">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <div class="step-title">4. Song Played</div>
+        <div class="step-count text-emerald">{{ funnel()?.song_played | number }}</div>
+        <div class="step-bar"><div class="fill emerald" [style.width.%]="funnel()?.pct_song_played"></div></div>
+        <div class="step-pct text-emerald">{{ funnel()?.pct_song_played }}% Played</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 6. MONTHLY & YEARLY SEARCH ANALYTICS EXPLORER ───────────────────── -->
+  <div class="two-col-grid">
+
+    <!-- Monthly Search Analytics Panel -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Monthly Search Analytics</h2>
+          <p class="panel-subtitle">Historical month-by-month search demand & top queries</p>
+        </div>
+
+        <!-- Month Selector Dropdown -->
+        <select 
+          class="month-select" 
+          [ngModel]="selectedMonthYm()" 
+          (ngModelChange)="selectMonth($event)">
+          <option *ngFor="let m of monthlyAnalytics()" [value]="m.ym">{{ m.month_name }}</option>
+        </select>
+      </div>
+
+      <!-- Inspected Month Card -->
+      <div class="inspected-month-card" *ngIf="inspectedMonth()">
+        <div class="month-stat-badges">
+          <div class="month-stat-box">
+            <span class="ms-lbl">Total Searches</span>
+            <span class="ms-val">{{ inspectedMonth()?.total_searches | number }}</span>
+          </div>
+          <div class="month-stat-box">
+            <span class="ms-lbl">MoM Growth</span>
+            <span class="ms-val" [class.text-emerald]="inspectedMonth()?.mom_growth >= 0" [class.text-red]="inspectedMonth()?.mom_growth < 0">
+              {{ inspectedMonth()?.mom_growth >= 0 ? '+' : '' }}{{ inspectedMonth()?.mom_growth }}%
+            </span>
+          </div>
+          <div class="month-stat-box">
+            <span class="ms-lbl">Top Query of Month</span>
+            <span class="ms-val highlight-purple query-truncate" [title]="inspectedMonth()?.top_query">{{ inspectedMonth()?.top_query }}</span>
+          </div>
+        </div>
+
+        <!-- Top 5 Queries of Selected Month -->
+        <div class="month-top-queries">
+          <span class="top-list-label">Top 5 Searches in {{ inspectedMonth()?.month_name }}:</span>
+          <div class="pill-cloud">
+            <span class="query-pill" *ngFor="let tq of inspectedMonth()?.top_queries; let i = index" (click)="openQueryDrilldown(tq.query)">
+              #{{ i + 1 }} {{ tq.query }} ({{ tq.searches | number }})
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Trend Bar Chart -->
+      <div class="mini-chart-box">
+        <canvas 
+          baseChart 
+          [data]="monthlyChartData()" 
+          [options]="monthlyChartOptions" 
+          [type]="'bar'">
+        </canvas>
+      </div>
+    </div>
+
+    <!-- Yearly Search Analytics Panel -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Yearly Search Analytics</h2>
+          <p class="panel-subtitle">Annual volume, YoY growth & top searches</p>
+        </div>
+
+        <!-- Year Selector -->
+        <select 
+          class="month-select" 
+          [ngModel]="selectedYearVal()" 
+          (ngModelChange)="selectYear(+$event)">
+          <option *ngFor="let y of yearlyAnalytics()" [value]="y.year">{{ y.year }}</option>
+        </select>
+      </div>
+
+      <div class="inspected-year-card" *ngIf="inspectedYear()">
+        <div class="month-stat-badges">
+          <div class="month-stat-box">
+            <span class="ms-lbl">Total Annual Searches</span>
+            <span class="ms-val">{{ inspectedYear()?.total_searches | number }}</span>
+          </div>
+          <div class="month-stat-box">
+            <span class="ms-lbl">YoY Growth</span>
+            <span class="ms-val" [class.text-emerald]="inspectedYear()?.yoy_growth >= 0" [class.text-red]="inspectedYear()?.yoy_growth < 0">
+              {{ inspectedYear()?.yoy_growth >= 0 ? '+' : '' }}{{ inspectedYear()?.yoy_growth }}%
+            </span>
+          </div>
+          <div class="month-stat-box">
+            <span class="ms-lbl">Most Searched of Year</span>
+            <span class="ms-val highlight-purple query-truncate" [title]="inspectedYear()?.top_query">{{ inspectedYear()?.top_query }}</span>
+          </div>
+        </div>
+
+        <!-- Monthly Breakdown inside selected year -->
+        <div class="year-monthly-table">
+          <span class="top-list-label">Monthly Volume for {{ inspectedYear()?.year }}:</span>
+          <div class="year-month-grid">
+            <div class="year-month-cell" *ngFor="let m of inspectedYear()?.monthly_volume">
+              <span class="ym-month">{{ m.month }}</span>
+              <span class="ym-searches">{{ m.searches | number }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 7. ZERO-RESULT SEARCHES & SEARCH SPIKES ─────────────────────────── -->
+  <div class="two-col-grid">
+
+    <!-- Zero-Result Searches (Content Gap Diagnostics) -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Zero-Result Searches (Content Gaps)</h2>
+          <p class="panel-subtitle">Queries where users found no results — identify music to add</p>
+        </div>
+        <span class="panel-badge red-badge">Content Gaps</span>
+      </div>
+
+      <div class="zero-results-list" *ngIf="zeroResults().length > 0; else noZeroRes">
+        <div class="zero-item-row" *ngFor="let z of zeroResults()" (click)="openQueryDrilldown(z.query)">
+          <div class="zero-query-col">
+            <span class="zero-query-text">{{ z.query }}</span>
+            <span class="zero-meta">{{ z.unique_users }} searchers affected · Last {{ z.last_searched }}</span>
+          </div>
+          <div class="zero-action-col">
+            <span class="zero-count-pill">{{ z.zero_count }} searches</span>
+            <span class="priority-tag" [class.critical]="z.priority === 'High Priority'">{{ z.priority }}</span>
+          </div>
+        </div>
+      </div>
+      <ng-template #noZeroRes>
+        <div class="empty-state-card text-emerald">Great! No zero-result queries recorded in this period.</div>
+      </ng-template>
+    </div>
+
+    <!-- Search Spikes & Anomalies -->
+    <div class="dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Search Spikes & Anomalies</h2>
+          <p class="panel-subtitle">Sudden abnormal search surges detected in real time</p>
+        </div>
+        <span class="panel-badge amber-badge">Anomaly Radar</span>
+      </div>
+
+      <div class="spikes-list" *ngIf="searchSpikes().length > 0; else noSpikes">
+        <div class="spike-item-row" *ngFor="let sp of searchSpikes()" (click)="openQueryDrilldown(sp.query)">
+          <div class="spike-left">
+            <div class="spike-title-row">
+              <span class="spike-query">{{ sp.query }}</span>
+              <span class="badge-spike" [class.viral]="sp.badge === 'Viral Breakout'">{{ sp.badge }}</span>
+            </div>
+            <span class="spike-desc">Surged from {{ sp.previous_volume | number }} to {{ sp.current_volume | number }} searches</span>
+          </div>
+          <div class="spike-right">
+            <span class="surge-pct text-emerald">↑ +{{ sp.growth_pct }}%</span>
+          </div>
+        </div>
+      </div>
+      <ng-template #noSpikes>
+        <div class="empty-state-card">No abnormal spikes detected for this timeframe.</div>
+      </ng-template>
+    </div>
+
+  </div>
+
+  <!-- ── 8. LIVE RECENT SEARCH ACTIVITY STREAM ────────────────────────────── -->
+  <div class="dashboard-panel">
+    <div class="panel-header">
+      <div class="title-row">
+        <h2 class="panel-title">Live Search Stream</h2>
+        <span class="live-dot-pulse"></span>
+      </div>
+      <span class="panel-subtitle">Latest incoming anonymous search queries in real time</span>
+    </div>
+
+    <div class="recent-stream-container" *ngIf="recentActivity().length > 0; else noRecent">
+      <div class="stream-item" *ngFor="let rec of recentActivity()">
+        <span class="stream-time">{{ rec.searched_at | date:'HH:mm:ss' }}</span>
+        <span class="stream-query" (click)="openQueryDrilldown(rec.query)">{{ rec.query }}</span>
+        <span class="stream-category">{{ rec.category }}</span>
+        <span class="stream-user-tag">{{ rec.anonymous_user }}</span>
+        <span class="stream-results" [class.zero]="rec.result_count === 0">{{ rec.result_count }} results</span>
+        <div class="stream-conversions">
+          <span class="conv-dot" [class.active]="rec.clicked" title="Result Clicked">Click</span>
+          <span class="conv-dot" [class.active]="rec.played" title="Song Played">Play</span>
+        </div>
+      </div>
+    </div>
+    <ng-template #noRecent>
+      <div class="empty-state-card">No recent searches logged yet.</div>
+    </ng-template>
+  </div>
+
+  <!-- ── 9. DETAILED SEARCH QUERY TABLE WITH SORTING & PAGINATION ────────── -->
+  <div class="dashboard-panel table-panel">
+    <div class="panel-header table-header">
+      <div>
+        <h2 class="panel-title">Comprehensive Search Query Table</h2>
+        <p class="panel-subtitle">Complete list of search queries with volume, CTR, conversion rate and rankings</p>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="table-actions-row">
+        <div class="table-search-input-box">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input 
+            type="text" 
+            placeholder="Search keywords..." 
+            class="table-search-input"
+            [ngModel]="searchFilterQuery()"
+            (ngModelChange)="onSearchQueryInput($event)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+      <table class="modern-data-table">
+        <thead>
+          <tr>
+            <th class="cursor-pointer" (click)="onSort('rank')">
+              Rank <span *ngIf="sortBy() === 'rank'">{{ sortOrder() === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th>Search Query</th>
+            <th>Category</th>
+            <th class="cursor-pointer text-right" (click)="onSort('search_count')">
+              Search Count <span *ngIf="sortBy() === 'search_count'">{{ sortOrder() === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th class="text-right">Previous</th>
+            <th class="cursor-pointer text-right" (click)="onSort('growth_pct')">
+              Growth % <span *ngIf="sortBy() === 'growth_pct'">{{ sortOrder() === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th class="cursor-pointer text-right" (click)="onSort('unique_users')">
+              Unique Searchers <span *ngIf="sortBy() === 'unique_users'">{{ sortOrder() === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th class="cursor-pointer text-right" (click)="onSort('ctr_pct')">
+              CTR % <span *ngIf="sortBy() === 'ctr_pct'">{{ sortOrder() === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th class="cursor-pointer text-right" (click)="onSort('play_conv_pct')">
+              Play Conv % <span *ngIf="sortBy() === 'play_conv_pct'">{{ sortOrder() === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of tableData().items" class="table-row-hover">
+            <td class="col-rank">#{{ row.rank }}</td>
+            <td class="col-query">
+              <span class="clickable-query" (click)="openQueryDrilldown(row.display_query)" [title]="'View detailed analytics for ' + row.display_query">
+                {{ row.display_query }}
+              </span>
+            </td>
+            <td>
+              <span class="category-pill">{{ row.category }}</span>
+            </td>
+            <td class="text-right font-semibold">{{ row.search_count | number }}</td>
+            <td class="text-right text-muted">{{ row.previous_count | number }}</td>
+            <td class="text-right">
+              <span class="delta-badge" [class.positive]="row.growth_pct >= 0" [class.negative]="row.growth_pct < 0">
+                {{ row.growth_pct >= 0 ? '+' : '' }}{{ row.growth_pct }}%
+              </span>
+            </td>
+            <td class="text-right">{{ row.unique_users | number }}</td>
+            <td class="text-right">
+              <span class="ctr-badge">{{ row.ctr_pct }}%</span>
+            </td>
+            <td class="text-right">
+              <span class="conv-badge" [class.good]="row.play_conv_pct >= 40">{{ row.play_conv_pct }}%</span>
+            </td>
+            <td class="text-center">
+              <button class="btn-inspect" (click)="openQueryDrilldown(row.display_query)">Inspect</button>
+            </td>
+          </tr>
+          <tr *ngIf="tableData().items.length === 0">
+            <td colspan="10" class="empty-table-cell">No matching search records found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="table-pagination-footer" *ngIf="tableData().total > 0">
+      <div class="pagination-info">
+        Showing {{ ((currentPage() - 1) * pageSize()) + 1 }} to {{ ((currentPage() - 1) * pageSize()) + tableData().items.length }} of {{ tableData().total | number }} queries
+      </div>
+      <div class="pagination-buttons">
+        <button 
+          class="btn-page" 
+          [disabled]="currentPage() <= 1" 
+          (click)="changePage(currentPage() - 1)">
+          Previous
+        </button>
+        <span class="page-current">Page {{ currentPage() }} of {{ tableData().total_pages }}</span>
+        <button 
+          class="btn-page" 
+          [disabled]="currentPage() >= tableData().total_pages" 
+          (click)="changePage(currentPage() + 1)">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 10. QUERY DETAILS DRILLDOWN MODAL ────────────────────────────────── -->
+  <div class="modal-backdrop" *ngIf="isDrilldownOpen()" (click)="closeQueryDrilldown()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-title-row">
+            <h3 class="modal-query-title">{{ drilldownData()?.query || 'Query Details' }}</h3>
+            <span class="category-pill" *ngIf="drilldownData()?.category">{{ drilldownData()?.category }}</span>
+          </div>
+          <span class="modal-subtitle">In-depth performance, conversions & 60-day historical activity</span>
+        </div>
+        <button class="modal-close-btn" (click)="closeQueryDrilldown()">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body" *ngIf="drilldownData(); else drillLoading">
+        
+        <!-- Key Metrics Cards -->
+        <div class="modal-metrics-grid">
+          <div class="m-card">
+            <span class="m-label">Total Searches</span>
+            <span class="m-val">{{ drilldownData()?.total_searches | number }}</span>
+          </div>
+          <div class="m-card">
+            <span class="m-label">Click-Through (CTR)</span>
+            <span class="m-val text-blue">{{ drilldownData()?.ctr_pct }}%</span>
+            <span class="m-sub">{{ drilldownData()?.total_clicks | number }} clicks</span>
+          </div>
+          <div class="m-card">
+            <span class="m-label">Play Conversion</span>
+            <span class="m-val text-emerald">{{ drilldownData()?.play_conv_pct }}%</span>
+            <span class="m-sub">{{ drilldownData()?.total_plays | number }} plays</span>
+          </div>
+          <div class="m-card">
+            <span class="m-label">Daily Average</span>
+            <span class="m-val">{{ drilldownData()?.avg_daily }}</span>
+            <span class="m-sub">searches / day</span>
+          </div>
+        </div>
+
+        <!-- Period Breakdown Row -->
+        <div class="drilldown-sub-row">
+          <div class="drill-sub-box">
+            <span class="ds-lbl">Today</span>
+            <span class="ds-val">{{ drilldownData()?.searches_today | number }}</span>
+          </div>
+          <div class="drill-sub-box">
+            <span class="ds-lbl">This Week</span>
+            <span class="ds-val">{{ drilldownData()?.searches_week | number }}</span>
+          </div>
+          <div class="drill-sub-box">
+            <span class="ds-lbl">This Month</span>
+            <span class="ds-val">{{ drilldownData()?.searches_month | number }}</span>
+          </div>
+          <div class="drill-sub-box">
+            <span class="ds-lbl">This Year</span>
+            <span class="ds-val">{{ drilldownData()?.searches_year | number }}</span>
+          </div>
+          <div class="drill-sub-box highlight">
+            <span class="ds-lbl">Peak Search Date</span>
+            <span class="ds-val">{{ drilldownData()?.peak_date }}</span>
+            <span class="ds-sub">({{ drilldownData()?.peak_volume | number }} searches)</span>
+          </div>
+        </div>
+
+        <!-- Historical Sparkline Chart -->
+        <div class="drilldown-chart-panel">
+          <h4 class="drill-chart-title">60-Day Search Volume History</h4>
+          <div class="drilldown-chart-canvas">
+            <canvas 
+              baseChart 
+              [data]="drilldownSparklineData()" 
+              [options]="drilldownSparklineOptions" 
+              [type]="'line'">
+            </canvas>
+          </div>
+        </div>
+
+        <!-- First & Last Seen Timestamps -->
+        <div class="modal-footer-info">
+          <span>First Detected: <strong>{{ drilldownData()?.first_searched }}</strong></span>
+          <span>Last Searched: <strong>{{ drilldownData()?.last_searched }}</strong></span>
+        </div>
+
+      </div>
+
+      <ng-template #drillLoading>
+        <div class="modal-loading">
+          <div class="spinner"></div>
+          <p>Loading deep analytics for query...</p>
+        </div>
+      </ng-template>
+
+    </div>
+  </div>
+
+</div>
