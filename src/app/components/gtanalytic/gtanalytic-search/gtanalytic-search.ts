@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -21,6 +21,22 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
 
   private searchSub?: Subscription;
   private drilldownSub?: Subscription;
+
+  constructor() {
+    effect(() => {
+      // Re-fetch whenever global refresh is triggered or global filter changes
+      this.dataService.refreshTrigger();
+      
+      const globalFilter = this.dataService.currentFilter();
+      untracked(() => {
+        // Sync the period if it exists in our local list, otherwise keep local
+        if (this.timePeriods.some(t => t.id === globalFilter)) {
+          this.currentPeriod.set(globalFilter);
+        }
+        this.loadSearchAnalytics();
+      });
+    });
+  }
 
   // ── State Signals ──────────────────────────────────────────────────────────
   loading = signal<boolean>(false);
@@ -371,7 +387,7 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit() {
-    this.loadSearchAnalytics();
+    // Handled by effect in constructor
   }
 
   ngOnDestroy() {

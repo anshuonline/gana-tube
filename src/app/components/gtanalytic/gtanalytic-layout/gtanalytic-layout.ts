@@ -63,7 +63,7 @@ export class GtanalyticLayoutComponent implements OnInit {
   }
 
   refreshData() {
-    this.dataService.loadAllData();
+    this.dataService.triggerRefresh();
   }
 
   toggleMobileMenu() {

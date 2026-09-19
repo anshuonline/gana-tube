@@ -15,7 +15,15 @@ export class GtanalyticDataService {
   roomLoading = signal<boolean>(false);
   error = signal<string>('');
   lastUpdated = signal<Date>(new Date());
+  refreshTrigger = signal<number>(0);
   private autoRefreshTimer: any = null;
+
+  triggerRefresh() {
+    this.refreshTrigger.update(v => v + 1);
+    if (this.isAuthenticated()) {
+      this.loadAllData();
+    }
+  }
 
   getPassword(): string {
     if (typeof sessionStorage !== 'undefined') {
@@ -45,9 +53,7 @@ export class GtanalyticDataService {
 
   setFilter(filter: string) {
     this.currentFilter.set(filter);
-    if (this.isAuthenticated()) {
-      this.loadAllData();
-    }
+    this.triggerRefresh();
   }
 
   loadAllData() {
