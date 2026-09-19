@@ -756,6 +756,47 @@
           <span>Searching more songs...</span>
         </div>
       </div>
+
+      <!-- Home Page SEO Section -->
+      <section class="home-seo-section" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode()">
+        <div class="seo-badge">
+          <svg lucideSparkles [attr.size]="14"></svg>
+          <span>Music Streaming Reimagined</span>
+        </div>
+        <h2 class="seo-title">Why <span class="gradient-text">GanaTube</span></h2>
+        <h3 class="seo-subtitle">Free Online Music Streaming & Social Audio Platform</h3>
+        
+        <p class="seo-text">
+          GanaTube is a premier free music streaming platform built for Indian and international music lovers. Discover and stream millions of songs, trending Hindi tracks, latest Punjabi chartbusters, classic Bollywood melodies, vibrant Bhojpuri tunes, and rich regional melodies across Bengali, Haryanvi, Tamil, English, and more — all in one seamless place. Every track streams in clean, high-definition (HD) audio quality with background playback support, real-time synchronized lyrics, and zero mandatory signups or subscriptions.
+        </p>
+
+        <p class="seo-text">
+          Whether you want to explore top hits on our <a routerLink="/discovery">Discovery Charts</a>, enjoy hand-crafted <a routerLink="/curated-playlists">Curated Playlists</a>, jam with friends in synchronized <a routerLink="/rooms">Listen Together Rooms</a>, or browse music by your favorite languages — <a routerLink="/language/hindi">Hindi</a>, <a routerLink="/language/punjabi">Punjabi</a>, <a routerLink="/language/bhojpuri">Bhojpuri</a>, <a routerLink="/language/english">English</a>, <a routerLink="/language/haryanvi">Haryanvi</a>, <a routerLink="/language/bengali">Bengali</a>, or <a routerLink="/language/tamil">Tamil</a> — GanaTube provides a lightning-fast, AMOLED dark, distraction-free audio experience across all devices. Search effortlessly across songs, albums, and artists with smart voice search, save your personalized favorites, and enjoy continuous music wherever you go.
+        </p>
+
+        <div class="seo-highlights-grid">
+          <div class="seo-highlight-card">
+            <div class="highlight-icon"><svg lucideSparkles [attr.size]="20"></svg></div>
+            <div class="highlight-title">Free HD Streaming</div>
+            <p class="highlight-desc">High-fidelity audio streaming across Bollywood, regional, and global charts.</p>
+          </div>
+          <div class="seo-highlight-card">
+            <div class="highlight-icon"><svg lucideRadio [attr.size]="20"></svg></div>
+            <div class="highlight-title">Listen Together Rooms</div>
+            <p class="highlight-desc">Real-time synchronized listening and live chat with friends worldwide.</p>
+          </div>
+          <div class="seo-highlight-card">
+            <div class="highlight-icon"><svg lucideMusic [attr.size]="20"></svg></div>
+            <div class="highlight-title">Multi-Language Hub</div>
+            <p class="highlight-desc">Explore Hindi, Punjabi, Bhojpuri, English, Tamil, Bengali & more.</p>
+          </div>
+          <div class="seo-highlight-card">
+            <div class="highlight-icon"><svg lucideFlame [attr.size]="20"></svg></div>
+            <div class="highlight-title">Synced Lyrics & Timer</div>
+            <p class="highlight-desc">Real-time scrolling karaoke lyrics and automated sleep timer for easy nights.</p>
+          </div>
+        </div>
+      </section>
     </div>
 
 
