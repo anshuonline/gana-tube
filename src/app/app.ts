@@ -524,30 +524,119 @@ export class App implements OnInit {
   activeShelfModal = signal<{ title: string; query?: string; songs: any[] } | null>(null);
   isShelfModalMinimized = signal<boolean>(false);
   isShelfModalMaximized = signal<boolean>(false);
+  shelfModalVisibleCount = signal<number>(12);
+  isShelfModalLoadingMore = signal<boolean>(false);
+  hasFetchedExtraShelfSongs = signal<boolean>(false);
+
+  visibleShelfModalSongs = computed(() => {
+    const modal = this.activeShelfModal();
+    if (!modal || !modal.songs) return [];
+    return modal.songs.slice(0, this.shelfModalVisibleCount());
+  });
 
   openShelfModal(shelf: any) {
     if (!shelf) return;
     this.activeShelfModal.set({
       title: shelf.title,
       query: shelf.query || '',
-      songs: shelf.songs || []
+      songs: [...(shelf.songs || [])]
     });
+    this.shelfModalVisibleCount.set(12);
+    this.isShelfModalLoadingMore.set(false);
+    this.hasFetchedExtraShelfSongs.set(false);
     this.isShelfModalMinimized.set(false);
     this.isShelfModalMaximized.set(false);
+
+    // Prevent background page from scrolling
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
   }
 
   closeShelfModal() {
     this.activeShelfModal.set(null);
     this.isShelfModalMinimized.set(false);
     this.isShelfModalMaximized.set(false);
+    this.isShelfModalLoadingMore.set(false);
+
+    // Restore background scrolling if full player is not open
+    if (!this.isFullScreenPlayerVisible()) {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
   }
 
   toggleMinimizeShelfModal() {
-    this.isShelfModalMinimized.update(v => !v);
+    this.isShelfModalMinimized.update(v => {
+      const next = !v;
+      if (next) {
+        // Minimized to dock: restore background scrolling
+        if (!this.isFullScreenPlayerVisible()) {
+          document.body.style.overflow = '';
+          document.documentElement.style.overflow = '';
+        }
+      } else {
+        // Restored from dock: lock background scrolling
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+      }
+      return next;
+    });
   }
 
   toggleMaximizeShelfModal() {
     this.isShelfModalMaximized.update(v => !v);
+  }
+
+  onShelfModalScroll(event: Event) {
+    const el = event.target as HTMLElement;
+    if (!el || this.isShelfModalLoadingMore()) return;
+
+    // Trigger when user is within 180px of the bottom
+    const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (distanceToBottom > 180) return;
+
+    const modal = this.activeShelfModal();
+    if (!modal || !modal.songs) return;
+
+    const currentVisible = this.shelfModalVisibleCount();
+    const totalCurrent = modal.songs.length;
+
+    // Case 1: More songs already exist in the shelf songs list
+    if (currentVisible < totalCurrent) {
+      this.isShelfModalLoadingMore.set(true);
+      setTimeout(() => {
+        this.shelfModalVisibleCount.update(c => Math.min(c + 12, totalCurrent));
+        this.isShelfModalLoadingMore.set(false);
+      }, 160);
+      return;
+    }
+
+    // Case 2: All current songs displayed, but query exists and extra hasn't been fetched yet
+    if (modal.query && !this.hasFetchedExtraShelfSongs()) {
+      this.isShelfModalLoadingMore.set(true);
+      this.hasFetchedExtraShelfSongs.set(true);
+
+      this.youtubeApi.searchMusic(modal.query, 40).pipe(
+        takeUntil(this.destroy$),
+        catchError(() => of([]))
+      ).subscribe(newSongs => {
+        this.isShelfModalLoadingMore.set(false);
+        if (newSongs && newSongs.length > 0) {
+          const existingIds = new Set(modal.songs.map((s: any) => s.videoId));
+          const fresh = newSongs.filter((s: any) => s && s.videoId && !existingIds.has(s.videoId));
+          if (fresh.length > 0) {
+            const combined = [...modal.songs, ...fresh];
+            this.activeShelfModal.update(m => m ? { ...m, songs: combined } : null);
+            this.shelfModalVisibleCount.update(c => c + 12);
+
+            // Also update the shelf in loadedShelves for richer home content
+            this.loadedShelves.update(shelves =>
+              shelves.map(s => s.title === modal.title ? { ...s, songs: combined } : s)
+            );
+          }
+        }
+      });
+    }
   }
 
   playAllShelfModal() {
@@ -876,29 +965,6 @@ export class App implements OnInit {
               const randSong = recentPlays[Math.floor(Math.random() * recentPlays.length)];
               const thumbUrl = typeof randSong === 'string' ? `https://i.ytimg.com/vi/${randSong}/maxresdefault.jpg` : (randSong.thumbnailHigh || randSong.thumbnail);
               this.randomRecentThumbnail.set(thumbUrl);
-            }
-            if (recentPlays && recentPlays.length > 0) {
-              const hasRecentDef = this.allShelfDefinitions.some(s => s.title === 'Recently Played');
-              const hasRecentLoaded = this.loadedShelves().some(s => s.title === 'Recently Played');
-              if (!hasRecentDef && !hasRecentLoaded && this.allShelfDefinitions.length > 0) {
-                // Initial shelves already built: inject definition + visible shelf
-                const recentShelf = {
-                  title: 'Recently Played',
-                  query: '',
-                  songs: recentPlays
-                };
-
-                // Inject at index 2 (after Suggested and Time-based) or at end
-                this.allShelfDefinitions.splice(Math.min(2, this.allShelfDefinitions.length), 0, recentShelf);
-
-                this.loadedShelves.update(shelves => {
-                  if (shelves.some(s => s.title === 'Recently Played')) return shelves;
-                  const updated = [...shelves];
-                  updated.splice(Math.min(2, updated.length), 0, recentShelf);
-                  return updated;
-                });
-              }
-              // If initial shelves haven't been built yet, loadInitialShelves() will include it automatically
             }
           }
         });
@@ -1632,17 +1698,6 @@ export class App implements OnInit {
           type: 'custom'
         }));
 
-        // Add Recently Played if available
-        const recentPlays = this.userService.recentPlays();
-        const recentShelves: ShelfDefinition[] = [];
-        if (recentPlays && recentPlays.length > 0) {
-          recentShelves.push({
-            title: 'Recently Played',
-            query: '',
-            songs: recentPlays
-          });
-        }
-
         // Extract 'Trending' and 'Suggested for You' correctly
         const trendingShelf = algorithmicShelves.length > 0 ? [algorithmicShelves[0]] : [];
         const suggestedShelf = algorithmicShelves.length > 1 ? [algorithmicShelves[1]] : [];
@@ -1682,12 +1737,11 @@ export class App implements OnInit {
         this.allShelfDefinitions = [
           ...trendingShelf,
           ...suggestedShelf,
-          ...recentShelves, 
           ...restOfAlgorithmicShelves,
           ...customShelves
         ];
         
-        const initialDefinitions = this.allShelfDefinitions.slice(0, 3);
+        const initialDefinitions = this.allShelfDefinitions.slice(0, 5);
         let loadedCount = 0;
 
         if (initialDefinitions.length === 0) {
@@ -2719,6 +2773,8 @@ export class App implements OnInit {
     if (this.carouselInterval) {
       clearInterval(this.carouselInterval);
     }
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     this.destroy$.next();
     this.destroy$.complete();
   }
