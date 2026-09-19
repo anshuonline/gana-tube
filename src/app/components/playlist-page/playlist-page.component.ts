@@ -7,7 +7,7 @@ import { UserService } from '../../services/user.service';
 import { PlaylistMeta } from '../../data/playlists.data';
 import { SponsoredAd } from '../../app';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical, LucideShuffle } from '@lucide/angular';
+import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles } from '@lucide/angular';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
 
 import { ToastService } from '../../services/toast.service';
@@ -17,7 +17,7 @@ import { AppStateService } from '../../services/app-state.service';
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, DragDropModule, TrackMenuComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideBarChart2, LucideTimer, LucideMoreVertical, LucideGripVertical, LucideShuffle],
+  imports: [CommonModule, DragDropModule, TrackMenuComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -31,6 +31,16 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   isLoading = signal<boolean>(true);
   isCopied = signal<boolean>(false);
   playlistAd = signal<SponsoredAd | null>(null);
+
+  // Suggested songs state
+  suggestedSongs = signal<YouTubeSearchResult[]>([]);
+  isLoadingSuggestions = signal<boolean>(false);
+  suggestionQuery = signal<string>('');
+  private suggestionAttempts = 0;
+
+  get canAddDirectly(): boolean {
+    return (!!this.playlist?.is_owner || this.playlist?.id === 'liked-songs') && !this.playlist?.id?.startsWith('search-');
+  }
 
   private sanitizer = inject(DomSanitizer);
   private youtubeApi = inject(YoutubeApiService);
@@ -98,6 +108,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['playlist'] && !changes['playlist'].firstChange) {
+      this.suggestedSongs.set([]);
+      this.suggestionAttempts = 0;
       this.loadSongs();
     }
   }
@@ -159,6 +171,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
           this.songs.set(updatedSongs);
           this.isLoading.set(false);
           this.fetchMissingDurations(updatedSongs);
+          this.loadSuggestedSongs();
           
           if (this.playlist.id === 'liked-songs') {
             this.userService.likedSongs.set(updatedSongs);
@@ -168,6 +181,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
         this.songs.set(this.playlist.preloadedSongs);
         this.isLoading.set(false);
         this.fetchMissingDurations(this.playlist.preloadedSongs);
+        this.loadSuggestedSongs();
       }
       return;
     }
@@ -177,6 +191,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
       this.songs.set(results);
       this.isLoading.set(false);
       this.fetchMissingDurations(results);
+      this.loadSuggestedSongs();
     });
   }
 
@@ -378,6 +393,11 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     const email = this.authService.currentUser()?.email;
     if (!email) return;
 
+    // Update in-memory customPlaylists signal in userService immediately
+    this.userService.customPlaylists.update(list =>
+      list.map(p => p.playlist_id === this.playlist.id ? { ...p, tracks: songs } : p)
+    );
+
     fetch(`${apiUrl}?action=updatePlaylist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -387,5 +407,131 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
         songs: songs
       })
     }).catch(e => console.error('Error syncing playlist', e));
+  }
+
+  loadSuggestedSongs(force: boolean = false): void {
+    if (!this.playlist) return;
+    if (this.isLoadingSuggestions() && !force) return;
+
+    this.isLoadingSuggestions.set(true);
+
+    const queries: string[] = [];
+
+    // 1. From existing songs' artists/channels
+    const currentSongs = this.songs();
+    if (currentSongs.length > 0) {
+      const channelCounts = new Map<string, number>();
+      for (const s of currentSongs) {
+        if (s.channelTitle && !s.channelTitle.toLowerCase().includes('topic')) {
+          channelCounts.set(s.channelTitle, (channelCounts.get(s.channelTitle) || 0) + 1);
+        }
+      }
+      const sortedChannels = [...channelCounts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(e => e[0]);
+
+      if (sortedChannels.length > 0) {
+        queries.push(`${sortedChannels[0]} hit songs`);
+        if (sortedChannels.length > 1) {
+          queries.push(`${sortedChannels[1]} songs`);
+        }
+      }
+    }
+
+    // 2. From playlist title
+    if (this.playlist.title && this.playlist.id !== 'liked-songs') {
+      queries.push(`${this.playlist.title} songs`);
+      queries.push(`${this.playlist.title} music`);
+    }
+
+    // 3. From playlist searchQueries
+    if (this.playlist.searchQueries && this.playlist.searchQueries.length > 0) {
+      queries.push(...this.playlist.searchQueries);
+    }
+
+    // 4. From playlist language
+    if (this.playlist.language) {
+      queries.push(`Trending ${this.playlist.language} songs`);
+      queries.push(`Top ${this.playlist.language} music`);
+    } else {
+      queries.push('Trending songs');
+    }
+
+    const pickedQuery = queries[this.suggestionAttempts % queries.length] || `${this.playlist.title || 'Music'} songs`;
+    this.suggestionAttempts++;
+    this.suggestionQuery.set(pickedQuery);
+
+    this.youtubeApi.searchMusic(pickedQuery, 30).subscribe({
+      next: (results) => {
+        const existingIds = new Set(this.songs().map(s => s.videoId));
+        const uniqueSuggestions: YouTubeSearchResult[] = [];
+        const seen = new Set<string>();
+
+        for (const item of results) {
+          if (!existingIds.has(item.videoId) && !seen.has(item.videoId)) {
+            seen.add(item.videoId);
+            uniqueSuggestions.push(item);
+          }
+        }
+
+        const finalSuggestions = uniqueSuggestions.slice(0, 10);
+        this.suggestedSongs.set(finalSuggestions);
+        this.isLoadingSuggestions.set(false);
+
+        // Fetch missing durations for suggestions
+        const missingIds = finalSuggestions.filter(s => s.duration === undefined).map(s => s.videoId);
+        if (missingIds.length > 0) {
+          this.youtubeApi.getVideoDetails(missingIds).subscribe(details => {
+            const updated = this.suggestedSongs().map(s => {
+              if (s.duration === undefined) {
+                const found = details.find(d => d.videoId === s.videoId);
+                if (found && found.duration !== undefined) {
+                  return { ...s, duration: found.duration };
+                }
+              }
+              return s;
+            });
+            this.suggestedSongs.set(updated);
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching playlist suggestions:', err);
+        this.isLoadingSuggestions.set(false);
+      }
+    });
+  }
+
+  refreshSuggestions(): void {
+    this.loadSuggestedSongs(true);
+  }
+
+  playSuggestedSong(song: YouTubeSearchResult): void {
+    this.playerService.isPlaylistContext.set(false);
+    this.playerService.playTrack(song);
+  }
+
+  addSuggestedSong(song: YouTubeSearchResult, event: MouseEvent): void {
+    event.stopPropagation();
+
+    // Add to songs list
+    const updatedSongs = [...this.songs(), song];
+    this.songs.set(updatedSongs);
+
+    // Remove from suggestions
+    this.suggestedSongs.update(list => list.filter(s => s.videoId !== song.videoId));
+
+    // Sync to backend / user state
+    if (this.playlist.is_owner && this.playlist.id !== 'liked-songs' && !this.playlist.id.startsWith('search-')) {
+      this.syncPlaylistToDB(updatedSongs);
+    } else if (this.playlist.id === 'liked-songs') {
+      this.userService.likedSongs.set(updatedSongs);
+      const email = this.authService.currentUser()?.email;
+      if (email) {
+        this.userService.toggleLike(email, song, this.userService.preferredLanguages());
+      }
+    }
+
+    this.toastService.show(`Added "${song.title}" to playlist`, 'success');
   }
 }

@@ -28,27 +28,33 @@
       </div>
 
       <div class="playlist-actions">
-        <button class="pl-action-btn pl-play-all" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
-          <svg lucidePlay [attr.size]="18" fill="currentColor"></svg> Play all
-        </button>
-        
-        <button class="pl-action-btn pl-outline" (click)="shufflePlay()" [disabled]="isLoading() || songs().length === 0">
-          <svg lucideShuffle [attr.size]="18"></svg> Shuffle
-        </button>
-
-        <ng-container *ngIf="playlist.id !== 'liked-songs' && !playlist.is_owner">
-          <button class="pl-action-btn pl-outline" (click)="toggleSavePlaylist()" [class.active]="isSaved()">
-            <svg lucideFolderPlus [attr.size]="18" *ngIf="!isSaved()"></svg>
-            <svg lucideCheck [attr.size]="18" *ngIf="isSaved()"></svg>
-            {{ isSaved() ? 'Saved' : 'Save Playlist' }}
+        <div class="actions-primary">
+          <button class="pl-action-btn pl-play-all" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
+            <svg lucidePlay [attr.size]="18" fill="currentColor"></svg>
+            <span>Play all</span>
           </button>
-        </ng-container>
+          
+          <button class="pl-action-btn pl-outline pl-shuffle" (click)="shufflePlay()" [disabled]="isLoading() || songs().length === 0">
+            <svg lucideShuffle [attr.size]="18"></svg>
+            <span>Shuffle</span>
+          </button>
+        </div>
 
-        <button *ngIf="playlist.id !== 'liked-songs'" class="pl-action-btn pl-outline" (click)="sharePlaylist()" [class.active]="isCopied()">
-          <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="18"></svg>
-          <svg *ngIf="isCopied()" lucideCheck [attr.size]="18"></svg>
-          {{ isCopied() ? 'Copied' : 'Share' }}
-        </button>
+        <div class="actions-secondary" *ngIf="playlist.id !== 'liked-songs'">
+          <ng-container *ngIf="!playlist.is_owner">
+            <button class="pl-action-btn pl-outline pl-save" (click)="toggleSavePlaylist()" [class.active]="isSaved()">
+              <svg lucideFolderPlus [attr.size]="18" *ngIf="!isSaved()"></svg>
+              <svg lucideCheck [attr.size]="18" *ngIf="isSaved()"></svg>
+              <span>{{ isSaved() ? 'Saved' : 'Save Playlist' }}</span>
+            </button>
+          </ng-container>
+
+          <button class="pl-action-btn pl-outline pl-share" (click)="sharePlaylist()" [class.active]="isCopied()">
+            <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="18"></svg>
+            <svg *ngIf="isCopied()" lucideCheck [attr.size]="18"></svg>
+            <span>{{ isCopied() ? 'Copied' : 'Share' }}</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -60,7 +66,7 @@
     </div>
 
     <div *ngIf="!isLoading() && songs().length === 0" class="empty-state">
-      <p>No songs found for this playlist.</p>
+      <p>No songs in this playlist yet.</p>
     </div>
 
     <div *ngIf="!isLoading() && songs().length > 0" class="songs-list-container">
@@ -91,7 +97,10 @@
           </div>
           <div class="col-title song-title-col">
             <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
-            <span class="song-title" [title]="song.title">{{ song.title }}</span>
+            <div class="title-meta-box">
+              <span class="song-title" [title]="song.title">{{ song.title }}</span>
+              <span class="song-artist-mobile" [title]="song.channelTitle">{{ song.channelTitle }}</span>
+            </div>
           </div>
           <div class="col-artist song-artist-col" [title]="song.channelTitle">
             {{ song.channelTitle }}
@@ -120,6 +129,93 @@
           <span class="ad-label">Sponsored</span>
         </div>
       </ng-container>
+      </div>
+    </div>
+
+    <!-- Suggested Songs Section -->
+    <div class="suggested-section" *ngIf="!isLoading()">
+      <div class="suggested-header">
+        <div class="suggested-title-group">
+          <div class="suggested-badge">
+            <svg lucideSparkles [attr.size]="14" class="sparkles-icon"></svg>
+            <span>RECOMMENDED</span>
+          </div>
+          <h2 class="suggested-title">Suggested Songs</h2>
+          <p class="suggested-subtitle" *ngIf="playlist.title">
+            Recommended based on tracks in <span>{{ playlist.title }}</span>
+          </p>
+        </div>
+        
+        <button class="refresh-suggestions-btn" (click)="refreshSuggestions()" [disabled]="isLoadingSuggestions()" title="Get new suggestions">
+          <svg lucideRefreshCw [attr.size]="14" [class.spinning]="isLoadingSuggestions()"></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoadingSuggestions() && suggestedSongs().length === 0" class="suggested-loading">
+        <div class="spinner-small"></div>
+        <span>Finding matching tracks for this playlist...</span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoadingSuggestions() && suggestedSongs().length === 0" class="suggested-empty">
+        <p>No extra suggestions found right now.</p>
+        <button class="retry-suggestions-btn" (click)="refreshSuggestions()">
+          <svg lucideRefreshCw [attr.size]="14"></svg>
+          <span>Try Again</span>
+        </button>
+      </div>
+
+      <!-- Suggested Song Rows -->
+      <div class="suggested-songs-list" *ngIf="suggestedSongs().length > 0">
+        <div class="suggested-song-row" 
+             *ngFor="let song of suggestedSongs(); let i = index"
+             (click)="playSuggestedSong(song)"
+             [class.active]="playerService.currentTrack()?.videoId === song.videoId">
+          
+          <div class="col-index">
+            <span class="index-num" *ngIf="playerService.currentTrack()?.videoId !== song.videoId">{{ i + 1 }}</span>
+            <div class="play-ripple-small" *ngIf="playerService.currentTrack()?.videoId === song.videoId">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <svg lucidePlay class="hover-play-icon" [attr.size]="16" fill="currentColor"></svg>
+          </div>
+
+          <div class="col-title song-title-col">
+            <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb" loading="lazy">
+            <div class="title-meta-box">
+              <span class="song-title" [title]="song.title">{{ song.title }}</span>
+              <span class="song-artist-mobile" [title]="song.channelTitle">{{ song.channelTitle }}</span>
+            </div>
+          </div>
+
+          <div class="col-artist song-artist-col" [title]="song.channelTitle">
+            {{ song.channelTitle }}
+          </div>
+
+          <div class="col-duration song-duration-col" style="font-variant-numeric: tabular-nums; text-align: right; padding-right: 16px; font-size: 0.9em;">
+            {{ song.duration ? formatTime(song.duration) : '' }}
+          </div>
+
+          <div class="col-actions">
+            <!-- Add Button if user is playlist owner / creator -->
+            <button *ngIf="canAddDirectly" 
+                    class="add-to-pl-btn" 
+                    (click)="addSuggestedSong(song, $event)" 
+                    title="Add to this playlist">
+              <svg lucidePlus [attr.size]="18"></svg>
+              <span class="add-btn-text">Add</span>
+            </button>
+
+            <!-- More Menu if not owner -->
+            <button *ngIf="!canAddDirectly" 
+                    class="track-menu-trigger" 
+                    (click)="openTrackMenu(song, $event)"
+                    title="More options">
+              <svg lucideMoreVertical [attr.size]="20"></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
