@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideHeart, LucideClock } from '@lucide/angular';
+  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideHeart, LucideClock, LucideEye, LucideEyeOff } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -92,6 +92,8 @@ export interface SponsoredAd {
     LucideChevronDown,
     LucideHeart,
     LucideClock,
+    LucideEye,
+    LucideEyeOff,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -251,6 +253,28 @@ export class App implements OnInit {
   lazyLoadPage = 0;
   isLazyLoading = signal<boolean>(false);
   isScrolled = signal<boolean>(false);
+  isNavbarHidden = signal<boolean>(false);
+  isNavbarAutoHide = signal<boolean>(
+    typeof localStorage !== 'undefined'
+      ? localStorage.getItem('gt_navbar_autohide') !== 'false'
+      : true
+  );
+  private lastScrollOffset = 0;
+
+  toggleNavbarAutoHide(): void {
+    const newVal = !this.isNavbarAutoHide();
+    this.isNavbarAutoHide.set(newVal);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_navbar_autohide', newVal ? 'true' : 'false');
+    }
+    if (!newVal) {
+      this.isNavbarHidden.set(false);
+      this.toastService.show('Navbar pinned (Always visible)', 'info');
+    } else {
+      this.toastService.show('Auto-hide enabled (Hides on scroll)', 'info');
+    }
+  }
+
   isSearchMode = signal<boolean>(false);
   isSearchFocused = signal<boolean>(false);
   searchFilter = signal<'all' | 'songs' | 'albums' | 'playlists'>('all');
@@ -2293,6 +2317,27 @@ export class App implements OnInit {
       this.lastScrolledState = isNowScrolled;
       this.isScrolled.set(isNowScrolled);
     }
+
+    // Auto-hide Navbar logic on scroll
+    if (this.isNavbarAutoHide() && !this.isMobileMenuOpen() && !this.isSearchMode()) {
+      const delta = scrollOffset - this.lastScrollOffset;
+      if (Math.abs(delta) > 8) {
+        if (delta > 0 && scrollOffset > 70) {
+          // Scrolling down into feed -> hide navbar
+          if (!this.isNavbarHidden()) {
+            this.isNavbarHidden.set(true);
+          }
+        } else if (delta < 0 || scrollOffset <= 50) {
+          // Scrolling up (down-scroll gesture) or near top -> show navbar
+          if (this.isNavbarHidden()) {
+            this.isNavbarHidden.set(false);
+          }
+        }
+      }
+    } else if (this.isNavbarHidden()) {
+      this.isNavbarHidden.set(false);
+    }
+    this.lastScrollOffset = scrollOffset;
 
     // Parallax: use cached DOM references
     if (!this.cachedHeroEl) {
