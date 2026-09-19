@@ -25,8 +25,25 @@
       <!-- Search Bar (Desktop Only) -->
       <div class="fs-header-search" *ngIf="isDesktop">
         <div class="search-input-wrapper">
-          <svg lucideSearch [attr.size]="18"></svg>
-          <input type="text" placeholder="Search for songs, artists, or podcasts..." [(ngModel)]="searchQuery" (keyup.enter)="onSearchInPlayer()" />
+          <svg lucideSearch [attr.size]="18" class="search-leading-icon"></svg>
+          <input 
+            type="text" 
+            placeholder="Search for songs, artists, or podcasts..." 
+            [(ngModel)]="searchQuery" 
+            (keyup.enter)="onSearchInPlayer()" 
+          />
+          <button *ngIf="searchQuery" class="fs-search-clear-btn" (click)="clearSearch()" title="Clear query">
+            <svg lucideX [attr.size]="16"></svg>
+          </button>
+          <button 
+            class="fs-search-submit-btn" 
+            (click)="onSearchInPlayer()" 
+            title="Search"
+            [disabled]="searchLoading"
+            [class.loading]="searchLoading">
+            <svg *ngIf="!searchLoading" lucideSearch [attr.size]="18"></svg>
+            <svg *ngIf="searchLoading" lucideLoader2 class="spinner" [attr.size]="18"></svg>
+          </button>
         </div>
       </div>
 
@@ -220,7 +237,7 @@
             <div 
               class="related-item" 
               *ngFor="let track of searchResults"
-              (click)="playRelatedTrack(track)"
+              (click)="playSearchResult(track)"
               (contextmenu)="openItemMenu($event, track)"
             >
               <img [src]="track.thumbnail" [alt]="track.title" class="related-thumb" />
@@ -234,8 +251,11 @@
             </div>
           </div>
 
+          <div *ngIf="!searchLoading && searchResults.length === 0 && searchQuery" class="related-not-found">
+            <p>No search results found for "{{ searchQuery }}".</p>
+          </div>
           <div *ngIf="!searchLoading && searchResults.length === 0 && !searchQuery" class="related-not-found">
-            <p>No search results.</p>
+            <p>Type above to search songs, artists or albums.</p>
           </div>
         </div>
 

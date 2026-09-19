@@ -21,7 +21,7 @@ export const routes: Routes = [
   { path: 'user/:username/:id', children: [] },
   { path: 'rooms', children: [] },
   { path: 'rooms/:roomId', children: [] },
-  { path: 'release-notes', children: [] },
+  { path: 'release-notes', redirectTo: 'home', pathMatch: 'full' },
   { path: 'advertise', redirectTo: 'home', pathMatch: 'full' },
   { path: 'ad-booking', redirectTo: 'home', pathMatch: 'full' },
   { path: 'ad-terms', redirectTo: 'home', pathMatch: 'full' },

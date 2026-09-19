@@ -49,7 +49,6 @@ import { CuratedPlaylistsComponent } from './components/curated-playlists/curate
   import { PromoPopupModalComponent } from './components/promo-popup-modal/promo-popup-modal.component';
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
-import { ReleaseNotesComponent } from './components/release-notes/release-notes.component';
 import { RoomFeaturesPopupComponent } from './components/room-features-popup/room-features-popup.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
@@ -123,7 +122,6 @@ export interface SponsoredAd {
     PromoPopupModalComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
-    ReleaseNotesComponent,
     RoomFeaturesPopupComponent
   ],
   templateUrl: './app.html',
@@ -1115,12 +1113,7 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         this.isFullScreenPlayerVisible.set(false);
         return;
-      } else if (event.urlAfterRedirects.startsWith('/release-notes')) {
-        this.currentPage.set('release-notes');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        this.isFullScreenPlayerVisible.set(false);
-        return;
-      } else if (event.urlAfterRedirects.startsWith('/advertise') || event.urlAfterRedirects.startsWith('/ad-booking') || event.urlAfterRedirects.startsWith('/ad-terms') || event.urlAfterRedirects.startsWith('/ad-prohibited')) {
+      } else if (event.urlAfterRedirects.startsWith('/release-notes') || event.urlAfterRedirects.startsWith('/advertise') || event.urlAfterRedirects.startsWith('/ad-booking') || event.urlAfterRedirects.startsWith('/ad-terms') || event.urlAfterRedirects.startsWith('/ad-prohibited')) {
         this.currentPage.set('home');
         this.router.navigate(['/home'], { replaceUrl: true });
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1429,11 +1422,6 @@ export class App implements OnInit {
     } else {
       this.router.navigate(['/rooms']);
     }
-  }
-
-  openReleaseNotes() {
-    this.closeMobileMenu();
-    this.router.navigate(['/release-notes']);
   }
 
 
@@ -2093,6 +2081,7 @@ export class App implements OnInit {
 
   executeSearchApi(query: string): void {
     this.currentQuery = query;
+    this.analyticsService.setLastSearch(query);
     this.lazyLoadPage = 0;
     this.noMoreResultsCount = 0;
     this.isLoading.set(true);

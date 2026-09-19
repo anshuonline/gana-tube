@@ -22,12 +22,14 @@ import {
   LucideMinimize2,
   LucideMusic2,
   LucideSearch,
-  LucideLoader2
+  LucideLoader2,
+  LucideX
 } from '@lucide/angular';
 import { Router } from '@angular/router';
 import { AlgorithmService } from '../../services/algorithm.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
+import { AnalyticsService } from '../../services/analytics.service';
 import { FormsModule } from '@angular/forms';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -60,6 +62,7 @@ import { RoomService } from '../../services/room.service';
     LucideMusic2,
     LucideSearch,
     LucideLoader2,
+    LucideX,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
@@ -82,6 +85,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   private toastService = inject(ToastService);
   private router = inject(Router);
   public roomService = inject(RoomService);
+  private analyticsService = inject(AnalyticsService);
   
   hasShownRoomWarning = false;
 
@@ -296,11 +300,17 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   onSearchInPlayer(): void {
     const q = this.searchQuery.trim();
     if (q) {
+      this.analyticsService.setLastSearch(q);
       if (!this.isDesktop) {
         this.close();
         this.router.navigate(['/search'], { queryParams: { q } });
       } else {
-        this.toggleView('search');
+        if (this.activeView !== 'search') {
+          this.activeView = 'search';
+          this.isSidebarVisible = true;
+        } else {
+          this.isSidebarVisible = true;
+        }
         this.fetchSearch(q);
       }
     }
@@ -309,16 +319,37 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   fetchSearch(query: string): void {
     this.searchLoading = true;
     this.searchResults = [];
+    this.analyticsService.setLastSearch(query);
     
-    this.youtubeApi.searchMusic(query).subscribe(res => {
-      this.searchResults = res || [];
-      this.searchLoading = false;
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('Error fetching search results', err);
-      this.searchLoading = false;
-      this.cdr.detectChanges();
+    this.youtubeApi.searchMusic(query).subscribe({
+      next: (res) => {
+        this.searchResults = res || [];
+        this.searchLoading = false;
+        this.analyticsService.recordSearch(query, 'songs', this.searchResults.length, 'manual');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching search results', err);
+        this.searchLoading = false;
+        this.analyticsService.recordSearch(query, 'songs', 0, 'manual');
+        this.cdr.detectChanges();
+      }
     });
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchResults = [];
+    if (this.activeView === 'search') {
+      this.activeView = 'queue';
+    }
+    this.cdr.detectChanges();
+  }
+
+  playSearchResult(track: Track): void {
+    this.analyticsService.recordSearchClick(track.videoId, track.title || '');
+    this.analyticsService.recordSearchPlay(track.videoId);
+    this.playerService.playTrack(track);
   }
 
   // Double Tap & Guide Logic
