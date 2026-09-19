@@ -387,8 +387,18 @@ export class App implements OnInit {
     if (typeof window === 'undefined' || !customHtml) return;
     
     try {
+      let cleanHtml = customHtml.trim();
+      if (cleanHtml.includes('\\"') || cleanHtml.includes('\\r\\n') || cleanHtml.includes('\\n') || cleanHtml.includes("\\'")) {
+        cleanHtml = cleanHtml
+          .replace(/\\r\\n/g, '\n')
+          .replace(/\\n/g, '\n')
+          .replace(/\\r/g, '\n')
+          .replace(/\\"/g, '"')
+          .replace(/\\'/g, "'");
+      }
+
       const container = document.createElement('div');
-      container.innerHTML = customHtml;
+      container.innerHTML = cleanHtml;
       
       Array.from(container.childNodes).forEach(node => {
         if (node.nodeName.toLowerCase() === 'script') {
@@ -396,19 +406,20 @@ export class App implements OnInit {
           const newScript = document.createElement('script');
           
           Array.from(originalScript.attributes).forEach(attr => {
-            newScript.setAttribute(attr.name, attr.value);
+            const cleanVal = attr.value.replace(/^["']|["']$/g, '');
+            newScript.setAttribute(attr.name, cleanVal);
           });
           
           if (originalScript.text) {
             newScript.text = originalScript.text;
+          } else if (originalScript.innerHTML) {
+            newScript.innerHTML = originalScript.innerHTML;
           }
           
           document.head.appendChild(newScript);
-        } else if (node.nodeType === node.ELEMENT_NODE || node.nodeType === node.TEXT_NODE) {
-          // If there are other tags (e.g. meta, link, noscript), just append them directly
-          if (node.textContent?.trim() !== '') {
-            document.head.appendChild(node.cloneNode(true));
-          }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          // If there are other tags (e.g. meta, link, noscript, style), append them directly
+          document.head.appendChild(node.cloneNode(true));
         }
       });
     } catch (e) {
