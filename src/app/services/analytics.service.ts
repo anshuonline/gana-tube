@@ -202,10 +202,12 @@ export class AnalyticsService {
           user_identifier: userIdentifier
         }),
         keepalive: true
-      });
-      const data = await res.json();
-      if (data && data.search_id) {
-        this.activeSearchId = data.search_id;
+      }).catch(() => null);
+      if (res && res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data && data.search_id) {
+          this.activeSearchId = data.search_id;
+        }
       }
     } catch(e) {
       // Silent catch
@@ -225,7 +227,7 @@ export class AnalyticsService {
           item_title: itemTitle
         }),
         keepalive: true
-      });
+      }).catch(() => null);
     } catch(e) {
       // Silent catch
     }
@@ -243,7 +245,7 @@ export class AnalyticsService {
           video_id: videoId
         }),
         keepalive: true
-      });
+      }).catch(() => null);
     } catch(e) {
       // Silent catch
     }

@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AnalyticsService } from '../../../services/analytics.service';
 import { GtanalyticDataService } from '../gtanalytic-data.service';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -14,9 +15,12 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
   templateUrl: './gtanalytic-search.html',
   styleUrls: ['./gtanalytic-search.scss']
 })
-export class GtanalyticSearchComponent implements OnInit {
+export class GtanalyticSearchComponent implements OnInit, OnDestroy {
   private analyticsService = inject(AnalyticsService);
   dataService = inject(GtanalyticDataService);
+
+  private searchSub?: Subscription;
+  private drilldownSub?: Subscription;
 
   // ── State Signals ──────────────────────────────────────────────────────────
   loading = signal<boolean>(false);
@@ -370,6 +374,11 @@ export class GtanalyticSearchComponent implements OnInit {
     this.loadSearchAnalytics();
   }
 
+  ngOnDestroy() {
+    this.searchSub?.unsubscribe();
+    this.drilldownSub?.unsubscribe();
+  }
+
   loadSearchAnalytics() {
     const pwd = this.dataService.getPassword();
     if (!pwd) {
@@ -396,7 +405,8 @@ export class GtanalyticSearchComponent implements OnInit {
       params.to_date = this.customToDate();
     }
 
-    this.analyticsService.getSearchAnalytics(pwd, params).subscribe({
+    this.searchSub?.unsubscribe();
+    this.searchSub = this.analyticsService.getSearchAnalytics(pwd, params).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.searchData.set(res.data);
@@ -412,7 +422,12 @@ export class GtanalyticSearchComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set('Failed to connect to analytics server');
+        // If aborted due to navigation or component destruction, ignore gracefully
+        if (err?.name === 'AbortError' || err?.message?.includes('aborted') || err?.error?.name === 'AbortError') {
+          return;
+        }
+        console.error('getSearchAnalytics error:', err);
+        this.error.set(err?.error?.message || err?.message || 'Failed to connect to analytics server');
         this.loading.set(false);
       }
     });
@@ -492,14 +507,16 @@ export class GtanalyticSearchComponent implements OnInit {
     this.drilldownLoading.set(true);
     this.drilldownData.set(null);
 
-    this.analyticsService.getQueryDetails(pwd, query).subscribe({
+    this.drilldownSub?.unsubscribe();
+    this.drilldownSub = this.analyticsService.getQueryDetails(pwd, query).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.drilldownData.set(res.data);
         }
         this.drilldownLoading.set(false);
       },
-      error: () => {
+      error: (err) => {
+        if (err?.name === 'AbortError' || err?.message?.includes('aborted')) return;
         this.drilldownLoading.set(false);
       }
     });
