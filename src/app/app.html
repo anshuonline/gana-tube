@@ -556,6 +556,9 @@
             <ng-container *ngIf="shelf.title === 'Recently Played'">
               <div class="shelf-header">
                 <h2 class="shelf-title">{{ shelf.title }}</h2>
+                <button class="shelf-more-btn" *ngIf="shelf.songs.length > 0" (click)="openShelfModal(shelf)" title="View all songs in {{ shelf.title }}">
+                  <span>More</span>
+                </button>
               </div>
               <div class="swiper-recent-wrapper">
                 <swiper-container
@@ -595,13 +598,18 @@
             <ng-container *ngIf="shelf.title !== 'Suggested for You' && shelf.title !== 'Recently Played'">
               <div class="shelf-header">
                 <h2 class="shelf-title">{{ shelf.title }}</h2>
-                <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
-                  <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                <div class="shelf-controls">
+                  <button class="shelf-more-btn" *ngIf="shelf.songs.length > 0" (click)="openShelfModal(shelf)" title="View all songs in {{ shelf.title }}">
+                    <span>More</span>
                   </button>
-                  <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                  </button>
+                  <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
+                    <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="shelf-grid" #shelfGrid>
@@ -903,6 +911,141 @@
 
   <!-- Old Playlist Modal Removed -->
 </div>
+
+<!-- Interactive Shelf / Section Playlist Popup Modal -->
+<div class="shelf-modal-backdrop" 
+     *ngIf="activeShelfModal() && !isShelfModalMinimized()" 
+     (click)="closeShelfModal()">
+  <div class="shelf-modal-container" 
+       [class.is-maximized]="isShelfModalMaximized()"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Ambient Glow Behind Modal -->
+    <div class="shelf-modal-ambient" aria-hidden="true">
+      <div class="shelf-glow-1"></div>
+      <div class="shelf-glow-2"></div>
+    </div>
+
+    <!-- Mobile Drag Handle -->
+    <div class="mobile-drag-handle"></div>
+
+    <!-- Modal Header -->
+    <div class="shelf-modal-header">
+      <div class="header-left-info">
+        <div class="shelf-badge-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        </div>
+        <div class="header-title-group">
+          <div class="header-badges">
+            <span class="category-pill">COLLECTION</span>
+            <span class="count-pill">{{ activeShelfModal()?.songs?.length || 0 }} Songs</span>
+          </div>
+          <h2 class="shelf-modal-title" [title]="activeShelfModal()?.title">{{ activeShelfModal()?.title }}</h2>
+        </div>
+      </div>
+
+      <!-- Window Actions (Minimize, Maximize/Restore, Close) -->
+      <div class="shelf-modal-window-actions">
+        <button class="win-btn minimize-btn" (click)="toggleMinimizeShelfModal()" title="Minimize to dock">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button class="win-btn maximize-btn" (click)="toggleMaximizeShelfModal()" [title]="isShelfModalMaximized() ? 'Restore size' : 'Maximize full screen'">
+          <svg *ngIf="!isShelfModalMaximized()" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect></svg>
+          <svg *ngIf="isShelfModalMaximized()" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+        </button>
+        <button class="win-btn close-btn" (click)="closeShelfModal()" title="Close">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Play / Shuffle Controls Bar -->
+    <div class="shelf-modal-toolbar">
+      <div class="toolbar-actions">
+        <button class="pl-action-btn pl-play-all" (click)="playAllShelfModal()" [disabled]="!activeShelfModal()?.songs?.length">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span>Play all</span>
+        </button>
+        <button class="pl-action-btn pl-outline" (click)="shuffleShelfModal()" [disabled]="!activeShelfModal()?.songs?.length">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          <span>Shuffle</span>
+        </button>
+      </div>
+      <div class="toolbar-hint">
+        Tap any song to play immediately
+      </div>
+    </div>
+
+    <!-- Songs Table Header -->
+    <div class="shelf-songs-header-row">
+      <div class="col-num">#</div>
+      <div class="col-title">TRACK</div>
+      <div class="col-channel">ARTIST / CHANNEL</div>
+      <div class="col-opt"></div>
+    </div>
+
+    <!-- Scrollable Songs List -->
+    <div class="shelf-songs-scroll-body">
+      <div class="shelf-song-row"
+           *ngFor="let song of activeShelfModal()?.songs; let i = index; trackBy: trackByVideoId"
+           [class.active]="playerService.currentTrack()?.videoId === song.videoId"
+           (click)="onPlayTrack(song, activeShelfModal()!.songs)">
+        
+        <div class="col-num">
+          <span class="row-num" *ngIf="playerService.currentTrack()?.videoId !== song.videoId">{{ i + 1 }}</span>
+          <div class="play-ripple-small" *ngIf="playerService.currentTrack()?.videoId === song.videoId">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          </div>
+          <svg class="row-hover-play" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+
+        <div class="col-title">
+          <div class="thumb-wrap">
+            <img [src]="song.thumbnail" [alt]="song.title" loading="lazy" (error)="onImgError($event, song)" />
+          </div>
+          <div class="title-details">
+            <span class="track-name" [title]="song.title">{{ song.title }}</span>
+            <span class="track-sub-artist">{{ song.channelTitle }}</span>
+          </div>
+        </div>
+
+        <div class="col-channel" [title]="song.channelTitle">
+          {{ song.channelTitle }}
+        </div>
+
+        <div class="col-opt" (click)="$event.stopPropagation()">
+          <button class="track-menu-trigger" (click)="toggleMenu(song, $event)" title="Options">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Minimized Floating Dock Pill -->
+<div class="shelf-dock-pill" 
+     *ngIf="activeShelfModal() && isShelfModalMinimized()"
+     [class.with-player]="playerService.currentTrack() !== null">
+  <div class="dock-info" (click)="toggleMinimizeShelfModal()">
+    <div class="dock-indicator">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    </div>
+    <div class="dock-text">
+      <span class="dock-title">{{ activeShelfModal()?.title }}</span>
+      <span class="dock-count">{{ activeShelfModal()?.songs?.length || 0 }} songs</span>
+    </div>
+  </div>
+  <div class="dock-actions">
+    <button class="dock-btn restore-btn" (click)="toggleMinimizeShelfModal()" title="Restore window">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+    </button>
+    <button class="dock-btn close-btn" (click)="closeShelfModal()" title="Close">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+</div>
+
 <!-- Global Reusable Track Menu -->
 <app-track-menu 
   *ngIf="activeMenuTrack()"

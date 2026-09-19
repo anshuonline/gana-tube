@@ -520,6 +520,51 @@ export class App implements OnInit {
     this.activePlaylistMenuPosition.set(null);
   }
 
+  // ── Shelf "More" Popup Modal State ─────────────────────────────────────────
+  activeShelfModal = signal<{ title: string; query?: string; songs: any[] } | null>(null);
+  isShelfModalMinimized = signal<boolean>(false);
+  isShelfModalMaximized = signal<boolean>(false);
+
+  openShelfModal(shelf: any) {
+    if (!shelf) return;
+    this.activeShelfModal.set({
+      title: shelf.title,
+      query: shelf.query || '',
+      songs: shelf.songs || []
+    });
+    this.isShelfModalMinimized.set(false);
+    this.isShelfModalMaximized.set(false);
+  }
+
+  closeShelfModal() {
+    this.activeShelfModal.set(null);
+    this.isShelfModalMinimized.set(false);
+    this.isShelfModalMaximized.set(false);
+  }
+
+  toggleMinimizeShelfModal() {
+    this.isShelfModalMinimized.update(v => !v);
+  }
+
+  toggleMaximizeShelfModal() {
+    this.isShelfModalMaximized.update(v => !v);
+  }
+
+  playAllShelfModal() {
+    const modal = this.activeShelfModal();
+    if (modal && modal.songs && modal.songs.length > 0) {
+      this.playerService.setQueue(modal.songs, 0);
+    }
+  }
+
+  shuffleShelfModal() {
+    const modal = this.activeShelfModal();
+    if (modal && modal.songs && modal.songs.length > 0) {
+      const shuffled = [...modal.songs].sort(() => Math.random() - 0.5);
+      this.playerService.setQueue(shuffled, 0);
+    }
+  }
+
   addToQueue(track: any) {
     this.playerService.addToQueue(track);
     this.closeMenu();
