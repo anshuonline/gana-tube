@@ -419,15 +419,40 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   toggleMenu(event: MouseEvent): void {
     event.stopPropagation();
     this.menuTrack = null;
-    this.showMenu = !this.showMenu;
+    if (!this.showMenu) {
+      const target = event.currentTarget as HTMLElement;
+      if (target && target.getBoundingClientRect) {
+        const rect = target.getBoundingClientRect();
+        this.menuX = rect.right;
+        this.menuY = rect.bottom + 8;
+      } else {
+        this.menuX = event.clientX || (window.innerWidth - 280);
+        this.menuY = event.clientY || 60;
+      }
+      this.showMenu = true;
+    } else {
+      this.showMenu = false;
+    }
   }
   
   openItemMenu(event: MouseEvent, track: Track): void {
     event.stopPropagation();
     event.preventDefault();
     this.menuTrack = track;
-    this.menuX = event.clientX;
-    this.menuY = event.clientY;
+    if (event.type === 'contextmenu') {
+      this.menuX = event.clientX;
+      this.menuY = event.clientY;
+    } else {
+      const target = event.currentTarget as HTMLElement;
+      if (target && target.getBoundingClientRect) {
+        const rect = target.getBoundingClientRect();
+        this.menuX = rect.right;
+        this.menuY = rect.bottom + 4;
+      } else {
+        this.menuX = event.clientX;
+        this.menuY = event.clientY;
+      }
+    }
     this.showMenu = true;
   }
   

@@ -12,14 +12,12 @@ import {
   LucideFolderPlus,
   LucideHeart,
   LucideShare2,
-  LucideDownload,
   LucideRadio,
   LucideTrash2,
   LucideMoon,
   LucideVolumeX,
   LucideVolume1,
-  LucideVolume2,
-  LucideCheck
+  LucideVolume2
 } from '@lucide/angular';
 import { FormsModule } from '@angular/forms';
 import { OfflineService } from '../../services/offline.service';
@@ -35,14 +33,12 @@ import { OfflineService } from '../../services/offline.service';
     LucideFolderPlus,
     LucideHeart,
     LucideShare2,
-    LucideDownload,
     LucideRadio,
     LucideTrash2,
     LucideMoon,
     LucideVolumeX,
     LucideVolume1,
-    LucideVolume2,
-    LucideCheck
+    LucideVolume2
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -110,35 +106,41 @@ export class TrackMenuComponent implements OnChanges {
   calculatePosition() {
     if (this.isMobile || !this.isOpen) return;
     
-    // Assuming menu width is around 260px
+    // Width of desktop track menu
     const menuWidth = 260;
-    // Assuming menu height might be around 400px at most
-    const menuHeight = 400;
+    // Accurate height of track menu without download option
+    const menuHeight = 460;
 
     let finalX = this.xPos;
     let finalY = this.yPos;
 
     // Prevent going off screen to the right
-    if (finalX + menuWidth > window.innerWidth) {
+    if (finalX + menuWidth > window.innerWidth - 16) {
       finalX = window.innerWidth - menuWidth - 16;
     }
+    if (finalX < 16) {
+      finalX = 16;
+    }
     
-    // Prevent going off screen to the bottom (open upwards instead)
-    // Account for the minimized player which is ~90px on desktop
-    const playerOffset = this.playerService.currentTrack() ? 90 : 0;
+    // Prevent overlapping bottom player bar (~88px) or going off bottom screen
+    const hasPlayer = !!this.playerService.currentTrack();
+    const playerOffset = hasPlayer ? 104 : 20;
     const maxAllowedY = window.innerHeight - playerOffset;
     
     if (finalY + menuHeight > maxAllowedY) {
-      // open upwards (subtract button height roughly 24px and menu height)
-      finalY = Math.max(16, this.yPos - menuHeight - 24);
-      // Ensure it still doesn't overlap the player
+      // Flip upwards above the trigger element / click coordinate
+      finalY = this.yPos - menuHeight - 12;
+      // If flipping upwards goes too high or still doesn't fit, clamp to maxAllowed
+      if (finalY < 16) {
+        finalY = 16;
+      }
       if (finalY + menuHeight > maxAllowedY) {
-        finalY = maxAllowedY - menuHeight;
+        finalY = Math.max(16, maxAllowedY - menuHeight);
       }
     }
 
-    this.calculatedX = finalX;
-    this.calculatedY = finalY;
+    this.calculatedX = Math.round(finalX);
+    this.calculatedY = Math.round(finalY);
   }
 
   close(event?: Event) {

@@ -349,8 +349,20 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   openTrackMenu(track: YouTubeSearchResult, event: MouseEvent): void {
     event.stopPropagation();
     this.activeMenuTrack = track;
-    this.menuX = event.clientX;
-    this.menuY = event.clientY;
+    if (event.type === 'contextmenu') {
+      this.menuX = event.clientX;
+      this.menuY = event.clientY;
+    } else {
+      const target = event.currentTarget as HTMLElement;
+      if (target && target.getBoundingClientRect) {
+        const rect = target.getBoundingClientRect();
+        this.menuX = rect.right;
+        this.menuY = rect.bottom + 4;
+      } else {
+        this.menuX = event.clientX;
+        this.menuY = event.clientY;
+      }
+    }
     this.isMenuOpen = true;
   }
 
