@@ -319,6 +319,30 @@ export class TrackMenuComponent implements OnChanges {
     return this.artistImage() || this.track?.channelThumbnail || 'ganatubenewlogo.png';
   }
 
+  getArtistInitials(name: string): string {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  getArtistColor(name: string): string {
+    const colors = [
+      'linear-gradient(135deg, #a855f7, #ec4899)',
+      'linear-gradient(135deg, #6366f1, #a855f7)',
+      'linear-gradient(135deg, #ec4899, #f43f5e)',
+      'linear-gradient(135deg, #8b5cf6, #d946ef)',
+      'linear-gradient(135deg, #7c3aed, #c026d3)',
+      'linear-gradient(135deg, #a855f7, #f97316)',
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  }
+
   artistImage = signal<string>('');
   private ytApi = inject(YoutubeApiService);
 
