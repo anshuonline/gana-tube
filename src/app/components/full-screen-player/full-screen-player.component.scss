@@ -40,10 +40,11 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 40px 32px 32px;
-  max-width: 1000px;
-  margin: 0 auto;
   width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .icon-btn {
@@ -72,12 +73,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  height: 48px;
+  padding: 20px 32px;
+  height: 72px;
+  width: 100%;
+  flex-shrink: 0;
+  z-index: 5;
+
+  @media (max-width: 768px) {
+    padding: 14px 18px;
+    height: 60px;
+  }
 
   .icon-btn {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
 }
 
@@ -104,15 +113,18 @@
 .fs-header-right {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .fs-main {
   flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-bottom: 24px;
+  padding: 8px 32px 16px;
+  width: 100%;
 }
 
 .fs-player-view {
@@ -125,10 +137,11 @@
 
 .fs-artwork-container {
   position: relative;
-  width: min(100%, calc(100dvh - 330px), 500px);
+  width: min(100%, calc(100dvh - 200px), 520px);
   aspect-ratio: 1 / 1;
-  border-radius: 0; // Fixed "round ho raha" issue to match Spotify's perfectly square cover art
+  border-radius: 4px;
   overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
   transition: transform 0.4s ease;
   margin: 0 auto;
 
@@ -307,58 +320,6 @@
   }
 }
 
-.fs-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 0 16px;
-  width: 100%;
-  max-width: 680px;
-  margin: 0 auto;
-}
-
-.fs-track-info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.fs-track-text {
-  flex: 1;
-  overflow: hidden;
-  .fs-title-wrapper {
-    display: flex;
-    overflow: hidden;
-    white-space: nowrap;
-    width: 100%;
-    /* Gradient mask so the edges fade out nicely */
-    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-  }
-
-  .fs-title {
-    font-size: 1.8rem;
-    font-weight: 800;
-    margin: 0;
-    white-space: nowrap;
-    letter-spacing: -0.5px;
-    padding-right: 50px; /* Space before it repeats or bounces */
-    display: inline-block;
-    min-width: 100%;
-    animation: smoothMarquee 12s linear infinite;
-  }
-
-  .fs-artist {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: rgba(255,255,255,0.7);
-    margin: 4px 0 0 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
 .track-transition {
   transition: opacity 0.3s ease, transform 0.3s ease;
   opacity: 1;
@@ -370,127 +331,326 @@
   transform: translateY(10px) !important;
 }
 
-.fs-toggle-btn {
-  background: transparent;
-  border: none;
-  color: rgba(255,255,255,0.7);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: color 0.2s, transform 0.2s;
+// ---- Bottom Player Bar (Spotify / Mini-Player Style) ----
+.fs-bottom-bar {
+  width: 100%;
+  height: 90px;
+  background: rgba(10, 10, 16, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(360px, 2fr) minmax(220px, 1fr);
+  align-items: center;
+  padding: 0 28px;
+  gap: 20px;
+  z-index: 10;
+  flex-shrink: 0;
 
-  &:hover {
-    color: #fff;
-    transform: scale(1.1);
-  }
-  
-  &:active {
-    transform: scale(0.9);
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(180px, 1fr) minmax(280px, 2fr) auto;
+    padding: 0 16px;
+    gap: 12px;
   }
 
-  &.active {
-    color: #fff;
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding: 10px 16px env(safe-area-inset-bottom, 12px);
+    gap: 8px;
   }
 }
 
-.fs-progress-container {
+// Left Section: Album Thumb, Title/Artist, Like, 3-Dots
+.fs-bar-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  min-width: 0;
 
-  .fs-time {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: rgba(255,255,255,0.6);
-    font-variant-numeric: tabular-nums;
-    width: 40px;
-    text-align: center;
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.fs-bar-thumb-wrapper {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  .fs-bar-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.fs-bar-track-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  max-width: 220px;
+
+  @media (max-width: 768px) {
+    max-width: 180px;
+    flex: 1;
   }
 
-  .fs-progress-bar {
+  .fs-bar-title-wrapper {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .fs-bar-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+
+  .fs-bar-artist {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+}
+
+.fs-bar-left-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+// Center Section: Playback Controls & Progress Slider
+.fs-bar-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  max-width: 620px;
+  width: 100%;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    order: -1;
+  }
+}
+
+.fs-bar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    gap: 20px;
+  }
+}
+
+.fs-bar-play-pause {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+
+  &:hover {
+    transform: scale(1.08);
+    background: #f0f0f0;
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+}
+
+.fs-bar-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+
+  .fs-bar-time {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.55);
+    font-variant-numeric: tabular-nums;
+    width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .fs-bar-slider {
     flex: 1;
     -webkit-appearance: none;
-    background: rgba(255,255,255,0.2);
-    height: 6px;
-    border-radius: 3px;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.2);
+    height: 4px;
+    border-radius: 2px;
     outline: none;
     cursor: pointer;
+    transition: height 0.15s ease;
+
+    &:hover {
+      height: 6px;
+
+      &::-webkit-slider-thumb {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
 
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      appearance: none;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-      transition: transform 0.2s;
-    }
-
-    &::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease;
     }
   }
 }
 
-.fs-controls-row {
+// Right Section: Tools, Volume & Fullscreen
+.fs-bar-right {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
+  justify-content: flex-end;
+  gap: 10px;
 
   @media (max-width: 768px) {
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 24px 0;
+    display: none;
+  }
+}
+
+.fs-bar-volume-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fs-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 90px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    height: 6px;
   }
 
-  .side-controls {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    gap: 16px;
-    
-    &.right {
-      justify-content: flex-end;
-    }
-
-    @media (max-width: 768px) {
-      display: contents;
-    }
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s ease;
   }
 
-  .fs-control-btn {
-    background: transparent;
-    border: none;
+  &:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+}
+
+// Generic Player Bar Button
+.fs-bar-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
     color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, opacity 0.2s;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
 
-    &:active {
-      transform: scale(0.9);
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    &:hover {
+      background: transparent;
+      transform: none;
+    }
+  }
+
+  &.secondary {
+    color: rgba(255, 255, 255, 0.55);
+
+    &:hover {
+      color: #fff;
     }
 
-    &:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      &:active {
-        transform: none;
-      }
+    &.active {
+      color: #a855f7 !important;
     }
-    
-    &.secondary {
-      color: rgba(255,255,255,0.7);
-      padding: 12px;
-      &:hover { color: #fff; }
-      &.active { color: #9333ea; } // Active state color for icons
+  }
+
+  &.skip-btn {
+    color: rgba(255, 255, 255, 0.85);
+    &:hover:not(:disabled) {
+      color: #fff;
+      transform: scale(1.08);
     }
-    
-    &.view-toggle {
-      position: relative;
-      &.active::after {
+  }
+
+  &.like-btn {
+    &.active {
+      color: #ec4899;
+    }
+  }
+
+  &.view-toggle {
+    position: relative;
+    &.active {
+      color: #fff !important;
+      &::after {
         content: '';
         position: absolute;
         bottom: 2px;
@@ -499,38 +659,7 @@
         width: 4px;
         height: 4px;
         border-radius: 50%;
-        background-color: #9333ea;
-      }
-    }
-  }
-
-  .fs-main-controls {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    
-    @media (max-width: 768px) {
-      order: -1;
-      width: 100%;
-      justify-content: center;
-      gap: 24px;
-    }
-
-    .play-pause {
-      background: #fff;
-      color: #000;
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      transition: transform 0.2s, box-shadow 0.2s;
-
-      &:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      }
-      
-      &:active {
-        transform: scale(0.95);
+        background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
       }
     }
   }
@@ -819,7 +948,7 @@
   }
 
   .fs-artwork-container {
-    width: min(100%, calc(100dvh - 310px), 500px);
+    width: min(100%, calc(100dvh - 170px), 440px);
     height: auto;
     max-width: 100%;
     max-height: 100%;
@@ -827,41 +956,22 @@
     margin: 0 auto;
   }
 
-  .fs-bottom {
-    gap: 14px;
-    padding: 0;
-    max-width: 100%;
-  }
+  .fs-bottom-bar {
+    height: 76px;
+    padding: 0 16px;
+    gap: 12px;
 
-  .fs-track-info-row {
-    margin-bottom: 0;
-  }
+    .fs-bar-thumb-wrapper {
+      width: 44px;
+      height: 44px;
+    }
 
-  .fs-track-text .fs-title {
-    font-size: 1.3rem;
-  }
-  
-  .fs-track-text .fs-artist {
-    font-size: 0.95rem;
-    margin-top: 2px;
-  }
-
-  .fs-progress-container {
-    /* Slightly compress progress bar area */
-  }
-
-  .fs-controls-row {
-    margin-top: 0;
-    .fs-main-controls {
-      gap: 16px;
-
-      .play-pause {
-        width: 60px;
-        height: 60px;
-        svg {
-          width: 32px;
-          height: 32px;
-        }
+    .fs-bar-play-pause {
+      width: 38px;
+      height: 38px;
+      svg {
+        width: 20px;
+        height: 20px;
       }
     }
   }

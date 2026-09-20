@@ -11,6 +11,7 @@ import {
   LucideSkipBack, 
   LucideMic2,
   LucideMoreVertical,
+  LucideMoreHorizontal,
   LucideHeart,
   LucideCar,
   LucideRepeat,
@@ -19,11 +20,16 @@ import {
   LucideMonitor,
   LucideListMusic,
   LucideRadio,
+  LucideMaximize2,
   LucideMinimize2,
   LucideMusic2,
   LucideSearch,
   LucideLoader2,
-  LucideX
+  LucideX,
+  LucideShuffle,
+  LucideVolume2,
+  LucideVolume1,
+  LucideVolumeX
 } from '@lucide/angular';
 import { Router } from '@angular/router';
 import { AlgorithmService } from '../../services/algorithm.service';
@@ -50,6 +56,7 @@ import { RoomService } from '../../services/room.service';
     LucideSkipBack, 
     LucideMic2,
     LucideMoreVertical,
+    LucideMoreHorizontal,
     LucideHeart,
     LucideCar,
     LucideRepeat,
@@ -58,11 +65,16 @@ import { RoomService } from '../../services/room.service';
     LucideMonitor,
     LucideListMusic,
     LucideRadio,
+    LucideMaximize2,
     LucideMinimize2,
     LucideMusic2,
     LucideSearch,
     LucideLoader2,
     LucideX,
+    LucideShuffle,
+    LucideVolume2,
+    LucideVolume1,
+    LucideVolumeX,
     TrackMenuComponent
   ],
   templateUrl: './full-screen-player.component.html',
@@ -411,7 +423,46 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     }, 800);
   }
 
+  isBrowserFullscreen = false;
+
+  toggleBrowserFullscreen(): void {
+    if (typeof document === 'undefined') return;
+    if (!document.fullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().then(() => {
+          this.isBrowserFullscreen = true;
+          this.cdr.detectChanges();
+        }).catch(err => {
+          console.warn('Fullscreen request failed:', err);
+        });
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().then(() => {
+          this.isBrowserFullscreen = false;
+          this.cdr.detectChanges();
+        }).catch(err => {
+          console.warn('Exit fullscreen failed:', err);
+        });
+      }
+    }
+  }
+
+  @HostListener('document:fullscreenchange')
+  onFullscreenChange(): void {
+    this.isBrowserFullscreen = typeof document !== 'undefined' && !!document.fullscreenElement;
+    this.cdr.detectChanges();
+  }
+
+  onVolumeChange(event: Event): void {
+    const val = +(event.target as HTMLInputElement).value;
+    this.playerService.setVolume(val);
+  }
+
   close(): void {
+    if (this.isBrowserFullscreen && typeof document !== 'undefined' && document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
     this.closePlayer.emit();
     this.showMenu = false;
   }
@@ -446,8 +497,9 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
       const target = event.currentTarget as HTMLElement;
       if (target && target.getBoundingClientRect) {
         const rect = target.getBoundingClientRect();
-        this.menuX = rect.right;
-        this.menuY = rect.bottom + 4;
+        this.menuX = rect.left;
+        // If near bottom of viewport, position at top of button so calculatePosition flips upward
+        this.menuY = rect.top > window.innerHeight / 2 ? rect.top : (rect.bottom + 4);
       } else {
         this.menuX = event.clientX;
         this.menuY = event.clientY;

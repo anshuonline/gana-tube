@@ -53,12 +53,16 @@
         <span class="fs-source">{{ effectiveTrack()?.channelTitle }}</span>
       </div>
 
-      <div class="fs-header-right" style="position: relative;">
-        <button class="icon-btn" style="margin-right: 8px;" title="Car Mode" (click)="openCarMode.emit()">
-          <svg lucideCar [attr.size]="24"></svg>
+      <div class="fs-header-right">
+        <button class="icon-btn" title="Car Mode" (click)="openCarMode.emit()">
+          <svg lucideCar [attr.size]="22"></svg>
         </button>
         <button class="icon-btn" (click)="toggleMenu($event)" title="More Options">
-          <svg lucideMoreVertical [attr.size]="24"></svg>
+          <svg lucideMoreHorizontal [attr.size]="22"></svg>
+        </button>
+        <button class="icon-btn fullscreen-btn" (click)="toggleBrowserFullscreen()" [title]="isBrowserFullscreen ? 'Exit Fullscreen' : 'Fullscreen'">
+          <svg *ngIf="!isBrowserFullscreen" lucideMaximize2 [attr.size]="22"></svg>
+          <svg *ngIf="isBrowserFullscreen" lucideMinimize2 [attr.size]="22"></svg>
         </button>
       </div>
     </div>
@@ -263,96 +267,176 @@
 
     </div>
 
-    <!-- Bottom Controls Area -->
-    <div class="fs-bottom">
+    <!-- Bottom Player Bar (Minimize Player / Spotify Style) -->
+    <div class="fs-bottom-bar">
       
-      <!-- Track Info Row -->
-      <div class="fs-track-info-row">
-        <div class="fs-track-text">
-          <div class="fs-title-wrapper">
-            <h2 class="fs-title track-transition" [title]="effectiveTrack()?.title" [class.track-changing]="isChanging">{{ effectiveTrack()?.title }}</h2>
-          </div>
-          <p class="fs-artist track-transition" [class.track-changing]="isChanging">{{ effectiveTrack()?.channelTitle }}</p>
+      <!-- Left: Thumbnail, Track Info, Like & 3-Dot Menu -->
+      <div class="fs-bar-left">
+        <div class="fs-bar-thumb-wrapper" *ngIf="effectiveTrack() as track">
+          <img 
+            [src]="track.thumbnailHigh || track.thumbnail" 
+            [alt]="track.title" 
+            class="fs-bar-thumb track-transition"
+            [class.track-changing]="isChanging"
+          />
         </div>
-        <button class="fs-toggle-btn like-btn" [class.active]="isCurrentTrackLiked()" (click)="toggleLike()" title="Like">
-          <svg lucideHeart [attr.size]="28" [attr.stroke]="isCurrentTrackLiked() ? 'url(#gtHeartGradient)' : 'currentColor'" [attr.fill]="isCurrentTrackLiked() ? 'url(#gtHeartGradient)' : 'none'"></svg>
+        <div class="fs-bar-track-info">
+          <div class="fs-bar-title-wrapper">
+            <span class="fs-bar-title track-transition" [title]="effectiveTrack()?.title" [class.track-changing]="isChanging">
+              {{ effectiveTrack()?.title || 'Not Playing' }}
+            </span>
+          </div>
+          <span class="fs-bar-artist track-transition" [title]="effectiveTrack()?.channelTitle" [class.track-changing]="isChanging">
+            {{ effectiveTrack()?.channelTitle || '---' }}
+          </span>
+        </div>
+        <div class="fs-bar-left-actions">
+          <button 
+            class="fs-bar-btn like-btn" 
+            [class.active]="isCurrentTrackLiked()" 
+            (click)="toggleLike()" 
+            title="Like">
+            <svg 
+              lucideHeart 
+              [attr.size]="20" 
+              [attr.stroke]="isCurrentTrackLiked() ? 'url(#gtHeartGradient)' : 'currentColor'" 
+              [attr.fill]="isCurrentTrackLiked() ? 'url(#gtHeartGradient)' : 'none'">
+            </svg>
+          </button>
+          <button 
+            class="fs-bar-btn icon-btn track-options-btn" 
+            (click)="openItemMenu($event, effectiveTrack() || playerService.currentTrack()!)" 
+            title="More Options">
+            <svg lucideMoreHorizontal [attr.size]="20"></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Center: Playback Controls & Progress Bar -->
+      <div class="fs-bar-center">
+        <div class="fs-bar-controls">
+          <button 
+            class="fs-bar-btn secondary" 
+            [class.active]="playerService.isShuffled()" 
+            (click)="playerService.toggleShuffle()" 
+            title="Shuffle">
+            <svg lucideShuffle [attr.size]="18"></svg>
+          </button>
+
+          <button 
+            class="fs-bar-btn skip-btn" 
+            (click)="handlePrevious()" 
+            [disabled]="playerService.currentIndex() <= 0" 
+            title="Previous">
+            <svg lucideSkipBack [attr.size]="22" fill="currentColor"></svg>
+          </button>
+
+          <button 
+            class="fs-bar-play-pause prominent" 
+            (click)="handlePlayPause()" 
+            [title]="playerService.isPlaying() ? 'Pause' : 'Play'">
+            <svg *ngIf="playerService.isPlaying()" lucidePause [attr.size]="24" fill="currentColor"></svg>
+            <svg *ngIf="!playerService.isPlaying()" lucidePlay [attr.size]="24" fill="currentColor" style="margin-left: 2px;"></svg>
+          </button>
+
+          <button 
+            class="fs-bar-btn skip-btn" 
+            (click)="handleNext()" 
+            [disabled]="playerService.currentIndex() >= playerService.queue().length - 1" 
+            title="Next">
+            <svg lucideSkipForward [attr.size]="22" fill="currentColor"></svg>
+          </button>
+
+          <button 
+            class="fs-bar-btn secondary" 
+            (click)="playerService.toggleRepeat()" 
+            [title]="'Repeat: ' + playerService.repeatMode()">
+            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="18" style="stroke: #a855f7"></svg>
+            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="18" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#a855f7'"></svg>
+          </button>
+        </div>
+
+        <div class="fs-bar-progress-row">
+          <span class="fs-bar-time">{{ formatTime(displayCurrentTime) }}</span>
+          <input 
+            type="range" 
+            class="fs-bar-slider" 
+            min="0" 
+            step="1" 
+            [max]="playerService.duration() || 100" 
+            [value]="displayCurrentTime" 
+            [style.background]="getProgressBackground()"
+            (input)="onScrubInput($event)" 
+            (change)="onSeek($event)" 
+            title="Seek"
+          />
+          <span class="fs-bar-time">{{ formatTime(playerService.duration()) }}</span>
+        </div>
+      </div>
+
+      <!-- Right: Lyrics, Queue, Related, Devices, Volume, Fullscreen -->
+      <div class="fs-bar-right">
+        <button 
+          class="fs-bar-btn secondary view-toggle" 
+          [class.active]="activeView === 'lyrics'" 
+          (click)="toggleView('lyrics')" 
+          title="Lyrics">
+          <svg lucideMic2 [attr.size]="18"></svg>
+        </button>
+
+        <button 
+          class="fs-bar-btn secondary view-toggle" 
+          [class.active]="activeView === 'queue'" 
+          (click)="toggleView('queue')" 
+          title="Queue">
+          <svg lucideListMusic [attr.size]="18"></svg>
+        </button>
+
+        <button 
+          class="fs-bar-btn secondary view-toggle" 
+          [class.active]="activeView === 'related'" 
+          (click)="toggleView('related')" 
+          title="Related">
+          <svg lucideRadio [attr.size]="18"></svg>
+        </button>
+
+        <button 
+          class="fs-bar-btn secondary" 
+          [class.active]="showDevices()" 
+          (click)="toggleDevices()" 
+          title="Connect to a device">
+          <svg lucideMonitor [attr.size]="18"></svg>
+        </button>
+
+        <div class="fs-bar-volume-group">
+          <button 
+            class="fs-bar-btn secondary" 
+            (click)="playerService.toggleMute()" 
+            title="Volume">
+            <svg *ngIf="playerService.isMuted() || playerService.volume() === 0" lucideVolumeX [attr.size]="18"></svg>
+            <svg *ngIf="!playerService.isMuted() && playerService.volume() > 0 && playerService.volume() < 50" lucideVolume1 [attr.size]="18"></svg>
+            <svg *ngIf="!playerService.isMuted() && playerService.volume() >= 50" lucideVolume2 [attr.size]="18"></svg>
+          </button>
+          <input 
+            type="range" 
+            class="fs-volume-slider" 
+            min="0" 
+            max="100" 
+            [value]="playerService.isMuted() ? 0 : playerService.volume()" 
+            (input)="onVolumeChange($event)" 
+            title="Volume"
+          />
+        </div>
+
+        <button 
+          class="fs-bar-btn secondary fs-toggle-fullscreen" 
+          (click)="toggleBrowserFullscreen()" 
+          [title]="isBrowserFullscreen ? 'Exit Fullscreen' : 'Fullscreen'">
+          <svg *ngIf="!isBrowserFullscreen" lucideMaximize2 [attr.size]="18"></svg>
+          <svg *ngIf="isBrowserFullscreen" lucideMinimize2 [attr.size]="18"></svg>
         </button>
       </div>
 
-      <!-- Progress Bar -->
-      <div class="fs-progress-container">
-        <span class="fs-time">{{ formatTime(displayCurrentTime) }}</span>
-        <input 
-          type="range" 
-          class="fs-progress-bar" 
-          min="0" 
-          step="1"
-          [max]="playerService.duration() || 100" 
-          [value]="displayCurrentTime" 
-          [style.background]="getProgressBackground()"
-          (input)="onScrubInput($event)"
-          (change)="onSeek($event)"
-        />
-        <span class="fs-time">{{ formatTime(playerService.duration()) }}</span>
-      </div>
-
-      <!-- Playback Controls -->
-      <div class="fs-controls-row">
-        <!-- Left Side Controls -->
-        <div class="side-controls left">
-          <button class="fs-control-btn secondary" (click)="playerService.toggleMute()" title="Mute">
-            <svg *ngIf="!playerService.isMuted()" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-            </svg>
-            <svg *ngIf="playerService.isMuted()" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-              <line x1="23" y1="9" x2="17" y2="15"></line>
-              <line x1="17" y1="9" x2="23" y2="15"></line>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Main Controls -->
-        <div class="fs-main-controls">
-          <button class="fs-control-btn secondary" [class.active]="playerService.isShuffled()" title="Shuffle" (click)="playerService.toggleShuffle()" style="margin-right: 16px;">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-          </button>
-
-          <button class="fs-control-btn skip" (click)="handlePrevious()" [disabled]="playerService.currentIndex() <= 0">
-            <svg lucideSkipBack [attr.size]="32" fill="currentColor"></svg>
-          </button>
-          
-          <button class="fs-control-btn play-pause" (click)="handlePlayPause()">
-            <svg lucidePause [attr.size]="40" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
-            <svg lucidePlay [attr.size]="40" fill="currentColor" style="margin-left: 4px;" *ngIf="!playerService.isPlaying()"></svg>
-          </button>
-          
-          <button class="fs-control-btn skip" (click)="handleNext()" [disabled]="playerService.currentIndex() >= playerService.queue().length - 1">
-            <svg lucideSkipForward [attr.size]="32" fill="currentColor"></svg>
-          </button>
-
-          <button class="fs-control-btn secondary" (click)="playerService.toggleRepeat()" title="Repeat" style="margin-left: 16px;">
-            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" style="stroke: #9333ea"></svg>
-            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
-          </button>
-        </div>
-
-        <!-- Right Side Controls (Queue, Lyrics, Related) -->
-        <div class="side-controls right">
-          <button class="fs-control-btn secondary view-toggle" [class.active]="activeView === 'queue'" (click)="toggleView('queue')" title="Up Next">
-            <svg lucideListMusic [attr.size]="20"></svg>
-          </button>
-          
-          <button class="fs-control-btn secondary view-toggle" [class.active]="activeView === 'lyrics'" (click)="toggleView('lyrics')" title="Lyrics">
-            <svg lucideMic2 [attr.size]="20"></svg>
-          </button>
-
-          <button class="fs-control-btn secondary view-toggle" [class.active]="activeView === 'related'" (click)="toggleView('related')" title="Related">
-            <svg lucideRadio [attr.size]="20"></svg>
-          </button>
-        </div>
-      </div>
     </div>
     
   </div>
