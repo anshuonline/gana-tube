@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, OnInit, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,18 +8,23 @@ import { CommonModule } from '@angular/common';
   templateUrl: './intro-video.component.html',
   styleUrl: './intro-video.component.scss'
 })
-export class IntroVideoComponent implements OnInit {
+export class IntroVideoComponent implements OnInit, AfterViewInit {
   showOverlay = signal(false);
   fadingOut = signal(false);
 
-  private readonly SESSION_KEY = 'ganatube_intro_played';
   private readonly VIDEO_SRC = '/videos/47erhjfdtop5lkds687231hji.mp4';
 
+  @ViewChild('introVideo', { static: false }) videoRef!: ElementRef<HTMLVideoElement>;
+
   ngOnInit(): void {
-    if (sessionStorage.getItem(this.SESSION_KEY)) {
-      return;
-    }
     this.showOverlay.set(true);
+  }
+
+  ngAfterViewInit(): void {
+    const video = this.videoRef?.nativeElement;
+    if (video) {
+      video.play().catch(() => {});
+    }
   }
 
   get videoSrc(): string {
@@ -37,7 +42,6 @@ export class IntroVideoComponent implements OnInit {
   private dismiss(): void {
     if (this.fadingOut()) return;
     this.fadingOut.set(true);
-    sessionStorage.setItem(this.SESSION_KEY, '1');
     setTimeout(() => {
       this.showOverlay.set(false);
       this.fadingOut.set(false);

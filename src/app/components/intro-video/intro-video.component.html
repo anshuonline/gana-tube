@@ -1,11 +1,13 @@
 @if (showOverlay()) {
   <div class="intro-overlay" [class.fading]="fadingOut()">
     <video
+      #introVideo
       class="intro-video"
       [src]="videoSrc"
       autoplay
       muted
       playsinline
+      preload="auto"
       (ended)="onVideoEnded()"
       (error)="onVideoEnded()">
     </video>
