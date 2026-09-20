@@ -312,6 +312,9 @@
   flex-direction: column;
   gap: 24px;
   padding: 0 16px;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 .fs-track-info-row {
@@ -827,6 +830,7 @@
   .fs-bottom {
     gap: 14px;
     padding: 0;
+    max-width: 100%;
   }
 
   .fs-track-info-row {
