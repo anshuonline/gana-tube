@@ -316,6 +316,13 @@
       <div class="fs-bar-center">
         <div class="fs-bar-controls">
           <button 
+            class="fs-bar-btn mobile-more-btn" 
+            (click)="showMobileOptions.set(true)" 
+            title="More Options">
+            <svg lucideMoreHorizontal [attr.size]="20"></svg>
+          </button>
+
+          <button 
             class="fs-bar-btn secondary" 
             [class.active]="playerService.isShuffled()" 
             (click)="playerService.toggleShuffle()" 
@@ -439,6 +446,55 @@
 
     </div>
     
+  </div>
+
+  <!-- Mobile Options Sheet (3-Dots) -->
+  <div class="fs-mobile-sheet-backdrop" [class.show]="showMobileOptions()" (click)="showMobileOptions.set(false)"></div>
+  <div class="fs-mobile-options-sheet" [class.show]="showMobileOptions()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Playback Options</div>
+
+    <button class="sheet-item" (click)="playerService.toggleShuffle()" [class.active]="playerService.isShuffled()">
+      <svg lucideShuffle [attr.size]="20"></svg>
+      <span>Shuffle</span>
+      <svg lucideCheck [attr.size]="16" class="sheet-check" *ngIf="playerService.isShuffled()"></svg>
+    </button>
+
+    <button class="sheet-item" (click)="playerService.toggleRepeat()" [class.active]="playerService.repeatMode() !== 'none'">
+      <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20"></svg>
+      <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20"></svg>
+      <span>{{ playerService.repeatMode() === 'one' ? 'Repeat One' : playerService.repeatMode() === 'all' ? 'Repeat All' : 'Repeat' }}</span>
+      <svg lucideCheck [attr.size]="16" class="sheet-check" *ngIf="playerService.repeatMode() !== 'none'"></svg>
+    </button>
+
+    <div class="sheet-divider"></div>
+
+    <button class="sheet-item" (click)="toggleView('lyrics'); showMobileOptions.set(false)">
+      <svg lucideMic2 [attr.size]="20"></svg>
+      <span>Lyrics</span>
+    </button>
+
+    <button class="sheet-item" (click)="toggleView('queue'); showMobileOptions.set(false)">
+      <svg lucideListMusic [attr.size]="20"></svg>
+      <span>Queue</span>
+    </button>
+
+    <button class="sheet-item" (click)="toggleView('related'); showMobileOptions.set(false)">
+      <svg lucideRadio [attr.size]="20"></svg>
+      <span>Related Songs</span>
+    </button>
+
+    <div class="sheet-divider"></div>
+
+    <button class="sheet-item" (click)="openCarMode.emit(); showMobileOptions.set(false)">
+      <svg lucideCar [attr.size]="20"></svg>
+      <span>Car Mode</span>
+    </button>
+
+    <button class="sheet-item" (click)="castService.requestCastSession(); showMobileOptions.set(false)" [class.active]="castService.isCasting()">
+      <svg lucideCast [attr.size]="20"></svg>
+      <span>{{ castService.isCasting() ? 'Casting to ' + castService.connectedDeviceName() : 'Cast to TV or Speakers' }}</span>
+    </button>
   </div>
 
   <!-- Reusable Track Menu (Anchored to More Options in Header or Items) -->

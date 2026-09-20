@@ -27,6 +27,7 @@ import {
   LucideLoader2,
   LucideX,
   LucideShuffle,
+  LucideCheck,
   LucideVolume2,
   LucideVolume1,
   LucideVolumeX
@@ -72,6 +73,7 @@ import { RoomService } from '../../services/room.service';
     LucideLoader2,
     LucideX,
     LucideShuffle,
+    LucideCheck,
     LucideVolume2,
     LucideVolume1,
     LucideVolumeX,
@@ -132,6 +134,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   activeView: 'artwork' | 'queue' | 'lyrics' | 'related' | 'search' = 'artwork';
   isSidebarVisible = true;
   showMenu = false;
+  showMobileOptions = signal(false);
   menuTrack: Track | null = null;
   menuX = 0;
   menuY = 0;
