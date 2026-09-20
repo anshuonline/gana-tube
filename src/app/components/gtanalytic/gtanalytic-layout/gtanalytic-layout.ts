@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { GtanalyticDataService } from '../gtanalytic-data.service';
+import { ToastService } from '../../../services/toast.service';
 
 interface NavItem {
   path: string;
@@ -21,9 +22,27 @@ interface NavItem {
 export class GtanalyticLayoutComponent implements OnInit {
   dataService = inject(GtanalyticDataService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   isMobileMenuOpen = false;
   selectedNavPath = '/gtanalytic/overview';
+
+  isSwinging = false;
+  showNazarBubble = false;
+  private bubbleTimeout: any;
+
+  triggerNazarDefense(event?: Event) {
+    if (event) event.stopPropagation();
+    this.isSwinging = true;
+    this.showNazarBubble = true;
+    this.toastService.show('🌶️ Buri nazar wale tera muh kala! 🍋', 'info', 4000);
+
+    clearTimeout(this.bubbleTimeout);
+    this.bubbleTimeout = setTimeout(() => {
+      this.showNazarBubble = false;
+      this.isSwinging = false;
+    }, 4000);
+  }
 
   get isLoggedIn(): boolean {
     return this.dataService.isAuthenticated() && !this.router.url.includes('/login');

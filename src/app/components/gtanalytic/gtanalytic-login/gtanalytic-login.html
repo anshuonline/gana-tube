@@ -1,4 +1,19 @@
 <div class="analytic-login-page">
+  <!-- Nimbu Mirchi Charm (Top-Right Corner) -->
+  <div class="nimbu-mirchi-login-corner" (click)="triggerNazarDefense()" title="Buri nazar wale tera muh kala!">
+    <img 
+      src="https://i.ibb.co/KpBxGvHJ/d63efb07-dce0-493f-8739-f7c2046722f7-1.webp" 
+      alt="Nimbu Mirchi" 
+      class="nimbu-mirchi-img"
+      [class.swinging]="isSwinging"
+    />
+    <div class="nazar-speech-bubble" *ngIf="showNazarBubble">
+      <span class="bubble-emoji">🌶️</span>
+      <span class="bubble-text">Buri nazar wale tera muh kala!</span>
+      <span class="bubble-emoji">🍋</span>
+    </div>
+  </div>
+
   <div class="login-card">
     <div class="brand-badge">
       <img src="/ganatubenewlogo.png" alt="GanaTube" class="brand-logo" />

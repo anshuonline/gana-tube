@@ -51,6 +51,21 @@
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span class="logout-text">Logout</span>
       </button>
+
+      <!-- Nimbu Mirchi Charm (Nazar Battu) -->
+      <div class="nimbu-mirchi-wrapper" (click)="triggerNazarDefense($event)" title="Buri nazar wale tera muh kala!">
+        <img 
+          src="https://i.ibb.co/KpBxGvHJ/d63efb07-dce0-493f-8739-f7c2046722f7-1.webp" 
+          alt="Nimbu Mirchi" 
+          class="nimbu-mirchi-img"
+          [class.swinging]="isSwinging"
+        />
+        <div class="nazar-speech-bubble" *ngIf="showNazarBubble">
+          <span class="bubble-emoji">🌶️</span>
+          <span class="bubble-text">Buri nazar wale tera muh kala!</span>
+          <span class="bubble-emoji">🍋</span>
+        </div>
+      </div>
     </div>
   </header>
 
