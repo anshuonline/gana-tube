@@ -1,4 +1,4 @@
-import { Component, ElementRef, AfterViewInit, OnInit, ViewChild, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,31 +8,15 @@ import { CommonModule } from '@angular/common';
   templateUrl: './intro-video.component.html',
   styleUrl: './intro-video.component.scss'
 })
-export class IntroVideoComponent implements OnInit, AfterViewInit {
+export class IntroVideoComponent implements OnInit {
   showOverlay = signal(false);
   fadingOut = signal(false);
 
-  private readonly VIDEO_SRC = '/videos/47erhjfdtop5lkds687231hji.mp4';
-
-  @ViewChild('introVideo', { static: false }) videoRef!: ElementRef<HTMLVideoElement>;
-
   ngOnInit(): void {
     this.showOverlay.set(true);
-  }
-
-  ngAfterViewInit(): void {
-    const video = this.videoRef?.nativeElement;
-    if (video) {
-      video.play().catch(() => {});
-    }
-  }
-
-  get videoSrc(): string {
-    return this.VIDEO_SRC;
-  }
-
-  onVideoEnded(): void {
-    this.dismiss();
+    setTimeout(() => {
+      this.dismiss();
+    }, 2500);
   }
 
   skipIntro(): void {
@@ -45,6 +29,6 @@ export class IntroVideoComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.showOverlay.set(false);
       this.fadingOut.set(false);
-    }, 500);
+    }, 800);
   }
 }
