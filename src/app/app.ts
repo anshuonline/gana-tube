@@ -50,6 +50,7 @@ import { CuratedPlaylistsComponent } from './components/curated-playlists/curate
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { RoomFeaturesPopupComponent } from './components/room-features-popup/room-features-popup.component';
+import { IntroVideoComponent } from './components/intro-video/intro-video.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
@@ -122,7 +123,8 @@ export interface SponsoredAd {
     PromoPopupModalComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
-    RoomFeaturesPopupComponent
+    RoomFeaturesPopupComponent,
+    IntroVideoComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],

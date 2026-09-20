@@ -1,3 +1,6 @@
+<!-- Intro Video Overlay -->
+<app-intro-video></app-intro-video>
+
 <div class="app-container" [class.player-active]="playerService.currentTrack() !== null">
   <!-- Hidden YouTube Player -->
   <app-yt-player *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin'"></app-yt-player>
