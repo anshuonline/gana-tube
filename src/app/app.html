@@ -756,47 +756,6 @@
           <span>Searching more songs...</span>
         </div>
       </div>
-
-      <!-- Home Page SEO Section -->
-      <section class="home-seo-section" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode()">
-        <div class="seo-badge">
-          <svg lucideSparkles [attr.size]="14"></svg>
-          <span>Music Streaming Reimagined</span>
-        </div>
-        <h2 class="seo-title">Why <span class="gradient-text">GanaTube</span></h2>
-        <h3 class="seo-subtitle">Free Online Music Streaming & Social Audio Platform</h3>
-        
-        <p class="seo-text">
-          GanaTube is a premier free music streaming platform built for Indian and international music lovers. Discover and stream millions of songs, trending Hindi tracks, latest Punjabi chartbusters, classic Bollywood melodies, vibrant Bhojpuri tunes, and rich regional melodies across Bengali, Haryanvi, Tamil, English, and more — all in one seamless place. Every track streams in clean, high-definition (HD) audio quality with PC & desktop background playback support, real-time synchronized lyrics, and zero mandatory signups or subscriptions.
-        </p>
-
-        <p class="seo-text">
-          Whether you want to explore top hits on our <a routerLink="/discovery">Discovery Charts</a>, enjoy hand-crafted <a routerLink="/curated-playlists">Curated Playlists</a>, jam with friends in synchronized <a routerLink="/rooms">Listen Together Rooms</a>, or browse music by your favorite languages — <a routerLink="/language/hindi">Hindi</a>, <a routerLink="/language/punjabi">Punjabi</a>, <a routerLink="/language/bhojpuri">Bhojpuri</a>, <a routerLink="/language/english">English</a>, <a routerLink="/language/haryanvi">Haryanvi</a>, <a routerLink="/language/bengali">Bengali</a>, or <a routerLink="/language/tamil">Tamil</a> — GanaTube provides a lightning-fast, AMOLED dark, distraction-free audio experience across all devices. Search effortlessly across songs, albums, and artists with smart voice search, save your personalized favorites, and enjoy continuous music wherever you go.
-        </p>
-
-        <div class="seo-highlights-grid">
-          <div class="seo-highlight-card">
-            <div class="highlight-icon"><svg lucideSparkles [attr.size]="20"></svg></div>
-            <div class="highlight-title">Free HD Streaming</div>
-            <p class="highlight-desc">High-fidelity audio streaming across Bollywood, regional, and global charts.</p>
-          </div>
-          <div class="seo-highlight-card">
-            <div class="highlight-icon"><svg lucideRadio [attr.size]="20"></svg></div>
-            <div class="highlight-title">Listen Together Rooms</div>
-            <p class="highlight-desc">Real-time synchronized listening and live chat with friends worldwide.</p>
-          </div>
-          <div class="seo-highlight-card">
-            <div class="highlight-icon"><svg lucideMusic [attr.size]="20"></svg></div>
-            <div class="highlight-title">Multi-Language Hub</div>
-            <p class="highlight-desc">Explore Hindi, Punjabi, Bhojpuri, English, Tamil, Bengali & more.</p>
-          </div>
-          <div class="seo-highlight-card">
-            <div class="highlight-icon"><svg lucideFlame [attr.size]="20"></svg></div>
-            <div class="highlight-title">Synced Lyrics & Timer</div>
-            <p class="highlight-desc">Real-time scrolling karaoke lyrics and automated sleep timer for easy nights.</p>
-          </div>
-        </div>
-      </section>
     </div>
 
 
@@ -826,109 +785,6 @@
 
     <!-- Modern Footer -->
     <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts'">
-      
-      <!-- SEO & Discovery Showcase Card (Why GanaTube) -->
-      <div class="footer-seo-container">
-        <section class="footer-seo-card">
-          <!-- Top Badge & Title -->
-          <div class="seo-card-header">
-            <div class="seo-pill-badge">
-              <svg lucideSparkles [attr.size]="14"></svg>
-              <span>MUSIC STREAMING REIMAGINED</span>
-            </div>
-            <h2 class="seo-main-title">Why <span class="gradient-brand">GanaTube</span></h2>
-            <p class="seo-sub-title">Free Online Music Streaming & Social Audio Platform</p>
-          </div>
-
-          <!-- Smart SEO Content Paragraphs -->
-          <div class="seo-body-paragraphs">
-            <p>
-              GanaTube is a premier free music streaming platform built for Indian and international music lovers. Discover and stream millions of songs, trending <a routerLink="/language/hindi" class="seo-keyword-link">Hindi tracks</a>, latest <a routerLink="/language/punjabi" class="seo-keyword-link">Punjabi chartbusters</a>, classic Bollywood melodies, vibrant <a routerLink="/language/bhojpuri" class="seo-keyword-link">Bhojpuri tunes</a>, and rich regional melodies across <a routerLink="/language/bengali" class="seo-keyword-link">Bengali</a>, <a routerLink="/language/haryanvi" class="seo-keyword-link">Haryanvi</a>, <a routerLink="/language/tamil" class="seo-keyword-link">Tamil</a>, <a routerLink="/language/telugu" class="seo-keyword-link">Telugu</a>, and <a routerLink="/language/english" class="seo-keyword-link">English</a> — all in one seamless place. Every track streams in clean, high-definition (HD) audio quality with PC & desktop background playback support, real-time synchronized lyrics, and zero mandatory signups or subscriptions.
-            </p>
-            <p>
-              Whether you want to explore top hits on our <a routerLink="/discovery" class="seo-keyword-link">Discovery Charts</a>, enjoy hand-crafted <a routerLink="/curated-playlists" class="seo-keyword-link">Curated Playlists</a>, jam with friends in synchronized <a routerLink="/rooms" class="seo-keyword-link">Listen Together Rooms</a>, or browse music by your favorite languages — <a routerLink="/language/hindi" class="seo-keyword-link">Hindi</a>, <a routerLink="/language/punjabi" class="seo-keyword-link">Punjabi</a>, <a routerLink="/language/bhojpuri" class="seo-keyword-link">Bhojpuri</a>, <a routerLink="/language/english" class="seo-keyword-link">English</a>, <a routerLink="/language/haryanvi" class="seo-keyword-link">Haryanvi</a>, <a routerLink="/language/bengali" class="seo-keyword-link">Bengali</a>, or <a routerLink="/language/tamil" class="seo-keyword-link">Tamil</a> — GanaTube provides a lightning-fast, AMOLED dark, distraction-free audio experience across all devices. Search effortlessly across songs, albums, and artists with smart voice search, save your personalized favorites, and enjoy continuous music wherever you go.
-            </p>
-          </div>
-
-          <!-- 4 Feature Highlights Grid -->
-          <div class="seo-features-grid">
-            <div class="seo-feature-card">
-              <div class="feature-icon-badge">
-                <svg lucideSparkles [attr.size]="20"></svg>
-              </div>
-              <div class="feature-text">
-                <h4 class="feature-heading">Free HD Streaming</h4>
-                <p class="feature-detail">High-fidelity audio streaming across Bollywood, regional, and global charts.</p>
-              </div>
-            </div>
-
-            <div class="seo-feature-card">
-              <div class="feature-icon-badge">
-                <svg lucideRadio [attr.size]="20"></svg>
-              </div>
-              <div class="feature-text">
-                <h4 class="feature-heading">Listen Together Rooms</h4>
-                <p class="feature-detail">Real-time synchronized listening and live chat with friends worldwide.</p>
-              </div>
-            </div>
-
-            <div class="seo-feature-card">
-              <div class="feature-icon-badge">
-                <svg lucideMusic [attr.size]="20"></svg>
-              </div>
-              <div class="feature-text">
-                <h4 class="feature-heading">Multi-Language Hub</h4>
-                <p class="feature-detail">Explore Hindi, Punjabi, Bhojpuri, English, Tamil, Bengali & more.</p>
-              </div>
-            </div>
-
-            <div class="seo-feature-card">
-              <div class="feature-icon-badge">
-                <svg lucideFlame [attr.size]="20"></svg>
-              </div>
-              <div class="feature-text">
-                <h4 class="feature-heading">Synced Lyrics & Timer</h4>
-                <p class="feature-detail">Real-time scrolling karaoke lyrics and automated sleep timer for easy nights.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3 Transparent Pillars (What you get, Quality & Safety, Explore More) -->
-          <div class="seo-pillars-grid">
-            <div class="seo-pillar-card">
-              <h4 class="pillar-heading">What you get</h4>
-              <ul class="pillar-bullet-list">
-                <li>Zero audio advertisement interruptions with continuous playback.</li>
-                <li>Smart algorithmic auto-queuing that never lets the playlist end.</li>
-                <li>Installable Progressive Web App (PWA) with zero disk footprint.</li>
-                <li>Seamless background audio playback on desktop and mobile.</li>
-              </ul>
-            </div>
-
-            <div class="seo-pillar-card">
-              <h4 class="pillar-heading">Quality & safety</h4>
-              <ul class="pillar-bullet-list">
-                <li>Official API player architecture with zero hosted media files.</li>
-                <li>Strict DMCA & copyright compliance with rapid takedown response.</li>
-                <li>Privacy-first local storage with optional Google cross-device sync.</li>
-                <li>AMOLED dark theme engineered to conserve battery on OLED displays.</li>
-              </ul>
-            </div>
-
-            <div class="seo-pillar-card">
-              <h4 class="pillar-heading">Explore more</h4>
-              <ul class="pillar-bullet-list">
-                <li><a routerLink="/how-it-works" class="seo-keyword-link">How it works</a>: Streaming architecture & queueing logic.</li>
-                <li><a routerLink="/features" class="seo-keyword-link">Features</a>: Car mode, smart queue, lyrics & rooms.</li>
-                <li><a routerLink="/faq" class="seo-keyword-link">FAQ</a>: Answers on audio quality, data saver & legality.</li>
-                <li><a routerLink="/privacy-policy" class="seo-keyword-link">Privacy & policies</a>: Data use, cookies & AdSense disclosure.</li>
-              </ul>
-            </div>
-          </div>
-
-        </section>
-      </div>
-
       <div class="footer-giant-brand">ganatube.in</div>
       <div class="footer-content">
         <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
@@ -966,6 +822,108 @@
         </div>
       </div>
     </footer>
+
+    <!-- SEO & Discovery Showcase Card (Why GanaTube) - ONLY ON HOME PAGE (BELOW FOOTER) -->
+    <div class="footer-seo-container" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode()">
+      <section class="footer-seo-card">
+        <!-- Top Badge & Title -->
+        <div class="seo-card-header">
+          <div class="seo-pill-badge">
+            <svg lucideSparkles [attr.size]="14"></svg>
+            <span>MUSIC STREAMING REIMAGINED</span>
+          </div>
+          <h2 class="seo-main-title">Why <span class="gradient-brand">GanaTube</span></h2>
+          <p class="seo-sub-title">Free Online Music Streaming & Social Audio Platform</p>
+        </div>
+
+        <!-- Smart SEO Content Paragraphs -->
+        <div class="seo-body-paragraphs">
+          <p>
+            GanaTube is a premier free music streaming platform built for Indian and international music lovers. Discover and stream millions of songs, trending <a routerLink="/language/hindi" class="seo-keyword-link">Hindi tracks</a>, latest <a routerLink="/language/punjabi" class="seo-keyword-link">Punjabi chartbusters</a>, classic Bollywood melodies, vibrant <a routerLink="/language/bhojpuri" class="seo-keyword-link">Bhojpuri tunes</a>, and rich regional melodies across <a routerLink="/language/bengali" class="seo-keyword-link">Bengali</a>, <a routerLink="/language/haryanvi" class="seo-keyword-link">Haryanvi</a>, <a routerLink="/language/tamil" class="seo-keyword-link">Tamil</a>, <a routerLink="/language/telugu" class="seo-keyword-link">Telugu</a>, and <a routerLink="/language/english" class="seo-keyword-link">English</a> — all in one seamless place. Every track streams in clean, high-definition (HD) audio quality with PC & desktop background playback support, real-time synchronized lyrics, and zero mandatory signups or subscriptions.
+          </p>
+          <p>
+            Whether you want to explore top hits on our <a routerLink="/discovery" class="seo-keyword-link">Discovery Charts</a>, enjoy hand-crafted <a routerLink="/curated-playlists" class="seo-keyword-link">Curated Playlists</a>, jam with friends in synchronized <a routerLink="/rooms" class="seo-keyword-link">Listen Together Rooms</a>, or browse music by your favorite languages — <a routerLink="/language/hindi" class="seo-keyword-link">Hindi</a>, <a routerLink="/language/punjabi" class="seo-keyword-link">Punjabi</a>, <a routerLink="/language/bhojpuri" class="seo-keyword-link">Bhojpuri</a>, <a routerLink="/language/english" class="seo-keyword-link">English</a>, <a routerLink="/language/haryanvi" class="seo-keyword-link">Haryanvi</a>, <a routerLink="/language/bengali" class="seo-keyword-link">Bengali</a>, or <a routerLink="/language/tamil" class="seo-keyword-link">Tamil</a> — GanaTube provides a lightning-fast, AMOLED dark, distraction-free audio experience across all devices. Search effortlessly across songs, albums, and artists with smart voice search, save your personalized favorites, and enjoy continuous music wherever you go.
+          </p>
+        </div>
+
+        <!-- 4 Feature Highlights Grid -->
+        <div class="seo-features-grid">
+          <div class="seo-feature-card">
+            <div class="feature-icon-badge">
+              <svg lucideSparkles [attr.size]="20"></svg>
+            </div>
+            <div class="feature-text">
+              <h4 class="feature-heading">Free HD Streaming</h4>
+              <p class="feature-detail">High-fidelity audio streaming across Bollywood, regional, and global charts.</p>
+            </div>
+          </div>
+
+          <div class="seo-feature-card">
+            <div class="feature-icon-badge">
+              <svg lucideRadio [attr.size]="20"></svg>
+            </div>
+            <div class="feature-text">
+              <h4 class="feature-heading">Listen Together Rooms</h4>
+              <p class="feature-detail">Real-time synchronized listening and live chat with friends worldwide.</p>
+            </div>
+          </div>
+
+          <div class="seo-feature-card">
+            <div class="feature-icon-badge">
+              <svg lucideMusic [attr.size]="20"></svg>
+            </div>
+            <div class="feature-text">
+              <h4 class="feature-heading">Multi-Language Hub</h4>
+              <p class="feature-detail">Explore Hindi, Punjabi, Bhojpuri, English, Tamil, Bengali & more.</p>
+            </div>
+          </div>
+
+          <div class="seo-feature-card">
+            <div class="feature-icon-badge">
+              <svg lucideFlame [attr.size]="20"></svg>
+            </div>
+            <div class="feature-text">
+              <h4 class="feature-heading">Synced Lyrics & Timer</h4>
+              <p class="feature-detail">Real-time scrolling karaoke lyrics and automated sleep timer for easy nights.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Transparent Pillars (What you get, Quality & Safety, Explore More) -->
+        <div class="seo-pillars-grid">
+          <div class="seo-pillar-card">
+            <h4 class="pillar-heading">What you get</h4>
+            <ul class="pillar-bullet-list">
+              <li>Zero audio advertisement interruptions with continuous playback.</li>
+              <li>Smart algorithmic auto-queuing that never lets the playlist end.</li>
+              <li>Installable Progressive Web App (PWA) with zero disk footprint.</li>
+              <li>Seamless background audio playback on desktop and mobile.</li>
+            </ul>
+          </div>
+
+          <div class="seo-pillar-card">
+            <h4 class="pillar-heading">Quality & safety</h4>
+            <ul class="pillar-bullet-list">
+              <li>Official API player architecture with zero hosted media files.</li>
+              <li>Strict DMCA & copyright compliance with rapid takedown response.</li>
+              <li>Privacy-first local storage with optional Google cross-device sync.</li>
+              <li>AMOLED dark theme engineered to conserve battery on OLED displays.</li>
+            </ul>
+          </div>
+
+          <div class="seo-pillar-card">
+            <h4 class="pillar-heading">Explore more</h4>
+            <ul class="pillar-bullet-list">
+              <li><a routerLink="/how-it-works" class="seo-keyword-link">How it works</a>: Streaming architecture & queueing logic.</li>
+              <li><a routerLink="/features" class="seo-keyword-link">Features</a>: Car mode, smart queue, lyrics & rooms.</li>
+              <li><a routerLink="/faq" class="seo-keyword-link">FAQ</a>: Answers on audio quality, data saver & legality.</li>
+              <li><a routerLink="/privacy-policy" class="seo-keyword-link">Privacy & policies</a>: Data use, cookies & AdSense disclosure.</li>
+            </ul>
+          </div>
+        </div>
+
+      </section>
+    </div>
   </main>
 
   <!-- Global Sponsored Ad Banner (Only shown if active) -->
