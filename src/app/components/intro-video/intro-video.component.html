@@ -1,18 +1,9 @@
 @if (showOverlay()) {
-  <div class="intro-overlay" [class.fading]="fadingOut()">
-    <div class="ambient-glow glow-purple"></div>
-    <div class="ambient-glow glow-pink"></div>
-
+  <div class="intro-overlay" [class.fading]="fadingOut()" (click)="skipIntro()">
     <div class="intro-content" [class.visible]="!fadingOut()">
       <div class="logo-wrapper">
         <img src="/ganatubenewlogo.png" alt="GanaTube" class="logo-icon" />
       </div>
-
-      <h1 class="intro-title">
-        <span class="plain-text">ganatube</span><span class="gradient-text">.in</span>
-      </h1>
-
-      <p class="intro-tagline">Free Music. No Ads Between Songs.</p>
     </div>
   </div>
 }

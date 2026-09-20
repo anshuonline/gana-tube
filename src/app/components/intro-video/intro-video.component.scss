@@ -7,114 +7,49 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-}
+  user-select: none;
+  pointer-events: all;
+  transition: opacity 0.6s ease;
 
-.ambient-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0;
-  animation: glowPulse 2.5s ease-in-out forwards;
-  pointer-events: none;
+  &.fading {
+    opacity: 0;
 
-  &.glow-purple {
-    width: 400px;
-    height: 400px;
-    background: rgba(168, 85, 247, 0.12);
-    top: 20%;
-    left: 30%;
-    animation-delay: 0.3s;
-  }
-
-  &.glow-pink {
-    width: 350px;
-    height: 350px;
-    background: rgba(236, 72, 153, 0.10);
-    bottom: 25%;
-    right: 25%;
-    animation-delay: 0.6s;
+    .intro-content {
+      opacity: 0;
+      transform: scale(1.06);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
   }
 }
 
 .intro-content {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition: opacity 0.8s ease;
 
   &.visible {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .logo-wrapper {
   opacity: 0;
-  animation: logoReveal 0.8s ease-out 0.2s forwards;
+  animation: logoReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
 }
 
 .logo-icon {
-  width: 72px;
-  height: 72px;
+  width: 130px;
+  height: 130px;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 0 28px rgba(168, 85, 247, 0.45));
-}
-
-.intro-title {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 3rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin: 0;
-  opacity: 0;
-  animation: textReveal 0.8s ease-out 0.5s forwards;
-}
-
-.plain-text {
-  color: #ffffff;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.intro-tagline {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin: 0;
-  opacity: 0;
-  animation: textReveal 0.8s ease-out 0.8s forwards;
-}
-
-.intro-overlay.fading {
-  .intro-content {
-    opacity: 0;
-    transform: translateY(-12px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .ambient-glow {
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
 }
 
 @keyframes logoReveal {
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.82);
   }
   to {
     opacity: 1;
@@ -122,48 +57,9 @@
   }
 }
 
-@keyframes textReveal {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes glowPulse {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
-}
-
 @media (max-width: 640px) {
-  .intro-title {
-    font-size: 2.2rem;
-  }
-
   .logo-icon {
-    width: 56px;
-    height: 56px;
-  }
-
-  .intro-tagline {
-    font-size: 0.8rem;
-  }
-
-  .ambient-glow {
-    filter: blur(80px);
-
-    &.glow-purple {
-      width: 280px;
-      height: 280px;
-    }
-
-    &.glow-pink {
-      width: 240px;
-      height: 240px;
-    }
+    width: 96px;
+    height: 96px;
   }
 }

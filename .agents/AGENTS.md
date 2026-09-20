@@ -18,10 +18,15 @@ This project spans across two primary GitHub repositories:
 - **CRITICAL**: Before committing, you must explicitly run `git add dist/` (or `git add dist/ganatube`) along with your modified source files. The live server serves the `dist/` folder directly. If you forget this step, the live server will not get the updated build.
 - **Synchronized Backend Pushes**: If changes are made to the `manageads` backend files, they must also be committed and pushed to their respective repository. Ensure both repositories are pushed if both have been modified.
 
-## 4. Top-Class Engineering
+## 4. API Priority & Music Data Source (CRITICAL RULE)
+- **1st PRIORITY ALWAYS**: You **MUST ALWAYS** use the `npm ytmusic api` (YouTube Music API / node-ytmusic / ytmusic-api) as the primary source for all music data (songs, search, artists, albums, recommendations, metadata).
+- **NEVER EVER** use custom/personal APIs by default for music data.
+- **CUSTOM API AS FALLBACK ONLY (ASK PERMISSION FIRST)**: Custom APIs can **ONLY** be used as a fallback if `npm ytmusic api` fails or lacks a feature, **AND ONLY AFTER EXPLICITLY ASKING THE USER FOR PERMISSION FIRST**. Never write code using custom APIs without asking the user and getting explicit approval.
+
+## 5. Top-Class Engineering
 - Always act as a highly intelligent developer. Think deeply about the consequences of your actions and seek the absolute best implementation. Ask yourself "If I do this, what will happen? What is the absolute BEST way to achieve this?"
 
-## 5. UI / UX & Styling Rules (Official Design System)
+## 6. UI / UX & Styling Rules (Official Design System)
 - **Official Color Palette Document**: For comprehensive guidelines, always refer to [COLOR_PALETTE.md](file:///f:/APPS/ganatube/.agents/COLOR_PALETTE.md).
 - **Color Scheme**:
   - **Canvas / Background**: Strictly maintain an **AMOLED Black** background (`#000000`). Never use grays or light mode.
@@ -32,7 +37,7 @@ This project spans across two primary GitHub repositories:
 - **Component Encapsulation**: Every component must have its own dedicated `.scss` file. Do not write component-specific CSS globally inside `app.scss`.
 - **No Browser Native Popups**: **NEVER** use `alert()` or `prompt()` in production code (testing is okay, but must be removed). Always build or utilize custom UI input fields, modals, or toast notifications.
 
-## 6. Key Frontend Architecture (`f:\APPS\ganatube\src\app\`)
+## 7. Key Frontend Architecture (`f:\APPS\ganatube\src\app\`)
 GanaTube uses modern Angular features like Standalone Components and Signals for state management.
 
 ### Core Services (`src/app/services/`)
@@ -47,7 +52,7 @@ GanaTube uses modern Angular features like Standalone Components and Signals for
   - `room-view/`: The actual live room interface containing a synchronized player, a queue/requests panel, and live chat.
   - `rooms-discover/`: The lobby to find public rooms or create/join private ones.
 
-## 7. Listen Together (Rooms) Mechanics
+## 8. Listen Together (Rooms) Mechanics
 - **Host (Admin)**: The creator of the room. Has exclusive control over playback (Play/Pause, Scrubbing, Skipping). Can add songs directly to the queue and accept/reject song requests.
 - **Listeners**: Synced automatically to the Host's playback timestamp. Cannot control the player.
 - **Song Requests**: Listeners can search for a song and hit "Request Song". This triggers `roomService.requestSong(track)`, which adds the track to the "Requests" tab for the host to review.
