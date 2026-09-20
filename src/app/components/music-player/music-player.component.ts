@@ -20,7 +20,7 @@ import {
   LucideHeart,
   LucideShare2,
   LucideMoon,
-  LucideMonitor,
+  LucideCast,
   LucideActivity,
   LucideMoreVertical
 } from '@lucide/angular';
@@ -32,7 +32,7 @@ import { OfflineService } from '../../services/offline.service';
 import { ToastService } from '../../services/toast.service';
 import { RoomService } from '../../services/room.service';
 
-import { SyncService } from '../../services/sync.service';
+import { CastService } from '../../services/cast.service';
 
 @Component({
   selector: 'app-music-player',
@@ -58,7 +58,7 @@ import { SyncService } from '../../services/sync.service';
     LucideHeart,
     LucideShare2,
     LucideMoon,
-    LucideMonitor,
+    LucideCast,
     LucideActivity,
     LucideMoreVertical
   ],
@@ -189,9 +189,9 @@ import { SyncService } from '../../services/sync.service';
         >
           <svg lucideListMusic [attr.size]="18"></svg>
         </button>
-        <!-- <button class="ctrl-btn secondary" (click)="toggleDevices(); $event.stopPropagation()" title="Devices" [class.active]="showDevices()">
-          <svg lucideMonitor [attr.size]="18"></svg>
-        </button> -->
+        <button class="ctrl-btn secondary cast-btn" (click)="castService.requestCastSession(); $event.stopPropagation()" [class.active]="castService.isCasting()" [title]="castService.isCasting() ? 'Casting to ' + castService.connectedDeviceName() : 'Cast to TV or Speakers'">
+          <svg lucideCast [attr.size]="18"></svg>
+        </button>
         <button class="ctrl-btn secondary" (click)="copyShareLink()" title="Share Link">
           <svg lucideShare2 [attr.size]="18"></svg>
         </button>
@@ -227,38 +227,6 @@ import { SyncService } from '../../services/sync.service';
           <button class="dropdown-item" (click)="copyShareLink(); toggleOptions()">
             <svg lucideShare2 [attr.size]="16"></svg> Share Track
           </button>
-        </div>
-      </div>
-
-      <!-- Devices Drawer Panel -->
-      <div class="devices-drawer" [class.open]="showDevices()" (click)="$event.stopPropagation()">
-        <div class="devices-header">
-          <h3>Connect to a device</h3>
-          <button class="close-devices-btn" (click)="showDevices.set(false)">Close</button>
-        </div>
-        <div class="devices-list">
-          <div
-            class="device-item"
-            *ngFor="let device of syncService.availableDevices()"
-            [class.active]="device.isActive"
-            [class.this-device]="device.deviceId === syncService.deviceId"
-            (click)="device.deviceId === syncService.deviceId ? syncService.requestTakeover() : syncService.transferPlayback(device.deviceId)"
-          >
-            <div class="device-icon">
-              <svg lucideMonitor *ngIf="!device.isMobile" [attr.size]="24"></svg>
-              <!-- fallback for mobile if no LucideSmartphone -->
-              <svg lucideMonitor *ngIf="device.isMobile" [attr.size]="24"></svg> 
-            </div>
-            <div class="device-meta">
-              <span class="device-name">{{ device.deviceName }} <span *ngIf="device.deviceId === syncService.deviceId">(This Device)</span></span>
-              <span class="device-status" *ngIf="device.isActive">Listening Now</span>
-            </div>
-          </div>
-          
-          <div *ngIf="syncService.availableDevices().length === 0" class="no-devices">
-            <p *ngIf="!authService.currentUser()">Log in to sync with other devices.</p>
-            <p *ngIf="authService.currentUser()">Listening on this device only. Open GanaTube on another device to sync.</p>
-          </div>
         </div>
       </div>
 
@@ -487,7 +455,6 @@ export class MusicPlayerComponent implements OnDestroy {
   
   isFullScreen = signal<boolean>(false);
   showQueue = signal<boolean>(false);
-  showDevices = signal<boolean>(false);
   showFSQueue = signal<boolean>(false);
   showToast = signal<boolean>(false);
   showOptionsMenu = signal<boolean>(false);
@@ -499,7 +466,7 @@ export class MusicPlayerComponent implements OnDestroy {
     public algorithmService: AlgorithmService,
     private userService: UserService,
     public authService: AuthService,
-    public syncService: SyncService,
+    public castService: CastService,
     public offlineService: OfflineService,
     private toastService: ToastService,
     public roomService: RoomService
@@ -542,17 +509,9 @@ export class MusicPlayerComponent implements OnDestroy {
     }
   }
 
-  toggleDevices(): void {
-    this.showDevices.set(!this.showDevices());
-    if (this.showDevices()) {
-      this.showQueue.set(false);
-    }
-  }
-
   toggleQueue(): void {
     this.showQueue.set(!this.showQueue());
     if (this.showQueue()) {
-      this.showDevices.set(false);
       this.showOptionsMenu.set(false);
     }
   }
@@ -561,7 +520,6 @@ export class MusicPlayerComponent implements OnDestroy {
     this.showOptionsMenu.set(!this.showOptionsMenu());
     if (this.showOptionsMenu()) {
       this.showQueue.set(false);
-      this.showDevices.set(false);
     }
   }
 

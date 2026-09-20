@@ -919,6 +919,10 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .fullscreen-btn {
+    display: none;
+  }
+
   .fs-container {
     padding: 16px 16px 20px;
     height: 100vh;
@@ -948,7 +952,7 @@
   }
 
   .fs-artwork-container {
-    width: min(100%, calc(100dvh - 170px), 440px);
+    width: min(100%, calc(100dvh - 210px), 440px);
     height: auto;
     max-width: 100%;
     max-height: 100%;
@@ -957,9 +961,9 @@
   }
 
   .fs-bottom-bar {
-    height: 76px;
-    padding: 0 16px;
-    gap: 12px;
+    height: auto;
+    padding: 10px 16px max(12px, env(safe-area-inset-bottom));
+    gap: 10px;
 
     .fs-bar-thumb-wrapper {
       width: 44px;
@@ -974,6 +978,12 @@
         height: 20px;
       }
     }
+  }
+
+  .fs-bar-controls {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 10px;
   }
 }
 
@@ -1079,142 +1089,6 @@
     color: rgba(255,255,255,0.4);
     padding: 60px 20px;
   }
-}
-
-/* Devices Drawer in Full Screen */
-.fs-devices-drawer {
-  position: absolute;
-  top: 70px; /* Below header */
-  right: 24px;
-  width: 320px;
-  max-height: calc(100vh - 120px);
-  background: rgba(15, 15, 25, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(139, 92, 246, 0.15);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 1000;
-  
-  // Transitions
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(20px);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  &.open {
-    opacity: 1;
-    pointer-events: all;
-    transform: translateY(0);
-  }
-
-  @media (max-width: 768px) {
-    top: auto;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100%;
-    border-radius: 24px 24px 0 0;
-  }
-}
-
-.devices-header {
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-
-  h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 0;
-  }
-}
-
-.close-devices-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.4);
-  font-family: var(--primary-font);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.2s;
-
-  &:hover {
-    color: #fff;
-  }
-}
-
-.devices-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-}
-
-.device-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  gap: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  &.active {
-    background: rgba(139, 92, 246, 0.15);
-    border-left: 3px solid #a855f7;
-    
-    .device-icon svg { color: #a855f7; }
-    .device-name { color: #fff; font-weight: 600; }
-  }
-  
-  &.this-device { cursor: default; }
-}
-
-.device-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #a0a0a0;
-}
-
-.device-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.device-name {
-  font-size: 0.95rem;
-  color: #e5e7eb;
-}
-
-.device-status {
-  font-size: 0.75rem;
-  color: #10b981; // Green for active
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.no-devices {
-  padding: 32px 16px;
-  text-align: center;
-  color: #a0a0a0;
-  font-size: 0.9rem;
 }
 
 // Desktop Layout Modifiers

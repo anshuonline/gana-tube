@@ -19,9 +19,6 @@ const io = new Server(server, {
 });
 const PORT = process.env.PORT || 3000;
 
-
-const userDevices = new Map(); // email -> [{socketId, deviceId, deviceName, isMobile, isActive}]
-
 const { setupRoomHandlers, handleRoomDisconnect, initBotRooms, getRoomAnalytics, createDiscordRoom, deleteDiscordRoom } = require('./room.js');
 
 app.use(express.json());
@@ -58,54 +55,6 @@ io.on('connection', (socket) => {
 
     // --- Listening Rooms cleanup ---
     handleRoomDisconnect(io, socket.id);
-
-    // --- Device Sync cleanup ---
-    for (const [email, devices] of userDevices.entries()) {
-      const idx = devices.findIndex(d => d.socketId === socket.id);
-      if (idx !== -1) {
-        devices.splice(idx, 1);
-        if (devices.length === 0) {
-          userDevices.delete(email);
-        } else {
-          io.to(`user_sync_${email}`).emit('available_devices', devices);
-        }
-      }
-    }
-  });
-
-  // --- Device Sync (Spotify Connect Style) ---
-  socket.on('join_device_sync', ({ email, deviceId, deviceName, isMobile }) => {
-    if (!email) return;
-    const room = `user_sync_${email}`;
-    socket.join(room);
-    
-    if (!userDevices.has(email)) {
-      userDevices.set(email, []);
-    }
-    
-    const devices = userDevices.get(email);
-    // Remove existing with same deviceId to prevent duplicates
-    const existingIdx = devices.findIndex(d => d.deviceId === deviceId);
-    if (existingIdx !== -1) devices.splice(existingIdx, 1);
-    
-    devices.push({ socketId: socket.id, deviceId, deviceName, isMobile, isActive: false });
-    
-    io.to(room).emit('available_devices', devices);
-  });
-  
-  socket.on('device_state_update', ({ email, deviceId, state }) => {
-    if (!email) return;
-    socket.to(`user_sync_${email}`).emit('remote_state_update', { deviceId, state });
-  });
-
-  socket.on('takeover_device', ({ email, fromDeviceId, toDeviceId }) => {
-    if (!email) return;
-    const devices = userDevices.get(email);
-    if (devices) {
-      devices.forEach(d => d.isActive = (d.deviceId === toDeviceId));
-      io.to(`user_sync_${email}`).emit('available_devices', devices);
-    }
-    socket.to(`user_sync_${email}`).emit('takeover_requested', { fromDeviceId, toDeviceId });
   });
 
   // --- Listening Rooms Events ---

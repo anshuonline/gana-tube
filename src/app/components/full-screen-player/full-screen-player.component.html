@@ -401,11 +401,11 @@
         </button>
 
         <button 
-          class="fs-bar-btn secondary" 
-          [class.active]="showDevices()" 
-          (click)="toggleDevices()" 
-          title="Connect to a device">
-          <svg lucideMonitor [attr.size]="18"></svg>
+          class="fs-bar-btn secondary cast-btn" 
+          [class.active]="castService.isCasting()" 
+          (click)="castService.requestCastSession()" 
+          [title]="castService.isCasting() ? 'Casting to ' + castService.connectedDeviceName() : 'Cast to TV or Speakers'">
+          <svg lucideCast [attr.size]="18"></svg>
         </button>
 
         <div class="fs-bar-volume-group">
@@ -451,36 +451,6 @@
     (openPlaylist)="openPlaylist.emit($event)">
   </app-track-menu>
 
-  <!-- Devices Drawer Panel -->
-  <div class="fs-devices-drawer" [class.open]="showDevices()">
-    <div class="devices-header">
-      <h3>Connect to a device</h3>
-      <button class="close-devices-btn" (click)="showDevices.set(false)">Close</button>
-    </div>
-    <div class="devices-list">
-      <div
-        class="device-item"
-        *ngFor="let device of syncService.availableDevices()"
-        [class.active]="device.isActive"
-        [class.this-device]="device.deviceId === syncService.deviceId"
-        (click)="device.deviceId === syncService.deviceId ? syncService.requestTakeover() : syncService.transferPlayback(device.deviceId)"
-      >
-        <div class="device-icon">
-          <svg lucideMonitor *ngIf="!device.isMobile" [attr.size]="24"></svg>
-          <svg lucideMonitor *ngIf="device.isMobile" [attr.size]="24"></svg> 
-        </div>
-        <div class="device-meta">
-          <span class="device-name">{{ device.deviceName }} <span *ngIf="device.deviceId === syncService.deviceId">(This Device)</span></span>
-          <span class="device-status" *ngIf="device.isActive">Listening Now</span>
-        </div>
-      </div>
-      
-      <div *ngIf="syncService.availableDevices().length === 0" class="no-devices">
-        <p *ngIf="!authService.currentUser()">Log in to sync with other devices.</p>
-        <p *ngIf="authService.currentUser()">Listening on this device only. Open GanaTube on another device to sync.</p>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast Notification -->
   <div class="toast-notification" [class.show]="showToast">

@@ -17,7 +17,7 @@ import {
   LucideRepeat,
   LucideRepeat1,
   LucideGripVertical,
-  LucideMonitor,
+  LucideCast,
   LucideListMusic,
   LucideRadio,
   LucideMaximize2,
@@ -39,7 +39,7 @@ import { AnalyticsService } from '../../services/analytics.service';
 import { FormsModule } from '@angular/forms';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { SyncService } from '../../services/sync.service';
+import { CastService } from '../../services/cast.service';
 import { RoomService } from '../../services/room.service';
 
 @Component({
@@ -62,7 +62,7 @@ import { RoomService } from '../../services/room.service';
     LucideRepeat,
     LucideRepeat1,
     LucideGripVertical,
-    LucideMonitor,
+    LucideCast,
     LucideListMusic,
     LucideRadio,
     LucideMaximize2,
@@ -93,7 +93,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   public authService = inject(AuthService);
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
-  public syncService = inject(SyncService);
+  public castService = inject(CastService);
   private toastService = inject(ToastService);
   private router = inject(Router);
   public roomService = inject(RoomService);
@@ -133,7 +133,6 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   isSidebarVisible = true;
   showMenu = false;
   menuTrack: Track | null = null;
-  showDevices = signal<boolean>(false);
   menuX = 0;
   menuY = 0;
   lyrics: string | null = null; // Plain text fallback
@@ -506,10 +505,6 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
       }
     }
     this.showMenu = true;
-  }
-  
-  toggleDevices(): void {
-    this.showDevices.set(!this.showDevices());
   }
 
   onRightClick(event: MouseEvent): void {

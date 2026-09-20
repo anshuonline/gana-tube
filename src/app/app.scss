@@ -1436,6 +1436,10 @@
   animation: fadeIn 0.3s ease-in;
   margin-bottom: 24px;
 
+  &.lazy-skeleton {
+    margin-top: 12px;
+  }
+
   .skeleton-shelf {
     margin-bottom: 32px;
   }
@@ -1444,15 +1448,15 @@
     width: 200px;
     height: 26px;
     border-radius: 8px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.04) 75%);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 25%, rgba(255, 255, 255, 0.22) 50%, rgba(255, 255, 255, 0.08) 75%);
     background-size: 200% 100%;
-    animation: skeletonShimmer 1.8s infinite linear;
+    animation: skeletonShimmer 1.5s infinite linear;
     margin-bottom: 12px;
   }
 
   .skeleton-song-card {
-    background: rgba(18, 18, 24, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #14141c !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     cursor: default !important;
     pointer-events: none;
 
@@ -1463,14 +1467,14 @@
     .skeleton-thumbnail {
       position: absolute;
       inset: 0;
-      background: rgba(255, 255, 255, 0.02);
+      background: #181824;
 
       .skeleton-shimmer-sweep {
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.06) 50%, transparent 100%);
+        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.16) 50%, transparent 100%);
         background-size: 200% 100%;
-        animation: skeletonShimmer 1.8s infinite linear;
+        animation: skeletonShimmer 1.5s infinite linear;
       }
     }
 
@@ -1484,24 +1488,23 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
 
       .skeleton-line {
         height: 12px;
         border-radius: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        background-size: 200% 100%;
-        animation: skeletonShimmer 1.8s infinite linear;
+        background: rgba(255, 255, 255, 0.18);
 
         &.short {
           width: 45%;
-          height: 9px;
-          background: rgba(255, 255, 255, 0.06);
+          height: 10px;
+          background: rgba(255, 255, 255, 0.12);
         }
 
         &.title {
           width: 80%;
-          height: 13px;
+          height: 14px;
+          background: rgba(255, 255, 255, 0.24);
         }
       }
     }
@@ -1510,6 +1513,13 @@
     &:nth-child(3n) .skeleton-shimmer-sweep { animation-delay: 0.3s; }
     &:nth-child(4n) .skeleton-shimmer-sweep { animation-delay: 0.45s; }
   }
+}
+
+.home-scroll-sentinel {
+  width: 100%;
+  height: 20px;
+  pointer-events: none;
+  opacity: 0;
 }
 
 @keyframes skeletonShimmer {

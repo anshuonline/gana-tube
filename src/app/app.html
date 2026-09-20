@@ -558,7 +558,7 @@
         <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !isSearchMode()">
 
           <!-- Initial Shelves Skeleton Loader (Shown before sections load) -->
-          <div class="home-shelves-skeleton" *ngIf="loadedShelves().length === 0">
+          <div class="home-shelves-skeleton initial-skeleton" *ngIf="shelvesLoading() || loadedShelves().length === 0">
             <div class="shelf-section skeleton-shelf" *ngFor="let s of [1, 2, 3]">
               <div class="shelf-header">
                 <div class="skeleton-title-bar"></div>
@@ -728,14 +728,27 @@
           </div>
 
           <!-- Shimmering Skeleton for Next Lazy Loaded Shelf -->
-          <div class="shelf-section loading-shelf" *ngIf="shelfLoading() && loadedShelves().length > 0">
-            <div class="shelf-header">
-              <h2 class="shelf-title" style="opacity: 0.5;">Loading: {{ loadingShelfTitle() }}...</h2>
-            </div>
-            <div class="shelf-grid" style="overflow-x: hidden; display: flex; flex-direction: row; gap: 20px;">
-              <div class="song-card skeleton-card" *ngFor="let dummy of [1,2,3,4,5,6]" style="flex: 0 0 240px !important; width: 240px !important; height: 360px; border-radius: 16px; background: rgba(255, 255, 255, 0.03); opacity: 0.4; border: 1px solid rgba(255, 255, 255, 0.05);"></div>
+          <div class="home-shelves-skeleton lazy-skeleton" *ngIf="shelfLoading() && loadedShelves().length > 0">
+            <div class="shelf-section skeleton-shelf">
+              <div class="shelf-header">
+                <div class="skeleton-title-bar" style="width: 240px;"></div>
+              </div>
+              <div class="shelf-grid">
+                <div class="song-card skeleton-song-card" *ngFor="let sc of [1, 2, 3, 4, 5, 6]">
+                  <div class="skeleton-thumbnail">
+                    <div class="skeleton-shimmer-sweep"></div>
+                  </div>
+                  <div class="skeleton-info">
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-line title"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- Sentinel for Instant Infinite Scroll -->
+          <div #homeScrollSentinel class="home-scroll-sentinel" *ngIf="loadedShelves().length < allShelfDefinitions.length"></div>
 
         </div>
 
@@ -794,7 +807,7 @@
     </app-playlist-page>
 
     <!-- Modern Footer -->
-    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts'">
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts' && (currentPage() !== 'home' || isHomeFullyLoaded())">
       <div class="footer-giant-brand">ganatube.in</div>
       <div class="footer-content">
         <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
@@ -834,7 +847,7 @@
     </footer>
 
     <!-- SEO & Discovery Showcase Card (Why GanaTube) - ONLY ON HOME PAGE (BELOW FOOTER) -->
-    <div class="footer-seo-container" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode()">
+    <div class="footer-seo-container" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode() && isHomeFullyLoaded()">
       <section class="footer-seo-card">
         <!-- Top Badge & Title -->
         <div class="seo-card-header">

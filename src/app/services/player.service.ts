@@ -7,7 +7,6 @@ import { YoutubeApiService } from './youtube-api.service';
 import { RoomService } from './room.service';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
-import { SyncService, SyncState } from './sync.service';
 import { ToastService } from './toast.service';
 import { SpinService } from './spin.service';
 import { AnalyticsService } from './analytics.service';
@@ -28,7 +27,6 @@ export class PlayerService {
   private userService = inject(UserService);
   private analyticsService = inject(AnalyticsService);
   private authService = inject(AuthService);
-  public syncService = inject(SyncService);
   private spinService = inject(SpinService);
   public offlineService = inject(OfflineService);
   private trackStartTime: number = 0;
@@ -36,9 +34,6 @@ export class PlayerService {
   private isRemoteUpdate = false;
   private location = inject(Location);
   private ngZone = inject(NgZone);
-
-  // When true, this instance of the player is just a remote control for another device
-  public isRemoteControl = signal<boolean>(false);
 
   // Video mode — shows the active player's video in a floating window (rooms, admin only)
   public isVideoMode = signal<boolean>(false);
@@ -49,7 +44,6 @@ export class PlayerService {
 
   constructor() {
     this.setupSocketListeners();
-    this.setupDeviceSyncListeners();
     this.setupNetworkWatcher();
 
     // Listen Together Sync Worker
@@ -103,53 +97,6 @@ export class PlayerService {
     }
     this.effectiveQuality.set(q);
   }
-
-  private setupDeviceSyncListeners() {
-    this.syncService.onRemoteStateReceived = (state: SyncState) => {
-      // If we are acting as a remote control, update our UI state to match
-      if (this.isRemoteControl()) {
-        this.isRemoteUpdate = true;
-        this.playerState.set(state.isPlaying ? 'playing' : 'paused');
-        this.currentTime.set(state.currentTime);
-        if (state.queue && state.currentIndex !== undefined) {
-          this.queue.set(state.queue);
-          this.currentIndex.set(state.currentIndex);
-        }
-        
-        // Pause local ytPlayer to ensure no audio plays
-        if (this.ytPlayer && this.ytPlayer.getPlayerState() === 1) { // 1 = playing
-           this.ytPlayer.pauseVideo();
-        }
-        
-        this.isRemoteUpdate = false;
-      }
-    };
-
-    this.syncService.onTakeoverRequested = (deviceId: string) => {
-      // Someone else took over, we become a remote control
-      if (this.syncService.deviceId !== deviceId) {
-        this.isRemoteControl.set(true);
-        if (this.ytPlayer) {
-          this.ytPlayer.pauseVideo();
-        }
-        this.playerState.set('paused');
-      }
-    };
-  }
-
-  // Helper to broadcast state to SyncService
-  public broadcastToSync(forceRemote: boolean = false) {
-    if (this.isRemoteUpdate || this.isRemoteControl()) return;
-    
-    this.syncService.broadcastState({
-      isPlaying: this.playerState() === 'playing',
-      currentTime: this.currentTime(),
-      currentTrackId: this.currentTrack()?.videoId,
-      queue: this.queue(),
-      currentIndex: this.currentIndex()
-    }, forceRemote);
-  }
-
 
   // Signals for state management
   queue = signal<Track[]>([]);
@@ -532,7 +479,6 @@ export class PlayerService {
   }
   
   private broadcastPlaybackSync(isPlaying: boolean) {
-    this.broadcastToSync(true); // Broadcast for personal device sync
     if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
       if (isPlaying) {
         this.roomService.adminResume(this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0);
@@ -646,7 +592,6 @@ export class PlayerService {
     this.seekTargetTime = seconds;
     this.seekTargetSetAt = Date.now();
     this.currentTime.set(seconds);
-    this.broadcastToSync(true);
     
     if (this.isPlayingOffline() && this.htmlAudio) {
       this.htmlAudio.currentTime = seconds;
@@ -1048,7 +993,7 @@ export class PlayerService {
         const deltaSeconds = (now - this.lastTickTime) / 1000;
         this.lastTickTime = now;
 
-        if (this.ytPlayer && !this.isRemoteControl()) {
+        if (this.ytPlayer) {
           this.ngZone.run(() => {
             try {
               const cTime = typeof this.ytPlayer.getCurrentTime === 'function' ? this.ytPlayer.getCurrentTime() || 0 : 0;
@@ -1078,7 +1023,6 @@ export class PlayerService {
           try {
             const cTime = typeof this.ytPlayer.getCurrentTime === 'function' ? this.ytPlayer.getCurrentTime() || 0 : 0;
             const dur = typeof this.ytPlayer.getDuration === 'function' ? this.ytPlayer.getDuration() || 0 : 0;
-            this.broadcastToSync(); // Send to sync service (will be throttled)
           
           // Fake crossfade logic (fade in/out volume)
           if (this.isCrossfadeEnabled() && dur > this.crossfadeDuration() * 2 && typeof this.ytPlayer.setVolume === 'function') {
@@ -1114,11 +1058,6 @@ export class PlayerService {
         } catch (e) {
           console.error('Error in progress tracking interval', e);
         }
-      } else if (this.isRemoteControl() && this.playerState() === 'playing') {
-        // Increment locally by delta if acting as remote, to keep UI moving
-        this.ngZone.run(() => {
-          this.currentTime.update(t => t + deltaSeconds);
-        });
       }
     }, 500);
   });

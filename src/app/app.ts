@@ -322,6 +322,39 @@ export class App implements OnInit {
   loadingShelfTitle = signal<string>('');
 
   currentPage = signal<string>('home');
+
+  isHomeFullyLoaded(): boolean {
+    if (this.currentPage() !== 'home') return true;
+    if (this.hasSearched() || this.isSearchMode()) return true;
+    if (this.shelvesLoading() || this.shelfLoading()) return false;
+    if (this.allShelfDefinitions.length === 0) return false;
+    return this.loadedShelves().length >= this.allShelfDefinitions.length;
+  }
+
+  private sentinelObserver?: IntersectionObserver;
+
+  @ViewChild('homeScrollSentinel') set sentinelRef(el: ElementRef<HTMLDivElement> | undefined) {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    if (el && el.nativeElement) {
+      if (!this.sentinelObserver) {
+        this.sentinelObserver = new IntersectionObserver((entries) => {
+          const entry = entries[0];
+          if (entry && entry.isIntersecting) {
+            if (this.currentPage() === 'home' && !this.hasSearched() && !this.isSearchMode()) {
+              if (!this.shelfLoading() && !this.shelvesLoading() && this.loadedShelves().length < this.allShelfDefinitions.length) {
+                this.loadNextShelf(this.homeScreenLanguage());
+              }
+            }
+          }
+        }, {
+          root: null,
+          rootMargin: '1000px 0px',
+          threshold: 0
+        });
+      }
+      this.sentinelObserver.observe(el.nativeElement);
+    }
+  }
   activeSocialTab = signal<'chat' | 'rooms'>('chat');
   linkCopied = false;
   pageContent = PAGE_CONTENT;
@@ -1764,7 +1797,7 @@ export class App implements OnInit {
           ...customShelves
         ];
         
-        const initialDefinitions = this.allShelfDefinitions.slice(0, 5);
+        const initialDefinitions = this.allShelfDefinitions.slice(0, 7);
         let loadedCount = 0;
 
         if (initialDefinitions.length === 0) {
@@ -1881,8 +1914,8 @@ export class App implements OnInit {
       return;
     }
 
-    // Load 2 shelves at a time for smoother lazy loading
-    const batchSize = 2;
+    // Load 3 shelves at a time for smoother lazy loading
+    const batchSize = 3;
     const nextDefs = pendingDefs.slice(0, batchSize);
     
     this.loadingShelfTitle.set(nextDefs[0].title + (nextDefs.length > 1 ? ' & more...' : ''));
@@ -2357,8 +2390,8 @@ export class App implements OnInit {
     const pos = scrollOffset + window.innerHeight;
     const max = document.documentElement.scrollHeight;
     
-    // True infinite scroll: trigger much earlier (1500px before bottom)
-    if (pos >= max - 1500) {
+    // True infinite scroll: trigger much earlier (2500px before bottom)
+    if (pos >= max - 2500) {
       if (this.hasSearched()) {
         this.loadMoreResults();
       } else if (this.currentPage() === 'home' && this.loadedShelves().length < this.allShelfDefinitions.length) {
@@ -2815,6 +2848,7 @@ export class App implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.sentinelObserver?.disconnect();
     if (this.carouselInterval) {
       clearInterval(this.carouselInterval);
     }
