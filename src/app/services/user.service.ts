@@ -97,9 +97,13 @@ export class UserService {
     }
   }
 
-  async loadProfile(email: string): Promise<UserProfileData | null> {
+  async loadProfile(email: string, displayName?: string): Promise<UserProfileData | null> {
     try {
-      const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}?action=getProfile&email=${encodeURIComponent(email)}`));
+      let url = `${this.apiUrl}?action=getProfile&email=${encodeURIComponent(email)}`;
+      if (displayName) {
+        url += `&name=${encodeURIComponent(displayName)}`;
+      }
+      const response: any = await firstValueFrom(this.http.get(url));
       
       if (response.status === 'success') {
         this.isProfileLoaded = true;
@@ -127,6 +131,19 @@ export class UserService {
     } catch (error) {
       console.error('Failed to load user profile from DB', error);
       return null;
+    }
+  }
+
+  async sendWelcomeEmail(email: string, displayName?: string): Promise<boolean> {
+    try {
+      const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}?action=sendWelcomeEmail`, {
+        email,
+        name: displayName || ''
+      }));
+      return response.status === 'success';
+    } catch (e) {
+      console.error('Failed to send welcome email', e);
+      return false;
     }
   }
 

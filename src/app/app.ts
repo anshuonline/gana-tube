@@ -989,7 +989,7 @@ export class App implements OnInit {
     effect(() => {
       const user = this.authService.currentUser();
       if (user && user.email) {
-        this.userService.loadProfile(user.email).then(profile => {
+        this.userService.loadProfile(user.email, user.displayName || '').then(profile => {
           if (profile) {
             this.userService.loadPlaylists(user.email as string);
             if (profile.preferred_languages && profile.preferred_languages.length > 0) {
