@@ -610,12 +610,51 @@ app.get('/api/artist', async (req, res) => {
     (artist.topSongs || []).forEach(pushSong);
     (artistSongs || []).forEach(pushSong);
 
+    // If artist has fewer than 50 songs, do additional searches to get more
+    if (songs.length < 50 && artist.name) {
+      const searchQueries = [
+        `${artist.name} songs`,
+        `${artist.name} hits`,
+        `${artist.name} top songs`,
+        `${artist.name} new songs`,
+        `${artist.name} popular songs`,
+        `${artist.name} best songs`
+      ];
+
+      try {
+        const searchResults = await Promise.all(
+          searchQueries.map(q => yt.searchSongs(q).catch(() => []))
+        );
+
+        for (const results of searchResults) {
+          if (Array.isArray(results)) {
+            for (const item of results) {
+              // Only add songs by this artist (check channelTitle or artist name)
+              const itemArtist = (item.artist && item.artist.name) || item.channelTitle || '';
+              if (itemArtist.toLowerCase().includes(artist.name.toLowerCase()) ||
+                  item.title.toLowerCase().includes(artist.name.toLowerCase())) {
+                pushSong({
+                  videoId: item.videoId,
+                  name: item.name || item.title,
+                  artist: { name: itemArtist || artist.name },
+                  thumbnails: item.thumbnails || item.thumbs || [],
+                  duration: item.duration
+                });
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Additional artist search error:', e.message);
+      }
+    }
+
     const thumbs = artist.thumbnails || artist.thumbs || [];
     const payload = {
       name: artist.name,
       artistId: id,
       thumb: toHDUrl(thumbs[thumbs.length - 1]?.url || thumbs[0]?.url || ''),
-      songs: songs.slice(0, 60)
+      songs: songs.slice(0, 150)
     };
 
     artistCache.set(cacheKey, { ts: Date.now(), data: payload });
