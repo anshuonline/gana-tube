@@ -15,161 +15,77 @@
   }
 }
 
-// ---- Corner & Edge Animated Frame ("bich bich mei square animation border animation ke sath") ----
+// ---- High-Energy Neon Edge Border Animation (Dark Purple & Hot Pink) ----
 .fs-edge-frame {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 50;
   overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(126, 34, 206, 0.4), inset 0 0 45px rgba(236, 72, 153, 0.25);
+  animation: edgeAuraPulse 3.5s ease-in-out infinite alternate;
   transform: translateZ(0);
 }
 
-// Perimeter Border Beam
-.fs-edge-beam {
+.fs-edge-laser-svg {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  display: block;
 
-  // Masked border line (2px purple-pink gradient border)
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 2px;
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 30%, #8b5cf6 60%, #ec4899 100%);
-    background-size: 300% 300%;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    animation: edgeBorderCycle 7.5s ease-in-out infinite;
-    will-change: opacity, background-position;
+  .laser-base-track {
+    stroke: rgba(147, 51, 234, 0.28);
+    stroke-width: 2px;
   }
 
-  // Soft ambient edge glow
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.3), inset 0 0 32px rgba(236, 72, 153, 0.15);
-    opacity: 0;
-    animation: edgeGlowCycle 7.5s ease-in-out infinite;
-    will-change: opacity;
+  .laser-beam {
+    stroke-width: 3.5px;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.95)) drop-shadow(0 0 14px rgba(147, 51, 234, 0.85));
+    will-change: stroke-dashoffset;
+
+    &.beam-primary {
+      stroke: url(#edgeLaserGrad1);
+      stroke-dasharray: 25 75;
+      animation: laserTravelPrimary 5s linear infinite;
+    }
+
+    &.beam-secondary {
+      stroke: url(#edgeLaserGrad2);
+      stroke-dasharray: 22 78;
+      animation: laserTravelSecondary 5s linear infinite;
+    }
   }
 }
 
-// 4 Corner Squares / Brackets ("full corner mei ekdam corner border pe")
-.fs-corner-square {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  pointer-events: none;
-  opacity: 0;
-  animation: cornerSquareCycle 7.5s ease-in-out infinite;
-  will-change: opacity, transform;
-
-  @media (max-width: 768px) {
-    width: 15px;
-    height: 15px;
+@keyframes laserTravelPrimary {
+  0% {
+    stroke-dashoffset: 0;
   }
-
-  &.corner-tl {
-    top: 0;
-    left: 0;
-    border-top: 3px solid #a855f7;
-    border-left: 3px solid #a855f7;
-    box-shadow: -2px -2px 12px rgba(168, 85, 247, 0.7);
-  }
-
-  &.corner-tr {
-    top: 0;
-    right: 0;
-    border-top: 3px solid #ec4899;
-    border-right: 3px solid #ec4899;
-    box-shadow: 2px -2px 12px rgba(236, 72, 153, 0.7);
-  }
-
-  &.corner-bl {
-    bottom: 0;
-    left: 0;
-    border-bottom: 3px solid #ec4899;
-    border-left: 3px solid #ec4899;
-    box-shadow: -2px 2px 12px rgba(236, 72, 153, 0.7);
-  }
-
-  &.corner-br {
-    bottom: 0;
-    right: 0;
-    border-bottom: 3px solid #a855f7;
-    border-right: 3px solid #a855f7;
-    box-shadow: 2px 2px 12px rgba(168, 85, 247, 0.7);
+  100% {
+    stroke-dashoffset: -100;
   }
 }
 
-// Periodic Animation Keyframes ("bich bich mei aayega")
-// 7.5s cycle:
-// 0% - 18%: Dormant (idle rest)
-// 18% - 35%: Graceful surge and border beam sweep
-// 35% - 60%: Vivid peak glow, illuminated corner squares
-// 60% - 78%: Smooth fade-out
-// 78% - 100%: Rest phase
-@keyframes edgeBorderCycle {
-  0%, 16% {
-    opacity: 0;
-    background-position: 0% 0%;
+@keyframes laserTravelSecondary {
+  0% {
+    stroke-dashoffset: 50;
   }
-  28% {
-    opacity: 0.85;
-    background-position: 50% 50%;
+  100% {
+    stroke-dashoffset: -50;
   }
-  42% {
+}
+
+@keyframes edgeAuraPulse {
+  0% {
+    opacity: 0.6;
+    box-shadow: inset 0 0 15px rgba(126, 34, 206, 0.3), inset 0 0 32px rgba(236, 72, 153, 0.18);
+  }
+  100% {
     opacity: 1;
-    background-position: 100% 100%;
-  }
-  62% {
-    opacity: 0.75;
-    background-position: 150% 150%;
-  }
-  78%, 100% {
-    opacity: 0;
-    background-position: 200% 200%;
-  }
-}
-
-@keyframes edgeGlowCycle {
-  0%, 18% {
-    opacity: 0;
-  }
-  38%, 56% {
-    opacity: 0.9;
-  }
-  74%, 100% {
-    opacity: 0;
-  }
-}
-
-@keyframes cornerSquareCycle {
-  0%, 16% {
-    opacity: 0;
-    transform: scale(0.85);
-  }
-  30% {
-    opacity: 0.9;
-    transform: scale(1.06);
-  }
-  42% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  62% {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-  76%, 100% {
-    opacity: 0;
-    transform: scale(0.9);
+    box-shadow: inset 0 0 28px rgba(126, 34, 206, 0.6), inset 0 0 55px rgba(236, 72, 153, 0.38);
   }
 }
 
@@ -1465,18 +1381,6 @@
     &::before {
       opacity: 1;
     }
-  }
-
-  .search-leading-icon {
-    color: rgba(255, 255, 255, 0.6);
-    margin-right: 10px;
-    flex-shrink: 0;
-    transition: color 0.25s ease;
-  }
-
-  &:hover .search-leading-icon,
-  &:focus-within .search-leading-icon {
-    color: #fff;
   }
 
   input {

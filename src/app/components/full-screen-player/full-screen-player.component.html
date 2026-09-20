@@ -1,12 +1,46 @@
 <div class="fs-player-overlay" [class.visible]="isVisible">
 
-  <!-- Ambient Edge Border & Corner Square Pulse Animation -->
+  <!-- Ambient Neon Edge Lighting Border -->
   <div class="fs-edge-frame" aria-hidden="true">
-    <div class="fs-edge-beam"></div>
-    <div class="fs-corner-square corner-tl"></div>
-    <div class="fs-corner-square corner-tr"></div>
-    <div class="fs-corner-square corner-bl"></div>
-    <div class="fs-corner-square corner-br"></div>
+    <svg class="fs-edge-laser-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="edgeLaserGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#581c87"/>
+          <stop offset="35%" stop-color="#9333ea"/>
+          <stop offset="70%" stop-color="#ec4899"/>
+          <stop offset="100%" stop-color="#ff2a85"/>
+        </linearGradient>
+        <linearGradient id="edgeLaserGrad2" x1="100%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#ec4899"/>
+          <stop offset="35%" stop-color="#ff2a85"/>
+          <stop offset="70%" stop-color="#9333ea"/>
+          <stop offset="100%" stop-color="#581c87"/>
+        </linearGradient>
+      </defs>
+      <!-- Base Dark Purple Track -->
+      <rect 
+        class="laser-base-track" 
+        x="0.2" y="0.2" width="99.6" height="99.6" 
+        fill="none" 
+        vector-effect="non-scaling-stroke"
+      />
+      <!-- Primary Flowing Neon Beam -->
+      <rect 
+        class="laser-beam beam-primary" 
+        x="0.2" y="0.2" width="99.6" height="99.6" 
+        pathLength="100" 
+        fill="none" 
+        vector-effect="non-scaling-stroke"
+      />
+      <!-- Secondary Chasing Beam -->
+      <rect 
+        class="laser-beam beam-secondary" 
+        x="0.2" y="0.2" width="99.6" height="99.6" 
+        pathLength="100" 
+        fill="none" 
+        vector-effect="non-scaling-stroke"
+      />
+    </svg>
   </div>
   
   <!-- Shared SVG gradient defs (purple-pink brand gradient for hearts) -->
@@ -34,7 +68,6 @@
       <!-- Search Bar (Desktop Only) -->
       <div class="fs-header-search" *ngIf="isDesktop">
         <div class="search-input-wrapper">
-          <svg lucideSearch [attr.size]="18" class="search-leading-icon"></svg>
           <input 
             type="text" 
             placeholder="Search for songs, artists, or podcasts..." 
@@ -70,7 +103,7 @@
           <svg *ngIf="!isBrowserFullscreen" lucideMaximize2 [attr.size]="22"></svg>
           <svg *ngIf="isBrowserFullscreen" lucideMinimize2 [attr.size]="22"></svg>
         </button>
-        <button class="icon-btn" (click)="isDesktop ? toggleMenu($event) : showMobileOptions.set(true)" title="More Options">
+        <button class="icon-btn" (click)="toggleMenu($event)" title="More Options">
           <svg lucideMoreHorizontal [attr.size]="22"></svg>
         </button>
       </div>

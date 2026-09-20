@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy, Input, ElementRef, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, OnDestroy, Input, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -117,6 +117,24 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   clearHistory(): void {
     this.searchHistory.clear();
     this.showHistory = false;
+    this.isSelectingSuggestion = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    const clickedInsideWrapper = !!target.closest('.search-wrapper');
+    const clickedOnSuggestion = !!(target.closest('.suggestion-item') || target.closest('.history-clear-btn') || target.closest('.history-remove-btn'));
+
+    if (!clickedOnSuggestion) {
+      this.isSelectingSuggestion = false;
+    }
+
+    if (!clickedInsideWrapper) {
+      this.isFocused = false;
+      this.showSuggestions = false;
+      this.showHistory = false;
+    }
   }
 
   private initSpeechRecognition() {
