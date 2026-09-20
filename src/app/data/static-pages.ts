@@ -271,24 +271,34 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>3. Data Sharing and Disclosure</h3>
         <p><strong>We do not sell, rent, or trade your personal information to third parties.</strong> We only share information in the following limited circumstances:</p>
         <ul class="feature-list">
+          <li><strong>Advertising Partners (Google AdSense):</strong> We partner with Google AdSense to display visual advertisements. Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to our website or other websites. You may opt out of personalized advertising at any time by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Ads Settings</a>.</li>
           <li><strong>Service Providers:</strong> We may employ third-party companies (e.g., cloud hosting providers, analytics services) to facilitate our Service. These third parties have access to your Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</li>
-          <li><strong>API Partners:</strong> Because GanaTube utilizes third-party APIs (like the YouTube API) to source content, your device necessarily communicates directly with these third-party servers to request the audio streams. Consequently, these providers may collect your IP address and device information in accordance with their own Privacy Policies (e.g., the Google Privacy Policy).</li>
+          <li><strong>API Partners (YouTube API Services):</strong> GanaTube utilizes official YouTube API Services to power its search and streaming experience. By using our Service, you acknowledge and agree that your data is accessed and processed in accordance with the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Privacy Policy</a> and the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">YouTube Terms of Service</a>.</li>
           <li><strong>Legal Requirements:</strong> We may disclose your information if required to do so by law or in response to valid requests by public authorities (e.g., a court or a government agency).</li>
         </ul>
 
-        <h3>4. Data Security</h3>
+        <h3>4. Your Data Protection Rights (GDPR / CCPA)</h3>
+        <p>We respect your right to control your personal data. Depending on your jurisdiction, you may have the right to:</p>
+        <ul class="feature-list">
+          <li><strong>Access & Portability:</strong> Request a copy of the personal information we hold about you.</li>
+          <li><strong>Rectification & Deletion:</strong> Request that we correct inaccuracies or completely delete your account data and saved playlists.</li>
+          <li><strong>Opt-Out of Personalized Ads:</strong> Manage your ad preferences via <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Ads Settings</a>.</li>
+        </ul>
+        <p>To exercise any of these rights, please email us directly at <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a>.</p>
+
+        <h3>5. Data Security</h3>
         <p>We prioritize the security of your data. GanaTube enforces HTTPS encryption for all data transmitted between your device and our servers. However, please remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
 
-        <h3>5. Third-Party Links and Content</h3>
+        <h3>6. Third-Party Links and Content</h3>
         <p>Our Service may contain links to other sites or serve content hosted by third parties that are not operated by us. If you click on a third-party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</p>
 
-        <h3>6. Children's Privacy</h3>
+        <h3>7. Children's Privacy</h3>
         <p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If you are a parent or guardian and you are aware that your child has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.</p>
 
-        <h3>7. Changes to This Privacy Policy</h3>
+        <h3>8. Changes to This Privacy Policy</h3>
         <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Effective Date" at the top. You are advised to review this Privacy Policy periodically for any changes.</p>
 
-        <h3>8. Contact Us</h3>
+        <h3>9. Contact Us</h3>
         <p>If you have any questions about this Privacy Policy, the data we hold on you, or you would like to exercise one of your data protection rights, please do not hesitate to contact us at: <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a></p>
       </div>
     `
@@ -303,8 +313,9 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <p>Welcome to GanaTube. Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the https://ganatube.in website or the GanaTube Progressive Web Application (the "Service") operated by GanaTube ("us", "we", or "our").</p>
         <p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users, and others who access or use the Service. By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.</p>
 
-        <h3>1. Description of Service</h3>
-        <p>GanaTube is an independent media player and content discovery application. The Service acts as an interface that allows users to search for, organize, and play publicly available audio content sourced from third-party platforms via their official Application Programming Interfaces (APIs). GanaTube does not host, upload, or control any of the audio content accessed through the Service.</p>
+        <h3>1. Description of Service & Third-Party APIs</h3>
+        <p>GanaTube is an independent media player and content discovery application. The Service acts as an interface that allows users to search for, organize, and stream publicly available media content sourced from third-party platforms via their official Application Programming Interfaces (APIs), primarily the official YouTube API Services. GanaTube does not host, upload, or control any of the audio content accessed through the Service.</p>
+        <p><strong>By accessing or using GanaTube, you expressly agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">YouTube Terms of Service</a> and acknowledge the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Privacy Policy</a>.</strong></p>
 
         <h3>2. Acceptable Use</h3>
         <p>You agree not to use the Service in any way that causes, or may cause, damage to the Service or impairment of the availability or accessibility of the Service; or in any way which is unlawful, illegal, fraudulent, or harmful. Specifically, you agree NOT to:</p>
@@ -316,8 +327,8 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         </ul>
 
         <h3>3. Intellectual Property and Third-Party Content</h3>
-        <p>The Service, including its original code, design, interface, and branding (excluding the third-party audio content streamed through it), are and will remain the exclusive property of GanaTube and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of GanaTube.</p>
-        <p>All audio content, album art, and metadata streamed via the Service belong to their respective copyright holders. GanaTube accesses this content through official APIs (e.g., YouTube API) in compliance with their developer terms. GanaTube claims no ownership over this third-party content. If you are a copyright holder and believe your content is being inappropriately accessed, please refer to our DMCA Policy.</p>
+        <p>The Service, including its original code, design, interface, and branding (excluding the third-party audio and video content streamed through it), are and will remain the exclusive property of GanaTube and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of GanaTube.</p>
+        <p>All audio content, video streams, album artwork, and metadata streamed via the Service belong to their respective copyright holders. GanaTube accesses this content through official public APIs in full compliance with third-party developer terms, including the YouTube API Services Developer Policies. GanaTube claims no ownership over this third-party content. If you are a copyright holder and believe your content is being inappropriately accessed, please refer to our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>.</p>
 
         <h3>4. User Accounts</h3>
         <p>While using GanaTube does not require an account, you may opt to log in via Google SSO. When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service. You are responsible for safeguarding the password (managed by Google) that you use to access the Service.</p>
@@ -341,95 +352,85 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
     `
   },
   'cookie-policy': {
-    title: 'Cookie Policy',
+    title: 'Cookie & Storage Policy',
     html: `
       <div class="static-content-block">
-        <h2>Cookie and Local Storage Policy</h2>
-        <p><strong>Effective Date:</strong> September 11, 2026</p>
-        
-        <p>This Cookie and Local Storage Policy explains how GanaTube uses cookies and similar technologies, such as HTML5 Local Storage and IndexedDB, to recognize you when you visit our website at ganatube.in and use our Progressive Web App (PWA). It explains what these technologies are, why we use them, and your rights to control our use of them.</p>
+        <h2>Cookie & Local Storage Policy</h2>
+        <p><strong>Effective Date:</strong> September 20, 2026</p>
+        <p>This Cookie & Local Storage Policy explains how GanaTube ("we", "us", or "our") uses cookies, HTML5 local storage, and related technologies on our website (<a href="https://ganatube.in" style="color: var(--color-primary);">ganatube.in</a>) and our Progressive Web Application (PWA). This policy explains what these technologies are, why we use them, and your options regarding how they are handled.</p>
 
-        <h3>1. What Are Cookies and Local Storage?</h3>
+        <h3>1. What Are Cookies and Storage Technologies?</h3>
         <ul class="feature-list">
-          <li><strong>Cookies:</strong> Small data files placed on your computer or mobile device when you visit a website. They are widely used to make websites work efficiently and provide reporting information.</li>
-          <li><strong>Local Storage (localStorage):</strong> A web storage type that allows websites to store data directly in the browser with no expiration date. The data persists even when the browser window is closed.</li>
-          <li><strong>IndexedDB:</strong> A low-level API for client-side storage of significant amounts of structured data, including files/blobs. This is a much more powerful and higher-capacity storage mechanism than standard cookies.</li>
+          <li><strong>Cookies:</strong> Small text files placed on your browser or device by web servers. They help websites remember your session, preferences, and provide analytical information.</li>
+          <li><strong>Local Storage & IndexedDB:</strong> High-performance client-side storage mechanisms that permit web applications to save offline data, song queues, and user interface preferences locally on your device without transmitting data over the network.</li>
         </ul>
 
-        <h3>2. Why Do We Use These Technologies?</h3>
-        <p>GanaTube is an advanced web application designed to behave like a native mobile app. To achieve this performance without a traditional app install, we rely heavily on modern browser storage technologies rather than traditional tracking cookies. We categorize our storage usage as follows:</p>
-
-        <h4>A. Essential Functionality (Strictly Necessary)</h4>
-        <p>These storage mechanisms are vital for the app to function and cannot be switched off.</p>
+        <h3>2. Categories of Cookies & Storage We Use</h3>
+        
+        <h4>A. Strictly Necessary & Functional Storage</h4>
+        <p>These are essential for the operation of GanaTube and cannot be disabled without breaking the player:</p>
         <ul class="feature-list">
-          <li><strong>Authentication State:</strong> If you use Google Login, we store authentication tokens in your local storage to keep you logged in between sessions.</li>
-          <li><strong>Player State:</strong> We store your current queue, volume level, and repeat/shuffle settings in local storage so that if you accidentally refresh the page, your music doesn't stop and your settings are preserved.</li>
-          <li><strong>UI Preferences:</strong> Your language selection, theme choice (Dark Mode), and UI mode (Car Mode toggles) are saved locally.</li>
+          <li><strong>Player State:</strong> Storing current track queue, playback timestamps, repeat/shuffle status, and volume level so playback does not restart upon navigation.</li>
+          <li><strong>User Interface Preferences:</strong> Saving your language selections, audio quality settings, and AMOLED dark mode preferences.</li>
+          <li><strong>Authentication:</strong> Preserving login sessions securely if you sign in with Google SSO.</li>
         </ul>
 
-
-
-        <h4>C. Analytics and Performance</h4>
-        <p>We use minimal third-party analytics (which may set traditional cookies) to understand aggregated traffic patterns, such as how many active users we have and which features (like Listen Together or Shorts) are used most often. This data is anonymized and helps us improve server infrastructure.</p>
-
-        <h3>3. Controlling Your Storage</h3>
-        <p>Because GanaTube relies on Local Storage and IndexedDB rather than traditional cookies, standard "cookie blockers" may not affect the app, but clearing your browser's "Site Data" will.</p>
-        
-
-        
-        <h4>Clearing All App Data</h4>
-        <p>If you wish to completely wipe all GanaTube data from your device:</p>
+        <h4>B. Advertising & Third-Party Cookies (Google AdSense)</h4>
+        <p>GanaTube uses third-party advertising partners, including <strong>Google AdSense</strong>, to help support the cost of running a free, uninterrupted streaming service:</p>
         <ul class="feature-list">
-          <li><strong>On Chrome/Edge (Desktop):</strong> Click the padlock icon next to the URL, select "Site settings", and click "Clear data".</li>
-          <li><strong>On Android (Chrome):</strong> Go to Settings > Site settings > All sites > ganatube.in, and tap "Clear & reset".</li>
-          <li><strong>On iOS (Safari):</strong> Go to Settings > Safari > Advanced > Website Data, search for ganatube.in, and delete it.</li>
+          <li><strong>Third-Party Vendor Cookies:</strong> Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to ganatube.in or other websites.</li>
+          <li><strong>Personalized Advertising:</strong> Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our sites and/or other sites on the Internet.</li>
+          <li><strong>Non-Personalized Ads Option:</strong> In regions where applicable, non-personalized advertising cookies may be used for frequency capping, aggregated ad reporting, and fraud prevention.</li>
         </ul>
-        <p><strong>Warning:</strong> Doing this will instantly sign you out, and reset your UI preferences.</p>
 
-        <h3>4. Updates to This Policy</h3>
-        <p>We may update this policy periodically to reflect changes in the technologies we use or for other operational or legal reasons. Please revisit this page regularly to stay informed.</p>
+        <h4>C. Performance and Analytics</h4>
+        <p>We use lightweight analytics cookies and event tracking to understand platform stability, popular music genres, and active user concurrency to ensure server capacity.</p>
+
+        <h3>3. How You Can Control and Opt Out of Cookies</h3>
+        <p>You have the full right to decide whether to accept or reject cookies:</p>
+        <ul class="feature-list">
+          <li><strong>Opting Out of Google Personalized Ads:</strong> You can opt out of personalized advertising by visiting Google's official <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Ads Settings</a>.</li>
+          <li><strong>Third-Party Ad Network Opt-Out:</strong> You can also opt out of many third-party advertising cookies by visiting <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">aboutads.info/choices/</a> or <a href="https://www.youronlinechoices.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Your Online Choices</a>.</li>
+          <li><strong>Browser Cookie Controls:</strong> You can modify your browser settings to decline or clear cookies. Please refer to your browser's help menu (Chrome, Safari, Firefox, Edge) for step-by-step instructions.</li>
+        </ul>
+
+        <h3>4. Contact Us</h3>
+        <p>If you have any questions or concerns regarding our use of cookies or local storage, please reach out to us at:</p>
+        <div class="contact-card">
+          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a></p>
+        </div>
       </div>
     `
   },
   'dmca': {
-    title: 'DMCA & Intermediary Safe-Harbor Policy',
+    title: 'DMCA & Copyright Policy',
     html: `
       <div class="static-content-block">
-        <h2>DMCA & Intermediary Safe-Harbor Policy</h2>
-        <p>GanaTube.in ("Platform") operates as a technology intermediary and search interface. We strictly adhere to the <strong>Safe Harbor</strong> principles established under the <strong>Digital Millennium Copyright Act (17 U.S.C. § 512)</strong> and <strong>Section 79 of the Indian Information Technology Act, 2000</strong> (including the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021).</p>
+        <h2>DMCA & Copyright Policy</h2>
+        <p>GanaTube respects the intellectual property rights of artists, creators, and content owners, and we expect our users to do the same. In compliance with the Digital Millennium Copyright Act (17 U.S.C. § 512) and applicable global copyright laws, we maintain a clear procedure to address copyright infringement claims.</p>
+        <p>If you believe that any material or track available through GanaTube infringes upon a copyright you own or control, please submit a formal takedown notice with the required details listed below.</p>
 
-        <h3>1. Technical Architecture: Zero Media Hosting</h3>
-        <p>It is critical for copyright owners, regulatory authorities, and users to understand that <strong>GanaTube does not host, upload, store, copy, transcode, or distribute any audio files, MP3s, or multimedia files on its own servers.</strong></p>
+        <h3>Submitting a Takedown Notice</h3>
+        <p>To ensure prompt processing, please provide our designated copyright team with a written notice containing the following information:</p>
         <ul class="feature-list">
-          <li><strong>API Client Operation:</strong> GanaTube functions strictly as a client interface utilizing official, public third-party APIs (primarily the official YouTube IFrame and Data APIs).</li>
-          <li><strong>Direct Stream Delivery:</strong> When a track or video is played, all media streams are delivered directly from YouTube's content delivery servers to the user's browser or device. GanaTube has no custody or transmission path over these media files.</li>
+          <li><strong>Contact Information:</strong> Your full legal name, company or organization (if applicable), physical address, phone number, and a valid email address.</li>
+          <li><strong>Identification of Copyrighted Work:</strong> A clear description or title of the copyrighted work you claim has been infringed.</li>
+          <li><strong>Location of Infringing Material:</strong> The specific GanaTube URL(s), search result link, or description reasonably sufficient to permit us to locate the material on our platform.</li>
+          <li><strong>Good Faith Statement:</strong> A statement that you have a good faith belief that the use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law.</li>
+          <li><strong>Statement of Accuracy:</strong> A statement made under penalty of perjury that the information in your notification is accurate and that you are the copyright owner or authorized to act on behalf of the owner.</li>
+          <li><strong>Physical or Electronic Signature:</strong> An authorized physical or electronic signature of the copyright owner or a person authorized to act on their behalf.</li>
         </ul>
 
-        <h3>2. Why GanaTube Cannot Filter or Delete Content</h3>
-        <p>Because GanaTube does not store any audio or video content and does not maintain an independent database of media files, <strong>GanaTube has NO technical capacity or authority to delete, modify, or filter content hosted by YouTube.</strong></p>
-        <p>All content indexing and search results are dynamically fetched via public APIs in real time. We cannot alter or remove videos from YouTube's platform. Therefore, any attempt to request filtering from GanaTube directly is ineffective, as the content remains hosted on and delivered by third-party servers.</p>
-
-        <h3>3. Direct Takedowns via Source Host (YouTube)</h3>
-        <p>If you are a copyright owner or an authorized agent and believe that content accessible through our player infringes upon your copyright, <strong>you must submit your takedown notification directly to YouTube (Google LLC)</strong>, which is the actual hosting provider with direct control over the content.</p>
-        <ul class="feature-list">
-          <li><strong>YouTube DMCA Notice Portal:</strong> Submit your formal infringement notification directly via <a href="https://www.youtube.com/copyright_complaint_form" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">YouTube Copyright Complaint Form</a>.</li>
-          <li><strong>Instant Automatic Removal:</strong> Once YouTube removes or disables access to the reported content, it <strong>instantly, automatically, and permanently disappears from GanaTube</strong> without requiring any manual action on our part.</li>
-        </ul>
-
-        <h3>4. Statutory Safe Harbor Immunities</h3>
-        <p>Under <strong>17 U.S.C. § 512</strong> and <strong>Section 79 of the Information Technology Act, 2000</strong>:</p>
-        <ul class="feature-list">
-          <li>GanaTube acts solely as an intermediary providing access to a communication system over which information made available by third parties is transmitted.</li>
-          <li>GanaTube does not initiate the transmission, does not select the receiver of the transmission, and does not select or modify the information contained in the transmission.</li>
-          <li>GanaTube claims full statutory safe-harbor immunity from liability for third-party content made accessible via external public APIs.</li>
-        </ul>
-
-        <h3>5. Legal Desk & Inquiries</h3>
-        <p>For any policy inquiries or general legal correspondence, you may contact our legal desk at:</p>
+        <h3>Designated Copyright Agent</h3>
+        <p>Please send all takedown notices directly to our designated team:</p>
         <div class="contact-card">
           <p><strong>Email:</strong> <a href="mailto:dmca@ganatube.in" style="color: var(--color-primary);">dmca@ganatube.in</a></p>
-          <p><strong>Important:</strong> As stated above, GanaTube cannot delete or block files hosted by YouTube. All copyright takedown requests must be directed to YouTube directly.</p>
+          <p><strong>Secondary / Support:</strong> <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a></p>
+          <p style="margin-top: 10px; font-size: 0.9rem; color: rgba(255, 255, 255, 0.6);">Upon receipt of a valid and complete notification, we will review the submission promptly and take appropriate action in accordance with applicable laws. We may request additional information to verify identity or ownership.</p>
         </div>
+
+        <h3>Repeat Infringer Policy</h3>
+        <p>In accordance with the DMCA and other applicable intellectual property laws, GanaTube maintains a policy that provides for the restriction or termination, in appropriate circumstances, of users or services that are determined to be repeat infringers.</p>
       </div>
     `
   },
@@ -438,13 +439,13 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
     html: `
       <div class="static-content-block">
         <h2>Disclaimer of Liability and Usage</h2>
-        <p><strong>Effective Date:</strong> September 11, 2026</p>
+        <p><strong>Effective Date:</strong> September 20, 2026</p>
 
-        <h3>1. Content Source and Hosting</h3>
-        <p>The GanaTube platform (accessible at ganatube.in) acts solely as a specialized media player interface and search directory. <strong>GanaTube does not host, upload, or store any media files, audio tracks, or copyrighted content on its servers.</strong> All multimedia content streamed through the Service is sourced dynamically from third-party services and APIs, primarily the public YouTube Data API. GanaTube relies on the terms provided by these third-party services allowing developers to embed and interface with their publicly available content.</p>
+        <h3>1. Content Source and Third-Party APIs</h3>
+        <p>The GanaTube platform (accessible at ganatube.in) acts solely as a specialized media player interface and search directory. <strong>GanaTube does not host, upload, or store any audio files, music tracks, or copyrighted video streams on its servers.</strong> All multimedia content streamed through the Service is sourced dynamically via official third-party APIs, primarily the YouTube IFrame and Data APIs. By using GanaTube, users acknowledge that they are accessing third-party content in accordance with the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">YouTube Terms of Service</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Privacy Policy</a>.</p>
 
         <h3>2. Copyright Infringement and Liability</h3>
-        <p>Because GanaTube does not control the content uploaded to the source platforms, we cannot be held liable for copyright infringements, illegal uploads, or inappropriate content present on those external networks. We do not exercise editorial control over the metadata, album artwork, or audio streams provided by the APIs. Any legal claims regarding the illegality of the actual content should be directed to the third-party platforms (e.g., YouTube/Google) hosting the files. Removal from the host server will result in automatic removal from the GanaTube interface.</p>
+        <p>Because GanaTube does not control the content uploaded to or hosted on third-party networks, we cannot be held liable for copyright claims or external content. We do not exercise editorial control over metadata, album artwork, or audio streams provided through public APIs. All legal claims or takedown notices regarding the underlying media must be directed to the source host (YouTube/Google LLC) or submitted via our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>. Removal from the source platform automatically and permanently removes the content from GanaTube.</p>
 
         <h3>3. Service Availability and Performance</h3>
         <p>The GanaTube service is provided on an "as is" and "as available" basis. While we strive to maintain 100% uptime, the functionality of the platform relies heavily on the availability and stability of third-party APIs. If these underlying APIs change their structure, experience downtime, or restrict our access, the GanaTube platform may temporarily or permanently lose functionality without prior notice. We make no guarantees regarding uninterrupted access, speed, or flawless operation.</p>
@@ -452,8 +453,8 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>4. Data Usage</h3>
         <p>Users who utilize the platform on mobile networks are solely responsible for any data charges incurred. While GanaTube provides a "Data Saver" mode, audio streaming can consume significant bandwidth.</p>
 
-        <h3>5. "No Ads" Guarantee Definition</h3>
-        <p>Our promise of "Zero Audio Ads" refers strictly to the audio streaming experience provided through our custom interface, wherein we actively filter or utilize API endpoints that do not serve interstitial audio advertisements between tracks. GanaTube reserves the right to monetize the platform through non-intrusive visual display advertising on the website itself to support server costs.</p>
+        <h3>5. "Zero Audio Ads" Clarification</h3>
+        <p>Our promise of "Zero Audio Ads" refers strictly to our commitment that GanaTube does not inject its own audio advertisements or interruptions into the user's listening experience. GanaTube is supported exclusively through non-intrusive visual display advertising on the website to cover server and bandwidth costs.</p>
         
         <h3>6. Acceptance</h3>
         <p>By using the ganatube.in website or installing the Progressive Web App, you acknowledge that you have read, understood, and agree to be bound by this disclaimer. If you do not agree, you must discontinue use of the Service immediately.</p>
@@ -475,7 +476,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <div class="contact-card">
           <h3>Copyright & Legal (DMCA)</h3>
-          <p>For copyright owners or agents reporting alleged infringement. Please review our DMCA policy before submitting a request to ensure it contains all required information.</p>
+          <p>For copyright owners or agents reporting alleged infringement. Please review our DMCA & Copyright policy before submitting a request to ensure it contains all required information.</p>
           <p><strong>Email:</strong> <a href="mailto:dmca@ganatube.in" style="color: var(--color-primary);">dmca@ganatube.in</a></p>
         </div>
 
@@ -493,8 +494,6 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <li>The browser you are using, or if you are using the installed PWA</li>
           <li>A clear, step-by-step description of what causes the issue</li>
         </ul>
-      </div>
-        </div>
       </div>
     `
   }
