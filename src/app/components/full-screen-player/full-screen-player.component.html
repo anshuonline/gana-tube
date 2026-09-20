@@ -1,4 +1,13 @@
 <div class="fs-player-overlay" [class.visible]="isVisible">
+
+  <!-- Ambient Edge Border & Corner Square Pulse Animation -->
+  <div class="fs-edge-frame" aria-hidden="true">
+    <div class="fs-edge-beam"></div>
+    <div class="fs-corner-square corner-tl"></div>
+    <div class="fs-corner-square corner-tr"></div>
+    <div class="fs-corner-square corner-bl"></div>
+    <div class="fs-corner-square corner-br"></div>
+  </div>
   
   <!-- Shared SVG gradient defs (purple-pink brand gradient for hearts) -->
   <svg width="0" height="0" style="position: absolute" aria-hidden="true">
@@ -270,6 +279,30 @@
     <!-- Bottom Player Bar (Minimize Player / Spotify Style) -->
     <div class="fs-bottom-bar">
       
+      <!-- Full Width Duration Bar at Top (YouTube Music Style) -->
+      <div 
+        class="fs-top-progress-wrap" 
+        [class.scrubbing]="isScrubbing"
+        (mousedown)="onScrubStart($event)" 
+        (touchstart)="onScrubStart($event)"
+        (mousemove)="onProgressHover($event)"
+        (mouseleave)="onProgressLeave()"
+      >
+        <div class="fs-progress-track">
+          <div class="fs-progress-buffered" [style.width.%]="bufferedPercent"></div>
+          <div class="fs-progress-fill" [style.width.%]="displayProgressPercent"></div>
+          <div class="fs-progress-thumb" [style.left.%]="displayProgressPercent"></div>
+        </div>
+        <!-- Hover Time Tooltip -->
+        <div 
+          class="fs-progress-tooltip" 
+          *ngIf="showHoverTooltip && !isScrubbing" 
+          [style.left.%]="hoverProgressPercent"
+        >
+          {{ hoverProgressTime }}
+        </div>
+      </div>
+
       <!-- Left: Thumbnail, Track Info, Like & 3-Dot Menu -->
       <div class="fs-bar-left">
         <div class="fs-bar-thumb-wrapper" *ngIf="effectiveTrack() as track">
@@ -312,7 +345,7 @@
         </div>
       </div>
 
-      <!-- Center: Playback Controls & Progress Bar -->
+      <!-- Center: Playback Controls & Time Display -->
       <div class="fs-bar-center">
         <div class="fs-bar-controls">
           <button 
@@ -363,25 +396,12 @@
           </button>
         </div>
 
-        <div class="fs-bar-progress-row">
-          <span class="fs-bar-time">{{ formatTime(displayCurrentTime) }}</span>
-          <input 
-            type="range" 
-            class="fs-bar-slider" 
-            min="0" 
-            step="1" 
-            [max]="playerService.duration() || 100" 
-            [value]="displayCurrentTime" 
-            [style.background]="getProgressBackground()"
-            (input)="onScrubInput($event)" 
-            (change)="onSeek($event)" 
-            title="Seek"
-          />
-          <span class="fs-bar-time">{{ formatTime(playerService.duration()) }}</span>
+        <div class="fs-bar-time-row">
+          <span class="fs-bar-time-display">{{ formatTime(displayCurrentTime) }} / {{ formatTime(playerService.duration()) }}</span>
         </div>
       </div>
 
-      <!-- Right: Lyrics, Queue, Related, Devices, Volume, Fullscreen -->
+      <!-- Right: Lyrics, Queue, Related, Devices, Volume -->
       <div class="fs-bar-right">
         <button 
           class="fs-bar-btn secondary view-toggle" 
@@ -417,22 +437,25 @@
 
         <div class="fs-bar-volume-group">
           <button 
-            class="fs-bar-btn secondary" 
+            class="fs-bar-btn secondary volume-icon-btn" 
             (click)="playerService.toggleMute()" 
             title="Volume">
             <svg *ngIf="playerService.isMuted() || playerService.volume() === 0" lucideVolumeX [attr.size]="18"></svg>
             <svg *ngIf="!playerService.isMuted() && playerService.volume() > 0 && playerService.volume() < 50" lucideVolume1 [attr.size]="18"></svg>
             <svg *ngIf="!playerService.isMuted() && playerService.volume() >= 50" lucideVolume2 [attr.size]="18"></svg>
           </button>
-          <input 
-            type="range" 
-            class="fs-volume-slider" 
-            min="0" 
-            max="100" 
-            [value]="playerService.isMuted() ? 0 : playerService.volume()" 
-            (input)="onVolumeChange($event)" 
-            title="Volume"
-          />
+          <div class="fs-volume-slider-wrap">
+            <input 
+              type="range" 
+              class="fs-volume-slider" 
+              min="0" 
+              max="100" 
+              [value]="playerService.isMuted() ? 0 : playerService.volume()" 
+              (input)="onVolumeChange($event)" 
+              [style.background]="getVolumeProgressBackground()"
+              title="Volume"
+            />
+          </div>
         </div>
       </div>
 

@@ -706,6 +706,10 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
 
   isScrubbing = false;
   scrubTime = 0;
+  private scrubTarget: HTMLElement | null = null;
+  showHoverTooltip = false;
+  hoverProgressPercent = 0;
+  hoverProgressTime = '';
 
   formatTime(seconds: number): string {
     if (!seconds || isNaN(seconds)) return '0:00';
@@ -718,13 +722,91 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     return this.isScrubbing ? this.scrubTime : this.playerService.currentTime();
   }
 
-  // YouTube-style progress track: white = played, lighter = buffered/preloaded
-  getProgressBackground(): string {
+  get displayProgressPercent(): number {
     const dur = this.playerService.duration() || 0;
-    if (dur <= 0) return 'rgba(255,255,255,0.2)';
-    const playedPct = Math.min(100, Math.max(0, (this.displayCurrentTime / dur) * 100));
-    const bufferedPct = Math.max(playedPct, Math.min(100, this.playerService.bufferedPercent()));
-    return `linear-gradient(to right, #fff 0%, #fff ${playedPct}%, rgba(255,255,255,0.4) ${playedPct}%, rgba(255,255,255,0.4) ${bufferedPct}%, rgba(255,255,255,0.2) ${bufferedPct}%, rgba(255,255,255,0.2) 100%)`;
+    if (dur <= 0) return 0;
+    const cur = this.displayCurrentTime;
+    return Math.min(100, Math.max(0, (cur / dur) * 100));
+  }
+
+  get bufferedPercent(): number {
+    const dur = this.playerService.duration() || 0;
+    if (dur <= 0) return 0;
+    return Math.min(100, Math.max(0, this.playerService.bufferedPercent() || 0));
+  }
+
+  getVolumeProgressBackground(): string {
+    const vol = this.playerService.isMuted() ? 0 : this.playerService.volume();
+    return `linear-gradient(to right, #fff 0%, #fff ${vol}%, rgba(255,255,255,0.2) ${vol}%, rgba(255,255,255,0.2) 100%)`;
+  }
+
+  onScrubStart(event: MouseEvent | TouchEvent): void {
+    event.stopPropagation();
+    const target = event.currentTarget as HTMLElement;
+    this.scrubTarget = target;
+    this.isScrubbing = true;
+    this.calculateScrub(event, false);
+
+    const rect = target.getBoundingClientRect();
+    let clientX = 0;
+    if (event instanceof MouseEvent) {
+      clientX = event.clientX;
+    } else if ((event as TouchEvent).touches && (event as TouchEvent).touches.length > 0) {
+      clientX = (event as TouchEvent).touches[0].clientX;
+    }
+    const ratio = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
+    const seekTime = ratio * (this.playerService.duration() || 0);
+    this.playerService.seekTo(seekTime);
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  @HostListener('window:touchmove', ['$event'])
+  onWindowMove(event: MouseEvent | TouchEvent): void {
+    if (!this.isScrubbing) return;
+    this.calculateScrub(event, false);
+  }
+
+  @HostListener('window:mouseup', ['$event'])
+  @HostListener('window:touchend', ['$event'])
+  onWindowUp(event: MouseEvent | TouchEvent): void {
+    if (!this.isScrubbing) return;
+    this.isScrubbing = false;
+    this.calculateScrub(event, true);
+    this.scrubTarget = null;
+  }
+
+  calculateScrub(event: MouseEvent | TouchEvent, doSeek = false): void {
+    if (!this.scrubTarget) return;
+    const rect = this.scrubTarget.getBoundingClientRect();
+    let clientX = 0;
+    if (event instanceof MouseEvent) {
+      clientX = event.clientX;
+    } else if ((event as TouchEvent).touches && (event as TouchEvent).touches.length > 0) {
+      clientX = (event as TouchEvent).touches[0].clientX;
+    } else if ((event as TouchEvent).changedTouches && (event as TouchEvent).changedTouches.length > 0) {
+      clientX = (event as TouchEvent).changedTouches[0].clientX;
+    }
+    const ratio = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
+    const seekTime = ratio * (this.playerService.duration() || 0);
+    this.scrubTime = seekTime;
+
+    if (doSeek) {
+      this.playerService.seekTo(seekTime);
+    }
+  }
+
+  onProgressHover(event: MouseEvent): void {
+    const target = event.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min((event.clientX - rect.left) / rect.width, 1));
+    const targetTime = ratio * (this.playerService.duration() || 0);
+    this.hoverProgressPercent = ratio * 100;
+    this.hoverProgressTime = this.formatTime(targetTime);
+    this.showHoverTooltip = true;
+  }
+
+  onProgressLeave(): void {
+    this.showHoverTooltip = false;
   }
 
   onScrubInput(event: any): void {

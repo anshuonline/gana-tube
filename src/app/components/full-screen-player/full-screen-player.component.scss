@@ -15,6 +15,164 @@
   }
 }
 
+// ---- Corner & Edge Animated Frame ("bich bich mei square animation border animation ke sath") ----
+.fs-edge-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+// Perimeter Border Beam
+.fs-edge-beam {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  // Masked border line (2px purple-pink gradient border)
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 30%, #8b5cf6 60%, #ec4899 100%);
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    animation: edgeBorderCycle 7.5s ease-in-out infinite;
+    will-change: opacity, background-position;
+  }
+
+  // Soft ambient edge glow
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.3), inset 0 0 32px rgba(236, 72, 153, 0.15);
+    opacity: 0;
+    animation: edgeGlowCycle 7.5s ease-in-out infinite;
+    will-change: opacity;
+  }
+}
+
+// 4 Corner Squares / Brackets ("full corner mei ekdam corner border pe")
+.fs-corner-square {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  opacity: 0;
+  animation: cornerSquareCycle 7.5s ease-in-out infinite;
+  will-change: opacity, transform;
+
+  @media (max-width: 768px) {
+    width: 15px;
+    height: 15px;
+  }
+
+  &.corner-tl {
+    top: 0;
+    left: 0;
+    border-top: 3px solid #a855f7;
+    border-left: 3px solid #a855f7;
+    box-shadow: -2px -2px 12px rgba(168, 85, 247, 0.7);
+  }
+
+  &.corner-tr {
+    top: 0;
+    right: 0;
+    border-top: 3px solid #ec4899;
+    border-right: 3px solid #ec4899;
+    box-shadow: 2px -2px 12px rgba(236, 72, 153, 0.7);
+  }
+
+  &.corner-bl {
+    bottom: 0;
+    left: 0;
+    border-bottom: 3px solid #ec4899;
+    border-left: 3px solid #ec4899;
+    box-shadow: -2px 2px 12px rgba(236, 72, 153, 0.7);
+  }
+
+  &.corner-br {
+    bottom: 0;
+    right: 0;
+    border-bottom: 3px solid #a855f7;
+    border-right: 3px solid #a855f7;
+    box-shadow: 2px 2px 12px rgba(168, 85, 247, 0.7);
+  }
+}
+
+// Periodic Animation Keyframes ("bich bich mei aayega")
+// 7.5s cycle:
+// 0% - 18%: Dormant (idle rest)
+// 18% - 35%: Graceful surge and border beam sweep
+// 35% - 60%: Vivid peak glow, illuminated corner squares
+// 60% - 78%: Smooth fade-out
+// 78% - 100%: Rest phase
+@keyframes edgeBorderCycle {
+  0%, 16% {
+    opacity: 0;
+    background-position: 0% 0%;
+  }
+  28% {
+    opacity: 0.85;
+    background-position: 50% 50%;
+  }
+  42% {
+    opacity: 1;
+    background-position: 100% 100%;
+  }
+  62% {
+    opacity: 0.75;
+    background-position: 150% 150%;
+  }
+  78%, 100% {
+    opacity: 0;
+    background-position: 200% 200%;
+  }
+}
+
+@keyframes edgeGlowCycle {
+  0%, 18% {
+    opacity: 0;
+  }
+  38%, 56% {
+    opacity: 0.9;
+  }
+  74%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes cornerSquareCycle {
+  0%, 16% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  30% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+  42% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  62% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  76%, 100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
 .fs-bg-ambient {
   position: absolute;
   inset: -20%;
@@ -334,6 +492,7 @@
 
 // ---- Bottom Player Bar (Spotify / Mini-Player Style) ----
 .fs-bottom-bar {
+  position: relative;
   width: 100%;
   height: 90px;
   background: #000000;
@@ -497,52 +656,112 @@
   }
 }
 
-.fs-bar-progress-row {
+// ---- Edge-to-Edge Top Duration Bar (YouTube Music Style) ----
+.fs-top-progress-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  margin-top: -9px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
+  cursor: pointer;
+  z-index: 30;
+  user-select: none;
+  touch-action: none;
 
-  .fs-bar-time {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.55);
-    font-variant-numeric: tabular-nums;
-    width: 36px;
-    text-align: center;
-    flex-shrink: 0;
+  .fs-progress-track {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.14);
+    transition: height 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 2px;
   }
 
-  .fs-bar-slider {
-    flex: 1;
-    -webkit-appearance: none;
-    appearance: none;
-    background: rgba(255, 255, 255, 0.2);
-    height: 4px;
+  // Hover or dragging expands bar ("thoda mota hoga")
+  &:hover .fs-progress-track,
+  &.scrubbing .fs-progress-track {
+    height: 6px;
+
+    .fs-progress-thumb {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  .fs-progress-buffered {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.25);
     border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-    transition: height 0.15s ease;
+    pointer-events: none;
+  }
 
-    &:hover {
-      height: 6px;
+  // Signature Purple-Pink Gradient Fill
+  .fs-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #a855f7 0%, #ec4899 100%);
+    border-radius: 2px;
+    pointer-events: none;
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.45);
+  }
 
-      &::-webkit-slider-thumb {
-        transform: scale(1.2);
-        opacity: 1;
-      }
-    }
+  // Scrubber Goal Ball ("wo goal ball aayega")
+  .fs-progress-thumb {
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.8), 0 2px 6px rgba(0, 0, 0, 0.6);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+    pointer-events: none;
+    z-index: 3;
+  }
 
-    &::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-      transition: transform 0.15s ease;
-    }
+  // Floating Timestamp Tooltip
+  .fs-progress-tooltip {
+    position: absolute;
+    bottom: 20px;
+    transform: translateX(-50%);
+    background: rgba(14, 14, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    padding: 3px 8px;
+    border-radius: 6px;
+    pointer-events: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+    z-index: 35;
+  }
+}
+
+.fs-bar-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+
+  .fs-bar-time-display {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    user-select: none;
   }
 }
 
@@ -558,40 +777,72 @@
   }
 }
 
+// Hover-Revealed Volume Group ("volume pe hover karne ke baad hi volume control wo bar aayega")
 .fs-bar-volume-group {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
-}
+  gap: 0;
+  padding: 2px 4px;
+  border-radius: 20px;
+  transition: background 0.2s ease;
 
-.fs-volume-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 90px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  &:hover,
+  &:focus-within {
+    background: rgba(255, 255, 255, 0.06);
 
-  &:hover {
-    height: 6px;
+    .fs-volume-slider-wrap {
+      width: 85px;
+      opacity: 1;
+      margin-left: 6px;
+      margin-right: 4px;
+      pointer-events: auto;
+    }
   }
 
-  &::-webkit-slider-thumb {
+  .volume-icon-btn {
+    flex-shrink: 0;
+  }
+
+  .fs-volume-slider-wrap {
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    transition: width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, margin 0.25s ease;
+  }
+
+  .fs-volume-slider {
     -webkit-appearance: none;
     appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    transition: transform 0.15s ease;
-  }
+    width: 85px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    transition: height 0.15s ease;
 
-  &:hover::-webkit-slider-thumb {
-    transform: scale(1.2);
+    &:hover {
+      height: 6px;
+
+      &::-webkit-slider-thumb {
+        transform: scale(1.2);
+      }
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s ease;
+    }
   }
 }
 
