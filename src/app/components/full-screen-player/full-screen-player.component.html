@@ -57,12 +57,12 @@
         <button class="icon-btn" title="Car Mode" (click)="openCarMode.emit()">
           <svg lucideCar [attr.size]="22"></svg>
         </button>
-        <button class="icon-btn" (click)="toggleMenu($event)" title="More Options">
-          <svg lucideMoreHorizontal [attr.size]="22"></svg>
-        </button>
         <button class="icon-btn fullscreen-btn" (click)="toggleBrowserFullscreen()" [title]="isBrowserFullscreen ? 'Exit Fullscreen' : 'Fullscreen'">
           <svg *ngIf="!isBrowserFullscreen" lucideMaximize2 [attr.size]="22"></svg>
           <svg *ngIf="isBrowserFullscreen" lucideMinimize2 [attr.size]="22"></svg>
+        </button>
+        <button class="icon-btn" (click)="isDesktop ? toggleMenu($event) : showMobileOptions.set(true)" title="More Options">
+          <svg lucideMoreHorizontal [attr.size]="22"></svg>
         </button>
       </div>
     </div>
@@ -305,7 +305,7 @@
           </button>
           <button 
             class="fs-bar-btn icon-btn track-options-btn" 
-            (click)="openItemMenu($event, effectiveTrack() || playerService.currentTrack()!)" 
+            (click)="isDesktop ? openItemMenu($event, effectiveTrack() || playerService.currentTrack()!) : showMobileOptions.set(true)" 
             title="More Options">
             <svg lucideMoreHorizontal [attr.size]="20"></svg>
           </button>
@@ -316,14 +316,7 @@
       <div class="fs-bar-center">
         <div class="fs-bar-controls">
           <button 
-            class="fs-bar-btn mobile-more-btn" 
-            (click)="showMobileOptions.set(true)" 
-            title="More Options">
-            <svg lucideMoreHorizontal [attr.size]="20"></svg>
-          </button>
-
-          <button 
-            class="fs-bar-btn secondary" 
+            class="fs-bar-btn secondary shuffle-btn" 
             [class.active]="playerService.isShuffled()" 
             (click)="playerService.toggleShuffle()" 
             title="Shuffle">
@@ -355,11 +348,18 @@
           </button>
 
           <button 
-            class="fs-bar-btn secondary" 
+            class="fs-bar-btn secondary repeat-btn" 
             (click)="playerService.toggleRepeat()" 
             [title]="'Repeat: ' + playerService.repeatMode()">
             <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="18" style="stroke: #a855f7"></svg>
             <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="18" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#a855f7'"></svg>
+          </button>
+
+          <button 
+            class="fs-bar-btn mobile-more-btn" 
+            (click)="showMobileOptions.set(true)" 
+            title="More Options">
+            <svg lucideMoreHorizontal [attr.size]="20"></svg>
           </button>
         </div>
 
@@ -434,14 +434,6 @@
             title="Volume"
           />
         </div>
-
-        <button 
-          class="fs-bar-btn secondary fs-toggle-fullscreen" 
-          (click)="toggleBrowserFullscreen()" 
-          [title]="isBrowserFullscreen ? 'Exit Fullscreen' : 'Fullscreen'">
-          <svg *ngIf="!isBrowserFullscreen" lucideMaximize2 [attr.size]="18"></svg>
-          <svg *ngIf="isBrowserFullscreen" lucideMinimize2 [attr.size]="18"></svg>
-        </button>
       </div>
 
     </div>

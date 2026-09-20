@@ -269,6 +269,62 @@
               <span class="toggle-knob"></span>
             </button>
           </div>
+          <!-- Auto-Stop on Inactivity -->
+          <div class="setting-item" [class.has-detail-open]="playerService.isInactivityTimerEnabled()">
+            <div class="setting-info">
+              <h3>Auto-Stop on Inactivity</h3>
+              <p>Pause music if no screen touch or interaction is detected.</p>
+            </div>
+            <button class="toggle-switch" [class.on]="playerService.isInactivityTimerEnabled()" (click)="playerService.toggleInactivityTimer()" aria-label="Toggle Inactivity Auto-Stop" [attr.aria-pressed]="playerService.isInactivityTimerEnabled()">
+              <span class="toggle-knob"></span>
+            </button>
+          </div>
+          <div class="setting-item-full inactivity-settings-block" *ngIf="playerService.isInactivityTimerEnabled()">
+            <div class="inactivity-header">
+              <span class="inactivity-label">Pause music after</span>
+              <div class="inactivity-input-wrap">
+                <input
+                  type="number"
+                  class="inactivity-number-input"
+                  min="1"
+                  max="360"
+                  step="5"
+                  [value]="playerService.inactivityMinutes()"
+                  (input)="onInactivityMinutesInput($event)"
+                  (change)="onInactivityMinutesChange($event)"
+                  aria-label="Inactivity minutes"
+                />
+                <span class="inactivity-unit">mins</span>
+              </div>
+            </div>
+            <div class="inactivity-presets">
+              <button
+                type="button"
+                class="q-btn inactivity-chip"
+                [class.active]="playerService.inactivityMinutes() === 30"
+                (click)="setInactivityPreset(30)"
+              >30m</button>
+              <button
+                type="button"
+                class="q-btn inactivity-chip"
+                [class.active]="playerService.inactivityMinutes() === 60"
+                (click)="setInactivityPreset(60)"
+              >60m (1h)</button>
+              <button
+                type="button"
+                class="q-btn inactivity-chip"
+                [class.active]="playerService.inactivityMinutes() === 90"
+                (click)="setInactivityPreset(90)"
+              >90m (1.5h)</button>
+              <button
+                type="button"
+                class="q-btn inactivity-chip"
+                [class.active]="playerService.inactivityMinutes() === 120"
+                (click)="setInactivityPreset(120)"
+              >120m (2h)</button>
+            </div>
+            <p class="inactivity-hint">Timer resets automatically whenever you touch the screen, click, or scroll.</p>
+          </div>
         </div>
 
         <!-- Languages -->

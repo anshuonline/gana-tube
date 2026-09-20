@@ -71,6 +71,8 @@ export class PlayerService {
         }
       }
     }, 2000);
+
+    this.setupInactivityTracker();
   }
 
   private setupNetworkWatcher(): void {
@@ -211,6 +213,91 @@ export class PlayerService {
     const m = Math.floor(totalSeconds / 60);
     const s = Math.floor(totalSeconds % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  // Inactivity Auto-Stop State (Auto-pause if no screen interaction occurs for X minutes)
+  isInactivityTimerEnabled = signal<boolean>(
+    typeof localStorage !== 'undefined' ? localStorage.getItem('gt_inactivity_enabled') !== 'false' : true
+  );
+  inactivityMinutes = signal<number>(
+    typeof localStorage !== 'undefined' ? Math.max(1, Math.min(360, parseInt(localStorage.getItem('gt_inactivity_minutes') || '60', 10) || 60)) : 60
+  );
+  private lastUserInteractionTime: number = Date.now();
+  private inactivityTriggered: boolean = false;
+
+  recordUserActivity(): void {
+    this.lastUserInteractionTime = Date.now();
+    this.inactivityTriggered = false;
+  }
+
+  toggleInactivityTimer(): void {
+    this.setInactivityTimerEnabled(!this.isInactivityTimerEnabled());
+  }
+
+  setInactivityTimerEnabled(enabled: boolean): void {
+    this.isInactivityTimerEnabled.set(enabled);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_inactivity_enabled', String(enabled));
+    }
+    this.recordUserActivity();
+    if (enabled) {
+      this.toastService.show(`Auto-stop on inactivity enabled (${this.inactivityMinutes()}m)`, 'info');
+    } else {
+      this.toastService.show('Auto-stop on inactivity disabled', 'info');
+    }
+  }
+
+  setInactivityMinutes(mins: number): void {
+    const clamped = Math.max(1, Math.min(360, Math.round(mins)));
+    this.inactivityMinutes.set(clamped);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_inactivity_minutes', String(clamped));
+    }
+    this.recordUserActivity();
+    this.toastService.show(`Inactivity timer set to ${clamped} min${clamped > 1 ? 's' : ''}`, 'info');
+  }
+
+  private setupInactivityTracker(): void {
+    if (typeof window === 'undefined') return;
+
+    this.lastUserInteractionTime = Date.now();
+
+    const events = ['touchstart', 'touchmove', 'touchend', 'pointerdown', 'mousedown', 'mousemove', 'keydown', 'scroll', 'click'];
+    let lastThrottle = 0;
+    const handleInteraction = () => {
+      const now = Date.now();
+      if (now - lastThrottle > 2000) {
+        lastThrottle = now;
+        this.lastUserInteractionTime = now;
+        this.inactivityTriggered = false;
+      }
+    };
+
+    this.ngZone.runOutsideAngular(() => {
+      events.forEach(evt => {
+        window.addEventListener(evt, handleInteraction, { passive: true });
+      });
+
+      // Check inactivity periodically every 30 seconds (100% client-side, zero server calls, battery-friendly)
+      setInterval(() => {
+        if (this.playerState() === 'playing' && this.isInactivityTimerEnabled() && !this.inactivityTriggered) {
+          const elapsedMs = Date.now() - this.lastUserInteractionTime;
+          const targetLimitMs = this.inactivityMinutes() * 60 * 1000;
+
+          if (elapsedMs >= targetLimitMs) {
+            this.inactivityTriggered = true;
+            this.ngZone.run(() => {
+              this.pause();
+              const mins = this.inactivityMinutes();
+              const timeLabel = mins >= 60 && mins % 60 === 0 
+                ? `${mins / 60} hour${mins / 60 > 1 ? 's' : ''}` 
+                : `${mins} minute${mins > 1 ? 's' : ''}`;
+              this.toastService.show(`Playback paused after ${timeLabel} of inactivity`, 'info', 5000);
+            });
+          }
+        }
+      }, 30000);
+    });
   }
 
   setYtPlayer(player: any): void {

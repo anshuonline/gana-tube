@@ -1366,6 +1366,28 @@ export class App implements OnInit {
     this.playerService.setMusicQuality(quality);
   }
 
+  onInactivityMinutesChange(event: Event): void {
+    const val = parseInt((event.target as HTMLInputElement).value, 10);
+    if (!isNaN(val) && val >= 1 && val <= 360) {
+      this.playerService.setInactivityMinutes(val);
+    }
+  }
+
+  onInactivityMinutesInput(event: Event): void {
+    const val = parseInt((event.target as HTMLInputElement).value, 10);
+    if (!isNaN(val) && val >= 1 && val <= 360) {
+      this.playerService.inactivityMinutes.set(val);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('gt_inactivity_minutes', String(val));
+      }
+      this.playerService.recordUserActivity();
+    }
+  }
+
+  setInactivityPreset(minutes: number): void {
+    this.playerService.setInactivityMinutes(minutes);
+  }
+
   onSearchFocus(): void {
     this.isSearchMode.set(false);
   }
