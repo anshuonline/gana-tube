@@ -15,15 +15,17 @@ export class SearchResultsComponent implements OnChanges {
   @Input() results: YouTubeSearchResult[] = [];
   @Input() isLoading = false;
   @Input() hasSearched = false;
-  @Input() currentFilter: 'all' | 'songs' | 'albums' | 'playlists' = 'all';
+  @Input() currentFilter: 'all' | 'songs' | 'albums' | 'playlists' | 'artists' = 'all';
   @Input() isLoadingMore = false;
   @Input() hasMoreSongs = false;
+  @Input() artistResults: { name: string; artistId: string; thumb?: string }[] = [];
 
   @Output() suggestSearch = new EventEmitter<string>();
   @Output() playTrack = new EventEmitter<YouTubeSearchResult>();
   @Output() ambientBgFound = new EventEmitter<string>();
   @Output() toggleMenu = new EventEmitter<{track: YouTubeSearchResult, event: MouseEvent}>();
   @Output() loadMore = new EventEmitter<void>();
+  @Output() openArtist = new EventEmitter<{ artistId: string; name: string }>();
 
   skeletons = Array(8).fill(0);
   readonly songPageSize = 50;
@@ -147,6 +149,23 @@ export class SearchResultsComponent implements OnChanges {
 
   searchArtist(artist: string): void {
     this.suggestSearch.emit(`${artist} songs`);
+  }
+
+  get artistsSource(): { name: string; artistId?: string; thumb?: string }[] {
+    if (this.artistResults.length > 0) return this.artistResults;
+    return this.artistTabs.map(name => ({ name }));
+  }
+
+  onArtistImgError(artist: { name: string; artistId?: string; thumb?: string }): void {
+    artist.thumb = undefined;
+  }
+
+  onArtistClick(artist: { name: string; artistId?: string; thumb?: string }): void {
+    if (artist?.artistId) {
+      this.openArtist.emit({ artistId: artist.artistId, name: artist.name });
+    } else if (artist?.name) {
+      this.suggestSearch.emit(`${artist.name} songs`);
+    }
   }
 
   private extractArtists(songs: YouTubeSearchResult[]): string[] {

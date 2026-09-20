@@ -394,6 +394,48 @@ export class YoutubeApiService {
     });
   }
 
+  searchArtists(query: string): Observable<{ name: string; artistId: string; thumb?: string }[]> {
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams().set('q', query);
+    return this.http.get<any[]>(`${backendUrl}/artist-search`, { params }).pipe(
+      timeout(10000),
+      catchError((err) => {
+        console.warn('Artist search failed:', err);
+        return of([]);
+      })
+    );
+  }
+
+  getArtist(artistId: string): Observable<any> {
+    const cacheKey = `artist_${artistId}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) {
+          return of(parsed.data);
+        }
+      } catch (e) {}
+    }
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams().set('id', artistId);
+    return this.http.get<any>(`${backendUrl}/artist`, { params }).pipe(
+      timeout(15000),
+      map((artist) => {
+        if (artist && artist.name) {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: artist }));
+          } catch (e) {}
+        }
+        return artist;
+      }),
+      catchError((err) => {
+        console.warn('Artist fetch failed:', err);
+        return of(null);
+      })
+    );
+  }
+
   getSuggestions(query: string): Observable<string[]> {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams().set('q', query);

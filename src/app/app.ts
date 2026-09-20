@@ -275,7 +275,8 @@ export class App implements OnInit {
 
   isSearchMode = signal<boolean>(false);
   isSearchFocused = signal<boolean>(false);
-  searchFilter = signal<'all' | 'songs' | 'albums' | 'playlists'>('all');
+  searchFilter = signal<'all' | 'songs' | 'albums' | 'playlists' | 'artists'>('all');
+  artistResults = signal<{ name: string; artistId: string; thumb?: string }[]>([]);
   searchGenres = [
     // Moods & Vibes
     { title: 'Romance', color: 'linear-gradient(135deg, #FF416C, #FF4B2B)', emoji: '💕' },
@@ -1090,7 +1091,11 @@ export class App implements OnInit {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (playlistId) {
           this.currentLoadingPlaylistId = playlistId; // Set tracking ID
-          if (playlistId.startsWith('pl_') || playlistId.startsWith('cp-')) {
+          if (playlistId.startsWith('artist-')) {
+            if (!(this.currentPage() === 'playlist' && this.selectedPlaylist()?.id === playlistId)) {
+              this.openArtistPage(playlistId.replace('artist-', ''), '');
+            }
+          } else if (playlistId.startsWith('pl_') || playlistId.startsWith('cp-')) {
             this.fetchPublicPlaylist(playlistId, '');
           } else if (playlistId.startsWith('MPREb_')) {
             this.isLoading.set(true);
@@ -1197,13 +1202,14 @@ export class App implements OnInit {
       } else if (url === 'artist') {
         const artistParam = decodeURIComponent(event.urlAfterRedirects.split('/')[2] || '');
         if (artistParam) {
-          this.performSearch(artistParam + ' songs');
+          this.openArtistPage(artistParam, artistParam);
           this.updateSEO(
             `${artistParam} Songs & Hits - GanaTube`,
             `Listen to ${artistParam}'s top hits, latest songs, and popular albums for free on GanaTube.`
           );
+        } else {
+          this.currentPage.set('search');
         }
-        this.currentPage.set('search');
         this.isSearchMode.set(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
@@ -1302,9 +1308,15 @@ export class App implements OnInit {
             this.openLikedSongs();
           }
         } else {
-          const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
-          if (targetPlaylist && !this.selectedPlaylist()) {
-            this.selectedPlaylist.set(targetPlaylist);
+          if (playlistId.startsWith('artist-')) {
+            if (!this.selectedPlaylist()) {
+              this.openArtistPage(playlistId.replace('artist-', ''), '');
+            }
+          } else {
+            const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
+            if (targetPlaylist && !this.selectedPlaylist()) {
+              this.selectedPlaylist.set(targetPlaylist);
+            }
           }
         }
       }
@@ -1407,12 +1419,87 @@ export class App implements OnInit {
     }
   }
 
-  setSearchFilter(filter: 'all' | 'songs' | 'albums' | 'playlists'): void {
+  setSearchFilter(filter: 'all' | 'songs' | 'albums' | 'playlists' | 'artists'): void {
     this.searchFilter.set(filter);
     if (this.currentQuery) {
       this.executeSearchApi(this.currentQuery);
     } else if (filter === 'playlists') {
       this.executeSearchApi('');
+    }
+  }
+
+  fetchSearchArtists(query: string): void {
+    this.youtubeApi.searchArtists(query).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (artists) => {
+        if (artists && artists.length > 0) {
+          this.artistResults.set(artists);
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  openArtistPage(artistOrName: string, fallbackName: string = ''): void {
+    if (!artistOrName) return;
+    const looksLikeId = /^UC[\w-]{20,}$/.test(artistOrName);
+
+    const loadById = (artistId: string, name: string) => {
+      const id = `artist-${artistId}`;
+      this.currentLoadingPlaylistId = id;
+      this.isLoading.set(true);
+
+      this.youtubeApi.getArtist(artistId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (artist) => {
+          if (this.currentLoadingPlaylistId !== id) return;
+          this.isLoading.set(false);
+
+          if (artist && artist.name && artist.songs && artist.songs.length > 0) {
+            const playlistMeta: PlaylistMeta = {
+              id: id,
+              title: artist.name || name || 'Artist',
+              language: '',
+              coverImage: artist.thumb || artist.songs[0]?.thumbnailHigh || artist.songs[0]?.thumbnail || 'ganatubenewlogo.png',
+              preloadedSongs: artist.songs,
+              searchQueries: [],
+              creator: 'Artist',
+              is_public: true,
+              is_owner: false
+            };
+            this.openPlaylist(playlistMeta);
+          } else if (name) {
+            this.performSearch(name + ' songs');
+          } else {
+            this.toastService.error('Artist not found');
+          }
+        },
+        error: () => {
+          if (this.currentLoadingPlaylistId !== id) return;
+          this.isLoading.set(false);
+          if (name) {
+            this.performSearch(name + ' songs');
+          } else {
+            this.toastService.error('Error loading artist');
+          }
+        }
+      });
+    };
+
+    if (looksLikeId) {
+      loadById(artistOrName, fallbackName);
+    } else {
+      // Name given — resolve to artistId first
+      this.youtubeApi.searchArtists(artistOrName).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (artists) => {
+          if (artists && artists.length > 0 && artists[0].artistId) {
+            loadById(artists[0].artistId, artists[0].name || artistOrName);
+          } else {
+            this.performSearch(artistOrName + ' songs');
+          }
+        },
+        error: () => {
+          this.performSearch(artistOrName + ' songs');
+        }
+      });
     }
   }
 
@@ -2199,6 +2286,14 @@ export class App implements OnInit {
       return;
     }
 
+    if (this.searchFilter() === 'artists') {
+      this.results.set([]);
+      this.isLoading.set(false);
+      this.fetchSearchArtists(query);
+      this.analyticsService.recordSearch(query, 'artists', 0);
+      return;
+    }
+
     // Default YouTube Search (Songs / All)
     if (this.searchFilter() === 'all') {
       // Optimized streaming: render Songs the moment they arrive, then enrich
@@ -2233,6 +2328,9 @@ export class App implements OnInit {
           this.isLoading.set(false);
         },
       });
+
+      // 4. Artist matches (with images)
+      this.fetchSearchArtists(query);
 
       // 2. Album matches
       const albumsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {

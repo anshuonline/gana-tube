@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, HostListener, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { AuthService } from '../../services/auth.service';
@@ -23,6 +23,7 @@ import {
 } from '@lucide/angular';
 import { FormsModule } from '@angular/forms';
 import { OfflineService } from '../../services/offline.service';
+import { YoutubeApiService } from '../../services/youtube-api.service';
 
 @Component({
   selector: 'app-track-menu',
@@ -106,6 +107,7 @@ export class TrackMenuComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] || changes['track']) {
       this.isArtistsExpanded = false;
+      this.loadArtistImage();
     }
     if (changes['isOpen'] || changes['xPos'] || changes['yPos']) {
       this.calculatePosition();
@@ -314,7 +316,32 @@ export class TrackMenuComponent implements OnChanges {
   }
 
   getArtistImage(): string {
-    return this.track?.channelThumbnail || 'ganatubenewlogo.png';
+    return this.artistImage() || this.track?.channelThumbnail || 'ganatubenewlogo.png';
+  }
+
+  artistImage = signal<string>('');
+  private ytApi = inject(YoutubeApiService);
+
+  loadArtistImage(): void {
+    const name = (this.track?.channelTitle || this.track?.artist || '').toString().replace(/\s*-\s*Topic$/i, '').trim();
+    if (!name) return;
+
+    const cacheKey = `artist_img_${name.toLowerCase()}`;
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        this.artistImage.set(cached);
+        return;
+      }
+    } catch (e) {}
+
+    this.ytApi.searchArtists(name).subscribe((artists) => {
+      const thumb = artists?.[0]?.thumb;
+      if (thumb) {
+        this.artistImage.set(thumb);
+        try { localStorage.setItem(cacheKey, thumb); } catch (e) {}
+      }
+    });
   }
 
   onImageError(event: any) {

@@ -66,6 +66,10 @@ app.use(express.json());
 
 let ytmusicInstance = null;
 
+// Artist data cache (24h TTL) — artist images/data rarely change
+const artistCache = new Map();
+const ARTIST_CACHE_TTL = 24 * 60 * 60 * 1000;
+
 // Initialize YTMusic instance once
 async function getYTMusic() {
   if (!ytmusicInstance) {
@@ -510,6 +514,108 @@ app.get('/api/playlist', async (req, res) => {
   } catch (error) {
     console.error('Error fetching playlist:', error);
     res.status(500).json({ error: 'Failed to fetch playlist' });
+  }
+});
+
+// Artist search endpoint (ytmusic-api) — returns artists with profile images
+app.get('/api/artist-search', async (req, res) => {
+  try {
+    const q = (req.query.q || '').toString().trim();
+    if (!q) return res.json([]);
+
+    const cacheKey = `asearch_${q.toLowerCase()}`;
+    const cached = artistCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < ARTIST_CACHE_TTL) {
+      return res.json(cached.data);
+    }
+
+    const yt = await getYTMusic();
+    const artists = await yt.searchArtists(q);
+    const top = (artists || []).slice(0, 8).filter(a => a.artistId);
+
+    const withThumbs = await Promise.all(top.map(async (a) => {
+      let thumb = '';
+      try {
+        const detailed = await yt.getArtist(a.artistId);
+        const thumbs = detailed?.thumbnails || detailed?.thumbs || [];
+        thumb = thumbs[thumbs.length - 1]?.url || thumbs[0]?.url || '';
+      } catch (e) { thumb = ''; }
+      return { name: a.name, artistId: a.artistId, thumb };
+    }));
+
+    artistCache.set(cacheKey, { ts: Date.now(), data: withThumbs });
+    res.json(withThumbs);
+  } catch (err) {
+    console.error('Artist search error:', err.message);
+    res.json([]);
+  }
+});
+
+// Artist details endpoint (ytmusic-api) — name, image, songs
+app.get('/api/artist', async (req, res) => {
+  try {
+    const id = (req.query.id || '').toString().trim();
+    if (!id) return res.status(400).json({ error: 'Missing artist id' });
+
+    const cacheKey = `artist_${id}`;
+    const cached = artistCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < ARTIST_CACHE_TTL) {
+      return res.json(cached.data);
+    }
+
+    const yt = await getYTMusic();
+    const artist = await yt.getArtist(id);
+    if (!artist) return res.status(404).json({ error: 'Artist not found' });
+
+    const toHDUrl = (url) => {
+      if (!url) return '';
+      if (url.includes('img.youtube.com')) {
+        return url.replace('/default.jpg', '/hqdefault.jpg');
+      }
+      return url
+        .replace(/=w\d+-h\d+/, '=w600-h600')
+        .replace(/-w\d+-h\d+/, '-w600-h600')
+        .replace(/\/s\d+-/, '/s600-');
+    };
+
+    let artistSongs = [];
+    try {
+      artistSongs = await yt.getArtistSongs(id);
+    } catch (e) { artistSongs = []; }
+
+    const seen = new Set();
+    const songs = [];
+    const pushSong = (song) => {
+      if (!song || !song.videoId || seen.has(song.videoId)) return;
+      seen.add(song.videoId);
+      const thumbs = song.thumbnails || song.thumbs || [];
+      songs.push({
+        videoId: song.videoId,
+        title: song.name || song.title,
+        channelTitle: (song.artist && song.artist.name) || artist.name || 'Unknown Artist',
+        thumbnail: toHDUrl(thumbs[0]?.url || ''),
+        thumbnailHigh: toHDUrl(thumbs[thumbs.length - 1]?.url || thumbs[0]?.url || ''),
+        duration: parseDurationToSeconds(song.duration),
+        type: 'song'
+      });
+    };
+
+    (artist.topSongs || []).forEach(pushSong);
+    (artistSongs || []).forEach(pushSong);
+
+    const thumbs = artist.thumbnails || artist.thumbs || [];
+    const payload = {
+      name: artist.name,
+      artistId: id,
+      thumb: toHDUrl(thumbs[thumbs.length - 1]?.url || thumbs[0]?.url || ''),
+      songs: songs.slice(0, 60)
+    };
+
+    artistCache.set(cacheKey, { ts: Date.now(), data: payload });
+    res.json(payload);
+  } catch (err) {
+    console.error('Artist fetch error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch artist' });
   }
 });
 

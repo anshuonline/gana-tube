@@ -562,6 +562,7 @@
               <button class="filter-chip" [class.active]="searchFilter() === 'songs'" (click)="setSearchFilter('songs')">Songs</button>
               <button class="filter-chip" [class.active]="searchFilter() === 'albums'" (click)="setSearchFilter('albums')">Albums</button>
               <button class="filter-chip" [class.active]="searchFilter() === 'playlists'" (click)="setSearchFilter('playlists')">Playlists</button>
+              <button class="filter-chip" [class.active]="searchFilter() === 'artists'" (click)="setSearchFilter('artists')">Artists</button>
             </div>
           </div>
 
@@ -822,10 +823,12 @@
           [currentFilter]="searchFilter()"
           [isLoadingMore]="isLazyLoading()"
           [hasMoreSongs]="hasMoreSongs()"
+          [artistResults]="artistResults()"
           (suggestSearch)="onSuggestSearch($event)"
           (playTrack)="onPlaySearchTrack($event)"
           (toggleMenu)="toggleMenu($event.track, $event.event)"
           (loadMore)="loadMoreResults()"
+          (openArtist)="openArtistPage($event.artistId, $event.name)"
           (ambientBgFound)="onAmbientBgFound($event)">
         </app-search-results>
 

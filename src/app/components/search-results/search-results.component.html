@@ -7,7 +7,7 @@
         <div class="skeleton-list-item" *ngFor="let s of skeletons"></div>
       </div>
     </ng-container>
-    <div class="skeleton-grid" *ngIf="currentFilter === 'albums' || currentFilter === 'playlists'">
+    <div class="skeleton-grid" *ngIf="currentFilter === 'albums' || currentFilter === 'playlists' || currentFilter === 'artists'">
       <div class="skeleton-grid-item" *ngFor="let s of skeletons"></div>
     </div>
     <div class="skeleton-list" *ngIf="currentFilter === 'songs'">
@@ -185,22 +185,23 @@
     </div>
 
     <!-- Artists Section (Bottom) -->
-    <div class="artists-section" *ngIf="artistTabs.length > 0">
+    <div class="artists-section" *ngIf="artistsSource.length > 0">
       <h2 class="section-heading">
         <svg lucideUser [attr.size]="18"></svg>
         Artists
-        <span class="count">{{ artistTabs.length }}</span>
+        <span class="count">{{ artistsSource.length }}</span>
       </h2>
       <div class="artist-list">
         <div
           class="artist-row"
-          *ngFor="let artist of artistTabs; let i = index"
+          *ngFor="let artist of artistsSource; let i = index"
           [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
-          (click)="searchArtist(artist)">
-          <div class="artist-avatar" [style.background]="getArtistGradient(artist)">
-            {{ getArtistInitials(artist) }}
+          (click)="onArtistClick(artist)">
+          <div class="artist-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
+            <img *ngIf="artist.thumb" [src]="artist.thumb" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
+            <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
           </div>
-          <span class="artist-name">{{ artist }}</span>
+          <span class="artist-name">{{ artist.name }}</span>
           <svg lucideChevronRight class="artist-chevron" [attr.size]="16"></svg>
         </div>
       </div>
@@ -258,22 +259,23 @@
     </div>
 
     <!-- Artists Section (Bottom) -->
-    <div class="artists-section" *ngIf="artistTabs.length > 0">
+    <div class="artists-section" *ngIf="artistsSource.length > 0">
       <h2 class="section-heading">
         <svg lucideUser [attr.size]="18"></svg>
         Artists
-        <span class="count">{{ artistTabs.length }}</span>
+        <span class="count">{{ artistsSource.length }}</span>
       </h2>
       <div class="artist-list">
         <div
           class="artist-row"
-          *ngFor="let artist of artistTabs; let i = index"
+          *ngFor="let artist of artistsSource; let i = index"
           [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
-          (click)="searchArtist(artist)">
-          <div class="artist-avatar" [style.background]="getArtistGradient(artist)">
-            {{ getArtistInitials(artist) }}
+          (click)="onArtistClick(artist)">
+          <div class="artist-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
+            <img *ngIf="artist.thumb" [src]="artist.thumb" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
+            <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
           </div>
-          <span class="artist-name">{{ artist }}</span>
+          <span class="artist-name">{{ artist.name }}</span>
           <svg lucideChevronRight class="artist-chevron" [attr.size]="16"></svg>
         </div>
       </div>
@@ -347,6 +349,29 @@
       <svg lucideLibrary [attr.size]="48"></svg>
       <h3>No playlists found</h3>
       <p>Try the "All" tab to see songs and albums</p>
+    </div>
+  </ng-container>
+
+  <!-- "Artists" Filter View: Responsive Grid -->
+  <ng-container *ngIf="currentFilter === 'artists'">
+    <div class="artist-grid" *ngIf="artistsSource.length > 0">
+      <div
+        class="artist-card"
+        *ngFor="let artist of artistsSource; let i = index"
+        [style.animation-delay.ms]="i * 25"
+        (click)="onArtistClick(artist)">
+        <div class="artist-card-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
+          <img *ngIf="artist.thumb" [src]="artist.thumb" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
+          <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
+        </div>
+        <p class="media-title">{{ artist.name }}</p>
+        <p class="media-sub">Artist</p>
+      </div>
+    </div>
+    <div class="filter-empty" *ngIf="artistsSource.length === 0">
+      <svg lucideUser [attr.size]="48"></svg>
+      <h3>No artists found</h3>
+      <p>Try the "All" tab to see songs and playlists</p>
     </div>
   </ng-container>
 
