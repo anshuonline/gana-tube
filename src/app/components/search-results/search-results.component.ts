@@ -40,7 +40,7 @@ export class SearchResultsComponent implements OnChanges {
   constructor(private playerService: PlayerService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['results'] || changes['currentFilter']) {
+    if (changes['results'] || changes['currentFilter'] || changes['artistResults']) {
       this.processResults();
     }
   }
@@ -152,8 +152,25 @@ export class SearchResultsComponent implements OnChanges {
   }
 
   get artistsSource(): { name: string; artistId?: string; thumb?: string }[] {
-    if (this.artistResults.length > 0) return this.artistResults;
-    return this.artistTabs.map(name => ({ name }));
+    const list: { name: string; artistId?: string; thumb?: string }[] = [];
+    const seen = new Set<string>();
+
+    for (const a of this.artistResults || []) {
+      if (a && a.name && !seen.has(a.name.toLowerCase().trim())) {
+        seen.add(a.name.toLowerCase().trim());
+        list.push(a);
+      }
+    }
+
+    for (const name of this.artistTabs || []) {
+      const cleanName = (name || '').trim();
+      if (cleanName && !seen.has(cleanName.toLowerCase())) {
+        seen.add(cleanName.toLowerCase());
+        list.push({ name: cleanName });
+      }
+    }
+
+    return list;
   }
 
   onArtistImgError(artist: { name: string; artistId?: string; thumb?: string }): void {
@@ -164,7 +181,7 @@ export class SearchResultsComponent implements OnChanges {
     if (artist?.artistId) {
       this.openArtist.emit({ artistId: artist.artistId, name: artist.name });
     } else if (artist?.name) {
-      this.suggestSearch.emit(`${artist.name} songs`);
+      this.openArtist.emit({ artistId: '', name: artist.name });
     }
   }
 

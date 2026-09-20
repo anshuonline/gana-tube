@@ -1429,10 +1429,31 @@ export class App implements OnInit {
   }
 
   fetchSearchArtists(query: string): void {
+    const qLower = (query || '').toLowerCase().trim();
+    const curatedMatches: { name: string; artistId: string; thumb?: string }[] = [];
+    for (const lang of Object.keys(this.topArtistsByLang)) {
+      for (const artist of this.topArtistsByLang[lang]) {
+        if (artist.name.toLowerCase().includes(qLower) || qLower.includes(artist.name.toLowerCase())) {
+          if (!curatedMatches.some(m => m.name.toLowerCase() === artist.name.toLowerCase())) {
+            curatedMatches.push({ name: artist.name, artistId: '', thumb: artist.image });
+          }
+        }
+      }
+    }
+    if (curatedMatches.length > 0) {
+      this.artistResults.set(curatedMatches);
+    }
+
     this.youtubeApi.searchArtists(query).pipe(takeUntil(this.destroy$)).subscribe({
       next: (artists) => {
         if (artists && artists.length > 0) {
-          this.artistResults.set(artists);
+          const merged = [...artists];
+          for (const c of curatedMatches) {
+            if (!merged.some(m => m.name.toLowerCase() === c.name.toLowerCase())) {
+              merged.push(c);
+            }
+          }
+          this.artistResults.set(merged);
         }
       },
       error: () => {}
@@ -1442,6 +1463,35 @@ export class App implements OnInit {
   openArtistPage(artistOrName: string, fallbackName: string = ''): void {
     if (!artistOrName) return;
     const looksLikeId = /^UC[\w-]{20,}$/.test(artistOrName);
+
+    const fallbackToArtistPlaylist = (artistName: string) => {
+      this.isLoading.set(true);
+      this.youtubeApi.searchMusic(artistName + ' songs', 40, 'song').pipe(takeUntil(this.destroy$)).subscribe({
+        next: (songs) => {
+          this.isLoading.set(false);
+          if (songs && songs.length > 0) {
+            const playlistMeta: PlaylistMeta = {
+              id: `artist-${encodeURIComponent(artistName)}`,
+              title: artistName,
+              language: '',
+              coverImage: songs[0]?.thumbnailHigh || songs[0]?.thumbnail || 'ganatubenewlogo.png',
+              preloadedSongs: songs,
+              searchQueries: [],
+              creator: 'Artist',
+              is_public: true,
+              is_owner: false
+            };
+            this.openPlaylist(playlistMeta);
+          } else {
+            this.performSearch(artistName + ' songs');
+          }
+        },
+        error: () => {
+          this.isLoading.set(false);
+          this.performSearch(artistName + ' songs');
+        }
+      });
+    };
 
     const loadById = (artistId: string, name: string) => {
       const id = `artist-${artistId}`;
@@ -1467,17 +1517,17 @@ export class App implements OnInit {
             };
             this.openPlaylist(playlistMeta);
           } else if (name) {
-            this.performSearch(name + ' songs');
+            fallbackToArtistPlaylist(name);
           } else {
             this.toastService.error('Artist not found');
           }
         },
         error: () => {
           if (this.currentLoadingPlaylistId !== id) return;
-          this.isLoading.set(false);
           if (name) {
-            this.performSearch(name + ' songs');
+            fallbackToArtistPlaylist(name);
           } else {
+            this.isLoading.set(false);
             this.toastService.error('Error loading artist');
           }
         }
@@ -1487,17 +1537,17 @@ export class App implements OnInit {
     if (looksLikeId) {
       loadById(artistOrName, fallbackName);
     } else {
-      // Name given — resolve to artistId first
+      // Name given — try resolve to artistId first, otherwise create artist playlist directly
       this.youtubeApi.searchArtists(artistOrName).pipe(takeUntil(this.destroy$)).subscribe({
         next: (artists) => {
           if (artists && artists.length > 0 && artists[0].artistId) {
             loadById(artists[0].artistId, artists[0].name || artistOrName);
           } else {
-            this.performSearch(artistOrName + ' songs');
+            fallbackToArtistPlaylist(artistOrName);
           }
         },
         error: () => {
-          this.performSearch(artistOrName + ' songs');
+          fallbackToArtistPlaylist(artistOrName);
         }
       });
     }
@@ -2287,10 +2337,83 @@ export class App implements OnInit {
     }
 
     if (this.searchFilter() === 'artists') {
+      this.isLoading.set(true);
+      this.artistResults.set([]);
       this.results.set([]);
-      this.isLoading.set(false);
-      this.fetchSearchArtists(query);
-      this.analyticsService.recordSearch(query, 'artists', 0);
+
+      // 1. Fetch from backend artist-search API
+      const backendArtistPromise = new Promise<{ name: string; artistId: string; thumb?: string }[]>((resolve) => {
+        this.youtubeApi.searchArtists(query).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => resolve(res || []),
+          error: () => resolve([])
+        });
+      });
+
+      // 2. Fetch from songs search as guaranteed fallback
+      const songsPromise = new Promise<YouTubeSearchResult[]>((resolve) => {
+        this.youtubeApi.searchMusic(query, 30, 'song').pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => resolve(res || []),
+          error: () => resolve([])
+        });
+      });
+
+      Promise.all([backendArtistPromise, songsPromise]).then(([apiArtists, songs]) => {
+        if (this.currentQuery !== query) return;
+
+        // Extract artists from songs
+        const songArtistNames = new Set<string>();
+        const fallbackArtistsFromSongs: { name: string; artistId: string; thumb?: string }[] = [];
+        for (const s of songs || []) {
+          let cName = (s.channelTitle || '').trim()
+            .replace(/\s*-\s*Topic$/i, '')
+            .replace(/\s*VEVO\s*/gi, '')
+            .replace(/Official/gi, '')
+            .trim();
+          if (cName && !songArtistNames.has(cName.toLowerCase()) && cName.toLowerCase() !== 'artist' && cName.toLowerCase() !== 'various artists') {
+            songArtistNames.add(cName.toLowerCase());
+            fallbackArtistsFromSongs.push({
+              name: cName,
+              artistId: '',
+              thumb: s.thumbnailHigh || s.thumbnail || ''
+            });
+          }
+        }
+
+        // Check curated top artists in local data (topArtistsByLang)
+        const qLower = (query || '').toLowerCase().trim();
+        const curatedMatches: { name: string; artistId: string; thumb?: string }[] = [];
+        for (const lang of Object.keys(this.topArtistsByLang)) {
+          for (const artist of this.topArtistsByLang[lang]) {
+            if (artist.name.toLowerCase().includes(qLower) || qLower.includes(artist.name.toLowerCase())) {
+              if (!curatedMatches.some(m => m.name.toLowerCase() === artist.name.toLowerCase())) {
+                curatedMatches.push({ name: artist.name, artistId: '', thumb: artist.image });
+              }
+            }
+          }
+        }
+
+        // Merge: apiArtists -> curatedMatches -> fallbackArtistsFromSongs
+        const mergedList: { name: string; artistId: string; thumb?: string }[] = [];
+        const seenNames = new Set<string>();
+
+        const addCandidate = (item: { name: string; artistId: string; thumb?: string }) => {
+          if (!item || !item.name) return;
+          const key = item.name.toLowerCase().trim();
+          if (!seenNames.has(key)) {
+            seenNames.add(key);
+            mergedList.push(item);
+          }
+        };
+
+        (apiArtists || []).forEach(addCandidate);
+        curatedMatches.forEach(addCandidate);
+        fallbackArtistsFromSongs.forEach(addCandidate);
+
+        this.artistResults.set(mergedList);
+        this.results.set(songs || []);
+        this.isLoading.set(false);
+        this.analyticsService.recordSearch(query, 'artists', mergedList.length);
+      });
       return;
     }
 

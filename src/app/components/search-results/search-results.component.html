@@ -1,5 +1,5 @@
 <!-- Loading State -->
-<div class="loading-state" *ngIf="isLoading && results.length === 0">
+<div class="loading-state" *ngIf="isLoading && ((currentFilter === 'artists' && artistsSource.length === 0) || (currentFilter !== 'artists' && results.length === 0))">
   <div class="skeleton-container">
     <ng-container *ngIf="currentFilter === 'all'">
       <div class="skeleton-top-result"></div>
@@ -17,14 +17,15 @@
 </div>
 
 <!-- Empty State -->
-<div class="empty-state" *ngIf="!isLoading && results.length === 0 && hasSearched">
-  <svg lucideMusic2 class="empty-icon" [attr.size]="64"></svg>
-  <h3>No results found</h3>
+<div class="empty-state" *ngIf="!isLoading && hasSearched && (currentFilter === 'artists' ? artistsSource.length === 0 : results.length === 0)">
+  <svg *ngIf="currentFilter === 'artists'" lucideUser class="empty-icon" [attr.size]="64"></svg>
+  <svg *ngIf="currentFilter !== 'artists'" lucideMusic2 class="empty-icon" [attr.size]="64"></svg>
+  <h3>No {{ currentFilter === 'artists' ? 'artists' : 'results' }} found</h3>
   <p>Try a different keyword or check the spelling</p>
 </div>
 
 <!-- Results Layout -->
-<div class="results-layout" *ngIf="!isLoading && results.length > 0">
+<div class="results-layout" *ngIf="!isLoading && ((currentFilter === 'artists' && artistsSource.length > 0) || (currentFilter !== 'artists' && results.length > 0))">
 
   <!-- "All" Filter View: Top Result + Structured Sections -->
   <ng-container *ngIf="currentFilter === 'all'">

@@ -531,17 +531,24 @@ app.get('/api/artist-search', async (req, res) => {
 
     const yt = await getYTMusic();
     const artists = await yt.searchArtists(q);
-    const top = (artists || []).slice(0, 8).filter(a => a.artistId);
+    const top = (artists || []).slice(0, 12).filter(a => a.artistId);
 
-    const withThumbs = await Promise.all(top.map(async (a) => {
-      let thumb = '';
-      try {
-        const detailed = await yt.getArtist(a.artistId);
-        const thumbs = detailed?.thumbnails || detailed?.thumbs || [];
-        thumb = thumbs[thumbs.length - 1]?.url || thumbs[0]?.url || '';
-      } catch (e) { thumb = ''; }
-      return { name: a.name, artistId: a.artistId, thumb };
-    }));
+    const toHDUrl = (url) => {
+      if (!url) return '';
+      if (url.includes('img.youtube.com')) {
+        return url.replace('/default.jpg', '/hqdefault.jpg');
+      }
+      return url
+        .replace(/=w\d+-h\d+/, '=w300-h300')
+        .replace(/-w\d+-h\d+/, '-w300-h300')
+        .replace(/\/s\d+-/, '/s300-');
+    };
+
+    const withThumbs = top.map((a) => {
+      const thumbs = a.thumbnails || a.thumbs || [];
+      const thumb = thumbs[thumbs.length - 1]?.url || thumbs[0]?.url || '';
+      return { name: a.name, artistId: a.artistId, thumb: toHDUrl(thumb) };
+    });
 
     artistCache.set(cacheKey, { ts: Date.now(), data: withThumbs });
     res.json(withThumbs);
