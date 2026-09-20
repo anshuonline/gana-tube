@@ -1431,6 +1431,92 @@
   }
 }
 
+/* --- HOME SHELVES SKELETON LOADER --- */
+.home-shelves-skeleton {
+  animation: fadeIn 0.3s ease-in;
+  margin-bottom: 24px;
+
+  .skeleton-shelf {
+    margin-bottom: 32px;
+  }
+
+  .skeleton-title-bar {
+    width: 200px;
+    height: 26px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.8s infinite linear;
+    margin-bottom: 12px;
+  }
+
+  .skeleton-song-card {
+    background: rgba(18, 18, 24, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: default !important;
+    pointer-events: none;
+
+    &:hover {
+      transform: none !important;
+    }
+
+    .skeleton-thumbnail {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.02);
+
+      .skeleton-shimmer-sweep {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.06) 50%, transparent 100%);
+        background-size: 200% 100%;
+        animation: skeletonShimmer 1.8s infinite linear;
+      }
+    }
+
+    .skeleton-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 12px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+
+      .skeleton-line {
+        height: 12px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        background-size: 200% 100%;
+        animation: skeletonShimmer 1.8s infinite linear;
+
+        &.short {
+          width: 45%;
+          height: 9px;
+          background: rgba(255, 255, 255, 0.06);
+        }
+
+        &.title {
+          width: 80%;
+          height: 13px;
+        }
+      }
+    }
+
+    &:nth-child(2n) .skeleton-shimmer-sweep { animation-delay: 0.15s; }
+    &:nth-child(3n) .skeleton-shimmer-sweep { animation-delay: 0.3s; }
+    &:nth-child(4n) .skeleton-shimmer-sweep { animation-delay: 0.45s; }
+  }
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .artists-bento-grid {
   display: grid;
   grid-template-rows: repeat(2, 160px);

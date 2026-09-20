@@ -557,6 +557,26 @@
         <!-- Recommendation Shelves (Home Screen) -->
         <div class="recommendations-wrap" *ngIf="!hasSearched() && !isLoading() && !isSearchMode()">
 
+          <!-- Initial Shelves Skeleton Loader (Shown before sections load) -->
+          <div class="home-shelves-skeleton" *ngIf="loadedShelves().length === 0">
+            <div class="shelf-section skeleton-shelf" *ngFor="let s of [1, 2, 3]">
+              <div class="shelf-header">
+                <div class="skeleton-title-bar"></div>
+              </div>
+              <div class="shelf-grid">
+                <div class="song-card skeleton-song-card" *ngFor="let sc of [1, 2, 3, 4, 5, 6]">
+                  <div class="skeleton-thumbnail">
+                    <div class="skeleton-shimmer-sweep"></div>
+                  </div>
+                  <div class="skeleton-info">
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-line title"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Dynamic Shelves Loop -->
           <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index; trackBy: shelfTrackBy">
             
@@ -717,16 +737,6 @@
             </div>
           </div>
 
-        </div>
-
-        <!-- Shelves Loading Skeletons -->
-        <div class="recommendations-wrap" *ngIf="!hasSearched() && !isSearchMode() && (shelvesLoading() || (shelfLoading() && loadedShelves().length === 0))">
-          <div class="shelf-section" *ngFor="let s of [1,2]">
-            <div class="skeleton-title" style="width: 200px; height: 28px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
-            <div class="loading-grid">
-              <div class="skeleton-card" *ngFor="let sc of [1,2,3,4]"></div>
-            </div>
-          </div>
         </div>
 
         <!-- Search Results Area -->

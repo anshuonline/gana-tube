@@ -317,7 +317,7 @@ export class App implements OnInit {
 
   // Dynamic shelves signal holding loaded categories
   loadedShelves = signal<Array<{ title: string; query: string; songs: YouTubeSearchResult[] }>>([]);
-  shelvesLoading = signal<boolean>(false);
+  shelvesLoading = signal<boolean>(true);
   shelfLoading = signal<boolean>(false);
   loadingShelfTitle = signal<string>('');
 

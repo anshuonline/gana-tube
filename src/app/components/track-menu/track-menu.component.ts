@@ -17,7 +17,9 @@ import {
   LucideMoon,
   LucideVolumeX,
   LucideVolume1,
-  LucideVolume2
+  LucideVolume2,
+  LucideChevronDown,
+  LucideChevronUp
 } from '@lucide/angular';
 import { FormsModule } from '@angular/forms';
 import { OfflineService } from '../../services/offline.service';
@@ -38,7 +40,9 @@ import { OfflineService } from '../../services/offline.service';
     LucideMoon,
     LucideVolumeX,
     LucideVolume1,
-    LucideVolume2
+    LucideVolume2,
+    LucideChevronDown,
+    LucideChevronUp
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -97,7 +101,12 @@ export class TrackMenuComponent implements OnChanges {
     }
   }
 
+  isArtistsExpanded = false;
+
   ngOnChanges(changes: SimpleChanges) {
+    if (changes['isOpen'] || changes['track']) {
+      this.isArtistsExpanded = false;
+    }
     if (changes['isOpen'] || changes['xPos'] || changes['yPos']) {
       this.calculatePosition();
     }
@@ -259,10 +268,47 @@ export class TrackMenuComponent implements OnChanges {
     this.close();
   }
 
-  goToArtist(event: Event) {
+  getArtists(): string[] {
+    if (!this.track) return [];
+    const raw = (this.track.artist && this.track.artist !== 'unknown' ? this.track.artist : this.track.channelTitle) || '';
+    if (!raw) return [];
+
+    // Split on delimiters: comma, &, feat., ft., featuring, /, •, +
+    const parts = raw
+      .split(/,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+featuring\s+|\s+\/\s+|\s+•\s+|\s+\+\s+/i)
+      .map((p: string) => p.trim())
+      .filter((p: string) => p.length > 0);
+
+    const unique: string[] = [];
+    const seen = new Set<string>();
+    for (const part of parts) {
+      const lower = part.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        unique.push(part);
+      }
+    }
+
+    return unique.length > 0 ? unique : [raw.trim()];
+  }
+
+  getVisibleArtists(): string[] {
+    const all = this.getArtists();
+    if (this.isArtistsExpanded || all.length <= 4) {
+      return all;
+    }
+    return all.slice(0, 4);
+  }
+
+  toggleArtistsExpanded(event: Event) {
     event.stopPropagation();
-    if (this.track && this.track.channelTitle) {
-      this.router.navigate(['/search'], { queryParams: { q: this.track.channelTitle } });
+    this.isArtistsExpanded = !this.isArtistsExpanded;
+  }
+
+  goToArtist(artistName: string, event: Event) {
+    event.stopPropagation();
+    if (artistName) {
+      this.router.navigate(['/artist', encodeURIComponent(artistName)]);
     }
     this.close();
   }

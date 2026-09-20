@@ -70,11 +70,29 @@
 
     <hr class="menu-divider">
     
-    <!-- Go to Artist (Card Style) -->
-    <div class="menu-item artist-card-item" style="cursor: default;">
-      <img [src]="getArtistImage()" (error)="onImageError($event)" class="artist-avatar" alt="Artist">
-      <div class="artist-info">
-        <span class="artist-name">{{ track?.channelTitle }}</span>
+    <!-- Artists Column Section -->
+    <div class="artists-column-group">
+      <div 
+        class="menu-item artist-card-item" 
+        *ngFor="let artist of getVisibleArtists()" 
+        (click)="goToArtist(artist, $event)"
+        [title]="'View songs by ' + artist">
+        <img [src]="getArtistImage()" (error)="onImageError($event)" class="artist-avatar" [alt]="artist">
+        <div class="artist-info">
+          <span class="artist-name">{{ artist }}</span>
+          <span class="artist-label">Artist</span>
+        </div>
+      </div>
+
+      <!-- Expand/Collapse Button if more than 4 artists -->
+      <div 
+        class="menu-item more-artists-item" 
+        *ngIf="getArtists().length > 4" 
+        (click)="toggleArtistsExpanded($event)">
+        <span *ngIf="!isArtistsExpanded">+{{ getArtists().length - 4 }} more</span>
+        <span *ngIf="isArtistsExpanded">Show less</span>
+        <svg *ngIf="!isArtistsExpanded" lucideChevronDown [attr.size]="18"></svg>
+        <svg *ngIf="isArtistsExpanded" lucideChevronUp [attr.size]="18"></svg>
       </div>
     </div>
     
