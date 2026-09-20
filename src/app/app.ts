@@ -1072,7 +1072,8 @@ export class App implements OnInit {
       }
       
       if (url === 'playlist') {
-        const playlistId = event.urlAfterRedirects.split('/')[2];
+        let playlistId = event.urlAfterRedirects.split('/')[2] || '';
+        try { playlistId = decodeURIComponent(playlistId); } catch { /* keep raw segment */ }
         if (playlistId === 'liked-songs') {
           this.openLikedSongs();
           return;
@@ -1095,7 +1096,9 @@ export class App implements OnInit {
           this.currentLoadingPlaylistId = playlistId; // Set tracking ID
           if (playlistId.startsWith('artist-')) {
             if (!(this.currentPage() === 'playlist' && this.selectedPlaylist()?.id === playlistId)) {
-              this.openArtistPage(playlistId.replace('artist-', ''), '');
+              let artistName = playlistId.replace('artist-', '');
+              try { artistName = decodeURIComponent(artistName); } catch { /* already raw */ }
+              this.openArtistPage(artistName, '');
             }
           } else if (playlistId.startsWith('pl_') || playlistId.startsWith('cp-')) {
             this.fetchPublicPlaylist(playlistId, '');
@@ -1474,7 +1477,7 @@ export class App implements OnInit {
           this.isLoading.set(false);
           if (songs && songs.length > 0) {
             const playlistMeta: PlaylistMeta = {
-              id: `artist-${encodeURIComponent(artistName)}`,
+              id: `artist-${artistName}`,
               title: artistName,
               language: '',
               coverImage: songs[0]?.thumbnailHigh || songs[0]?.thumbnail || 'ganatubenewlogo.png',
@@ -2743,7 +2746,7 @@ export class App implements OnInit {
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
     
-    const targetUrl = `/playlist/${playlist.id}`;
+    const targetUrl = `/playlist/${encodeURIComponent(playlist.id)}`;
     if (!this.router.url.includes(targetUrl)) {
       this.router.navigate(['/playlist', playlist.id]);
     }
@@ -2776,7 +2779,7 @@ export class App implements OnInit {
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
     
-    const targetUrl = `/playlist/${playlistId}`;
+    const targetUrl = `/playlist/${encodeURIComponent(playlistId)}`;
     if (!this.router.url.includes(targetUrl)) {
       this.router.navigate(['/playlist', playlistId]);
     }

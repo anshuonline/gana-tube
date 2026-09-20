@@ -28,10 +28,11 @@
         <div class="search-input-wrapper">
           <input 
             type="text" 
-            placeholder="Search for songs, artists, or podcasts..." 
             [(ngModel)]="searchQuery" 
-            (keyup.enter)="onSearchInPlayer()" 
+            (keyup.enter)="onSearchInPlayer()"
+            aria-label="Search for songs, artists, or podcasts"
           />
+          <span class="fs-search-placeholder" *ngIf="!searchQuery">Search for songs, artists, or podcasts...</span>
           <button *ngIf="searchQuery" class="fs-search-clear-btn" (click)="clearSearch()" title="Clear query">
             <svg lucideX [attr.size]="16"></svg>
           </button>
