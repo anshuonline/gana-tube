@@ -1204,6 +1204,7 @@ export class App implements OnInit {
       } else if (url === 'artist') {
         const artistParam = decodeURIComponent(event.urlAfterRedirects.split('/')[2] || '');
         if (artistParam) {
+          this.closeFullScreenPlayer();
           this.openArtistPage(artistParam, artistParam);
           this.updateSEO(
             `${artistParam} Songs & Hits - GanaTube`,

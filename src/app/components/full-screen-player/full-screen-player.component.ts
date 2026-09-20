@@ -132,7 +132,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   @Input() safePlayerCoverAdUrl: any = null;
 
   activeView: 'artwork' | 'queue' | 'lyrics' | 'related' | 'search' = 'artwork';
-  isSidebarVisible = true;
+  isSidebarVisible = false;
   showMenu = false;
   showMobileOptions = signal(false);
   menuTrack: Track | null = null;
