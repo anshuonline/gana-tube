@@ -12,16 +12,15 @@
   user-select: none;
   cursor: pointer;
   pointer-events: all;
-  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), filter 0.7s ease;
+  opacity: 1;
+  transition: opacity 0.72s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.fading {
     opacity: 0;
-    filter: blur(14px);
+    pointer-events: none;
 
-    .intro-signature {
-      transform: scale(1.08) translateY(-6px);
-      letter-spacing: 0.08em;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), letter-spacing 0.6s ease;
+    .intro-content {
+      transform: scale(1.16);
     }
   }
 }
@@ -33,6 +32,8 @@
   position: relative;
   width: 100%;
   padding: 0 24px;
+  transform: scale(1);
+  transition: transform 0.75s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .intro-signature {
@@ -40,115 +41,53 @@
   margin: 0;
   padding: 0 16px;
   font-family: 'Reenie Beanie', cursive, sans-serif;
-  font-size: clamp(4.8rem, 15vw, 10rem);
+  font-size: clamp(4.8rem, 16vw, 10rem);
   font-weight: 400;
   color: #ffffff;
   line-height: 1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-align: center;
   display: inline-block;
   white-space: nowrap;
+
+  /* STRICT: Absolutely NO glow, shadows, or color haze */
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  /* Pro cinematic fade-in entrance with subtle scale */
   opacity: 0;
-  transform: scale(0.9) translateY(12px);
-  filter: blur(16px);
-  animation: signatureEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
-
-  /* Multi-tier ethereal white luminescence glow */
-  text-shadow:
-    0 0 12px rgba(255, 255, 255, 0.95),
-    0 0 28px rgba(255, 255, 255, 0.7),
-    0 0 55px rgba(168, 85, 247, 0.5),
-    0 0 95px rgba(236, 72, 153, 0.32);
-
-  .signature-text {
-    position: relative;
-    z-index: 2;
-    display: inline-block;
-    animation: gentleBreathe 2.6s ease-in-out infinite alternate 1.1s;
-  }
-
-  /* Shimmering beam sweeps diagonally across the handwriting */
-  .signature-shimmer {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    line-height: inherit;
-    background: linear-gradient(
-      110deg,
-      transparent 0%,
-      transparent 35%,
-      rgba(255, 255, 255, 0.95) 50%,
-      transparent 65%,
-      transparent 100%
-    );
-    background-size: 250% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: shimmerStreak 2.4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s infinite;
-  }
+  transform: scale(0.9);
+  animation: proFadeInZoom 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards;
 }
 
-@keyframes signatureEntrance {
+@keyframes proFadeInZoom {
   0% {
     opacity: 0;
-    transform: scale(0.86) translateY(18px);
-    filter: blur(18px);
-    letter-spacing: -0.02em;
-  }
-  60% {
-    opacity: 1;
-    filter: blur(0px);
+    transform: scale(0.9);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: blur(0px);
-    letter-spacing: 0.04em;
-  }
-}
-
-@keyframes gentleBreathe {
-  0% {
-    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 35px rgba(168, 85, 247, 0.4));
-  }
-  100% {
-    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 1)) drop-shadow(0 0 60px rgba(236, 72, 153, 0.65));
-  }
-}
-
-@keyframes shimmerStreak {
-  0% {
-    background-position: 150% 0;
-  }
-  100% {
-    background-position: -150% 0;
+    transform: scale(1);
   }
 }
 
 @media (max-width: 640px) {
   .intro-signature {
-    font-size: clamp(3.6rem, 18vw, 5.6rem);
-    padding: 0 10px;
+    font-size: clamp(3.6rem, 18vw, 5.8rem);
+    padding: 0 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .intro-overlay,
+  .intro-content,
   .intro-signature {
-    opacity: 1;
-    transform: none;
-    filter: none;
-    animation: none;
-  }
-
-  .signature-text,
-  .signature-shimmer {
-    animation: none;
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

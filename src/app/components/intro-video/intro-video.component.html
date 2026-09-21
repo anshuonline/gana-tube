@@ -1,10 +1,7 @@
 @if (showOverlay()) {
   <div class="intro-overlay" [class.fading]="fadingOut()" (click)="skipIntro()">
     <div class="intro-content" [class.visible]="!fadingOut()">
-      <h1 class="intro-signature">
-        <span class="signature-text">GanaTube.in</span>
-        <span class="signature-shimmer" aria-hidden="true">GanaTube.in</span>
-      </h1>
+      <h1 class="intro-signature">GanaTube.in</h1>
     </div>
   </div>
 }
