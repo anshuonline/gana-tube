@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap');
+@import url('https://fonts.cdnfonts.com/css/allison-dream');
 
 .intro-overlay {
   position: fixed;
@@ -39,13 +39,13 @@
 .intro-signature {
   position: relative;
   margin: 0;
-  padding: 0 16px;
-  font-family: 'Reenie Beanie', cursive, sans-serif;
-  font-size: clamp(4.8rem, 16vw, 10rem);
+  padding: 0 24px;
+  font-family: 'Allison Dream', cursive, sans-serif;
+  font-size: clamp(4.5rem, 15vw, 9.5rem);
   font-weight: 400;
   color: #ffffff;
-  line-height: 1;
-  letter-spacing: 0.03em;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
   text-align: center;
   display: inline-block;
   white-space: nowrap;
