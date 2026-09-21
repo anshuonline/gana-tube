@@ -71,14 +71,6 @@
           <svg lucideShare2 [attr.size]="18" *ngIf="!linkCopied"></svg>
           <svg lucideCheck [attr.size]="18" *ngIf="linkCopied" style="color: #4ade80;"></svg>
         </button>
-        <button class="header-nav-toggle-btn" 
-                (click)="toggleNavbarAutoHide()" 
-                [title]="isNavbarAutoHide() ? 'Auto-hide: ON (Hides on scroll down. Click to pin)' : 'Navbar Pinned (Always visible. Click to auto-hide)'"
-                [class.pinned]="!isNavbarAutoHide()"
-                aria-label="Toggle Navbar Auto-Hide">
-          <svg lucideEye [attr.size]="18" *ngIf="!isNavbarAutoHide()"></svg>
-          <svg lucideEyeOff [attr.size]="18" *ngIf="isNavbarAutoHide()"></svg>
-        </button>
       </div>
 
       <!-- Center: Search Trigger -->
@@ -327,6 +319,25 @@
               >120m (2h)</button>
             </div>
             <p class="inactivity-hint">Timer resets automatically whenever you touch the screen, click, or scroll.</p>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="settings-group group-navigation">
+          <h2 class="group-title">Navigation</h2>
+          
+          <div class="setting-item">
+            <div class="setting-info">
+              <h3>Navbar Auto-Hide</h3>
+              <p>Automatically hide the top navigation bar when scrolling down, show when scrolling up.</p>
+            </div>
+            <button class="toggle-switch" 
+                    [class.on]="isNavbarAutoHide()" 
+                    (click)="toggleNavbarAutoHide()" 
+                    aria-label="Toggle Navbar Auto-Hide" 
+                    [attr.aria-pressed]="isNavbarAutoHide()">
+              <span class="toggle-knob"></span>
+            </button>
           </div>
         </div>
 
