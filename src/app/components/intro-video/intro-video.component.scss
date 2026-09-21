@@ -26,7 +26,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 28px;
   opacity: 0;
   transition: opacity 0.8s ease;
 
@@ -36,26 +36,86 @@
 }
 
 .logo-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
-  animation: logoReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  animation: logoReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+
+/* Soft ambient brand glow — pure light behind the mark, no solid background */
+.logo-glow {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.25) 0%,
+    rgba(236, 72, 153, 0.12) 45%,
+    transparent 70%
+  );
+  filter: blur(28px);
+  pointer-events: none;
+  animation: glowPulse 2.8s ease-in-out infinite;
 }
 
 .logo-icon {
-  width: 130px;
-  height: 130px;
-  object-fit: contain;
+  position: relative;
+  width: 180px;
+  height: 180px;
   display: block;
+  filter: drop-shadow(0 0 28px rgba(168, 85, 247, 0.35));
+  animation: logoFloat 3.4s ease-in-out infinite;
+}
+
+/* Equalizer bars gently dance */
+.wave {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: waveDance 1.5s ease-in-out infinite;
+
+  &.wave-1 {
+    animation-delay: 0s;
+  }
+
+  &.wave-2 {
+    animation-delay: 0.2s;
+  }
+
+  &.wave-3 {
+    animation-delay: 0.4s;
+  }
 }
 
 .intro-title {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 1.6rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #ffffff;
+  font-family: 'Urbanist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
   margin: 0;
+  display: flex;
+  align-items: baseline;
   opacity: 0;
-  animation: textReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+  animation: textReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+
+  .title-main {
+    background: linear-gradient(135deg, #c084fc 0%, #a855f7 40%, #ec4899 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .title-domain {
+    font-size: 0.45em;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.45);
+    margin-left: 3px;
+  }
 }
 
 @keyframes logoReveal {
@@ -72,7 +132,7 @@
 @keyframes textReveal {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -80,13 +140,64 @@
   }
 }
 
+@keyframes logoFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes waveDance {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.55);
+  }
+}
+
 @media (max-width: 640px) {
   .logo-icon {
-    width: 96px;
-    height: 96px;
+    width: 132px;
+    height: 132px;
+  }
+
+  .logo-glow {
+    width: 190px;
+    height: 190px;
   }
 
   .intro-title {
-    font-size: 1.3rem;
+    font-size: 2.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-wrapper,
+  .intro-title {
+    opacity: 1;
+    animation: none;
+  }
+
+  .logo-icon,
+  .logo-glow,
+  .wave {
+    animation: none;
   }
 }
