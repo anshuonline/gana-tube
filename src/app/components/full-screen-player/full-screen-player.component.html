@@ -19,32 +19,35 @@
     
     <!-- Top Header -->
     <div class="fs-header">
-      <button class="icon-btn" (click)="close()" title="Minimize">
-        <svg lucideChevronDown [attr.size]="32"></svg>
-      </button>
+      <div class="fs-header-left">
+        <button class="icon-btn" (click)="close()" title="Minimize">
+          <svg lucideChevronDown [attr.size]="32"></svg>
+        </button>
 
-      <!-- Search Bar (Desktop Only) -->
-      <div class="fs-header-search" *ngIf="isDesktop">
-        <div class="search-input-wrapper">
-          <input 
-            type="text" 
-            [(ngModel)]="searchQuery" 
-            (keyup.enter)="onSearchInPlayer()"
-            aria-label="Search for songs, artists, or podcasts"
-          />
-          <span class="fs-search-placeholder" *ngIf="!searchQuery">Search for songs, artists, or podcasts...</span>
-          <button *ngIf="searchQuery" class="fs-search-clear-btn" (click)="clearSearch()" title="Clear query">
-            <svg lucideX [attr.size]="16"></svg>
-          </button>
-          <button 
-            class="fs-search-submit-btn" 
-            (click)="onSearchInPlayer()" 
-            title="Search"
-            [disabled]="searchLoading"
-            [class.loading]="searchLoading">
-            <svg *ngIf="!searchLoading" lucideSearch [attr.size]="18"></svg>
-            <svg *ngIf="searchLoading" lucideLoader2 class="spinner" [attr.size]="18"></svg>
-          </button>
+        <!-- Search Bar (Desktop Only - Expandable on hover) -->
+        <div class="fs-header-search" *ngIf="isDesktop">
+          <div class="search-input-wrapper" [class.expanded]="searchQuery.length > 0">
+            <button 
+              type="button"
+              class="fs-search-submit-btn" 
+              (click)="onSearchInPlayer(); $event.stopPropagation()" 
+              title="Search"
+              [disabled]="searchLoading"
+              [class.loading]="searchLoading">
+              <svg *ngIf="!searchLoading" lucideSearch [attr.size]="18"></svg>
+              <svg *ngIf="searchLoading" lucideLoader2 class="spinner" [attr.size]="18"></svg>
+            </button>
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              (keyup.enter)="onSearchInPlayer()"
+              placeholder="Search songs, artists..."
+              aria-label="Search for songs, artists, or podcasts"
+            />
+            <button *ngIf="searchQuery" class="fs-search-clear-btn" (click)="clearSearch(); $event.stopPropagation()" title="Clear query">
+              <svg lucideX [attr.size]="16"></svg>
+            </button>
+          </div>
         </div>
       </div>
 
