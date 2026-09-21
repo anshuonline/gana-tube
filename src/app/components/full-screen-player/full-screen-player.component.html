@@ -40,6 +40,7 @@
             <input 
               type="text" 
               [(ngModel)]="searchQuery" 
+              (input)="onSearchInput()"
               (keyup.enter)="onSearchInPlayer()"
               placeholder="Search songs, artists..."
               aria-label="Search for songs, artists, or podcasts"

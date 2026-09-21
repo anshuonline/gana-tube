@@ -42,6 +42,7 @@ import { TrackMenuComponent } from '../track-menu/track-menu.component';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CastService } from '../../services/cast.service';
 import { RoomService } from '../../services/room.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-full-screen-player',
@@ -127,6 +128,9 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
 
   isDesktop = false;
   searchQuery = '';
+  searchDebounceTimer: any = null;
+  lastSearchedQuery = '';
+  private searchSub: Subscription | null = null;
 
   @Input() playerCoverAd: any = null;
   @Input() safePlayerCoverAdUrl: any = null;
@@ -295,6 +299,14 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearAdTimers();
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+      this.searchSub = null;
+    }
   }
 
   clearAdTimers(): void {
@@ -311,32 +323,65 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.isDesktop = typeof window !== 'undefined' && window.innerWidth >= 992;
   }
 
-  onSearchInPlayer(): void {
+  onSearchInput(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
     const q = this.searchQuery.trim();
-    if (q) {
-      this.analyticsService.setLastSearch(q);
-      if (!this.isDesktop) {
-        this.close();
-        this.router.navigate(['/search'], { queryParams: { q } });
+    if (!q) {
+      this.clearSearch();
+      return;
+    }
+    if (q === this.lastSearchedQuery) {
+      return;
+    }
+    this.searchDebounceTimer = setTimeout(() => {
+      this.onSearchInPlayer();
+    }, 3000);
+  }
+
+  onSearchInPlayer(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
+    const q = this.searchQuery.trim();
+    if (!q) {
+      this.clearSearch();
+      return;
+    }
+    this.lastSearchedQuery = q;
+    this.analyticsService.setLastSearch(q);
+    if (!this.isDesktop) {
+      this.close();
+      this.router.navigate(['/search'], { queryParams: { q } });
+    } else {
+      if (this.activeView !== 'search') {
+        this.activeView = 'search';
+        this.isSidebarVisible = true;
       } else {
-        if (this.activeView !== 'search') {
-          this.activeView = 'search';
-          this.isSidebarVisible = true;
-        } else {
-          this.isSidebarVisible = true;
-        }
-        this.fetchSearch(q);
+        this.isSidebarVisible = true;
       }
+      this.fetchSearch(q);
     }
   }
 
   fetchSearch(query: string): void {
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+      this.searchSub = null;
+    }
     this.searchLoading = true;
     this.searchResults = [];
     this.analyticsService.setLastSearch(query);
     
-    this.youtubeApi.searchMusic(query).subscribe({
+    this.searchSub = this.youtubeApi.searchMusic(query).subscribe({
       next: (res) => {
+        if (!this.searchQuery.trim() || this.activeView !== 'search') {
+          this.searchLoading = false;
+          return;
+        }
         this.searchResults = res || [];
         this.searchLoading = false;
         this.analyticsService.recordSearch(query, 'songs', this.searchResults.length, 'manual');
@@ -352,10 +397,23 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   }
 
   clearSearch(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+      this.searchSub = null;
+    }
+    this.lastSearchedQuery = '';
     this.searchQuery = '';
     this.searchResults = [];
+    this.searchLoading = false;
     if (this.activeView === 'search') {
-      this.activeView = 'queue';
+      this.activeView = 'artwork';
+      if (this.isDesktop) {
+        this.isSidebarVisible = false;
+      }
     }
     this.cdr.detectChanges();
   }
