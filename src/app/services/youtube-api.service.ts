@@ -289,9 +289,9 @@ export class YoutubeApiService {
   }
 
   private parseISO8601Duration(duration: string): number {
-    if (!duration) return 210;
+    if (!duration) return 0;
     const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    if (!match) return 210;
+    if (!match) return 0;
     const hours = (parseInt(match[1]) || 0);
     const minutes = (parseInt(match[2]) || 0);
     const seconds = (parseInt(match[3]) || 0);
@@ -394,6 +394,23 @@ export class YoutubeApiService {
     });
   }
 
+  getRadioTracks(videoId: string, queryFallback?: string): Observable<YouTubeSearchResult[]> {
+    if (!videoId) return of([]);
+    const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
+    const params = new HttpParams()
+      .set('videoId', videoId)
+      .set('query', queryFallback || '');
+
+    return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/radio`, { params }).pipe(
+      timeout(10000),
+      map(results => results.filter((track: YouTubeSearchResult) => !this.isBanned(track))),
+      catchError((err) => {
+        console.warn('Radio endpoint failed, falling back to searchMusic:', err);
+        return this.searchMusic(`${queryFallback || videoId} similar songs`, 25);
+      })
+    );
+  }
+
   searchArtists(query: string): Observable<{ name: string; artistId: string; thumb?: string }[]> {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams().set('q', query);
@@ -412,7 +429,7 @@ export class YoutubeApiService {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) {
+        if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24 && parsed.data?.songs?.length > 5) {
           return of(parsed.data);
         }
       } catch (e) {}

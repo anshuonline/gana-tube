@@ -156,6 +156,8 @@ export class App implements OnInit {
   isRouteLoading = signal<boolean>(false);
   isRouteDone = signal<boolean>(false);
   loadingPageTitle = signal<string>('');
+  private lastNonPlaylistUrl = '/home';
+  private lastNonPlaylistPage = 'home';
 
   showInstallModal = false;
 
@@ -1071,6 +1073,12 @@ export class App implements OnInit {
         this.currentLoadingPlaylistId = null;
       }
       
+      // Track last non-playlist page for instant, bulletproof back button navigation
+      if (url !== 'playlist' && url !== 'artist') {
+        this.lastNonPlaylistUrl = event.urlAfterRedirects || '/home';
+        this.lastNonPlaylistPage = url;
+      }
+      
       if (url === 'playlist') {
         let playlistId = event.urlAfterRedirects.split('/')[2] || '';
         try { playlistId = decodeURIComponent(playlistId); } catch { /* keep raw segment */ }
@@ -1260,6 +1268,8 @@ export class App implements OnInit {
 
       // Check if it's a valid static page or one of our main pages
       if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'discovery', 'offline', 'curated-playlists'].includes(url) || this.pageContent[url]) {
+        this.selectedPlaylist.set(null);
+        this.loadingPageTitle.set('');
         this.currentPage.set(url);
         
         if (url === 'search') {
@@ -2818,7 +2828,8 @@ export class App implements OnInit {
     
     const targetUrl = `/playlist/${encodeURIComponent(playlist.id)}`;
     if (!this.router.url.includes(targetUrl)) {
-      this.router.navigate(['/playlist', playlist.id]);
+      const isRedirect = this.router.url.includes('/artist/') || this.router.url.includes('/user/');
+      this.router.navigate(['/playlist', playlist.id], { replaceUrl: isRedirect });
     }
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3078,12 +3089,22 @@ export class App implements OnInit {
   closePlaylist(): void {
     this.loadingPageTitle.set('');
     this.selectedPlaylist.set(null);
-    if ((window as any).hasNavigatedInApp) {
-      this.location.back();
+    
+    const targetUrl = this.lastNonPlaylistUrl || '/home';
+    const targetPage = this.lastNonPlaylistPage || 'home';
+    
+    this.currentPage.set(targetPage);
+    if (targetPage === 'search') {
+      this.isSearchMode.set(true);
     } else {
-      this.currentPage.set('home');
-      this.router.navigate(['/home']);
+      this.isSearchMode.set(false);
     }
+    
+    this.router.navigateByUrl(targetUrl).catch(() => {
+      this.currentPage.set('home');
+      this.isSearchMode.set(false);
+      this.router.navigate(['/home']);
+    });
   }
 
 

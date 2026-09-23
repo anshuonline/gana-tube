@@ -90,7 +90,7 @@ function parseDurationToSeconds(d) {
     if (parts.length === 2 && parts.every(p => !isNaN(p))) return parts[0] * 60 + parts[1];
     if (parts.length === 3 && parts.every(p => !isNaN(p))) return parts[0] * 3600 + parts[1] * 60 + parts[2];
   }
-  return 210;
+  return 0;
 }
 
 async function getBotSongs() {
@@ -517,6 +517,74 @@ app.get('/api/playlist', async (req, res) => {
   }
 });
 
+// Radio / Related Tracks endpoint (uses official YouTube Music RDAMVM radio mix)
+app.get('/api/radio', async (req, res) => {
+  const videoId = (req.query.videoId || '').toString().trim();
+  if (!videoId) return res.status(400).json({ error: 'videoId required' });
+
+  try {
+    const yt = await getYTMusic();
+    const data = await yt.constructRequest('next', { playlistId: 'RDAMVM' + videoId, isAudioOnly: true });
+    const queueRenderer = data.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer;
+    const contents = queueRenderer?.content?.playlistPanelRenderer?.contents || [];
+
+    const toHDUrl = (url) => {
+      if (!url) return '';
+      if (url.includes('img.youtube.com')) {
+        return url.replace('/default.jpg', '/hqdefault.jpg');
+      }
+      return url
+        .replace(/=w\d+-h\d+/, '=w500-h500')
+        .replace(/-w\d+-h\d+/, '-w500-h500')
+        .replace(/\/s\d+-/, '/s500-');
+    };
+
+    let songs = contents
+      .map(item => item.playlistPanelVideoRenderer)
+      .filter(Boolean)
+      .map(item => {
+        const thumbs = item.thumbnail?.thumbnails || [];
+        const rawDuration = item.lengthText?.runs?.[0]?.text || '';
+        return {
+          videoId: item.videoId,
+          title: item.title?.runs?.[0]?.text || 'Unknown',
+          channelTitle: item.shortBylineText?.runs?.map(r => r.text).join('') || 'Unknown Artist',
+          thumbnail: toHDUrl(thumbs[0]?.url || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/mqdefault.jpg` : '')),
+          thumbnailHigh: toHDUrl(thumbs[thumbs.length - 1]?.url || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg` : '')),
+          duration: parseDurationToSeconds(rawDuration),
+          publishedAt: new Date().toISOString()
+        };
+      })
+      .filter(s => s.videoId && s.videoId !== videoId);
+
+    // Fallback if radio had fewer than 5 tracks
+    if (songs.length < 5) {
+      const q = (req.query.query || '').toString().trim() || videoId;
+      const searchRes = await yt.searchSongs(`${q} similar songs`);
+      const existing = new Set(songs.map(s => s.videoId));
+      (searchRes || []).forEach(s => {
+        if (!s.videoId || s.videoId === videoId || existing.has(s.videoId)) return;
+        existing.add(s.videoId);
+        const thumbs = s.thumbnails || [];
+        songs.push({
+          videoId: s.videoId,
+          title: s.name || s.title,
+          channelTitle: (s.artist && s.artist.name) || (typeof s.artist === 'string' ? s.artist : '') || 'Unknown Artist',
+          thumbnail: toHDUrl(thumbs[0]?.url || `https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`),
+          thumbnailHigh: toHDUrl(thumbs[thumbs.length - 1]?.url || `https://i.ytimg.com/vi/${s.videoId}/hqdefault.jpg`),
+          duration: parseDurationToSeconds(s.duration),
+          publishedAt: new Date().toISOString()
+        });
+      });
+    }
+
+    res.json(songs);
+  } catch (err) {
+    console.error('Radio fetch error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch radio tracks' });
+  }
+});
+
 // Artist search endpoint (ytmusic-api) — returns artists with profile images
 app.get('/api/artist-search', async (req, res) => {
   try {
@@ -566,7 +634,7 @@ app.get('/api/artist', async (req, res) => {
 
     const cacheKey = `artist_${id}`;
     const cached = artistCache.get(cacheKey);
-    if (cached && Date.now() - cached.ts < ARTIST_CACHE_TTL) {
+    if (cached && Date.now() - cached.ts < ARTIST_CACHE_TTL && cached.data?.songs?.length > 5) {
       return res.json(cached.data);
     }
 
@@ -599,7 +667,7 @@ app.get('/api/artist', async (req, res) => {
       songs.push({
         videoId: song.videoId,
         title: song.name || song.title,
-        channelTitle: (song.artist && song.artist.name) || artist.name || 'Unknown Artist',
+        channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : '') || song.channelTitle || artist.name || 'Unknown Artist',
         thumbnail: toHDUrl(thumbs[0]?.url || ''),
         thumbnailHigh: toHDUrl(thumbs[thumbs.length - 1]?.url || thumbs[0]?.url || ''),
         duration: parseDurationToSeconds(song.duration),
@@ -615,10 +683,14 @@ app.get('/api/artist', async (req, res) => {
       const searchQueries = [
         `${artist.name} songs`,
         `${artist.name} hits`,
+        `${artist.name} all songs`,
         `${artist.name} top songs`,
-        `${artist.name} new songs`,
+        `${artist.name} romantic songs`,
+        `${artist.name} sad songs`,
+        `${artist.name} playlist`,
         `${artist.name} popular songs`,
-        `${artist.name} best songs`
+        `${artist.name} best songs`,
+        `${artist.name} audio`
       ];
 
       try {
@@ -626,17 +698,32 @@ app.get('/api/artist', async (req, res) => {
           searchQueries.map(q => yt.searchSongs(q).catch(() => []))
         );
 
+        const artistLower = artist.name.toLowerCase();
         for (const results of searchResults) {
           if (Array.isArray(results)) {
             for (const item of results) {
-              // Only add songs by this artist (check channelTitle or artist name)
-              const itemArtist = (item.artist && item.artist.name) || item.channelTitle || '';
-              if (itemArtist.toLowerCase().includes(artist.name.toLowerCase()) ||
-                  item.title.toLowerCase().includes(artist.name.toLowerCase())) {
+              const itemName = item.name || item.title || '';
+              const artistNames = [];
+              if (item.artist && item.artist.name) artistNames.push(item.artist.name);
+              else if (typeof item.artist === 'string') artistNames.push(item.artist);
+              if (Array.isArray(item.artists)) {
+                item.artists.forEach(a => {
+                  if (a && a.name) artistNames.push(a.name);
+                  else if (typeof a === 'string') artistNames.push(a);
+                });
+              }
+              if (item.channelTitle) artistNames.push(item.channelTitle);
+              const combinedArtists = artistNames.join(', ');
+
+              if (
+                combinedArtists.toLowerCase().includes(artistLower) ||
+                itemName.toLowerCase().includes(artistLower) ||
+                (artistLower.length > 3 && artist.name.split(' ').some(word => word.length > 2 && (combinedArtists.toLowerCase().includes(word.toLowerCase()) || itemName.toLowerCase().includes(word.toLowerCase()))))
+              ) {
                 pushSong({
                   videoId: item.videoId,
-                  name: item.name || item.title,
-                  artist: { name: itemArtist || artist.name },
+                  name: itemName,
+                  artist: { name: combinedArtists || artist.name },
                   thumbnails: item.thumbnails || item.thumbs || [],
                   duration: item.duration
                 });

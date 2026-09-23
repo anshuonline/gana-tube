@@ -148,8 +148,26 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   lyricsLoading = false;
   showToast = false;
   
+  allRelatedTracks: Track[] = [];
   relatedTracks: Track[] = [];
+  relatedDisplayLimit = signal<number>(15);
+  displayedRelatedTracks = computed(() => {
+    return this.allRelatedTracks.slice(0, this.relatedDisplayLimit());
+  });
   relatedLoading = false;
+  isLoadingMoreRelated = false;
+  private lastRelatedVideoId: string | null = null;
+  private relatedSub: Subscription | null = null;
+  private relatedPage = 1;
+
+  queueDisplayLimit = signal<number>(30);
+  displayedQueue = computed(() => {
+    const q = this.playerService.queue();
+    const currentIdx = this.playerService.currentIndex();
+    const minLimit = Math.max(30, currentIdx + 15);
+    const limit = Math.max(this.queueDisplayLimit(), minLimit);
+    return q.slice(0, limit);
+  });
   
   searchResults: Track[] = [];
   searchLoading = false;
@@ -233,6 +251,14 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         this.fetchLyrics();
       }
       
+      // If Autoplay is ON: automatically refresh Related/Radio for the newly playing song
+      // If Autoplay is OFF: do NOT auto-refresh related songs
+      if (track && (!current || track.videoId !== current.videoId)) {
+        if (this.playerService.isAutoplayEnabled()) {
+          this.fetchRelated(track);
+        }
+      }
+      
       // Manage Ad Timers
       if (track) {
         this.clearAdTimers();
@@ -306,6 +332,10 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     if (this.searchSub) {
       this.searchSub.unsubscribe();
       this.searchSub = null;
+    }
+    if (this.relatedSub) {
+      this.relatedSub.unsubscribe();
+      this.relatedSub = null;
     }
   }
 
@@ -611,7 +641,10 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         if (view === 'lyrics') {
           this.fetchLyrics();
         } else if (view === 'related') {
-          this.fetchRelated();
+          const ct = this.playerService.currentTrack();
+          if (ct && (this.allRelatedTracks.length === 0 || this.lastRelatedVideoId !== ct.videoId)) {
+            this.fetchRelated(ct);
+          }
         }
       }
     } else {
@@ -622,7 +655,10 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         if (view === 'lyrics') {
           this.fetchLyrics();
         } else if (view === 'related') {
-          this.fetchRelated();
+          const ct = this.playerService.currentTrack();
+          if (ct && (this.allRelatedTracks.length === 0 || this.lastRelatedVideoId !== ct.videoId)) {
+            this.fetchRelated(ct);
+          }
         }
       }
     }
@@ -708,22 +744,120 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  fetchRelated(): void {
-    const track = this.playerService.currentTrack();
-    if (!track) return;
+  trackByTrackId(index: number, track: Track): string {
+    return track.videoId || `${index}`;
+  }
+
+  onQueueScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target) return;
     
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 300;
+    if (nearBottom) {
+      const totalQueue = this.playerService.queue().length;
+      if (this.queueDisplayLimit() < totalQueue) {
+        this.queueDisplayLimit.update(l => l + 20);
+        this.cdr.detectChanges();
+      } else if (this.playerService.isAutoplayEnabled() && !this.playerService.isFetchingMore) {
+        const current = this.playerService.currentTrack();
+        if (current) {
+          this.playerService.fetchMoreAutoplayTracks(current, false);
+        }
+      }
+    }
+  }
+
+  onAutoplayToggle(): void {
+    this.playerService.toggleAutoplay();
+    if (this.playerService.isAutoplayEnabled()) {
+      const current = this.playerService.currentTrack();
+      if (current) {
+        this.fetchRelated(current);
+      }
+    }
+  }
+
+  fetchRelated(forceTrack?: Track | null): void {
+    const track = forceTrack || this.playerService.currentTrack();
+    if (!track || !track.videoId) return;
+
+    if (this.relatedSub) {
+      this.relatedSub.unsubscribe();
+      this.relatedSub = null;
+    }
+
+    this.lastRelatedVideoId = track.videoId;
     this.relatedLoading = true;
+    this.allRelatedTracks = [];
     this.relatedTracks = [];
+    this.relatedDisplayLimit.set(15);
+    this.relatedPage = 1;
+    this.cdr.detectChanges();
+
+    this.relatedSub = this.youtubeApi.getRadioTracks(track.videoId, `${track.channelTitle} ${track.title}`).subscribe({
+      next: (res) => {
+        this.allRelatedTracks = res || [];
+        this.relatedTracks = this.allRelatedTracks;
+        this.relatedLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching related tracks', err);
+        this.relatedLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onRelatedScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target) return;
     
-    const query = `${track.channelTitle} ${track.title} similar songs`;
-    this.youtubeApi.searchMusic(query).subscribe(res => {
-      this.relatedTracks = res || [];
-      this.relatedLoading = false;
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('Error fetching related tracks', err);
-      this.relatedLoading = false;
-      this.cdr.detectChanges();
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 300;
+    if (nearBottom && !this.isLoadingMoreRelated && !this.relatedLoading) {
+      if (this.relatedDisplayLimit() < this.allRelatedTracks.length) {
+        this.relatedDisplayLimit.update(l => l + 15);
+        this.cdr.detectChanges();
+      } else {
+        this.loadMoreRelated();
+      }
+    }
+  }
+
+  loadMoreRelated(): void {
+    const track = this.playerService.currentTrack();
+    if (!track || !track.videoId || this.isLoadingMoreRelated) return;
+    
+    this.isLoadingMoreRelated = true;
+    this.relatedPage++;
+    
+    const queries = [
+      `${track.title} radio songs`,
+      `${track.channelTitle} hit songs`,
+      `${track.title} mix songs`,
+      `Best of ${track.channelTitle} songs`
+    ];
+    const query = queries[(this.relatedPage - 2) % queries.length];
+    
+    this.youtubeApi.searchMusic(query, 20).subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          const existingIds = new Set(this.allRelatedTracks.map(t => t.videoId));
+          existingIds.add(track.videoId);
+          const unique = res.filter(t => !existingIds.has(t.videoId));
+          if (unique.length > 0) {
+            this.allRelatedTracks = [...this.allRelatedTracks, ...unique];
+            this.relatedTracks = this.allRelatedTracks;
+            this.relatedDisplayLimit.update(l => l + 15);
+          }
+        }
+        this.isLoadingMoreRelated = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoadingMoreRelated = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

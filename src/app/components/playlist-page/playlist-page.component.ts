@@ -9,6 +9,8 @@ import { SponsoredAd } from '../../app';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles } from '@lucide/angular';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
@@ -24,6 +26,8 @@ import { AppStateService } from '../../services/app-state.service';
 export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   @Input() playlist!: PlaylistMeta;
   @Output() back = new EventEmitter<void>();
+
+  private destroy$ = new Subject<void>();
 
   songs = signal<YouTubeSearchResult[]>([]);
   displayLimit = signal<number>(20);
@@ -98,6 +102,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     if (this.originalTitle) {
       this.titleService.setTitle(this.originalTitle);
     }
@@ -187,7 +193,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     }
     
     this.isLoading.set(true);
-    this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries, this.playlist.id).subscribe((results) => {
+    this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries, this.playlist.id).pipe(takeUntil(this.destroy$)).subscribe((results) => {
       this.songs.set(results);
       this.isLoading.set(false);
       this.fetchMissingDurations(results);
@@ -196,14 +202,14 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   fetchMissingDurations(currentList: YouTubeSearchResult[]): void {
-    const missingIds = currentList.filter(s => s.duration === undefined).map(s => s.videoId);
+    const missingIds = currentList.filter(s => !s.duration || s.duration === 210).map(s => s.videoId);
     if (missingIds.length === 0) return;
 
-    this.youtubeApi.getVideoDetails(missingIds).subscribe(details => {
+    this.youtubeApi.getVideoDetails(missingIds).pipe(takeUntil(this.destroy$)).subscribe(details => {
       const updated = currentList.map(song => {
-        if (song.duration === undefined) {
+        if (!song.duration || song.duration === 210) {
           const fetched = details.find(d => d.videoId === song.videoId);
-          if (fetched && fetched.duration !== undefined) {
+          if (fetched && fetched.duration) {
             return { ...song, duration: fetched.duration };
           }
         }
@@ -473,7 +479,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     this.suggestionAttempts++;
     this.suggestionQuery.set(pickedQuery);
 
-    this.youtubeApi.searchMusic(pickedQuery, 30).subscribe({
+    this.youtubeApi.searchMusic(pickedQuery, 30).pipe(takeUntil(this.destroy$)).subscribe({
       next: (results) => {
         const existingIds = new Set(this.songs().map(s => s.videoId));
         const uniqueSuggestions: YouTubeSearchResult[] = [];
@@ -491,13 +497,13 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
         this.isLoadingSuggestions.set(false);
 
         // Fetch missing durations for suggestions
-        const missingIds = finalSuggestions.filter(s => s.duration === undefined).map(s => s.videoId);
+        const missingIds = finalSuggestions.filter(s => !s.duration || s.duration === 210).map(s => s.videoId);
         if (missingIds.length > 0) {
-          this.youtubeApi.getVideoDetails(missingIds).subscribe(details => {
+          this.youtubeApi.getVideoDetails(missingIds).pipe(takeUntil(this.destroy$)).subscribe(details => {
             const updated = this.suggestedSongs().map(s => {
-              if (s.duration === undefined) {
+              if (!s.duration || s.duration === 210) {
                 const found = details.find(d => d.videoId === s.videoId);
-                if (found && found.duration !== undefined) {
+                if (found && found.duration) {
                   return { ...s, duration: found.duration };
                 }
               }

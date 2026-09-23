@@ -817,6 +817,8 @@
   background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   transition: background 0.2s, transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  content-visibility: auto;
+  contain-intrinsic-size: 0 68px;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -1195,6 +1197,8 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s ease;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 68px;
     
     &:hover {
       background: rgba(255,255,255,0.08);
@@ -1232,12 +1236,56 @@
       }
     }
   }
+
+  .related-loading-more,
+  .queue-loading-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 0 24px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+
+    .spinner-small {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #a855f7;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+  }
   
   .related-not-found {
     text-align: center;
     color: rgba(255,255,255,0.4);
     padding: 60px 20px;
   }
+}
+
+.queue-loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 0 24px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+
+  .spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #a855f7;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 // Desktop Layout Modifiers

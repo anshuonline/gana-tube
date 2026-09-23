@@ -129,7 +129,7 @@
       <div class="fs-list-view" *ngIf="activeView !== 'artwork' || (isDesktop && isSidebarVisible)">
         
         <!-- Queue View (Up Next) -->
-        <div class="fs-queue-view" *ngIf="activeView === 'queue' || (isDesktop && activeView === 'artwork')">
+        <div class="fs-queue-view" *ngIf="activeView === 'queue' || (isDesktop && activeView === 'artwork')" (scroll)="onQueueScroll($event)">
           
           <div class="queue-header-actions">
             <div class="autoplay-info">
@@ -137,7 +137,7 @@
               <p>Add similar content to the end of the queue</p>
             </div>
             <label class="gt-switch purple">
-              <input type="checkbox" [checked]="playerService.isAutoplayEnabled()" (change)="playerService.toggleAutoplay()">
+              <input type="checkbox" [checked]="playerService.isAutoplayEnabled()" (change)="onAutoplayToggle()">
               <span class="gt-slider round"></span>
             </label>
           </div>
@@ -145,7 +145,7 @@
           <div class="queue-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
             <div 
               class="queue-item" 
-              *ngFor="let track of playerService.queue(); let i = index"
+              *ngFor="let track of displayedQueue(); let i = index; trackBy: trackByTrackId"
               [class.active]="playerService.currentIndex() === i"
               (click)="playQueueTrack(i)"
               cdkDrag
@@ -155,7 +155,7 @@
                 <svg lucideGripVertical [attr.size]="20" style="color: rgba(255,255,255,0.3);"></svg>
               </div>
               <div class="queue-item-thumb">
-                <img [src]="track.thumbnail" [alt]="track.title" />
+                <img [src]="track.thumbnail" [alt]="track.title" loading="lazy" />
                 <div class="play-overlay" *ngIf="playerService.currentIndex() === i">
                   <div class="play-ripple">
                     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -170,6 +170,12 @@
                 <svg lucideMoreVertical [attr.size]="20"></svg>
               </button>
             </div>
+          </div>
+
+          <!-- Queue Loading More Spinner -->
+          <div *ngIf="playerService.isFetchingMore" class="queue-loading-more">
+            <div class="spinner-small"></div>
+            <span>Loading more tracks...</span>
           </div>
         </div>
 
@@ -206,20 +212,20 @@
         </div>
 
         <!-- Related View -->
-        <div class="fs-related-view" *ngIf="activeView === 'related'">
+        <div class="fs-related-view" *ngIf="activeView === 'related'" (scroll)="onRelatedScroll($event)">
           <div *ngIf="relatedLoading" class="related-loading">
             <div class="spinner"></div>
             <span>Finding similar songs...</span>
           </div>
 
-          <div *ngIf="!relatedLoading && relatedTracks.length > 0" class="related-list">
+          <div *ngIf="!relatedLoading && displayedRelatedTracks().length > 0" class="related-list">
             <div 
               class="related-item" 
-              *ngFor="let track of relatedTracks"
+              *ngFor="let track of displayedRelatedTracks(); trackBy: trackByTrackId"
               (click)="playRelatedTrack(track)"
               (contextmenu)="openItemMenu($event, track)"
             >
-              <img [src]="track.thumbnail" [alt]="track.title" class="related-thumb" />
+              <img [src]="track.thumbnail" [alt]="track.title" class="related-thumb" loading="lazy" />
               <div class="related-info">
                 <div class="related-title">{{ track.title }}</div>
                 <div class="related-artist">{{ track.channelTitle }}</div>
@@ -230,7 +236,13 @@
             </div>
           </div>
 
-          <div *ngIf="!relatedLoading && relatedTracks.length === 0" class="related-not-found">
+          <!-- Loading more indicator on scroll -->
+          <div *ngIf="isLoadingMoreRelated" class="related-loading-more">
+            <div class="spinner-small"></div>
+            <span>Loading more similar songs...</span>
+          </div>
+
+          <div *ngIf="!relatedLoading && displayedRelatedTracks().length === 0" class="related-not-found">
             <p>No related songs found.</p>
           </div>
         </div>

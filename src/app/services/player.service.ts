@@ -30,7 +30,7 @@ export class PlayerService {
   private spinService = inject(SpinService);
   public offlineService = inject(OfflineService);
   private trackStartTime: number = 0;
-  private isFetchingMore = false;
+  public isFetchingMore = false;
   private isRemoteUpdate = false;
   private location = inject(Location);
   private ngZone = inject(NgZone);
@@ -978,12 +978,11 @@ export class PlayerService {
     }
   }
 
-  private fetchMoreAutoplayTracks(current: Track, playNextOnSuccess: boolean = false): void {
-    if (this.isFetchingMore) return;
+  public fetchMoreAutoplayTracks(current: Track, playNextOnSuccess: boolean = false): void {
+    if (this.isFetchingMore || !current || !current.videoId) return;
     this.isFetchingMore = true;
     
-    const query = `${current.channelTitle} ${current.title} similar hit songs`;
-    this.youtubeApi.searchMusic(query, 20).subscribe({
+    this.youtubeApi.getRadioTracks(current.videoId, `${current.channelTitle} ${current.title}`).subscribe({
       next: (newTracks) => {
         if (newTracks && newTracks.length > 0) {
           const q = this.queue();
