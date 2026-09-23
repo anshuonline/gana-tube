@@ -3580,13 +3580,25 @@
     font-family: inherit;
 
     &.pl-play-all {
-      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.3);
+      background: linear-gradient(135deg, #6b21a8 0%, #be185d 100%);
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 14px rgba(107, 33, 168, 0.4);
+
+      span {
+        color: #ffffff !important;
+        font-weight: 700;
+      }
+
+      svg {
+        color: #ffffff !important;
+        fill: #ffffff !important;
+      }
 
       &:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(168, 85, 247, 0.45);
+        background: linear-gradient(135deg, #7c22d6 0%, #db2777 100%);
+        box-shadow: 0 6px 18px rgba(190, 24, 93, 0.5);
       }
     }
 
@@ -3961,6 +3973,81 @@
     background: rgba(239, 68, 68, 0.2);
     color: #ef4444;
   }
+}
+
+// Playlist Page Instant Loading Transition State
+.playlist-page-loading {
+  padding: 100px 40px 120px;
+  min-height: 80vh;
+  position: relative;
+  background: #000000;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+
+  @media (max-width: 768px) {
+    padding: 80px 16px 120px;
+  }
+
+  .back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    margin-bottom: 32px;
+    transition: background 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .loading-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 380px;
+    gap: 20px;
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3.5px solid rgba(255, 255, 255, 0.08);
+      border-top-color: #a855f7;
+      border-right-color: #ec4899;
+      border-radius: 50%;
+      animation: spinLoader 0.8s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      margin: 0;
+      text-align: center;
+    }
+  }
+}
+
+@keyframes spinLoader {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 

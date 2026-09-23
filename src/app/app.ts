@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideHeart, LucideClock } from '@lucide/angular';
+  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideHeart, LucideClock, LucideArrowLeft } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -92,6 +92,7 @@ export interface SponsoredAd {
     LucideChevronDown,
     LucideHeart,
     LucideClock,
+    LucideArrowLeft,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -154,6 +155,7 @@ export class App implements OnInit {
   isMobileMenuOpen = signal<boolean>(false);
   isRouteLoading = signal<boolean>(false);
   isRouteDone = signal<boolean>(false);
+  loadingPageTitle = signal<string>('');
 
   showInstallModal = false;
 
@@ -1082,6 +1084,7 @@ export class App implements OnInit {
         }
         const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
         if (targetPlaylist) {
+          this.loadingPageTitle.set('');
           this.selectedPlaylist.set(targetPlaylist);
           this.updateSEO(
             `${targetPlaylist.title} - GanaTube`,
@@ -1091,7 +1094,12 @@ export class App implements OnInit {
           this.isSearchMode.set(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (playlistId) {
-          this.currentLoadingPlaylistId = playlistId; // Set tracking ID
+          if (this.selectedPlaylist()?.id !== playlistId) {
+            this.currentLoadingPlaylistId = playlistId; // Set tracking ID
+            this.currentPage.set('playlist');
+            this.selectedPlaylist.set(null);
+            this.loadingPageTitle.set(playlistId.startsWith('artist-') ? playlistId.replace('artist-', '') : 'Playlist');
+          }
           if (playlistId.startsWith('artist-')) {
             if (!(this.currentPage() === 'playlist' && this.selectedPlaylist()?.id === playlistId)) {
               let artistName = playlistId.replace('artist-', '');
@@ -1102,39 +1110,52 @@ export class App implements OnInit {
             this.fetchPublicPlaylist(playlistId, '');
           } else if (playlistId.startsWith('MPREb_')) {
             this.isLoading.set(true);
-            this.youtubeApi.getAlbum(playlistId).pipe(takeUntil(this.destroy$)).subscribe(album => {
-              this.isLoading.set(false);
-              // Only open if this is still the playlist we are trying to load
-              if (this.currentLoadingPlaylistId !== playlistId) return;
-              
-              if (album) {
-                album.is_owner = false;
-                album.is_public = true;
-                album.language = 'English';
-                if (!album.searchQueries) album.searchQueries = [];
-                this.openPlaylist(album);
-              } else {
+            this.youtubeApi.getAlbum(playlistId).pipe(takeUntil(this.destroy$)).subscribe({
+              next: (album) => {
+                this.isLoading.set(false);
+                if (this.currentLoadingPlaylistId !== playlistId) return;
+                if (album) {
+                  album.is_owner = false;
+                  album.is_public = true;
+                  album.language = '';
+                  if (!album.searchQueries) album.searchQueries = [];
+                  this.openPlaylist(album);
+                } else {
+                  this.loadingPageTitle.set('');
+                  this.router.navigate(['/home']);
+                }
+              },
+              error: () => {
+                this.isLoading.set(false);
+                this.loadingPageTitle.set('');
                 this.router.navigate(['/home']);
               }
             });
           } else if (playlistId.startsWith('PL') || playlistId.startsWith('VL') || playlistId.startsWith('RD') || playlistId.startsWith('OL')) {
             this.isLoading.set(true);
-            this.youtubeApi.getYTPlaylist(playlistId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
-              this.isLoading.set(false);
-              // Only open if this is still the playlist we are trying to load
-              if (this.currentLoadingPlaylistId !== playlistId) return;
-              
-              if (playlist) {
-                playlist.is_owner = false;
-                playlist.is_public = true;
-                playlist.language = 'English';
-                if (!playlist.searchQueries) playlist.searchQueries = [];
-                this.openPlaylist(playlist);
-              } else {
+            this.youtubeApi.getYTPlaylist(playlistId).pipe(takeUntil(this.destroy$)).subscribe({
+              next: (playlist) => {
+                this.isLoading.set(false);
+                if (this.currentLoadingPlaylistId !== playlistId) return;
+                if (playlist) {
+                  playlist.is_owner = false;
+                  playlist.is_public = true;
+                  playlist.language = '';
+                  if (!playlist.searchQueries) playlist.searchQueries = [];
+                  this.openPlaylist(playlist);
+                } else {
+                  this.loadingPageTitle.set('');
+                  this.router.navigate(['/home']);
+                }
+              },
+              error: () => {
+                this.isLoading.set(false);
+                this.loadingPageTitle.set('');
                 this.router.navigate(['/home']);
               }
             });
           } else {
+            this.loadingPageTitle.set('');
             this.router.navigate(['/home']);
           }
         }
@@ -1206,6 +1227,12 @@ export class App implements OnInit {
         const artistParam = decodeURIComponent(event.urlAfterRedirects.split('/')[2] || '');
         if (artistParam) {
           this.closeFullScreenPlayer();
+          const targetId = `artist-${artistParam}`;
+          if (this.selectedPlaylist()?.id !== targetId && this.selectedPlaylist()?.title !== artistParam) {
+            this.currentPage.set('playlist');
+            this.selectedPlaylist.set(null);
+            this.loadingPageTitle.set(artistParam);
+          }
           this.openArtistPage(artistParam, artistParam);
           this.updateSEO(
             `${artistParam} Songs & Hits - GanaTube`,
@@ -1467,9 +1494,20 @@ export class App implements OnInit {
   openArtistPage(artistOrName: string, fallbackName: string = ''): void {
     if (!artistOrName) return;
     const looksLikeId = /^UC[\w-]{20,}$/.test(artistOrName);
+    const displayName = fallbackName || (looksLikeId ? '' : artistOrName);
+    const expectedId = looksLikeId ? `artist-${artistOrName}` : `artist-${displayName || artistOrName}`;
+
+    if (this.selectedPlaylist()?.id !== expectedId) {
+      this.currentPage.set('playlist');
+      this.selectedPlaylist.set(null);
+      this.loadingPageTitle.set(displayName);
+      this.isSearchMode.set(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     const fallbackToArtistPlaylist = (artistName: string) => {
       this.isLoading.set(true);
+      if (artistName) this.loadingPageTitle.set(artistName);
       this.youtubeApi.searchMusic(artistName + ' songs', 40, 'song').pipe(takeUntil(this.destroy$)).subscribe({
         next: (songs) => {
           this.isLoading.set(false);
@@ -1487,11 +1525,13 @@ export class App implements OnInit {
             };
             this.openPlaylist(playlistMeta);
           } else {
+            this.loadingPageTitle.set('');
             this.performSearch(artistName + ' songs');
           }
         },
         error: () => {
           this.isLoading.set(false);
+          this.loadingPageTitle.set('');
           this.performSearch(artistName + ' songs');
         }
       });
@@ -1501,6 +1541,7 @@ export class App implements OnInit {
       const id = `artist-${artistId}`;
       this.currentLoadingPlaylistId = id;
       this.isLoading.set(true);
+      if (name) this.loadingPageTitle.set(name);
 
       this.youtubeApi.getArtist(artistId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (artist) => {
@@ -1523,7 +1564,9 @@ export class App implements OnInit {
           } else if (name) {
             fallbackToArtistPlaylist(name);
           } else {
+            this.loadingPageTitle.set('');
             this.toastService.error('Artist not found');
+            this.closePlaylist();
           }
         },
         error: () => {
@@ -1532,7 +1575,9 @@ export class App implements OnInit {
             fallbackToArtistPlaylist(name);
           } else {
             this.isLoading.set(false);
+            this.loadingPageTitle.set('');
             this.toastService.error('Error loading artist');
+            this.closePlaylist();
           }
         }
       });
@@ -2206,17 +2251,30 @@ export class App implements OnInit {
 
     if (track.type === 'album') {
       this.currentLoadingPlaylistId = track.videoId;
+      this.currentPage.set('playlist');
+      this.selectedPlaylist.set(null);
+      this.loadingPageTitle.set(track.title || 'Album');
       this.isLoading.set(true);
-      this.youtubeApi.getAlbum(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(album => {
-        this.isLoading.set(false);
-        if (this.currentLoadingPlaylistId !== track.videoId) return;
-        
-        if (album) {
-          album.is_owner = false;
-          album.is_public = true;
-          album.language = 'English';
-          if (!album.searchQueries) album.searchQueries = [];
-          this.openPlaylist(album);
+      this.youtubeApi.getAlbum(track.videoId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (album) => {
+          this.isLoading.set(false);
+          if (this.currentLoadingPlaylistId !== track.videoId) return;
+          
+          if (album) {
+            album.is_owner = false;
+            album.is_public = true;
+            album.language = '';
+            if (!album.searchQueries) album.searchQueries = [];
+            this.openPlaylist(album);
+          } else {
+            this.loadingPageTitle.set('');
+            this.closePlaylist();
+          }
+        },
+        error: () => {
+          this.isLoading.set(false);
+          this.loadingPageTitle.set('');
+          this.closePlaylist();
         }
       });
       return;
@@ -2224,17 +2282,30 @@ export class App implements OnInit {
 
     if (track.type === 'playlist') {
       this.currentLoadingPlaylistId = track.videoId;
+      this.currentPage.set('playlist');
+      this.selectedPlaylist.set(null);
+      this.loadingPageTitle.set(track.title || 'Playlist');
       this.isLoading.set(true);
-      this.youtubeApi.getYTPlaylist(track.videoId).pipe(takeUntil(this.destroy$)).subscribe(playlist => {
-        this.isLoading.set(false);
-        if (this.currentLoadingPlaylistId !== track.videoId) return;
-        
-        if (playlist) {
-          playlist.is_owner = false;
-          playlist.is_public = true;
-          playlist.language = 'English';
-          if (!playlist.searchQueries) playlist.searchQueries = [];
-          this.openPlaylist(playlist);
+      this.youtubeApi.getYTPlaylist(track.videoId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (playlist) => {
+          this.isLoading.set(false);
+          if (this.currentLoadingPlaylistId !== track.videoId) return;
+          
+          if (playlist) {
+            playlist.is_owner = false;
+            playlist.is_public = true;
+            playlist.language = '';
+            if (!playlist.searchQueries) playlist.searchQueries = [];
+            this.openPlaylist(playlist);
+          } else {
+            this.loadingPageTitle.set('');
+            this.closePlaylist();
+          }
+        },
+        error: () => {
+          this.isLoading.set(false);
+          this.loadingPageTitle.set('');
+          this.closePlaylist();
         }
       });
       return;
@@ -2740,6 +2811,7 @@ export class App implements OnInit {
   }
 
   openPlaylist(playlist: PlaylistMeta): void {
+    this.loadingPageTitle.set('');
     this.selectedPlaylist.set(playlist);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
@@ -2753,6 +2825,7 @@ export class App implements OnInit {
   }
 
   openCustomPlaylist(pl: any): void {
+    this.loadingPageTitle.set('');
     const email = this.authService.currentUser()?.email || 'user';
     const username = email.split('@')[0];
     const playlistId = pl.playlist_id || pl.id;
@@ -2786,6 +2859,11 @@ export class App implements OnInit {
   }
 
   async fetchPublicPlaylist(playlistId: string, username: string) {
+    if (this.selectedPlaylist()?.id !== playlistId) {
+      this.currentPage.set('playlist');
+      this.selectedPlaylist.set(null);
+      this.loadingPageTitle.set('Playlist');
+    }
     // Wait for auth to initialize if it's currently undefined (loading)
     if (this.authService.currentUser() === undefined) {
       await new Promise(resolve => {
@@ -2831,6 +2909,7 @@ export class App implements OnInit {
           playCount: pl.play_count || 0
         };
         
+        this.loadingPageTitle.set('');
         this.selectedPlaylist.set(playlistMeta);
         this.currentPage.set('playlist');
         this.isSearchMode.set(false);
@@ -2840,6 +2919,7 @@ export class App implements OnInit {
           this.router.navigate(['/playlist', playlistId]);
         }
       } else {
+        this.loadingPageTitle.set('');
         // Fallback if not found or private
         if (this.router.url.includes(playlistId)) {
           this.router.navigate(['/home']);
@@ -2848,6 +2928,7 @@ export class App implements OnInit {
       }
     } catch(e) {
       if (this.currentLoadingPlaylistId !== playlistId) return;
+      this.loadingPageTitle.set('');
       
       if (this.router.url.includes(playlistId)) {
         this.router.navigate(['/home']);
@@ -2995,6 +3076,7 @@ export class App implements OnInit {
   }
 
   closePlaylist(): void {
+    this.loadingPageTitle.set('');
     this.selectedPlaylist.set(null);
     if ((window as any).hasNavigatedInApp) {
       this.location.back();

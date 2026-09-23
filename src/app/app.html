@@ -872,6 +872,17 @@
       <div class="static-page-content" [innerHTML]="pageContent[currentPage()]?.html"></div>
     </div>
 
+    <!-- Playlist Loading State -->
+    <div class="playlist-page-loading" *ngIf="currentPage() === 'playlist' && !selectedPlaylist()">
+      <button class="back-btn" (click)="closePlaylist()" title="Back">
+        <svg lucideArrowLeft [attr.size]="24"></svg>
+      </button>
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading {{ loadingPageTitle() ? loadingPageTitle() : 'Playlist' }}...</p>
+      </div>
+    </div>
+
     <!-- Playlist Page Section -->
     <app-playlist-page 
       *ngIf="currentPage() === 'playlist' && selectedPlaylist()" 
