@@ -22,7 +22,8 @@ import {
   LucideMoon,
   LucideCast,
   LucideActivity,
-  LucideMoreVertical
+  LucideMoreVertical,
+  LucideX
 } from '@lucide/angular';
 import { PlayerService } from '../../services/player.service';
 import { AlgorithmService } from '../../services/algorithm.service';
@@ -60,7 +61,8 @@ import { CastService } from '../../services/cast.service';
     LucideMoon,
     LucideCast,
     LucideActivity,
-    LucideMoreVertical
+    LucideMoreVertical,
+    LucideX
   ],
   template: `
     <div class="player-bar" [class.visible]="playerService.currentTrack() !== null" [class.room-locked]="isRoomLocked()" (click)="onPlayerBarClick($event)">
@@ -414,23 +416,58 @@ import { CastService } from '../../services/cast.service';
     <!-- Sleep Timer Modal (Outside of both player-bar and fullscreen-overlay) -->
     <div class="sleep-modal-overlay" *ngIf="playerService.showSleepModal()" (click)="playerService.showSleepModal.set(false)">
       <div class="sleep-modal" (click)="$event.stopPropagation()">
-        <h3>Sleep Timer</h3>
-        <p class="sleep-active-text" *ngIf="playerService.sleepTimerActive()">
+        <!-- Header -->
+        <div class="sleep-header">
+          <div class="sleep-header-title">
+            <svg lucideMoon [attr.size]="20" class="sleep-title-icon"></svg>
+            <h3>Sleep Timer</h3>
+          </div>
+          <button type="button" class="sleep-header-close" (click)="playerService.showSleepModal.set(false)" title="Close">
+            <svg lucideX [attr.size]="18"></svg>
+          </button>
+        </div>
+
+        <!-- Active Timer Status Badge -->
+        <div class="sleep-active-badge" *ngIf="playerService.sleepTimerActive()">
+          <span class="active-pulse"></span>
           <span *ngIf="playerService.sleepAtEndOfTrack()">Active: Until End of Track</span>
           <span *ngIf="!playerService.sleepAtEndOfTrack()">Active: {{ playerService.formatSleepTimeRemaining() }} left</span>
-        </p>
-        
-        <div class="sleep-options">
-          <button class="sleep-opt-btn" (click)="playerService.setSleepAtEndOfTrack()">End of Track</button>
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(15)">15 Min</button>
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(30)">30 Min</button>
-          <button class="sleep-opt-btn" (click)="playerService.setSleepTimer(60)">60 Min</button>
         </div>
         
+        <!-- Preset Options Grid (2x2) -->
+        <div class="sleep-options">
+          <button 
+            type="button"
+            class="sleep-opt-btn" 
+            [class.active]="playerService.sleepTimerActive() && playerService.sleepAtEndOfTrack()"
+            (click)="playerService.setSleepAtEndOfTrack()">
+            End of Track
+          </button>
+          <button 
+            type="button"
+            class="sleep-opt-btn" 
+            (click)="playerService.setSleepTimer(15)">
+            15 Min
+          </button>
+          <button 
+            type="button"
+            class="sleep-opt-btn" 
+            (click)="playerService.setSleepTimer(30)">
+            30 Min
+          </button>
+          <button 
+            type="button"
+            class="sleep-opt-btn" 
+            (click)="playerService.setSleepTimer(60)">
+            60 Min
+          </button>
+        </div>
+        
+        <!-- Custom Slider Section -->
         <div class="sleep-custom-container">
           <div class="sleep-custom-header">
-            <span>Custom Timer</span>
-            <span>{{ customSleepTime() }} Min</span>
+            <span class="custom-title">Custom Timer</span>
+            <span class="custom-val">{{ customSleepTime() }} Min</span>
           </div>
           <input 
             type="range" 
@@ -440,11 +477,26 @@ import { CastService } from '../../services/cast.service';
             [ngModel]="customSleepTime()" 
             (ngModelChange)="customSleepTime.set($event)"
             (change)="playerService.setSleepTimer(customSleepTime(), false)"
+            [style.background]="getSleepSliderBackground()"
           />
         </div>
 
-        <button class="sleep-cancel-btn" *ngIf="playerService.sleepTimerActive()" (click)="playerService.cancelSleepTimer()">Turn Off Timer</button>
-        <button class="sleep-close-btn" (click)="playerService.showSleepModal.set(false)">Close</button>
+        <!-- Action Buttons -->
+        <div class="sleep-actions">
+          <button 
+            type="button"
+            class="sleep-cancel-btn" 
+            *ngIf="playerService.sleepTimerActive()" 
+            (click)="playerService.cancelSleepTimer()">
+            Turn Off Timer
+          </button>
+          <button 
+            type="button"
+            class="sleep-close-btn" 
+            (click)="playerService.showSleepModal.set(false)">
+            Close
+          </button>
+        </div>
       </div>
     </div>
   `,
@@ -460,6 +512,12 @@ export class MusicPlayerComponent implements OnDestroy {
   showOptionsMenu = signal<boolean>(false);
   customSleepTime = signal<number>(30);
   isDownloading = signal<boolean>(false);
+
+  getSleepSliderBackground(): string {
+    const val = this.customSleepTime();
+    const percent = Math.min(100, Math.max(0, ((val - 1) / 119) * 100));
+    return `linear-gradient(to right, #a855f7 0%, #ec4899 ${percent}%, rgba(255, 255, 255, 0.15) ${percent}%, rgba(255, 255, 255, 0.15) 100%)`;
+  }
 
   constructor(
     public playerService: PlayerService,
