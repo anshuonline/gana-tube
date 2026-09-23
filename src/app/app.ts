@@ -1635,7 +1635,7 @@ export class App implements OnInit {
         this.toastService.error("Popup blocked! Please click the ❌ icon on the right side of your URL bar, select 'Always allow', and try logging in again.", 15000);
       } else {
         console.error('Login error:', e);
-        this.toastService.error('Failed to login. Please try again.');
+        this.toastService.error('Login failed. Please turn off your Ad-blocker or allow popups and try again.', 5000);
       }
     } finally {
       this.isLoggingIn = false;

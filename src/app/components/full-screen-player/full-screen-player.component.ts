@@ -929,7 +929,10 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
 
   getVolumeProgressBackground(): string {
     const vol = this.playerService.isMuted() ? 0 : this.playerService.volume();
-    return `linear-gradient(to right, #fff 0%, #fff ${vol}%, rgba(255,255,255,0.2) ${vol}%, rgba(255,255,255,0.2) 100%)`;
+    if (vol <= 0) {
+      return 'rgba(255, 255, 255, 0.2)';
+    }
+    return `linear-gradient(to right, #fff 0%, #fff ${vol}%, rgba(255, 255, 255, 0.2) ${vol}%, rgba(255, 255, 255, 0.2) 100%)`;
   }
 
   onScrubStart(event: MouseEvent | TouchEvent): void {

@@ -31,6 +31,7 @@ export class PlayerService {
   public offlineService = inject(OfflineService);
   private trackStartTime: number = 0;
   public isFetchingMore = false;
+  private lastNonZeroVolume: number = 80;
   private isRemoteUpdate = false;
   private location = inject(Location);
   private ngZone = inject(NgZone);
@@ -698,20 +699,24 @@ export class PlayerService {
   }
 
   setVolume(value: number): void {
+    if (value > 0) {
+      this.lastNonZeroVolume = value;
+      if (this.isMuted()) {
+        this.isMuted.set(false);
+      }
+    }
     this.volume.set(value);
     
     if (this.isPlayingOffline() && this.htmlAudio) {
       this.htmlAudio.volume = value / 100;
-      if (value > 0 && this.isMuted()) {
-        this.isMuted.set(false);
+      if (value > 0) {
         this.htmlAudio.muted = false;
       }
     }
     
     if (this.ytPlayer) {
       this.ytPlayer.setVolume(value);
-      if (value > 0 && this.isMuted()) {
-        this.isMuted.set(false);
+      if (value > 0 && typeof this.ytPlayer.unMute === 'function') {
         this.ytPlayer.unMute();
       }
     }
@@ -736,18 +741,29 @@ export class PlayerService {
   }
 
   toggleMute(): void {
-    const muted = !this.isMuted();
-    this.isMuted.set(muted);
-    
-    if (this.isPlayingOffline() && this.htmlAudio) {
-      this.htmlAudio.muted = muted;
-    }
-    
-    if (!this.ytPlayer) return;
-    if (muted) {
-      this.ytPlayer.mute();
+    if (this.isMuted() || this.volume() === 0) {
+      // Unmute: restore previous non-zero volume (or default 50)
+      const restoreVol = this.lastNonZeroVolume > 0 ? this.lastNonZeroVolume : 50;
+      this.isMuted.set(false);
+      this.setVolume(restoreVol);
+      if (this.isPlayingOffline() && this.htmlAudio) {
+        this.htmlAudio.muted = false;
+      }
+      if (this.ytPlayer && typeof this.ytPlayer.unMute === 'function') {
+        this.ytPlayer.unMute();
+      }
     } else {
-      this.ytPlayer.unMute();
+      // Mute: save current volume and mute
+      if (this.volume() > 0) {
+        this.lastNonZeroVolume = this.volume();
+      }
+      this.isMuted.set(true);
+      if (this.isPlayingOffline() && this.htmlAudio) {
+        this.htmlAudio.muted = true;
+      }
+      if (this.ytPlayer && typeof this.ytPlayer.mute === 'function') {
+        this.ytPlayer.mute();
+      }
     }
   }
 

@@ -102,10 +102,10 @@ import { CastService } from '../../services/cast.service';
           </div>
         </div>
         <div class="track-info" (click)="toggleFullScreen()">
-          <div class="track-title" [class.marquee]="playerService.currentTrack()?.title?.length! > 25">
+          <div class="track-title" [title]="playerService.currentTrack()?.title || ''">
             <span>{{ playerService.currentTrack()?.title || 'Not Playing' }}</span>
           </div>
-          <div class="track-artist">{{ playerService.currentTrack()?.channelTitle || '---' }}</div>
+          <div class="track-artist" [title]="playerService.currentTrack()?.channelTitle || ''">{{ playerService.currentTrack()?.channelTitle || '---' }}</div>
         </div>
       </div>
 
@@ -123,7 +123,7 @@ import { CastService } from '../../services/cast.service';
       <div class="player-center">
         <div class="control-buttons">
           <button
-            class="ctrl-btn secondary"
+            class="ctrl-btn secondary desktop-only"
             [class.active-heart]="isCurrentTrackLiked()"
             (click)="toggleLike($event)"
             title="Like"
@@ -132,15 +132,15 @@ import { CastService } from '../../services/cast.service';
             <svg lucideHeart [attr.size]="20" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
           </button>
           <button
-            class="ctrl-btn secondary"
+            class="ctrl-btn secondary desktop-only"
             [class.active]="playerService.isShuffled()"
             (click)="playerService.toggleShuffle()"
             title="Shuffle"
           >
             <svg lucideShuffle [attr.size]="20"></svg>
           </button>
-          <button class="ctrl-btn" (click)="playerService.previous()" title="Previous">
-            <svg lucideSkipBack [attr.size]="24"></svg>
+          <button class="ctrl-btn desktop-only" (click)="playerService.previous()" title="Previous">
+            <svg lucideSkipBack [attr.size]="22"></svg>
           </button>
           <button
             class="play-pause-btn prominent"
@@ -151,15 +151,15 @@ import { CastService } from '../../services/cast.service';
           >
             <div class="spinner dark" *ngIf="playerService.playerState() === 'loading'"></div>
             <ng-container *ngIf="playerService.playerState() !== 'loading'">
-              <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="28" fill="currentColor"></svg>
-              <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="28" fill="currentColor" style="margin-left: 2px;"></svg>
+              <svg *ngIf="playerService.playerState() === 'playing'" lucidePause [attr.size]="26" fill="currentColor"></svg>
+              <svg *ngIf="playerService.playerState() !== 'playing'" lucidePlay [attr.size]="26" fill="currentColor" style="margin-left: 2px;"></svg>
             </ng-container>
           </button>
-          <button class="ctrl-btn" (click)="playerService.next()" title="Next">
-            <svg lucideSkipForward [attr.size]="24"></svg>
+          <button class="ctrl-btn next-btn" (click)="playerService.next()" title="Next">
+            <svg lucideSkipForward [attr.size]="22"></svg>
           </button>
           <button
-            class="ctrl-btn secondary"
+            class="ctrl-btn secondary desktop-only"
             [class.active]="playerService.repeatMode() !== 'none'"
             (click)="playerService.toggleRepeat()"
             [title]="'Repeat: ' + playerService.repeatMode()"
@@ -171,11 +171,11 @@ import { CastService } from '../../services/cast.service';
       </div>
 
       <!-- Right Controls -->
-      <div class="player-right">
+      <div class="player-right desktop-only">
         <span class="time-display">{{ formatTime(playerService.currentTime()) }} / {{ formatTime(playerService.duration()) }}</span>
         
         <button
-          class="ctrl-btn secondary desktop-only"
+          class="ctrl-btn secondary"
           [class.active]="playerService.isCrossfadeEnabled()"
           (click)="playerService.toggleCrossfade()"
           title="Crossfade: Smoothly transition between songs"
@@ -208,28 +208,14 @@ import { CastService } from '../../services/cast.service';
           min="0"
           max="100"
           [value]="playerService.isMuted() ? 0 : playerService.volume()"
+          [class.zero-volume]="playerService.isMuted() || playerService.volume() === 0"
+          [style.background]="getVolumeBackground()"
           (input)="onVolumeChange($event)"
           title="Volume"
         />
         <button class="ctrl-btn secondary maximize-btn" (click)="toggleFullScreen()" title="Expand Player">
           <svg lucideMaximize2 [attr.size]="18"></svg>
         </button>
-        
-        <!-- Mobile Options Trigger -->
-        <button class="ctrl-btn secondary mobile-only options-btn" (click)="toggleOptions(); $event.stopPropagation()" title="More Options">
-          <svg lucideMoreVertical [attr.size]="18"></svg>
-        </button>
-        
-        <!-- Mobile Options Dropdown -->
-        <div class="options-dropdown" *ngIf="showOptionsMenu()" (click)="$event.stopPropagation()">
-          <button class="dropdown-item" (click)="playerService.toggleCrossfade()">
-            <svg lucideActivity [attr.size]="16" [attr.color]="playerService.isCrossfadeEnabled() ? '#3b82f6' : 'currentColor'"></svg> 
-            Crossfade: {{ playerService.isCrossfadeEnabled() ? 'On' : 'Off' }}
-          </button>
-          <button class="dropdown-item" (click)="copyShareLink(); toggleOptions()">
-            <svg lucideShare2 [attr.size]="16"></svg> Share Track
-          </button>
-        </div>
       </div>
 
       <!-- Queue Drawer Panel (Standard Bar) -->
@@ -740,6 +726,14 @@ export class MusicPlayerComponent implements OnDestroy {
   onVolumeChange(event: Event): void {
     const val = +(event.target as HTMLInputElement).value;
     this.playerService.setVolume(val);
+  }
+
+  getVolumeBackground(): string {
+    const vol = this.playerService.isMuted() ? 0 : this.playerService.volume();
+    if (vol <= 0) {
+      return 'rgba(255, 255, 255, 0.15)';
+    }
+    return `linear-gradient(to right, #fff 0%, #fff ${vol}%, rgba(255, 255, 255, 0.15) ${vol}%, rgba(255, 255, 255, 0.15) 100%)`;
   }
 
   onPlayerBarClick(event: MouseEvent): void {

@@ -8,20 +8,23 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 88px;
+  height: 84px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 0 24px;
-  gap: 16px;
+  gap: 20px;
 
-  background: rgba(10, 10, 20, 0.85);
+  background: rgba(10, 10, 16, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   cursor: pointer;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.6);
 
   transform: translateY(100%);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  overflow: visible; // Allows hover effects outside, but we might need hidden for bg. Wait, progress bar is absolute so it's fine.
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: visible;
 
   &.visible {
     transform: translateY(0);
@@ -61,6 +64,8 @@
   align-items: center;
   gap: 14px;
   min-width: 0;
+  flex: 1 1 0;
+  overflow: hidden;
 }
 
 .album-art-wrapper {
@@ -112,30 +117,55 @@
   color: rgba(255,255,255,0.3);
 }
 
-.track-meta {
+.track-info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 3px;
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  cursor: pointer;
 }
 
-.track-name {
-  font-size: 0.9rem;
+.track-title {
+  font-size: 0.92rem;
   font-weight: 600;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 220px;
+  min-width: 0;
+  max-width: 280px;
+  line-height: 1.3;
+  transition: color 0.15s ease;
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+
+  &:hover {
+    color: #e9d5ff;
+  }
 }
 
 .track-artist {
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.55);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 220px;
+  min-width: 0;
+  max-width: 280px;
+  line-height: 1.3;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.85);
+  }
 }
 
 // ---- Center: Controls + Progress ----
@@ -143,15 +173,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  width: 480px;
+  justify-content: center;
+  gap: 0;
+  width: auto;
   max-width: 100%;
 }
 
 .control-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .ctrl-btn {
@@ -296,19 +327,22 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
-// ---- Right: Volume ----
+// ---- Right: Volume & Utilities ----
 .player-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 0;
 }
 
 .time-display {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
   font-variant-numeric: tabular-nums;
-  margin-right: 8px;
+  margin-right: 6px;
+  white-space: nowrap;
 }
 
 .volume-slider {
@@ -324,6 +358,15 @@
 
   &:hover {
     height: 6px;
+
+    &::-webkit-slider-thumb {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    &::-moz-range-thumb {
+      transform: scale(1.2);
+      opacity: 1;
+    }
   }
 
   &::-webkit-slider-thumb {
@@ -335,48 +378,107 @@
     background: #fff;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    transition: transform 0.2s;
+    transition: transform 0.2s, opacity 0.2s;
   }
 
-  &:hover::-webkit-slider-thumb {
-    transform: scale(1.2);
+  &::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  &.zero-volume {
+    &::-webkit-slider-thumb {
+      opacity: 0;
+      transform: scale(0);
+    }
+    &::-moz-range-thumb {
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    &:hover,
+    &:active {
+      &::-webkit-slider-thumb {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+      &::-moz-range-thumb {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+    }
   }
 }
 
 // Responsive mobile/compact player bar
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .player-bar {
     display: flex !important;
     flex-direction: row !important;
-    height: 68px !important;
-    bottom: 0 !important;
-    padding: 0 16px !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
-    gap: 12px !important;
-    border-radius: 16px 16px 0 0 !important;
+    align-items: center !important;
     justify-content: space-between !important;
+    height: 64px !important;
+    bottom: 0 !important;
+    padding: 0 12px !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    gap: 10px !important;
+    border-radius: 16px 16px 0 0 !important;
+    background: rgba(12, 12, 18, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.8) !important;
   }
 
   .player-left {
-    flex: 1;
-    min-width: 0;
+    flex: 1 !important;
+    min-width: 0 !important;
     cursor: pointer;
     gap: 10px !important;
+    overflow: hidden !important;
 
     .album-art-wrapper {
-      width: 48px !important;
-      height: 48px !important;
-      border-radius: 10px !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 8px !important;
+      flex-shrink: 0 !important;
     }
 
-    .track-name {
-      font-size: 0.82rem !important;
-      max-width: 140px !important;
+    .track-info {
+      flex: 1 !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .track-title {
+      font-size: 0.88rem !important;
+      max-width: 100% !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      display: block !important;
+
+      span {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        display: block !important;
+      }
     }
     
     .track-artist {
       font-size: 0.72rem !important;
-      max-width: 140px !important;
+      max-width: 100% !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      display: block !important;
     }
   }
 
@@ -384,45 +486,77 @@
     width: auto !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 4px !important;
+    flex-shrink: 0 !important;
+    gap: 6px !important;
     order: unset !important;
 
     .control-buttons {
-      button:nth-child(1),
-      button:nth-child(2),
-      button:nth-child(3),
-      button:nth-child(4),
-      button:nth-child(7) {
-        display: none !important; // Hide everything except play/pause and next on mobile
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+
+      .play-pause-btn {
+        width: 38px !important;
+        height: 38px !important;
+        flex-shrink: 0 !important;
+
+        svg {
+          width: 22px !important;
+          height: 22px !important;
+        }
+      }
+
+      .ctrl-btn.next-btn {
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        flex-shrink: 0 !important;
+        color: #ffffff !important;
+
+        svg {
+          width: 22px !important;
+          height: 22px !important;
+        }
       }
     }
   }
 
   .player-right {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 4px !important;
-
-    .time-display,
-    button:not(.maximize-btn),
-    input.volume-slider {
-      display: none !important; // Hide mute, share, queue, time on small bar
-    }
-
-    .maximize-btn {
-      display: flex !important;
-    }
+    display: none !important;
   }
 
   .queue-drawer {
-    right: 12px !important;
-    left: 12px !important;
+    right: 8px !important;
+    left: 8px !important;
     width: auto !important;
-    bottom: 80px !important;
-    max-height: 55vh !important;
+    bottom: 72px !important;
+    max-height: 60vh !important;
   }
 }
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .player-bar {
+    height: 74px !important;
+    padding: 0 16px !important;
+    gap: 14px !important;
+  }
+
+  .player-left {
+    .track-title {
+      max-width: 180px !important;
+    }
+    .track-artist {
+      max-width: 180px !important;
+    }
+  }
+
+  .player-right {
+    .time-display {
+      display: none !important;
+    }
+  }
+}
+
 
 .toast-notification {
   position: fixed;
@@ -1558,12 +1692,47 @@
   }
 }
 
-.desktop-only { display: flex !important; }
-.mobile-only { display: none !important; }
-.options-dropdown { position: absolute; bottom: 80px; right: 16px; background: #000000; border-radius: 12px; padding: 8px 0; z-index: 100; box-shadow: 0 12px 36px rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.1); }
-.options-dropdown .dropdown-item { background: none; border: none; color: #fff; padding: 12px 20px; width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 14px; white-space: nowrap; }
-.options-dropdown .dropdown-item:hover { background: rgba(255,255,255,0.1); }
-@media (max-width: 768px) { .desktop-only { display: none !important; } .mobile-only { display: flex !important; } }
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+.options-dropdown {
+  position: absolute;
+  bottom: 80px;
+  right: 16px;
+  background: #000000;
+  border-radius: 12px;
+  padding: 8px 0;
+  z-index: 100;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.1);
+
+  .dropdown-item {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 12px 20px;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255,255,255,0.1);
+    }
+  }
+}
 
 // Room locked state - disable controls when in room
 .player-bar.room-locked {

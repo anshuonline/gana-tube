@@ -459,6 +459,7 @@
               min="0" 
               max="100" 
               [value]="playerService.isMuted() ? 0 : playerService.volume()" 
+              [class.zero-volume]="playerService.isMuted() || playerService.volume() === 0"
               (input)="onVolumeChange($event)" 
               [style.background]="getVolumeProgressBackground()"
               title="Volume"
