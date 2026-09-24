@@ -25,107 +25,137 @@ export class BlogPageComponent implements OnInit {
   currentPost: BlogPost | null = null;
 
   posts: BlogPost[] = [
-    {
-      slug: 'free-music-online-without-ads-2026',
-      title: 'How to Listen to Free Music Online Without Ads in 2026',
-      excerpt: 'Tired of unskippable ads? Discover the ultimate web-based solution for uninterrupted, ad-free music streaming.',
-      date: 'Sep 24, 2026',
-      author: 'GanaTube Team',
-      tags: ['Music', 'Ad Free Music', 'Free Music Online', 'Streaming', 'Tech'],
-      content: `
-        <p>If you are tired of listening to unskippable audio ads between your favorite songs, you are not alone. The era of truly free music streaming apps seems to be over, with platforms aggressively pushing expensive premium subscriptions. However, there is still a hidden gem on the internet.</p>
-        <p>Enter <strong><a href="/">GanaTube.in</a></strong>, a revolutionary web-based music streaming platform that is changing the way we listen to music online.</p>
-        <h3>Why GanaTube is the ultimate solution:</h3>
-        <ul>
-          <li><strong>100% Ad-Free Experience:</strong> You can listen to hundreds of songs back-to-back without a single audio or display ad breaking your flow.</li>
-          <li><strong>Zero Login Hassle:</strong> Unlike other apps that harvest your data, GanaTube requires absolutely no sign-up or login. Just visit the site and play.</li>
-          <li><strong>Desktop Background Play:</strong> While mobile browsers heavily restrict background audio, GanaTube fully supports seamless background play on your Desktop! You can minimize your browser, work on other tabs, and let the music play uninterrupted.</li>
-        </ul>
-        <p>If you want a pure, ad-free music experience without opening your wallet, bookmark GanaTube today.</p>
-      `
-    },
-    {
-      slug: 'best-unblocked-music-player-school-office',
-      title: 'The Best Unblocked Music Player for School and Office Wi-Fi',
-      excerpt: 'Bypass strict network firewalls and listen to your favorite unblocked songs seamlessly.',
-      date: 'Sep 23, 2026',
-      author: 'GanaTube Team',
-      tags: ['Unblocked Music', 'Education', 'Productivity', 'Web Development', 'Music Streaming'],
-      content: `
-        <p>Most schools, colleges, and corporate offices use strict network firewalls to block popular music streaming sites like Spotify, Apple Music, and YouTube. Sitting through a long study session or workday in silence can be exhausting. So, how do you bypass this?</p>
-        <p>The easiest solution is using an <strong>unblocked music player</strong> like <strong><a href="/">GanaTube.in</a></strong>.</p>
-        <h3>Why GanaTube bypasses strict networks:</h3>
-        <p>Because GanaTube is an independent, lightweight web application, it rarely gets flagged by institutional firewalls. You don't need to download any sketchy unblocker apps or VPNs.</p>
-        <ul>
-          <li><strong>No App Installation Needed:</strong> It runs directly in your browser.</li>
-          <li><strong>Massive Library:</strong> Search for any track globally and play it instantly.</li>
-          <li><strong>Perfect for Desktop Work:</strong> It offers flawless background play on desktop computers. You can hide the tab and listen to your favorite unblocked songs while completing your assignments or office spreadsheets.</li>
-        </ul>
-        <p>Stop staring at blocked network screens and switch to GanaTube for uninterrupted productivity.</p>
-      `
-    },
-    {
-      slug: 'ganatube-vs-youtube-music-free-alternative',
-      title: 'Why GanaTube is the Best Free Alternative to YouTube Music',
-      excerpt: 'Experience the world\'s biggest music library without the annoying background play restrictions.',
-      date: 'Sep 22, 2026',
-      author: 'GanaTube Team',
-      tags: ['YouTube Music', 'Spotify Alternative', 'Free Apps', 'Music', 'Web Player'],
-      content: `
-        <p>YouTube Music has one of the best music catalogs in the world, featuring rare covers, live performances, and official studio tracks. But there is a massive problem with its free tier: <strong>No Background Play and Too Many Ads.</strong></p>
-        <p>If you lock your screen or switch tabs, the music stops completely. Unless you pay for premium, it is almost unusable as a daily music driver. This is where <strong><a href="/">GanaTube.in</a></strong> steps in.</p>
-        <h3>The GanaTube Advantage:</h3>
-        <p>GanaTube gives you access to a massive universe of songs but fixes everything that is wrong with modern streaming free tiers.</p>
-        <ul>
-          <li><strong>Ad-Free by Default:</strong> No premium subscription required to skip ads.</li>
-          <li><strong>Desktop Multitasking:</strong> GanaTube supports background playback on Desktop. You can open a new software, minimize your browser, and the music won't abruptly pause.</li>
-          <li><strong>Clean UI:</strong> An ultra-modern, AMOLED dark-mode interface that looks better than most premium apps.</li>
-        </ul>
-        <p>Experience the world's biggest music library without the annoying restrictions.</p>
-      `
-    },
-    {
-      slug: 'listen-to-music-together-online-free',
-      title: 'How to Sync and Listen to Music Together with Friends Online',
-      excerpt: 'Host virtual listening parties and listen to music in perfect sync with your friends for free.',
-      date: 'Sep 21, 2026',
-      author: 'GanaTube Team',
-      tags: ['Listen Together', 'Social Media', 'Music Player', 'Relationships', 'Tech Solutions'],
-      content: `
-        <p>Listening to music with friends makes the experience ten times better. Whether you are hosting a virtual study session, managing a long-distance relationship, or just chilling remotely, syncing your music is a great way to bond.</p>
-        <p>While apps like Spotify offer "Group Sessions," they strictly require all participants to have a paid Premium account. Thankfully, <strong><a href="/rooms">GanaTube.in</a></strong> has solved this problem for free.</p>
-        <h3>Introducing GanaTube's "Listen Together" Rooms:</h3>
-        <p>GanaTube features a built-in Rooms functionality that lets you host virtual listening parties with zero cost.</p>
-        <ul>
-          <li><strong>Create a Room:</strong> You become the Host. You control the playback, play, pause, and skip tracks.</li>
-          <li><strong>Invite Friends:</strong> Just share the room link. Anyone can join instantly without logging in.</li>
-          <li><strong>Live Sync & Chat:</strong> Your friends hear exactly what you hear at the exact same second. Listeners can even search for tracks and send "Song Requests" directly to the Host's queue!</li>
-        </ul>
-        <p>Combine this with GanaTube's ad-free playback and desktop background support, and you have the most powerful social music platform on the internet today.</p>
-      `
-    },
-    {
-      slug: 'play-free-music-online-no-signup',
-      title: 'Play Free Music Online Instantly: No Sign-Up, No Downloads',
-      excerpt: 'Protect your privacy and stream music anonymously without giving away your email or phone number.',
-      date: 'Sep 20, 2026',
-      author: 'GanaTube Team',
-      tags: ['Privacy', 'Free Music Online', 'Web Player', 'Streaming Apps', 'Tech Trends'],
-      content: `
-        <p>Have you ever just wanted to quickly listen to a specific song, but the website forces you to download an app, verify your email, or create an account before playing a single second of audio? In 2026, music streaming has become incredibly intrusive. Apps track your listening habits, bombard you with marketing emails, and drain your phone’s storage.</p>
-        <p>If you value your privacy and prefer instant access, <strong><a href="/">GanaTube.in</a></strong> is exactly what you are looking for.</p>
-        <h3>The Power of a True Web Player:</h3>
-        <p>GanaTube is built on a modern web framework, meaning it operates entirely inside your browser.</p>
-        <ul>
-          <li><strong>Zero Registration:</strong> There is absolutely no "Sign Up" or "Log In" button forced on you. You open the link, search for your track, and hit play. It’s that simple.</li>
-          <li><strong>No App Downloads:</strong> Save your device's storage. You get a native, premium-app-like experience right in your browser.</li>
-          <li><strong>Desktop Background Play:</strong> Whether you are coding, writing, or designing on your PC, GanaTube’s desktop background playback ensures your music keeps running smoothly while you switch tabs and multitask.</li>
-          <li><strong>Ad-Free Experience:</strong> The best part? The platform respects your time by streaming music completely free of audio advertisements.</li>
-        </ul>
-        <p>For an anonymous, fast, and frictionless music streaming experience, ditch the heavy apps and switch to GanaTube.</p>
-      `
-    }
-  ];
+  {
+    "slug": "free-music-streaming-without-interruptions",
+    "title": "The Ultimate Guide to Free Music Streaming Without Interruptions",
+    "excerpt": "Discover how to enjoy your favorite tracks continuously without paying for premium subscriptions.",
+    "date": "Sep 24, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Streaming",
+      "Free Music",
+      "Audio"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80\" alt=\"Headphones on desk\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Listening to music online has become a daily habit for millions. However, constant interruptions can easily ruin the vibe. If you're tired of subscriptions, finding a truly seamless free music streaming platform is essential.</p>\n      <p>Modern platforms often restrict your listening experience by forcing audio ads between every few songs. But there are better ways to enjoy your playlists.</p>\n      <h3>Why Continuous Playback Matters</h3>\n      <p>Whether you are studying, working out, or relaxing, music helps maintain focus. A continuous stream keeps you in the zone. Web-based players like <strong><a href=\"/\">GanaTube</a></strong> focus entirely on the listening experience, offering unlimited track skipping and seamless playback.</p>\n      <p>Start listening the smart way and reclaim your audio experience today.</p>\n    "
+  },
+  {
+    "slug": "how-to-listen-to-unblocked-music-at-school",
+    "title": "How to Listen to Unblocked Music at School or Work",
+    "excerpt": "Bypass strict network firewalls easily and keep your productivity high with unblocked music players.",
+    "date": "Sep 23, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Unblocked Music",
+      "Productivity",
+      "Web Player"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1493225457124-a1a2a5956093?auto=format&fit=crop&w=800&q=80\" alt=\"Person walking with headphones\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Most schools and corporate offices use strict network firewalls to block popular entertainment sites. Sitting through a long study session in absolute silence can be exhausting.</p>\n      <p>The easiest solution is using an <strong>unblocked music player</strong> built directly for the web.</p>\n      <h3>The Browser Advantage</h3>\n      <p>Because web applications run inside the browser and don't require heavy media servers or executable installations, they rarely get flagged by institutional firewalls.</p>\n      <ul>\n        <li><strong>No Installation:</strong> Open the link and play instantly.</li>\n        <li><strong>Safe & Secure:</strong> No need for sketchy VPNs or proxy sites.</li>\n        <li><strong>Huge Library:</strong> Access millions of tracks globally.</li>\n      </ul>\n      <p>Boost your focus and get through the workday with uninterrupted music.</p>\n    "
+  },
+  {
+    "slug": "desktop-background-play-for-music",
+    "title": "Why Desktop Background Play is Essential for Music Lovers",
+    "excerpt": "Learn how to multitask effectively by keeping your music playing in the background while you work on your PC.",
+    "date": "Sep 22, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Desktop",
+      "Background Play",
+      "Multitasking"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80\" alt=\"DJ Mixing Board\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Have you ever switched tabs to read an email, only to have your music abruptly pause? It's one of the most frustrating experiences for desktop users.</p>\n      <p>Many modern free tiers intentionally disable background playback to push users toward paid subscriptions. But if you work on a PC all day, you need true multitasking.</p>\n      <h3>Seamless Multitasking</h3>\n      <p>Web-first audio platforms like <strong><a href=\"/\">GanaTube</a></strong> ensure that your music keeps playing no matter what you are doing. You can minimize the browser, open spreadsheets, or play a game, and the audio will remain flawless.</p>\n      <p>Never let arbitrary software limitations interrupt your workflow again.</p>\n    "
+  },
+  {
+    "slug": "host-virtual-listening-parties",
+    "title": "How to Host Virtual Listening Parties Online",
+    "excerpt": "Connect with friends globally by listening to the same music at the exact same time.",
+    "date": "Sep 21, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Listen Together",
+      "Social",
+      "Music Rooms"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80\" alt=\"Concert crowd\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Listening to music with friends makes the experience significantly better. Whether you are managing a long-distance relationship or just chilling remotely, syncing your audio is a great way to bond.</p>\n      <p>While some apps offer group sessions, they usually require all participants to have a premium account. But there are completely free ways to do this.</p>\n      <h3>Built-in Synchronized Rooms</h3>\n      <p>With features like 'Listen Together', you can host virtual rooms for free. The Host controls the playback, and everyone else hears the music in perfect sync.</p>\n      <ul>\n        <li><strong>Instant Invites:</strong> Share a link and friends join instantly.</li>\n        <li><strong>Live Chat:</strong> Discuss the tracks as they play.</li>\n        <li><strong>Song Requests:</strong> Listeners can queue up their favorite tracks.</li>\n      </ul>\n      <p>Start your own virtual party today and share the vibe with the world.</p>\n    "
+  },
+  {
+    "slug": "protecting-your-privacy-while-streaming",
+    "title": "Protecting Your Privacy While Streaming Music",
+    "excerpt": "Stream anonymously without giving away your email, phone number, or personal data.",
+    "date": "Sep 20, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Privacy",
+      "Security",
+      "Anonymous"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1516280440502-6c24387d8d21?auto=format&fit=crop&w=800&q=80\" alt=\"Record Player\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>In 2026, music streaming has become incredibly intrusive. Apps track your listening habits, bombard you with marketing emails, and constantly demand access to your device's data.</p>\n      <p>If you value your privacy, you need a platform that respects your boundaries.</p>\n      <h3>The No Sign-Up Philosophy</h3>\n      <p>True web players allow you to stream music without forcing a registration screen. You don't need to provide an email, and you don't need to download an app that tracks your location.</p>\n      <p>Enjoy your favorite albums anonymously and keep your inbox free from spam.</p>\n    "
+  },
+  {
+    "slug": "benefits-of-dark-mode-audio-players",
+    "title": "The Health and Battery Benefits of Dark Mode Audio Players",
+    "excerpt": "Why AMOLED dark themes are better for your eyes and your device battery.",
+    "date": "Sep 19, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Dark Mode",
+      "AMOLED",
+      "Design"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1458560871784-56d23406c091?auto=format&fit=crop&w=800&q=80\" alt=\"Music notes on dark background\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Staring at bright white screens while listening to music late at night can cause severe eye strain and disrupt your sleep cycle.</p>\n      <p>This is why native Dark Mode isn't just an aesthetic choice - it's a functional necessity for modern web applications.</p>\n      <h3>AMOLED Black and Battery Saving</h3>\n      <p>For users with OLED or AMOLED screens, true black pixels are actually turned off completely. This means an audio player designed with deep black backgrounds will consume significantly less battery while keeping your music playing for hours.</p>\n      <p>Protect your eyes and your battery life by switching to platforms that prioritize dark mode by default.</p>\n    "
+  },
+  {
+    "slug": "creating-the-perfect-study-playlist",
+    "title": "Creating the Perfect Study Playlist for Maximum Focus",
+    "excerpt": "Learn the science behind audio frequencies and how to curate music that boosts concentration.",
+    "date": "Sep 18, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Study",
+      "Focus",
+      "Playlists"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=800&q=80\" alt=\"Piano keys\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Music has a profound impact on cognitive function. But not all music is good for studying. Listening to heavy metal while trying to solve complex calculus might not yield the best results.</p>\n      <h3>The Lo-Fi and Instrumental Advantage</h3>\n      <p>Research shows that music without lyrics, such as classical, ambient, or Lo-Fi hip hop, helps the brain enter a state of flow.</p>\n      <ul>\n        <li><strong>Consistent Tempo:</strong> Choose tracks with 60 to 70 beats per minute.</li>\n        <li><strong>No Lyrics:</strong> Words can distract the language processing centers of your brain.</li>\n        <li><strong>Volume Control:</strong> Keep the volume low enough to be background noise.</li>\n      </ul>\n      <p>Curate your perfect focus playlist today and crush your next study session.</p>\n    "
+  },
+  {
+    "slug": "exploring-regional-music-online",
+    "title": "Exploring Regional Music: From Punjabi Pop to Tamil Melodies",
+    "excerpt": "Dive deep into the rich cultural diversity of regional music streaming.",
+    "date": "Sep 17, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Regional Music",
+      "Culture",
+      "Diversity"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=800&q=80\" alt=\"Acoustic Guitar\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>While international pop dominates the charts, regional music has seen an explosive rise in global popularity. The vibrancy of Punjabi beats, the soulfulness of Bengali folk, and the intricate rhythms of Tamil and Telugu cinema are captivating millions.</p>\n      <h3>A World of Sound</h3>\n      <p>A truly global music player doesn't restrict you to mainstream English tracks. It opens the door to explore different cultures through audio.</p>\n      <p>Whether you want to discover high-energy Bhojpuri tracks or relaxing instrumental covers of classic Hindi songs, having a diverse streaming platform makes all the difference.</p>\n    "
+  },
+  {
+    "slug": "the-resurgence-of-retro-music",
+    "title": "The Resurgence of Retro: Why 80s and 90s Music is Trending Again",
+    "excerpt": "Nostalgia is powerful. Discover why retro tracks are dominating modern streaming charts.",
+    "date": "Sep 16, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "Retro",
+      "Nostalgia",
+      "Trends"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1483032469466-b937c425697b?auto=format&fit=crop&w=800&q=80\" alt=\"Cassette tape\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Everything old is new again. In recent years, we've seen a massive resurgence of 80s synth-pop and 90s alternative rock across streaming platforms and social media apps.</p>\n      <h3>The Power of Nostalgia</h3>\n      <p>As modern life becomes increasingly complex, listeners seek comfort in the familiar sounds of their childhood. Furthermore, classic Bollywood melodies from the 90s remain the absolute gold standard for romantic music.</p>\n      <p>A good streaming library makes it incredibly easy to travel back in time. Search for any retro classic and experience the magic of the golden eras instantly.</p>\n    "
+  },
+  {
+    "slug": "high-definition-audio-streaming-explained",
+    "title": "High-Definition Audio Streaming Explained",
+    "excerpt": "What makes HD audio different, and why your ears deserve the best sound quality.",
+    "date": "Sep 15, 2026",
+    "author": "GanaTube Team",
+    "tags": [
+      "HD Audio",
+      "Sound Quality",
+      "Tech"
+    ],
+    "content": "\n      <img src=\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80\" alt=\"High quality headphones\" style=\"width:100%; border-radius: 12px; margin-bottom: 20px;\">\n      <p>Not all streams are created equal. When you listen to music online, the audio is compressed to save bandwidth. But aggressive compression destroys the subtle details of a song.</p>\n      <h3>Why HD Audio Matters</h3>\n      <p>High-Definition (HD) audio retains the depth of the bass, the crispness of the vocals, and the clarity of the instruments. It provides a studio-like experience right in your browser.</p>\n      <p>If you are using good quality headphones or speakers, settling for low-bitrate audio is a massive waste. Always choose platforms that prioritize clean, uncompressed, or high-bitrate streaming.</p>\n    "
+  }
+];
 
   constructor(
     private route: ActivatedRoute,
