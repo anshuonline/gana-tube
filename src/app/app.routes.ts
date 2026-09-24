@@ -19,6 +19,8 @@ export const routes: Routes = [
   { path: 'artist/:name', children: [] },
   { path: 'playlist/:id', children: [] },
   { path: 'user/:username/:id', children: [] },
+  { path: 'blog', loadComponent: () => import('./components/blog-page/blog-page.component').then(m => m.BlogPageComponent) },
+  { path: 'blog/:slug', loadComponent: () => import('./components/blog-page/blog-page.component').then(m => m.BlogPageComponent) },
   { path: 'rooms', children: [] },
   { path: 'rooms/:roomId', children: [] },
   { path: 'release-notes', redirectTo: 'home', pathMatch: 'full' },

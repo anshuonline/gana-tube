@@ -1,0 +1,49 @@
+<div class="blog-container">
+  <!-- Blog Listing Page -->
+  <div *ngIf="!currentPost" class="blog-list-view">
+    <div class="header">
+      <h1>GanaTube Blog</h1>
+      <p>Discover tips, tricks, and insights about free music streaming online.</p>
+    </div>
+
+    <div class="posts-grid">
+      <div class="post-card" *ngFor="let post of posts" [routerLink]="['/blog', post.slug]">
+        <div class="post-meta">
+          <span class="date"><svg lucideClock [attr.size]="14"></svg> {{ post.date }}</span>
+        </div>
+        <h2>{{ post.title }}</h2>
+        <p class="excerpt">{{ post.excerpt }}</p>
+        <div class="tags">
+          <span class="tag" *ngFor="let tag of post.tags">{{ tag }}</span>
+        </div>
+        <button class="read-more">Read Article <svg lucideArrowLeft [attr.size]="16" style="transform: rotate(180deg);"></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Single Blog Post View -->
+  <div *ngIf="currentPost" class="single-post-view">
+    <button class="back-btn" routerLink="/blog">
+      <svg lucideArrowLeft [attr.size]="20"></svg> Back to Articles
+    </button>
+    
+    <article class="post-content">
+      <header class="post-header">
+        <h1>{{ currentPost.title }}</h1>
+        <div class="post-meta">
+          <span><svg lucideClock [attr.size]="16"></svg> {{ currentPost.date }}</span>
+          <span><svg lucideUser [attr.size]="16"></svg> {{ currentPost.author }}</span>
+        </div>
+      </header>
+
+      <div class="content" [innerHTML]="currentPost.content"></div>
+
+      <div class="post-footer">
+        <h3>Tags:</h3>
+        <div class="tags">
+          <span class="tag" *ngFor="let tag of currentPost.tags">{{ tag }}</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
