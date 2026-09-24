@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
@@ -24,32 +24,41 @@ export class BlogPageComponent implements OnInit, OnDestroy {
   posts: BlogPost[] = BLOG_POSTS;
   readonly PAGE_SIZE = 9;
   displayedCount: number = 9;
+  visiblePosts: BlogPost[] = [];
+  hasMorePosts: boolean = true;
   isLoadingMore: boolean = false;
 
-  get visiblePosts(): BlogPost[] {
-    return this.posts.slice(0, this.displayedCount);
+  constructor(
+    private router: Router,
+    private titleService: Title,
+    private metaService: Meta,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.visiblePosts = this.posts.slice(0, this.displayedCount);
+    this.hasMorePosts = this.displayedCount < this.posts.length;
   }
 
-  get hasMorePosts(): boolean {
-    return this.displayedCount < this.posts.length;
+  private updateVisiblePosts(): void {
+    this.visiblePosts = this.posts.slice(0, this.displayedCount);
+    this.hasMorePosts = this.displayedCount < this.posts.length;
+    this.cdr.markForCheck();
   }
 
   loadMore(): void {
     if (this.isLoadingMore || !this.hasMorePosts) return;
     this.isLoadingMore = true;
+    this.cdr.markForCheck();
+
     setTimeout(() => {
       this.displayedCount = Math.min(this.displayedCount + this.PAGE_SIZE, this.posts.length);
+      this.updateVisiblePosts();
       this.isLoadingMore = false;
-    }, 220);
+      this.cdr.markForCheck();
+    }, 120);
   }
 
-  constructor(
-    private router: Router,
-    private titleService: Title,
-    private metaService: Meta
-  ) {}
-
   ngOnInit(): void {
+    this.updateVisiblePosts();
     this.checkCurrentRoute();
     this.routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -89,6 +98,7 @@ export class BlogPageComponent implements OnInit, OnDestroy {
       this.updateSEOForList();
     }
     this.isLoading = false;
+    this.cdr.markForCheck();
   }
 
   openPost(slug: string): void {
@@ -96,6 +106,7 @@ export class BlogPageComponent implements OnInit, OnDestroy {
     if (!found) return;
 
     this.isLoading = true;
+    this.cdr.markForCheck();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.router.navigate(['/blog', slug]);
 
@@ -103,18 +114,22 @@ export class BlogPageComponent implements OnInit, OnDestroy {
       this.currentPost = found;
       this.isLoading = false;
       this.updateSEOForPost(found);
+      this.cdr.markForCheck();
     }, 280);
   }
 
   goToBlogList(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.router.navigate(['/blog']);
 
     setTimeout(() => {
       this.currentPost = null;
       this.isLoading = false;
+      this.updateVisiblePosts();
       this.updateSEOForList();
+      this.cdr.markForCheck();
     }, 200);
   }
 
