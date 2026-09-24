@@ -41,6 +41,7 @@ import { LibraryPageComponent } from './components/library-page/library-page';
 import { FeedbackPopupComponent } from './components/feedback-popup/feedback-popup.component';
 import { ShortsPageComponent } from './components/shorts-page/shorts-page.component';
 import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
+import { BlogPageComponent } from './components/blog-page/blog-page.component';
 import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
 import { CuratedPlaylistsComponent } from './components/curated-playlists/curated-playlists';
@@ -114,6 +115,7 @@ export interface SponsoredAd {
     FeedbackPopupComponent,
     ShortsPageComponent,
     DiscoveryPageComponent,
+    BlogPageComponent,
     SpinWheelComponent,
     LucideGift,
     CuratedPlaylistsComponent,
@@ -1267,7 +1269,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'discovery', 'offline', 'curated-playlists'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'discovery', 'offline', 'curated-playlists', 'blog'].includes(url) || this.pageContent[url]) {
         this.selectedPlaylist.set(null);
         this.loadingPageTitle.set('');
         this.currentPage.set(url);

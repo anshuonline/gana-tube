@@ -867,6 +867,9 @@
       (toggleMenu)="toggleMenu($event.track, $event.event)">
     </app-discovery-page>
 
+    <!-- Blog Page Section -->
+    <app-blog-page *ngIf="currentPage() === 'blog'"></app-blog-page>
+
     <!-- Static Pages Section -->
     <div class="static-page-container" *ngIf="pageContent[currentPage()]">
       <div class="static-page-content" [innerHTML]="pageContent[currentPage()]?.html"></div>
