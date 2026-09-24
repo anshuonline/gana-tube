@@ -78,6 +78,10 @@
   padding: 14px 28px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 
+  @media (max-width: 768px) {
+    padding: 10px 16px;
+  }
+
   .nav-content {
     max-width: 1200px;
     margin: 0 auto;
@@ -93,10 +97,19 @@
     cursor: pointer;
     user-select: none;
 
+    @media (max-width: 480px) {
+      gap: 6px;
+    }
+
     .brand-logo {
       height: 32px;
       width: 32px;
       object-fit: contain;
+
+      @media (max-width: 480px) {
+        height: 24px;
+        width: 24px;
+      }
     }
 
     .brand-name {
@@ -104,12 +117,20 @@
       font-weight: 800;
       letter-spacing: -0.02em;
       color: #0f172a;
+
+      @media (max-width: 480px) {
+        font-size: 1.05rem;
+      }
     }
 
     .brand-divider {
       color: #cbd5e1;
       font-weight: 300;
       font-size: 1.2rem;
+
+      @media (max-width: 480px) {
+        font-size: 0.95rem;
+      }
     }
 
     .brand-sub {
@@ -120,6 +141,11 @@
       padding: 3px 10px;
       border-radius: 9999px;
       border: 1px solid #e9d5ff;
+
+      @media (max-width: 480px) {
+        font-size: 0.74rem;
+        padding: 2px 6px;
+      }
     }
   }
 
@@ -136,7 +162,26 @@
       font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.2s ease;
+
+      @media (max-width: 768px) {
+        padding: 5px 12px;
+        font-size: 0.76rem;
+        gap: 5px;
+        border-width: 1px;
+
+        svg {
+          width: 14px;
+          height: 14px;
+        }
+      }
+
+      @media (max-width: 400px) {
+        padding: 4px 10px;
+        font-size: 0.72rem;
+      }
 
       &:hover {
         background: #f3e8ff;
@@ -373,6 +418,10 @@
   .back-nav-bar {
     margin-bottom: 32px;
 
+    @media (max-width: 768px) {
+      margin-bottom: 18px;
+    }
+
     .back-to-blogs-btn {
       display: inline-flex;
       align-items: center;
@@ -389,6 +438,30 @@
       cursor: pointer;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       transition: all 0.22s ease;
+
+      @media (max-width: 768px) {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        gap: 6px;
+        border-width: 1px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+        svg {
+          width: 15px;
+          height: 15px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        padding: 5px 12px;
+        font-size: 0.76rem;
+        gap: 5px;
+
+        svg {
+          width: 13px;
+          height: 13px;
+        }
+      }
 
       &:hover {
         background: #fdf2f8;
@@ -586,6 +659,17 @@
           cursor: pointer;
           box-shadow: 0 10px 24px -5px rgba(107, 33, 168, 0.4);
           transition: all 0.25s ease;
+
+          @media (max-width: 768px) {
+            padding: 10px 22px;
+            font-size: 0.85rem;
+            gap: 6px;
+
+            svg {
+              width: 14px;
+              height: 14px;
+            }
+          }
 
           &:hover {
             transform: translateY(-2px);
