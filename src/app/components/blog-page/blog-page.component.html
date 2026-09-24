@@ -48,7 +48,7 @@
       <div class="posts-grid">
         <article
           class="post-card"
-          *ngFor="let post of posts"
+          *ngFor="let post of visiblePosts"
           (click)="openPost(post.slug)"
           tabindex="0"
           role="button"
@@ -91,6 +91,35 @@
             </div>
           </div>
         </article>
+      </div>
+
+      <!-- Load More Section -->
+      <div class="load-more-section" *ngIf="posts.length > PAGE_SIZE">
+        <p class="posts-count-indicator">
+          Showing <strong>{{ visiblePosts.length }}</strong> of <strong>{{ posts.length }}</strong> articles
+        </p>
+
+        <button
+          *ngIf="hasMorePosts"
+          class="load-more-btn"
+          (click)="loadMore()"
+          [disabled]="isLoadingMore"
+          aria-label="Load more blog articles"
+        >
+          <ng-container *ngIf="!isLoadingMore">
+            <span>Load More Articles</span>
+            <svg lucideChevronDown [attr.size]="18"></svg>
+          </ng-container>
+          <ng-container *ngIf="isLoadingMore">
+            <svg lucideLoader2 class="spin-icon" [attr.size]="18"></svg>
+            <span>Loading articles...</span>
+          </ng-container>
+        </button>
+
+        <div *ngIf="!hasMorePosts" class="all-loaded-badge">
+          <svg lucideCheck [attr.size]="15"></svg>
+          <span>You have explored all articles</span>
+        </div>
       </div>
     </div>
 

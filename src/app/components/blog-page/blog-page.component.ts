@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
-import { LucideArrowLeft, LucideClock, LucideUser, LucideArrowRight, LucideBookOpen, LucideLoader2 } from '@lucide/angular';
+import { LucideArrowLeft, LucideClock, LucideUser, LucideArrowRight, LucideBookOpen, LucideLoader2, LucideChevronDown, LucideCheck } from '@lucide/angular';
 import { filter, Subscription } from 'rxjs';
 
 import { BlogPost, BLOG_POSTS } from '../../data/blog-posts.data';
@@ -12,7 +12,7 @@ export type { BlogPost };
 @Component({
   selector: 'app-blog-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideArrowLeft, LucideClock, LucideUser, LucideArrowRight, LucideBookOpen, LucideLoader2],
+  imports: [CommonModule, RouterModule, LucideArrowLeft, LucideClock, LucideUser, LucideArrowRight, LucideBookOpen, LucideLoader2, LucideChevronDown, LucideCheck],
   templateUrl: './blog-page.component.html',
   styleUrls: ['./blog-page.component.scss']
 })
@@ -22,6 +22,26 @@ export class BlogPageComponent implements OnInit, OnDestroy {
   private routerSub?: Subscription;
 
   posts: BlogPost[] = BLOG_POSTS;
+  readonly PAGE_SIZE = 9;
+  displayedCount: number = 9;
+  isLoadingMore: boolean = false;
+
+  get visiblePosts(): BlogPost[] {
+    return this.posts.slice(0, this.displayedCount);
+  }
+
+  get hasMorePosts(): boolean {
+    return this.displayedCount < this.posts.length;
+  }
+
+  loadMore(): void {
+    if (this.isLoadingMore || !this.hasMorePosts) return;
+    this.isLoadingMore = true;
+    setTimeout(() => {
+      this.displayedCount = Math.min(this.displayedCount + this.PAGE_SIZE, this.posts.length);
+      this.isLoadingMore = false;
+    }, 220);
+  }
 
   constructor(
     private router: Router,

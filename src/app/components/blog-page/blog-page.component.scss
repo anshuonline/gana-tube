@@ -65,6 +65,11 @@
   to { opacity: 1; }
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 // Dedicated Blog Top Header Navbar
 .blog-header-nav {
   position: sticky;
@@ -409,6 +414,112 @@
         gap: 6px;
         transition: all 0.2s ease;
       }
+    }
+  }
+}
+
+// Load More Section
+.load-more-section {
+  margin-top: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    margin-top: 38px;
+    gap: 12px;
+  }
+
+  .posts-count-indicator {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+
+    strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.82rem;
+    }
+  }
+
+  .load-more-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    padding: 12px 32px;
+    border-radius: 9999px;
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover:not(:disabled) {
+      background: #fdf2f8;
+      border-color: #be185d;
+      color: #be185d;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(190, 24, 93, 0.12);
+
+      svg {
+        transform: translateY(2px);
+      }
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+
+    svg {
+      transition: transform 0.2s ease;
+    }
+
+    .spin-icon {
+      animation: spin 0.9s linear infinite;
+    }
+
+    @media (max-width: 480px) {
+      padding: 10px 24px;
+      font-size: 0.84rem;
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+
+  .all-loaded-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 20px;
+    border-radius: 9999px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    svg {
+      color: #10b981;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.78rem;
+      padding: 6px 16px;
     }
   }
 }
