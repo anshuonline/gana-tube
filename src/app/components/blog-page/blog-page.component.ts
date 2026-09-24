@@ -230,7 +230,16 @@ export class BlogPageComponent implements OnInit, OnDestroy {
     this.routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
-      this.checkCurrentRoute();
+      const rawUrl = this.router.url.split('?')[0];
+      const segments = rawUrl.split('/').filter(s => s.length > 0);
+      if (segments.length >= 2 && segments[0] === 'blog') {
+        const slug = decodeURIComponent(segments[1]);
+        if (this.currentPost?.slug !== slug) {
+          this.checkCurrentRoute();
+        }
+      } else if (this.currentPost !== null) {
+        this.checkCurrentRoute();
+      }
     });
   }
 
@@ -243,38 +252,41 @@ export class BlogPageComponent implements OnInit, OnDestroy {
     const segments = rawUrl.split('/').filter(s => s.length > 0);
     if (segments.length >= 2 && segments[0] === 'blog') {
       const slug = decodeURIComponent(segments[1]);
-      this.openPost(slug, false);
+      const found = this.posts.find(p => p.slug === slug);
+      if (found) {
+        this.currentPost = found;
+        this.updateSEOForPost(found);
+      } else {
+        this.currentPost = null;
+        this.updateSEOForList();
+      }
     } else {
       this.currentPost = null;
-      this.isLoading = false;
       this.updateSEOForList();
     }
+    this.isLoading = false;
   }
 
-  openPost(slug: string, navigate: boolean = true): void {
+  openPost(slug: string): void {
     const found = this.posts.find(p => p.slug === slug);
-    if (found) {
-      this.isLoading = true;
-      if (navigate) {
-        this.router.navigate(['/blog', slug]);
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      
-      // Smooth loading transition
-      setTimeout(() => {
-        this.currentPost = found;
-        this.isLoading = false;
-        this.updateSEOForPost(found);
-      }, 300);
-    } else if (navigate) {
-      this.goToBlogList();
-    }
+    if (!found) return;
+
+    this.isLoading = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.router.navigate(['/blog', slug]);
+
+    setTimeout(() => {
+      this.currentPost = found;
+      this.isLoading = false;
+      this.updateSEOForPost(found);
+    }, 280);
   }
 
   goToBlogList(): void {
     this.isLoading = true;
-    this.router.navigate(['/blog']);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.router.navigate(['/blog']);
+
     setTimeout(() => {
       this.currentPost = null;
       this.isLoading = false;

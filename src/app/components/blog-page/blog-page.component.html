@@ -1,11 +1,9 @@
 <div class="blog-page-root">
 
-  <!-- Centered Loading Overlay (Bich mei loading bar) -->
+  <!-- Centered Loading Bar Overlay (No text, pure purple-pink animated bar with blur) -->
   <div class="blog-center-loader" *ngIf="isLoading">
-    <div class="loader-card">
-      <div class="pulse-ring"></div>
-      <svg lucideLoader2 class="spin-icon" [attr.size]="36"></svg>
-      <p class="loader-caption">Loading Article...</p>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-indeterminate"></div>
     </div>
   </div>
 

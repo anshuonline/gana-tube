@@ -9,47 +9,55 @@
   box-sizing: border-box;
 }
 
-// Centered Loading Overlay (Bich mei loading bar)
+// Centered Loading Bar Overlay (No text, pure purple-pink animated bar with blur)
 .blog-center-loader {
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 99999;
   animation: fadeIn 0.15s ease-out;
+  pointer-events: all;
 
-  .loader-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 32px 48px;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 20px 45px -10px rgba(107, 33, 168, 0.18), 0 0 0 1px #f1f5f9;
+  .loading-bar-wrap {
+    width: 220px;
+    height: 6px;
+    background: rgba(107, 33, 168, 0.12);
+    border-radius: 9999px;
+    overflow: hidden;
     position: relative;
+    box-shadow: 0 4px 18px rgba(107, 33, 168, 0.25);
 
-    .spin-icon {
-      color: #6b21a8;
-      animation: spin 1s linear infinite;
-    }
-
-    .loader-caption {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin: 0;
-      letter-spacing: -0.01em;
+    .loading-bar-indeterminate {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #6b21a8 0%, #be185d 50%, #6b21a8 100%);
+      box-shadow: 0 0 12px rgba(190, 24, 93, 0.5);
+      animation: indeterminateBar 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite;
     }
   }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes indeterminateBar {
+  0% {
+    left: -40%;
+    width: 30%;
+  }
+  50% {
+    left: 20%;
+    width: 60%;
+  }
+  100% {
+    left: 100%;
+    width: 40%;
+  }
 }
 
 @keyframes fadeIn {
