@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
-import { LucideArrowLeft, LucideClock, LucideUser } from '@lucide/angular';
+import { LucideArrowLeft, LucideClock, LucideUser, LucideArrowRight, LucideBookOpen } from '@lucide/angular';
+import { filter, Subscription } from 'rxjs';
 
 export interface BlogPost {
   slug: string;
@@ -12,21 +13,26 @@ export interface BlogPost {
   date: string;
   author: string;
   tags: string[];
+  coverImage: string;
+  readTime: string;
 }
 
 @Component({
   selector: 'app-blog-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideArrowLeft, LucideClock, LucideUser],
+  imports: [CommonModule, RouterModule, LucideArrowLeft, LucideClock, LucideUser, LucideArrowRight, LucideBookOpen],
   templateUrl: './blog-page.component.html',
   styleUrls: ['./blog-page.component.scss']
 })
-export class BlogPageComponent implements OnInit {
+export class BlogPageComponent implements OnInit, OnDestroy {
   currentPost: BlogPost | null = null;
+  private routerSub?: Subscription;
 
   posts: BlogPost[] = [
   {
     "slug": "free-music-streaming-without-interruptions",
+    "coverImage": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
+    "readTime": "3 min read",
     "title": "The Ultimate Guide to Free Music Streaming Without Interruptions",
     "excerpt": "Discover how to enjoy your favorite tracks continuously without paying for premium subscriptions.",
     "date": "Sep 24, 2026",
@@ -40,6 +46,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "how-to-listen-to-unblocked-music-at-school",
+    "coverImage": "https://images.unsplash.com/photo-1493225457124-a1a2a5956093?auto=format&fit=crop&w=800&q=80",
+    "readTime": "4 min read",
     "title": "How to Listen to Unblocked Music at School or Work",
     "excerpt": "Bypass strict network firewalls easily and keep your productivity high with unblocked music players.",
     "date": "Sep 23, 2026",
@@ -53,6 +61,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "desktop-background-play-for-music",
+    "coverImage": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80",
+    "readTime": "3 min read",
     "title": "Why Desktop Background Play is Essential for Music Lovers",
     "excerpt": "Learn how to multitask effectively by keeping your music playing in the background while you work on your PC.",
     "date": "Sep 22, 2026",
@@ -66,6 +76,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "host-virtual-listening-parties",
+    "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80",
+    "readTime": "4 min read",
     "title": "How to Host Virtual Listening Parties Online",
     "excerpt": "Connect with friends globally by listening to the same music at the exact same time.",
     "date": "Sep 21, 2026",
@@ -79,6 +91,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "protecting-your-privacy-while-streaming",
+    "coverImage": "https://images.unsplash.com/photo-1516280440502-6c24387d8d21?auto=format&fit=crop&w=800&q=80",
+    "readTime": "3 min read",
     "title": "Protecting Your Privacy While Streaming Music",
     "excerpt": "Stream anonymously without giving away your email, phone number, or personal data.",
     "date": "Sep 20, 2026",
@@ -92,6 +106,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "benefits-of-dark-mode-audio-players",
+    "coverImage": "https://images.unsplash.com/photo-1458560871784-56d23406c091?auto=format&fit=crop&w=800&q=80",
+    "readTime": "3 min read",
     "title": "The Health and Battery Benefits of Dark Mode Audio Players",
     "excerpt": "Why AMOLED dark themes are better for your eyes and your device battery.",
     "date": "Sep 19, 2026",
@@ -105,6 +121,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "creating-the-perfect-study-playlist",
+    "coverImage": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=800&q=80",
+    "readTime": "4 min read",
     "title": "Creating the Perfect Study Playlist for Maximum Focus",
     "excerpt": "Learn the science behind audio frequencies and how to curate music that boosts concentration.",
     "date": "Sep 18, 2026",
@@ -118,6 +136,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "exploring-regional-music-online",
+    "coverImage": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=800&q=80",
+    "readTime": "4 min read",
     "title": "Exploring Regional Music: From Punjabi Pop to Tamil Melodies",
     "excerpt": "Dive deep into the rich cultural diversity of regional music streaming.",
     "date": "Sep 17, 2026",
@@ -131,6 +151,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "the-resurgence-of-retro-music",
+    "coverImage": "https://images.unsplash.com/photo-1483032469466-b937c425697b?auto=format&fit=crop&w=800&q=80",
+    "readTime": "3 min read",
     "title": "The Resurgence of Retro: Why 80s and 90s Music is Trending Again",
     "excerpt": "Nostalgia is powerful. Discover why retro tracks are dominating modern streaming charts.",
     "date": "Sep 16, 2026",
@@ -144,6 +166,8 @@ export class BlogPageComponent implements OnInit {
   },
   {
     "slug": "high-definition-audio-streaming-explained",
+    "coverImage": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+    "readTime": "3 min read",
     "title": "High-Definition Audio Streaming Explained",
     "excerpt": "What makes HD audio different, and why your ears deserve the best sound quality.",
     "date": "Sep 15, 2026",
@@ -158,32 +182,67 @@ export class BlogPageComponent implements OnInit {
 ];
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
     private titleService: Title,
     private metaService: Meta
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const slug = params.get('slug');
-      if (slug) {
-        this.currentPost = this.posts.find(p => p.slug === slug) || null;
-        if (this.currentPost) {
-          // Set dynamic SEO tags for the specific blog post
-          this.titleService.setTitle(this.currentPost.title + ' - GanaTube Blog');
-          this.metaService.updateTag({ name: 'description', content: this.currentPost.excerpt });
-          this.metaService.updateTag({ name: 'keywords', content: this.currentPost.tags.join(', ') });
-        } else {
-          this.router.navigate(['/blog']);
-        }
-      } else {
-        this.currentPost = null;
-        // Set SEO for the main blog list page
-        this.titleService.setTitle('GanaTube Blog - Free Music Streaming News & Updates');
-        this.metaService.updateTag({ name: 'description', content: 'Read the latest articles about free music streaming, unblocked music players, and ad-free listening on the GanaTube Blog.' });
-        this.metaService.updateTag({ name: 'keywords', content: 'music blog, streaming news, ganatube blog, free music articles' });
-      }
+    this.checkCurrentRoute();
+    this.routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.checkCurrentRoute();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+  }
+
+  checkCurrentRoute(): void {
+    const rawUrl = this.router.url.split('?')[0];
+    const segments = rawUrl.split('/').filter(s => s.length > 0);
+    // e.g. ['blog'] or ['blog', 'how-to-listen-...']
+    if (segments.length >= 2 && segments[0] === 'blog') {
+      const slug = decodeURIComponent(segments[1]);
+      this.openPost(slug, false);
+    } else {
+      this.currentPost = null;
+      this.updateSEOForList();
+    }
+  }
+
+  openPost(slug: string, navigate: boolean = true): void {
+    const found = this.posts.find(p => p.slug === slug);
+    if (found) {
+      this.currentPost = found;
+      if (navigate) {
+        this.router.navigate(['/blog', slug]);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.updateSEOForPost(found);
+    } else if (navigate) {
+      this.goToBlogList();
+    }
+  }
+
+  goToBlogList(): void {
+    this.currentPost = null;
+    this.router.navigate(['/blog']);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.updateSEOForList();
+  }
+
+  private updateSEOForList(): void {
+    this.titleService.setTitle('Blogs - GanaTube');
+    this.metaService.updateTag({ name: 'description', content: 'Explore curated music blogs, free streaming tips, and guides on GanaTube.' });
+    this.metaService.updateTag({ name: 'keywords', content: 'music blogs, ganatube blogs, free music streaming tips, unblocked music' });
+  }
+
+  private updateSEOForPost(post: BlogPost): void {
+    this.titleService.setTitle(`${post.title} - GanaTube Blogs`);
+    this.metaService.updateTag({ name: 'description', content: post.excerpt });
+    this.metaService.updateTag({ name: 'keywords', content: post.tags.join(', ') });
   }
 }

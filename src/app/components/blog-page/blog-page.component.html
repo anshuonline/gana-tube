@@ -1,49 +1,112 @@
 <div class="blog-container">
-  <!-- Blog Listing Page -->
+  <!-- Blog Listing View -->
   <div *ngIf="!currentPost" class="blog-list-view">
-    <div class="header">
-      <h1>GanaTube Blog</h1>
-      <p>Discover tips, tricks, and insights about free music streaming online.</p>
-    </div>
-
-    <div class="posts-grid">
-      <div class="post-card" *ngFor="let post of posts" [routerLink]="['/blog', post.slug]">
-        <div class="post-meta">
-          <span class="date"><svg lucideClock [attr.size]="14"></svg> {{ post.date }}</span>
-        </div>
-        <h2>{{ post.title }}</h2>
-        <p class="excerpt">{{ post.excerpt }}</p>
-        <div class="tags">
-          <span class="tag" *ngFor="let tag of post.tags">{{ tag }}</span>
-        </div>
-        <button class="read-more">Read Article <svg lucideArrowLeft [attr.size]="16" style="transform: rotate(180deg);"></svg></button>
+    <!-- Hero Header -->
+    <header class="blog-hero">
+      <div class="hero-badge">
+        <svg lucideBookOpen [attr.size]="14"></svg>
+        <span>GanaTube Knowledge Base</span>
       </div>
+      <h1 class="hero-title">Blogs</h1>
+      <p class="hero-subtitle">
+        Curated guides, streaming tips, and music culture for continuous, uninterrupted listening.
+      </p>
+    </header>
+
+    <!-- Posts Grid -->
+    <div class="posts-grid">
+      <article
+        class="post-card"
+        *ngFor="let post of posts"
+        (click)="openPost(post.slug)"
+        tabindex="0"
+        role="button"
+        (keydown.enter)="openPost(post.slug)"
+      >
+        <!-- Card Thumbnail Banner -->
+        <div class="card-thumb-wrap">
+          <img [src]="post.coverImage" [alt]="post.title" loading="lazy" class="card-thumb" />
+          <div class="thumb-gradient"></div>
+          <span class="card-category-badge">{{ post.tags[0] }}</span>
+        </div>
+
+        <!-- Card Content Body -->
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="meta-item">
+              <svg lucideClock [attr.size]="13"></svg> {{ post.date }}
+            </span>
+            <span class="meta-dot">•</span>
+            <span class="meta-item">{{ post.readTime }}</span>
+          </div>
+
+          <h2 class="card-title">{{ post.title }}</h2>
+          <p class="card-excerpt">{{ post.excerpt }}</p>
+
+          <div class="card-footer">
+            <div class="tags-row">
+              <span class="tag-pill" *ngFor="let tag of post.tags.slice(0, 2)">#{{ tag }}</span>
+            </div>
+            <span class="read-more-link">
+              Read Article
+              <svg lucideArrowRight [attr.size]="15"></svg>
+            </span>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 
   <!-- Single Blog Post View -->
   <div *ngIf="currentPost" class="single-post-view">
-    <button class="back-btn" routerLink="/blog">
-      <svg lucideArrowLeft [attr.size]="20"></svg> Back to Articles
-    </button>
-    
-    <article class="post-content">
-      <header class="post-header">
-        <h1>{{ currentPost.title }}</h1>
-        <div class="post-meta">
-          <span><svg lucideClock [attr.size]="16"></svg> {{ currentPost.date }}</span>
-          <span><svg lucideUser [attr.size]="16"></svg> {{ currentPost.author }}</span>
+    <div class="back-nav">
+      <button class="back-btn" (click)="goToBlogList()" title="Back to all blogs">
+        <svg lucideArrowLeft [attr.size]="18"></svg>
+        <span>Back to Blogs</span>
+      </button>
+    </div>
+
+    <article class="article-wrapper">
+      <header class="article-header">
+        <div class="article-tag-badge">{{ currentPost.tags[0] }}</div>
+        <h1 class="article-title">{{ currentPost.title }}</h1>
+        
+        <div class="article-meta-bar">
+          <div class="meta-pill">
+            <svg lucideUser [attr.size]="14"></svg>
+            <span>{{ currentPost.author }}</span>
+          </div>
+          <div class="meta-pill">
+            <svg lucideClock [attr.size]="14"></svg>
+            <span>{{ currentPost.date }}</span>
+          </div>
+          <div class="meta-pill">
+            <span>{{ currentPost.readTime }}</span>
+          </div>
         </div>
       </header>
 
-      <div class="content" [innerHTML]="currentPost.content"></div>
-
-      <div class="post-footer">
-        <h3>Tags:</h3>
-        <div class="tags">
-          <span class="tag" *ngFor="let tag of currentPost.tags">{{ tag }}</span>
-        </div>
+      <div class="article-featured-image">
+        <img [src]="currentPost.coverImage" [alt]="currentPost.title" class="featured-img" />
       </div>
+
+      <div class="article-body" [innerHTML]="currentPost.content"></div>
+
+      <footer class="article-footer">
+        <div class="tags-section">
+          <span class="tags-label">Related Topics:</span>
+          <div class="tags-cluster">
+            <span class="tag-chip" *ngFor="let tag of currentPost.tags">{{ tag }}</span>
+          </div>
+        </div>
+
+        <div class="article-nav-bottom">
+          <button class="bottom-back-btn" (click)="goToBlogList()">
+            <svg lucideArrowLeft [attr.size]="16"></svg>
+            <span>Explore More Blogs</span>
+          </button>
+        </div>
+      </footer>
     </article>
   </div>
 </div>
