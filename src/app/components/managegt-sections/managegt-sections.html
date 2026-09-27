@@ -92,6 +92,7 @@
       <div class="mode-toggle">
         <button [class.active]="createMode === 'simple'" (click)="createMode = 'simple'" class="mode-btn">Name Only</button>
         <button [class.active]="createMode === 'playlist'" (click)="createMode = 'playlist'" class="mode-btn">YT Playlist</button>
+        <button [class.active]="createMode === 'spotify'" (click)="createMode = 'spotify'" class="mode-btn">Spotify Playlist</button>
         <button [class.active]="createMode === 'json'" (click)="createMode = 'json'" class="mode-btn">Advanced JSON</button>
       </div>
 
@@ -112,13 +113,25 @@
         <input type="text" [(ngModel)]="ytPlaylistId" placeholder="e.g. https://music.youtube.com/playlist?list=PL... or just the ID" class="form-input" />
       </div>
 
+      <!-- Spotify Mode Inputs -->
+      <div class="form-group" *ngIf="createMode === 'spotify'">
+        <label class="flex-label">
+          <span>Spotify Playlist URL or ID</span>
+          <span class="hint">Imports tracklist & converts to YouTube streams</span>
+        </label>
+        <input type="text" [(ngModel)]="spotifyPlaylistUrl" placeholder="e.g. https://open.spotify.com/playlist/... or just the ID" class="form-input" />
+        <div style="margin-top: 6px; font-size: 0.8rem; color: #a1a1aa;">
+          ✨ Zero API required. Extracts all tracks and maps them to YouTube Music for instant streaming.
+        </div>
+      </div>
+
       <div *ngIf="fetchError" class="error-box">
         <svg lucideX [attr.size]="15"></svg>
         {{ fetchError }}
       </div>
 
       <div *ngIf="isFetching" class="progress-bar">
-        <div class="progress-fill" [style.width.%]="(fetchProgress / totalToFetch) * 100"></div>
+        <div class="progress-fill" [style.width.%]="totalToFetch > 0 ? (fetchProgress / totalToFetch) * 100 : 0"></div>
       </div>
       <div *ngIf="isFetching" class="progress-text">
         Fetching {{ fetchProgress }} / {{ totalToFetch }}
@@ -139,6 +152,15 @@
         <span *ngIf="isFetching || isPublishing" class="loading-text">
           <svg lucideRefreshCw class="spin" [attr.size]="17"></svg>
           Processing...
+        </span>
+      </button>
+
+      <!-- Button for Spotify mode -->
+      <button *ngIf="createMode === 'spotify'" class="submit-btn" [disabled]="isFetching || isPublishing || !spotifyPlaylistUrl.trim()" (click)="addSectionFromSpotify()">
+        <span *ngIf="!isFetching && !isPublishing">Import from Spotify</span>
+        <span *ngIf="isFetching || isPublishing" class="loading-text">
+          <svg lucideRefreshCw class="spin" [attr.size]="17"></svg>
+          {{ totalToFetch > 0 ? 'Mapping ' + fetchProgress + ' / ' + totalToFetch + ' songs...' : 'Fetching Spotify...' }}
         </span>
       </button>
 

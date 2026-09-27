@@ -30,11 +30,13 @@ export class ManagegtSectionsComponent implements OnInit {
   currentSections: CustomSection[] = [];
 
   // Add new section state
-  createMode: 'simple' | 'json' | 'playlist' = 'simple';
+  createMode: 'simple' | 'json' | 'playlist' | 'spotify' = 'simple';
   newSectionTitle = '';
   jsonInput = '';
   ytPlaylistId = '';
+  spotifyPlaylistUrl = '';
   isFetching = false;
+  isFetchingSpotify = false;
   isPublishing = false;
   fetchProgress = 0;
   totalToFetch = 0;
@@ -311,6 +313,103 @@ export class ManagegtSectionsComponent implements OnInit {
       this.fetchError = 'Failed to fetch playlist: ' + (e.message || 'Unknown error');
     } finally {
       this.isFetching = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async addSectionFromSpotify() {
+    const input = this.spotifyPlaylistUrl.trim();
+    if (!input) {
+      this.fetchError = 'Please provide a Spotify Playlist URL or ID.';
+      return;
+    }
+
+    this.isFetching = true;
+    this.isFetchingSpotify = true;
+    this.fetchError = '';
+    this.publishMessage = '';
+    this.fetchProgress = 0;
+    this.totalToFetch = 0;
+    this.cdr.detectChanges();
+
+    try {
+      // 1. Fetch Spotify tracklist from backend without API key
+      const res: any = await firstValueFrom(
+        this.http.get<any>(`${this.apiUrl}?action=fetch_spotify_playlist&url=${encodeURIComponent(input)}`).pipe(
+          timeout(15000),
+          catchError((err) => {
+            throw new Error(err.error?.message || err.message || 'Could not fetch Spotify playlist');
+          })
+        )
+      );
+
+      if (!res || res.status !== 'success' || !res.tracks || res.tracks.length === 0) {
+        throw new Error(res?.message || 'Playlist is empty or could not be fetched.');
+      }
+
+      // Pre-fill section title if user didn't enter one
+      if (!this.newSectionTitle.trim() && res.title) {
+        this.newSectionTitle = res.title;
+      }
+
+      const tracks: { title: string; artist: string; query: string }[] = res.tracks;
+      this.totalToFetch = tracks.length;
+      this.fetchProgress = 0;
+      this.cdr.detectChanges();
+
+      // 2. Parallel chunk search on YouTube Music API
+      const fetchedSongs: YouTubeSearchResult[] = [];
+      const chunkSize = 5;
+
+      for (let i = 0; i < tracks.length; i += chunkSize) {
+        const chunk = tracks.slice(i, i + chunkSize);
+        const promises = chunk.map(async (track) => {
+          try {
+            const results = await firstValueFrom(
+              this.youtubeApi.searchMusic(track.query, 1).pipe(
+                timeout(6000),
+                catchError(() => of([]))
+              )
+            );
+            if (results && results.length > 0) {
+              fetchedSongs.push(results[0]);
+            }
+          } catch (e) {
+            console.error('Error fetching YT match for:', track.query, e);
+          } finally {
+            this.fetchProgress++;
+            this.cdr.detectChanges();
+          }
+        });
+
+        await Promise.all(promises);
+        if (i + chunkSize < tracks.length) {
+          await new Promise(r => setTimeout(r, 350));
+        }
+      }
+
+      if (fetchedSongs.length === 0) {
+        throw new Error('Could not find matches for Spotify tracks on YouTube Music.');
+      }
+
+      const sectionTitle = this.newSectionTitle.trim() || res.title || 'Spotify Curated';
+
+      this.currentSections.unshift({
+        title: sectionTitle,
+        songs: fetchedSongs
+      });
+
+      this.allSectionsData[this.selectedLanguage] = [...this.currentSections];
+      await this.publishSections(true);
+
+      this.newSectionTitle = '';
+      this.spotifyPlaylistUrl = '';
+      this.openSection(0);
+    } catch (e: any) {
+      this.fetchError = e.message || 'Failed to import Spotify playlist.';
+    } finally {
+      this.isFetching = false;
+      this.isFetchingSpotify = false;
       this.cdr.detectChanges();
     }
   }

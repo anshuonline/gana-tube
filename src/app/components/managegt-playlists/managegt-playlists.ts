@@ -41,11 +41,13 @@ export class ManagegtPlaylistsComponent implements OnInit {
   newPlaylistDate = '';
   jsonInput = '';
   newPlaylistCoverUrl = ''; // Replaced image upload with URL link
-  createMode: 'json' | 'playlist' = 'json'; // json = songs array, playlist = YouTube Playlist ID/URL
+  createMode: 'json' | 'playlist' | 'spotify' = 'json'; // json = songs array, playlist = YouTube Playlist ID/URL, spotify = Spotify Playlist
   ytPlaylistInput = '';
   ytPlaylistId = '';
+  spotifyPlaylistInput = '';
   fetchedYtSongs: YouTubeSearchResult[] = [];
   isFetchingYtPlaylist = false;
+  isFetchingSpotify = false;
   isRefreshingPlaylist = false;
   
   // Edit State
@@ -241,6 +243,96 @@ export class ManagegtPlaylistsComponent implements OnInit {
     }
   }
 
+  // Fetches metadata and tracklist from Spotify, then maps to YouTube Music in parallel chunks
+  async fetchSpotifyPlaylistDetails(urlOrId: string): Promise<boolean> {
+    const input = (urlOrId || '').trim();
+    if (!input) {
+      this.fetchError = 'Please provide a Spotify Playlist link or ID';
+      return false;
+    }
+
+    this.isFetchingSpotify = true;
+    this.isFetching = true;
+    this.fetchError = '';
+    this.fetchProgress = 0;
+    this.totalToFetch = 0;
+    this.cdr.detectChanges();
+
+    try {
+      // 1. Fetch Spotify tracklist from backend without API key
+      const res: any = await firstValueFrom(
+        this.http.get<any>(`${this.apiUrl}?action=fetch_spotify_playlist&url=${encodeURIComponent(input)}`).pipe(
+          timeout(15000),
+          catchError((err) => {
+            throw new Error(err.error?.message || err.message || 'Could not fetch Spotify playlist');
+          })
+        )
+      );
+
+      if (!res || res.status !== 'success' || !res.tracks || res.tracks.length === 0) {
+        throw new Error(res?.message || 'Playlist is empty or could not be fetched.');
+      }
+
+      // Auto-fill title & cover image
+      if (res.title && !this.newPlaylistTitle.trim()) {
+        this.newPlaylistTitle = res.title;
+      }
+      if (res.coverImage && !this.newPlaylistCoverUrl.trim()) {
+        this.newPlaylistCoverUrl = res.coverImage;
+      }
+
+      const tracks: { title: string; artist: string; query: string }[] = res.tracks;
+      this.totalToFetch = tracks.length;
+      this.fetchProgress = 0;
+      this.cdr.detectChanges();
+
+      // 2. Parallel search on YouTube Music
+      const fetchedSongs: YouTubeSearchResult[] = [];
+      const chunkSize = 5;
+
+      for (let i = 0; i < tracks.length; i += chunkSize) {
+        const chunk = tracks.slice(i, i + chunkSize);
+        const promises = chunk.map(async (track) => {
+          try {
+            const results = await firstValueFrom(
+              this.youtubeApi.searchMusic(track.query, 1).pipe(
+                timeout(6000),
+                catchError(() => of([]))
+              )
+            );
+            if (results && results.length > 0) {
+              fetchedSongs.push(results[0]);
+            }
+          } catch (e) {
+            console.error('Error matching song on YT:', track.query, e);
+          } finally {
+            this.fetchProgress++;
+            this.cdr.detectChanges();
+          }
+        });
+
+        await Promise.all(promises);
+        if (i + chunkSize < tracks.length) {
+          await new Promise(r => setTimeout(r, 350));
+        }
+      }
+
+      if (fetchedSongs.length === 0) {
+        throw new Error('No songs could be matched on YouTube Music.');
+      }
+
+      this.fetchedYtSongs = fetchedSongs;
+      return true;
+    } catch (e: any) {
+      this.fetchError = e.message || 'Failed to import Spotify playlist.';
+      return false;
+    } finally {
+      this.isFetchingSpotify = false;
+      this.isFetching = false;
+      this.cdr.detectChanges();
+    }
+  }
+
   // Re-fetch songs from YouTube for a YT Playlist ID based playlist
   async refreshYtPlaylistSongs(playlist: CustomPlaylist) {
     if (!this.isYtPlaylistId(playlist.id)) return;
@@ -350,6 +442,79 @@ export class ManagegtPlaylistsComponent implements OnInit {
       } catch (e: any) {
         this.isFetching = false;
         this.fetchError = 'Failed to fetch playlist. ' + e.message;
+        this.cdr.detectChanges();
+      }
+      return;
+    }
+
+    if (this.createMode === 'spotify') {
+      // ─── Spotify Playlist mode ───
+      if (!this.newPlaylistCoverUrl.trim()) {
+        this.fetchError = 'Please provide a cover photo link (or click Fetch to auto-fill it)';
+        return;
+      }
+
+      if (this.newPlaylistStatus === 'schedule' && !this.newPlaylistDate) {
+        this.fetchError = 'Please select a date and time for scheduled publish';
+        return;
+      }
+
+      this.isFetching = true;
+      this.fetchProgress = 0;
+      this.totalToFetch = 1;
+      this.cdr.detectChanges();
+
+      try {
+        if (this.fetchedYtSongs.length === 0) {
+          const success = await this.fetchSpotifyPlaylistDetails(this.spotifyPlaylistInput);
+          if (!success) {
+            throw new Error(this.fetchError || 'Could not fetch Spotify playlist.');
+          }
+        }
+
+        const imageUrl = this.newPlaylistCoverUrl.trim();
+
+        if (this.editingPlaylistId) {
+          const index = this.currentPlaylists.findIndex(p => p.id === this.editingPlaylistId);
+          if (index > -1) {
+            this.currentPlaylists[index] = {
+              ...this.currentPlaylists[index],
+              title: this.newPlaylistTitle,
+              coverImage: imageUrl,
+              songs: this.fetchedYtSongs,
+              searchQueries: [],
+              status: this.newPlaylistStatus,
+              publishDate: this.newPlaylistStatus === 'schedule' ? new Date(this.newPlaylistDate).toISOString() : undefined
+            };
+            this.allPlaylistsData[this.selectedLang] = [...this.currentPlaylists];
+          }
+        } else {
+          const newPlaylist: CustomPlaylist = {
+            id: 'pl_' + Date.now() + Math.floor(Math.random() * 1000),
+            title: this.newPlaylistTitle,
+            language: this.selectedLang,
+            coverImage: imageUrl,
+            searchQueries: [],
+            songs: this.fetchedYtSongs,
+            status: this.newPlaylistStatus,
+            publishDate: this.newPlaylistStatus === 'schedule' ? new Date(this.newPlaylistDate).toISOString() : undefined
+          };
+
+          if (!this.allPlaylistsData[this.selectedLang]) {
+            this.allPlaylistsData[this.selectedLang] = [];
+          }
+          this.allPlaylistsData[this.selectedLang].unshift(newPlaylist);
+          this.updateCurrentPlaylists();
+        }
+
+        this.cancelEdit();
+        await this.publishPlaylists();
+
+        this.isFetching = false;
+        this.cdr.detectChanges();
+      } catch (e: any) {
+        this.isFetching = false;
+        this.fetchError = 'Failed to create playlist: ' + (e.message || 'Unknown error');
         this.cdr.detectChanges();
       }
       return;
@@ -597,6 +762,7 @@ export class ManagegtPlaylistsComponent implements OnInit {
     this.createMode = 'json';
     this.ytPlaylistInput = '';
     this.ytPlaylistId = '';
+    this.spotifyPlaylistInput = '';
     this.fetchedYtSongs = [];
   }
 

@@ -181,6 +181,7 @@
         <div class="mode-toggle">
           <button type="button" class="mode-btn" [class.active]="createMode === 'json'" (click)="createMode = 'json'">Songs JSON</button>
           <button type="button" class="mode-btn" [class.active]="createMode === 'playlist'" (click)="createMode = 'playlist'">YT Playlist ID</button>
+          <button type="button" class="mode-btn" [class.active]="createMode === 'spotify'" (click)="createMode = 'spotify'">Spotify Playlist</button>
         </div>
 
         <div *ngIf="createMode === 'json'">
@@ -208,6 +209,28 @@
             <svg lucideCheck [attr.size]="13"></svg>
             {{ fetchedYtSongs.length }} songs will be imported
             <span class="preview-link">https://ganatube.in/playlist/{{ ytPlaylistId }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="createMode === 'spotify'" class="yt-playlist-mode">
+          <label class="flex-label">
+            <span>Spotify Playlist URL or ID</span>
+            <span class="hint">e.g. https://open.spotify.com/playlist/7HsgS0aQhWfrBCitZzWYgt</span>
+          </label>
+          <div class="yt-input-row">
+            <input type="text" [(ngModel)]="spotifyPlaylistInput" placeholder="Paste Spotify playlist URL or ID" class="form-input" />
+            <button type="button" class="action-btn primary fetch-btn" [disabled]="isFetchingSpotify || !spotifyPlaylistInput.trim()" (click)="fetchSpotifyPlaylistDetails(spotifyPlaylistInput)">
+              <svg *ngIf="!isFetchingSpotify" lucideSearch [attr.size]="14"></svg>
+              <svg *ngIf="isFetchingSpotify" lucideRefreshCw class="pl-spinning" [attr.size]="14"></svg>
+              {{ isFetchingSpotify ? 'Importing...' : 'Fetch from Spotify' }}
+            </button>
+          </div>
+          <div style="margin-top: 6px; font-size: 0.8rem; color: #a1a1aa;">
+            ✨ Auto-extracts tracks, title & cover photo and maps all songs to YouTube streams for playing.
+          </div>
+          <div class="yt-link-preview" *ngIf="fetchedYtSongs.length > 0 && createMode === 'spotify'">
+            <svg lucideCheck [attr.size]="13"></svg>
+            {{ fetchedYtSongs.length }} songs converted & ready to create
           </div>
         </div>
       </div>
