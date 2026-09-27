@@ -331,7 +331,8 @@
       flex-shrink: 0;
 
       &.liked-icon {
-        background: linear-gradient(135deg, #450af5 0%, #8e8ee5 100%);
+        background: linear-gradient(135deg, #701a75 0%, #a21caf 40%, #be185d 100%);
+        box-shadow: 0 4px 14px rgba(162, 28, 175, 0.4);
       }
 
       &.custom-icon {
@@ -379,6 +380,8 @@
 
       .pin-icon {
         flex-shrink: 0;
+        fill: #ec4899;
+        color: #ec4899;
       }
 
       .delete-btn {
