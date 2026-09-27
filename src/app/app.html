@@ -362,6 +362,21 @@
           </div>
         </div>
 
+        <!-- Feedback & Review -->
+        <div class="settings-group group-feedback">
+          <h2 class="group-title">Feedback & Review</h2>
+          <div class="setting-item" (click)="openFeedbackPopup()" style="cursor: pointer;">
+            <div class="setting-info">
+              <h3>Rate & Review GanaTube</h3>
+              <p>Share suggestions, rate your experience, or report issues.</p>
+            </div>
+            <button class="btn-rate" (click)="openFeedbackPopup(); $event.stopPropagation()">
+              <svg lucideStar [attr.size]="15"></svg>
+              <span>Rate Us</span>
+            </button>
+          </div>
+        </div>
+
         <!-- What's New -->
         <div class="settings-group group-whatsnew">
           <h2 class="group-title">What's New</h2>
@@ -654,9 +669,9 @@
             <!-- Standard Shelf Layout -->
             <ng-container *ngIf="shelf.title !== 'Suggested for You'">
               <div class="shelf-header">
-                <h2 class="shelf-title">{{ shelf.title }}</h2>
+                <h2 class="shelf-title">{{ getShelfDisplayTitle(shelf) }}</h2>
                 <div class="shelf-controls">
-                  <button class="shelf-more-btn" *ngIf="shelf.songs.length > 0" (click)="openShelfModal(shelf)" title="View all songs in {{ shelf.title }}">
+                  <button class="shelf-more-btn" *ngIf="shelf.songs.length > 0" (click)="openShelfModal(shelf)" [title]="'View all songs in ' + getShelfDisplayTitle(shelf)">
                     <span>More</span>
                   </button>
                   <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
@@ -731,28 +746,34 @@
             <!-- Inject Artists after 5th shelf (index 4) or at the end if fewer than 5 shelves -->
             <ng-container *ngIf="shelfIdx === 4 || (loadedShelves().length < 5 && shelfIdx === loadedShelves().length - 1)">
               <!-- Dynamic Artists Section -->
-              <div class="artists-section" *ngIf="currentTopArtists().length > 0" style="margin: 24px 0 16px;">
-                <div class="artists-header" style="text-align: center; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; gap: 16px;">
-                  <h2 style="font-size: 1.35rem; letter-spacing: 0.15em; font-weight: 800; text-transform: uppercase;">ARTISTS</h2>
-                  <div class="shelf-nav-buttons" style="display: flex; gap: 8px;">
-                    <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, -600)" title="Scroll Left">
-                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                    </button>
-                    <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, 600)" title="Scroll Right">
-                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </button>
+              <div class="artists-section" *ngIf="currentTopArtists().length > 0" style="margin: 28px 0 16px;">
+                <div class="shelf-header">
+                  <h2 class="shelf-title">Top Artists</h2>
+                  <div class="shelf-controls">
+                    <div class="shelf-nav-buttons" *ngIf="currentTopArtists().length > 4">
+                      <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, -600)" title="Scroll Left">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                      </button>
+                      <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, 600)" title="Scroll Right">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div class="artists-bento-grid" #artistsGrid>
-                  <a class="artist-bento-card" *ngFor="let artist of currentTopArtists()" [routerLink]="['/artist', artist.name]">
-                    <div class="artist-img-wrapper" [style.background]="!artist.image ? getGradient(artist.name) : ''">
-                      <img *ngIf="artist.image" [src]="artist.image" [alt]="artist.name" (error)="artist.image = ''" />
-                      <div *ngIf="!artist.image" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; color: white;">
-                        <span style="font-size: 2rem; font-weight: 700;">{{ getInitials(artist.name) }}</span>
+                <div class="artists-carousel" #artistsGrid>
+                  <a class="artist-circular-card" *ngFor="let artist of currentTopArtists()" [routerLink]="['/artist', artist.name]" [title]="artist.name">
+                    <div class="artist-avatar-wrapper">
+                      <img *ngIf="artist.image" [src]="artist.image" [alt]="artist.name" loading="lazy" referrerpolicy="no-referrer" (error)="artist.image = ''" class="artist-avatar-img" />
+                      <div *ngIf="!artist.image" class="artist-avatar-placeholder" [style.background]="getGradient(artist.name)">
+                        <span>{{ getInitials(artist.name) }}</span>
+                      </div>
+                      <div class="artist-play-badge">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                       </div>
                     </div>
-                    <div class="artist-bento-overlay">
+                    <div class="artist-info">
                       <span class="artist-name">{{ artist.name }}</span>
+                      <span class="artist-role">Artist</span>
                     </div>
                   </a>
                 </div>
@@ -1270,7 +1291,12 @@
 <app-toast></app-toast>
 
 <!-- Feedback Popup -->
-<app-feedback-popup *ngIf="showFeedbackPopup()" (close)="showFeedbackPopup.set(false)"></app-feedback-popup>
+<app-feedback-popup 
+  *ngIf="showFeedbackPopup()" 
+  [title]="feedbackPopupConfig().title"
+  [subtitle]="feedbackPopupConfig().subtitle"
+  (close)="showFeedbackPopup.set(false)">
+</app-feedback-popup>
 
 <!-- One-time Room Features Popup -->
 <app-room-features-popup *ngIf="currentPage() === 'home' && !isSearchMode()"></app-room-features-popup>

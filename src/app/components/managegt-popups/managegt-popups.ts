@@ -3,7 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { LucidePlus, LucideX, LucideTrash2, LucideEdit3, LucideRefreshCw, LucideCheck, LucideUpload, LucideImage } from '@lucide/angular';
+import { 
+  LucidePlus, LucideX, LucideTrash2, LucideEdit3, LucideRefreshCw, 
+  LucideCheck, LucideUpload, LucideImage, LucideStar, LucideClock, 
+  LucideSparkles, LucideChevronDown, LucideChevronUp, LucideUsers 
+} from '@lucide/angular';
+import { FeedbackPopupConfig, DEFAULT_FEEDBACK_POPUP_CONFIG } from '../feedback-popup/feedback-popup.component';
 
 interface PopupItem {
   id: string;
@@ -18,11 +23,47 @@ interface PopupItem {
 @Component({
   selector: 'app-managegt-popups',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucidePlus, LucideX, LucideTrash2, LucideEdit3, LucideRefreshCw, LucideCheck, LucideUpload, LucideImage],
+  imports: [
+    CommonModule, FormsModule, LucidePlus, LucideX, LucideTrash2, 
+    LucideEdit3, LucideRefreshCw, LucideCheck, LucideUpload, 
+    LucideImage, LucideStar, LucideClock, LucideSparkles, 
+    LucideChevronDown, LucideChevronUp, LucideUsers
+  ],
   templateUrl: './managegt-popups.html',
   styleUrls: ['./managegt-popups.scss']
 })
 export class ManagegtPopupsComponent implements OnInit {
+  activeTab: 'feedback' | 'promo' = 'feedback';
+
+  // --- Feedback Popup Config & State ---
+  feedbackConfig: FeedbackPopupConfig = { ...DEFAULT_FEEDBACK_POPUP_CONFIG };
+  showAdvancedSettings = false;
+  previewRating = 5;
+
+  // Preset Chips
+  delayPresets = [15, 30, 40, 60, 90, 120];
+  frequencyPresets = [
+    { label: '24h (1 Day)', hours: 24 },
+    { label: '72h (3 Days)', hours: 72 },
+    { label: '168h (1 Week)', hours: 168 },
+    { label: '720h (1 Month)', hours: 720 }
+  ];
+  cooldownPresets = [
+    { label: '6h', hours: 6 },
+    { label: '12h', hours: 12 },
+    { label: '24h (1 Day)', hours: 24 },
+    { label: '48h (2 Days)', hours: 48 },
+    { label: '72h (3 Days)', hours: 72 }
+  ];
+  songPresets = [
+    { label: '0 (Turant)', count: 0 },
+    { label: '1 Song', count: 1 },
+    { label: '2 Songs', count: 2 },
+    { label: '3 Songs', count: 3 },
+    { label: '5 Songs', count: 5 }
+  ];
+
+  // --- Promo Popups State ---
   popups: PopupItem[] = [];
 
   // Form state
@@ -40,7 +81,9 @@ export class ManagegtPopupsComponent implements OnInit {
   saveMessage = '';
   formError = '';
 
-  apiUrl = window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
+  apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') 
+    ? 'http://localhost/manageads/managegt-api.php' 
+    : 'https://manageads.ganatube.in/managegt-api.php';
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
@@ -52,14 +95,65 @@ export class ManagegtPopupsComponent implements OnInit {
     try {
       const cacheBuster = Date.now();
       const data: any = await firstValueFrom(this.http.get(`${this.apiUrl}?action=get_popups&t=${cacheBuster}`));
-      const list = (data && data.popups) || [];
+      
+      const list = (data && data.popups) || (Array.isArray(data) ? data : []);
       this.popups = Array.isArray(list) ? list : [];
+
+      if (data && data.feedbackPopup) {
+        this.feedbackConfig = {
+          ...DEFAULT_FEEDBACK_POPUP_CONFIG,
+          ...data.feedbackPopup
+        };
+      }
       this.cdr.detectChanges();
     } catch (e) {
       console.error('Failed to load popups', e);
       this.popups = [];
       this.cdr.detectChanges();
     }
+  }
+
+  // --- Feedback Popup Actions ---
+  async toggleFeedbackEnabled() {
+    this.feedbackConfig.enabled = !this.feedbackConfig.enabled;
+    this.cdr.detectChanges();
+    await this.persistPopups(
+      this.feedbackConfig.enabled 
+        ? 'Review popup enabled and active!' 
+        : 'Review popup turned OFF.'
+    );
+  }
+
+  setDelayPreset(sec: number) {
+    this.feedbackConfig.delaySeconds = sec;
+  }
+
+  setFrequencyPreset(hrs: number) {
+    this.feedbackConfig.frequencyHours = hrs;
+  }
+
+  setCooldownPreset(hrs: number) {
+    this.feedbackConfig.dismissCooldownHours = hrs;
+  }
+
+  setSongPreset(count: number) {
+    this.feedbackConfig.minSongsPlayed = count;
+  }
+
+  resetFeedbackDefaults() {
+    if (confirm('Reset review popup settings to original defaults?')) {
+      this.feedbackConfig = { ...DEFAULT_FEEDBACK_POPUP_CONFIG };
+      this.cdr.detectChanges();
+    }
+  }
+
+  async saveFeedbackSettings() {
+    if (!this.feedbackConfig.title?.trim()) {
+      this.formError = 'Please provide a popup title.';
+      this.cdr.detectChanges();
+      return;
+    }
+    await this.persistPopups('Review & Feedback popup settings saved successfully!');
   }
 
   startCreate() {
@@ -196,20 +290,24 @@ export class ManagegtPopupsComponent implements OnInit {
     this.formError = '';
   }
 
-  private async persistPopups() {
+  private async persistPopups(customMsg?: string) {
     this.isSaving = true;
     this.saveMessage = '';
+    this.formError = '';
     this.cdr.detectChanges();
 
     try {
       const res: any = await firstValueFrom(this.http.post(`${this.apiUrl}?action=save_popups`, {
-        popupsData: { popups: this.popups }
+        popupsData: { 
+          popups: this.popups,
+          feedbackPopup: this.feedbackConfig
+        }
       }, {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       }));
 
       if (res && res.status === 'success') {
-        this.saveMessage = 'Popups saved successfully!';
+        this.saveMessage = customMsg || 'Settings saved successfully!';
       } else {
         throw new Error(res?.message || 'Save failed');
       }
@@ -218,7 +316,7 @@ export class ManagegtPopupsComponent implements OnInit {
     }
 
     this.isSaving = false;
-    setTimeout(() => { this.saveMessage = ''; this.cdr.detectChanges(); }, 3000);
+    setTimeout(() => { this.saveMessage = ''; this.cdr.detectChanges(); }, 3500);
     this.cdr.detectChanges();
   }
 }

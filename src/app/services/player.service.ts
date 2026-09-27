@@ -123,6 +123,9 @@ export class PlayerService {
     typeof localStorage !== 'undefined' ? Math.min(10, Math.max(1, parseInt(localStorage.getItem('gt_crossfade_duration') || '5', 10) || 5)) : 5
   );
 
+  /** Tracks how many songs have been initiated/played in the current session */
+  songsPlayedCount = signal<number>(0);
+
   // Audio Quality (Default to 'Standard' / Low for fast buffering and instant playback)
   musicQuality = signal<'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'>(
     (() => {
@@ -456,6 +459,7 @@ export class PlayerService {
       this.currentIndex.set(q.length);
     }
     this.playerState.set('loading');
+    this.songsPlayedCount.update(c => c + 1);
     this.location.replaceState('/play?v=' + track.videoId);
     this.loadInPlayer(track.videoId);
 

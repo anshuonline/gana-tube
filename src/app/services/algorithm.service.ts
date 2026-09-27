@@ -32,6 +32,7 @@ export interface ShelfDefinition {
   query: string;
   type?: 'search' | 'trending' | 'custom';
   songs?: YouTubeSearchResult[];
+  isMadeForYou?: boolean;
 }
 
 @Injectable({
@@ -334,10 +335,25 @@ export class AlgorithmService {
       query: timeQuery
     });
 
+    // Generate personalized title: "Made for {username}" or "Made for You" for guests
+    const currentUser = this.authService.currentUser();
+    const rawUsername = (this.userService.displayName() || currentUser?.displayName || (currentUser?.email ? currentUser.email.split('@')[0] : '') || '').trim();
+    const madeForTitle = (currentUser && rawUsername && rawUsername.toLowerCase() !== 'user' && rawUsername.toLowerCase() !== 'guest')
+      ? `Made for ${rawUsername.length > 20 ? rawUsername.substring(0, 20) : rawUsername}`
+      : 'Made for You';
+
     if (this.profile.history.length < 3) {
       // New user — show broad discovery shelves
       const newUsers2 = ['all time best', 'classic hits', 'golden era'];
       shelves.push({ title: 'All-Time Classics', query: `${newUsers2[Math.floor(Math.random() * newUsers2.length)]} ${language} songs` });
+
+      const genericModifiers = ['top', 'trending', 'popular', 'best hits'];
+      const madeForYouQuery = `${genericModifiers[Math.floor(Math.random() * genericModifiers.length)]} ${language} songs ${randomYear}`;
+      shelves.push({
+        title: madeForTitle,
+        query: madeForYouQuery,
+        isMadeForYou: true
+      });
     } else {
       // --- Personalized shelves ---
 
@@ -350,7 +366,7 @@ export class AlgorithmService {
         });
       }
 
-      // "Made For You" — smart genre-based discovery
+      // "Made for {username}" / "Made for You" — smart genre-based discovery
       // When user has 20+ liked songs, use genre analysis for truly personalized results
       const likedCount = this.profile.liked_songs.length;
       let madeForYouQuery = '';
@@ -380,8 +396,9 @@ export class AlgorithmService {
       }
 
       shelves.push({
-        title: 'Made For You',
-        query: madeForYouQuery
+        title: madeForTitle,
+        query: madeForYouQuery,
+        isMadeForYou: true
       });
 
       }

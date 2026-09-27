@@ -9,8 +9,8 @@
       <div class="icon-wrapper">
         <svg lucideHeartHandshake [attr.size]="32" class="glow-icon"></svg>
       </div>
-      <h2>Enjoying GanaTube?</h2>
-      <p>Help us improve your music experience. Rate us and drop a suggestion!</p>
+      <h2>{{ title || 'Enjoying GanaTube?' }}</h2>
+      <p>{{ subtitle || 'Help us improve your music experience. Rate us and drop a suggestion!' }}</p>
     </div>
 
     <div class="rating-section">

@@ -2,19 +2,275 @@
 
   <header class="popups-header">
     <div class="header-content">
-      <h2>Manage Popups</h2>
-      <p>Control the promotional popups users see across GanaTube. Each popup shows once per its frequency window.</p>
+      <h2>Manage Popups & Interstitials</h2>
+      <p>Configure review/rating prompts and promotional banner popups shown to GanaTube listeners.</p>
     </div>
-    <div class="header-actions">
+    <div class="header-actions" *ngIf="activeTab === 'promo'">
       <button class="action-btn primary" (click)="startCreate()" *ngIf="!showForm">
         <svg lucidePlus [attr.size]="16"></svg>
-        New Popup
+        New Promo Popup
       </button>
     </div>
   </header>
 
-  <!-- Popup List -->
-  <div class="popups-list" *ngIf="!showForm">
+  <!-- Global Notifications -->
+  <div *ngIf="saveMessage" class="status-banner success-banner">
+    <svg lucideCheck [attr.size]="18"></svg>
+    <span>{{ saveMessage }}</span>
+  </div>
+  <div *ngIf="formError" class="status-banner error-banner">
+    <svg lucideX [attr.size]="18"></svg>
+    <span>{{ formError }}</span>
+  </div>
+
+  <!-- Top Tab Navigation -->
+  <div class="popups-nav-tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'feedback'" (click)="activeTab = 'feedback'">
+      <svg lucideStar [attr.size]="18" class="star-tab-icon"></svg>
+      <span>Review & Rating Popup</span>
+      <span class="tab-badge" [class.on]="feedbackConfig.enabled">
+        {{ feedbackConfig.enabled ? 'ACTIVE' : 'OFF' }}
+      </span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'promo'" (click)="activeTab = 'promo'">
+      <svg lucideImage [attr.size]="18"></svg>
+      <span>Promotional Popups</span>
+      <span class="tab-count">{{ popups.length }}</span>
+    </button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 1: REVIEW & RATING POPUP               -->
+  <!-- ========================================== -->
+  <div class="feedback-panel" *ngIf="activeTab === 'feedback'">
+    
+    <!-- Master Hero Switch Card -->
+    <div class="feedback-master-card" [class.is-active]="feedbackConfig.enabled">
+      <div class="master-left">
+        <div class="master-icon-badge">
+          <svg lucideStar [attr.size]="28" class="star-glow"></svg>
+        </div>
+        <div class="master-info">
+          <div class="master-title-row">
+            <h3>User Review & Feedback Popup</h3>
+            <span class="status-pill" [class.active]="feedbackConfig.enabled">
+              {{ feedbackConfig.enabled ? '● ENABLED / LIVE' : '○ DISABLED / PAUSED' }}
+            </span>
+          </div>
+          <p class="master-desc" *ngIf="feedbackConfig.enabled">
+            Popup is live. Evaluates after <b>{{ feedbackConfig.delaySeconds }}s</b>, requires <b>{{ feedbackConfig.minSongsPlayed }}</b> song(s) played, and repeats every <b>{{ feedbackConfig.frequencyHours }}h</b> per listener.
+          </p>
+          <p class="master-desc disabled-desc" *ngIf="!feedbackConfig.enabled">
+            Popup is currently paused. Users will not see the review dialog.
+          </p>
+        </div>
+      </div>
+      <div class="master-toggle-wrap">
+        <button class="toggle-switch lg" [class.on]="feedbackConfig.enabled" (click)="toggleFeedbackEnabled()" aria-label="Toggle Review Popup">
+          <span class="toggle-knob"></span>
+        </button>
+        <span class="toggle-label">{{ feedbackConfig.enabled ? 'Enabled' : 'Paused' }}</span>
+      </div>
+    </div>
+
+    <!-- Main Settings Form Grid -->
+    <div class="settings-card-grid">
+
+      <!-- Timing & Frequency Card -->
+      <div class="setting-card">
+        <div class="card-header">
+          <div class="card-icon"><svg lucideClock [attr.size]="18"></svg></div>
+          <div>
+            <h4>Timing & Frequency</h4>
+            <p>Control when and how often listeners encounter the review popup.</p>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Initial Delay After Page Load (Seconds)</span>
+            <span class="chip-val">{{ feedbackConfig.delaySeconds }}s</span>
+          </label>
+          <input type="number" min="5" max="600" [(ngModel)]="feedbackConfig.delaySeconds" class="form-input" />
+          <div class="preset-chips">
+            <button type="button" *ngFor="let s of delayPresets" 
+                    class="preset-chip" 
+                    [class.active]="feedbackConfig.delaySeconds === s" 
+                    (click)="setDelayPreset(s)">
+              {{ s }}s
+            </button>
+          </div>
+          <p class="field-note">Wait this many seconds after user enters the website before evaluating popup conditions.</p>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Repeat Frequency (Kitne Ghante Baad Dobara Dikhe)</span>
+            <span class="chip-val">{{ feedbackConfig.frequencyHours }}h</span>
+          </label>
+          <input type="number" min="1" max="8760" [(ngModel)]="feedbackConfig.frequencyHours" class="form-input" />
+          <div class="preset-chips">
+            <button type="button" *ngFor="let f of frequencyPresets" 
+                    class="preset-chip" 
+                    [class.active]="feedbackConfig.frequencyHours === f.hours" 
+                    (click)="setFrequencyPreset(f.hours)">
+              {{ f.label }}
+            </button>
+          </div>
+          <p class="field-note">Once a user submits feedback, wait this many hours before they are eligible to see the popup again (Default: 720h = 30 days).</p>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Dismiss Cooldown ('Maybe Later' dabane ke baad)</span>
+            <span class="chip-val">{{ feedbackConfig.dismissCooldownHours }}h</span>
+          </label>
+          <input type="number" min="1" max="720" [(ngModel)]="feedbackConfig.dismissCooldownHours" class="form-input" />
+          <div class="preset-chips">
+            <button type="button" *ngFor="let c of cooldownPresets" 
+                    class="preset-chip" 
+                    [class.active]="feedbackConfig.dismissCooldownHours === c.hours" 
+                    (click)="setCooldownPreset(c.hours)">
+              {{ c.label }}
+            </button>
+          </div>
+          <p class="field-note">If user closes without rating, wait this many hours before re-prompting (prevents annoying repetitive popups).</p>
+        </div>
+      </div>
+
+      <!-- Advance Targeting & Trigger Conditions Card -->
+      <div class="setting-card">
+        <div class="card-header">
+          <div class="card-icon"><svg lucideSparkles [attr.size]="18"></svg></div>
+          <div>
+            <h4>Advance Conditions & Targeting</h4>
+            <p>Target specific audiences and set interaction requirements.</p>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Song Playback Threshold (Minimum Songs Sunne Ke Baad)</span>
+            <span class="chip-val">{{ feedbackConfig.minSongsPlayed }} Songs</span>
+          </label>
+          <input type="number" min="0" max="20" [(ngModel)]="feedbackConfig.minSongsPlayed" class="form-input" />
+          <div class="preset-chips">
+            <button type="button" *ngFor="let sp of songPresets" 
+                    class="preset-chip" 
+                    [class.active]="feedbackConfig.minSongsPlayed === sp.count" 
+                    (click)="setSongPreset(sp.count)">
+              {{ sp.label }}
+            </button>
+          </div>
+          <p class="field-note">Only prompt users who have actually played at least this many songs. Set 0 to prompt purely by timer.</p>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Target Audience</span>
+          </label>
+          <div class="audience-selector">
+            <button type="button" class="audience-btn" 
+                    [class.active]="feedbackConfig.targetAudience === 'all'" 
+                    (click)="feedbackConfig.targetAudience = 'all'">
+              <span>Sabhi Visitors (All)</span>
+            </button>
+            <button type="button" class="audience-btn" 
+                    [class.active]="feedbackConfig.targetAudience === 'guest'" 
+                    (click)="feedbackConfig.targetAudience = 'guest'">
+              <span>Sirf Guests (Not Logged In)</span>
+            </button>
+            <button type="button" class="audience-btn" 
+                    [class.active]="feedbackConfig.targetAudience === 'user'" 
+                    (click)="feedbackConfig.targetAudience = 'user'">
+              <span>Sirf Logged-in Users</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Device Targets</span>
+          </label>
+          <div class="device-checkbox-row">
+            <label class="device-checkbox">
+              <input type="checkbox" [(ngModel)]="feedbackConfig.showOnMobile" />
+              <span>📱 Mobile Devices</span>
+            </label>
+            <label class="device-checkbox">
+              <input type="checkbox" [(ngModel)]="feedbackConfig.showOnDesktop" />
+              <span>💻 Desktop / Laptop</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Popup Title</span>
+          </label>
+          <input type="text" [(ngModel)]="feedbackConfig.title" placeholder="Enjoying GanaTube?" class="form-input" />
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">
+            <span>Popup Subtitle / Message</span>
+          </label>
+          <textarea rows="2" [(ngModel)]="feedbackConfig.subtitle" placeholder="Help us improve your music experience..." class="form-textarea"></textarea>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Live Preview Box -->
+    <div class="preview-section">
+      <div class="preview-header">
+        <h4>Live User Preview</h4>
+        <span class="preview-hint">This is exactly how users see the review popup on GanaTube</span>
+      </div>
+      <div class="preview-stage">
+        <div class="live-feedback-modal">
+          <div class="preview-close-btn"><svg lucideX [attr.size]="18"></svg></div>
+          <div class="preview-heart-icon">
+            <svg lucideStar [attr.size]="28" class="star-fill"></svg>
+          </div>
+          <h3>{{ feedbackConfig.title || 'Enjoying GanaTube?' }}</h3>
+          <p>{{ feedbackConfig.subtitle || 'Help us improve your music experience. Rate us and drop a suggestion!' }}</p>
+          <div class="preview-stars">
+            <span *ngFor="let s of [1,2,3,4,5]" class="p-star" [class.filled]="s <= previewRating" (click)="previewRating = s">
+              ★
+            </span>
+          </div>
+          <div class="preview-textarea">Any suggestions for new features or improvements? (Optional)</div>
+          <div class="preview-actions">
+            <button type="button" class="btn-cancel">Maybe Later</button>
+            <button type="button" class="btn-submit">Submit Feedback</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Save Footer -->
+    <div class="feedback-save-footer">
+      <button type="button" class="btn-secondary" (click)="resetFeedbackDefaults()">
+        Reset to Defaults
+      </button>
+      <button type="button" class="action-btn primary lg" [disabled]="isSaving" (click)="saveFeedbackSettings()">
+        <svg lucideCheck [attr.size]="18" *ngIf="!isSaving"></svg>
+        <svg lucideRefreshCw class="spin" [attr.size]="18" *ngIf="isSaving"></svg>
+        <span>{{ isSaving ? 'Saving Settings...' : 'Save Feedback Settings' }}</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 2: PROMOTIONAL POPUPS                  -->
+  <!-- ========================================== -->
+  <div class="promo-panel" *ngIf="activeTab === 'promo'">
+
+    <!-- Popup List -->
+    <div class="popups-list" *ngIf="!showForm">
 
     <div class="popup-card" *ngFor="let popup of popups">
       <div class="popup-thumb">
@@ -149,5 +405,7 @@
     </button>
 
   </div>
+
+  </div> <!-- Close promo-panel -->
 
 </div>

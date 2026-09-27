@@ -114,6 +114,11 @@
       color: #ffd700;
       filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
     }
+
+    svg.filled {
+      fill: #ffd700;
+      stroke: #ffd700;
+    }
   }
 
   .rating-text {

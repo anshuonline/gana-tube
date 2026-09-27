@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideHeart, LucideClock, LucideArrowLeft, LucideFileText } from '@lucide/angular';
+  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideHeart, LucideClock, LucideArrowLeft, LucideFileText, LucideStar } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -34,11 +34,12 @@ import { AdTermsPageComponent } from './components/ad-terms-page/ad-terms-page.c
 import { AdProhibitedPageComponent } from './components/ad-prohibited-page/ad-prohibited-page.component';
 
 import { ALL_PLAYLISTS, PlaylistMeta } from './data/playlists.data';
+import { TOP_ARTISTS_BY_LANG, TopArtist } from './data/top-artists.data';
 import { PwaService } from './services/pwa.service';
 import { DomSanitizer, SafeResourceUrl, Meta, Title } from '@angular/platform-browser';
 import { CarModePlayerComponent } from './components/car-mode-player/car-mode-player.component';
 import { LibraryPageComponent } from './components/library-page/library-page';
-import { FeedbackPopupComponent } from './components/feedback-popup/feedback-popup.component';
+import { FeedbackPopupComponent, FeedbackPopupConfig, DEFAULT_FEEDBACK_POPUP_CONFIG } from './components/feedback-popup/feedback-popup.component';
 import { ShortsPageComponent } from './components/shorts-page/shorts-page.component';
 import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
 import { BlogPageComponent } from './components/blog-page/blog-page.component';
@@ -93,6 +94,7 @@ export interface SponsoredAd {
     LucideChevronDown,
     LucideHeart,
     LucideClock,
+    LucideStar,
     LucideArrowLeft,
     SearchBarComponent,
     SearchResultsComponent,
@@ -192,6 +194,8 @@ export class App implements OnInit {
 
   // Playlists State
   customPlaylists = signal<PlaylistMeta[]>([]);
+  isCustomPlaylistsLoaded = false;
+  private customPlaylistsPromise: Promise<PlaylistMeta[]> | null = null;
   
   // Track displayed video IDs to prevent duplicates on the home page
   displayedVideoIds = new Set<string>();
@@ -210,45 +214,8 @@ export class App implements OnInit {
     return [...custom, ...yt];
   });
 
-  // Top Artists Data
-  topArtistsByLang: Record<string, {name: string, image: string}[]> = {
-    'Hindi': [
-      { name: 'Arijit Singh', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Arijit_Singh_performance_at_Chandigarh_2025.jpg/500px-Arijit_Singh_performance_at_Chandigarh_2025.jpg' },
-      { name: 'Shreya Ghoshal', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV2uQTlBVTPRmPczCJ3ebYPPCiNXdskveCjApGGsiYHwhT8wFhNWrShJg-mjpRrnzFyUia504oAXU38CiDUN1pHbTZlcaNTA-AATVEBTWi-w&s=10' },
-      { name: 'AR Rahman', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/AR_Rahman_at_Premier_Futsal_Press_Meet_%28cropped%29.jpg/500px-AR_Rahman_at_Premier_Futsal_Press_Meet_%28cropped%29.jpg' },
-      { name: 'Neha Kakkar', image: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Neha_Kakkar_in_January_2020.jpg' },
-      { name: 'Armaan Malik', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Armaan_Malik_2016.jpg/500px-Armaan_Malik_2016.jpg' },
-      { name: 'Sunidhi Chauhan', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5BAm4r9Y80jFMiRlqTJEU_8Pt-1mF9q1APFLmpW8hbyozQcbXo5yF-AeYdeeoXl-ImjuA1nOpmHrdk05H9__xWFxUY_5xJwJ0DXlVto13gg&s=10' },
-      { name: 'Jubin Nautiyal', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS3crbcdJBTFuIOusxtwsqUoLUdjVlkYHxAagcfnPlhn9hMhlhMR61OsVSBK4YoDYflZKsd_vMq3dVpdGOZwMT441Old4qCx875VQj2Orp0A&s=10' },
-      { name: 'Darshan Raval', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQY-gC8oCBsrpKPs01Z_4KHtbrJnmjseZ6vsaVSSLAgOvrCzOGteyQ-LgjmS84tA_8xNYu4kNEB_sbbKGwzkIXoeKcDM_IU5kDUCqkZHgraNA&s=10' },
-      { name: 'Sonu Nigam', image: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Sonu_Nigam123.jpg' },
-      { name: 'Vishal Mishra', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5nWJytsnV4xt2lYhsgN70PmLdmQbGP3z2c0XZu2jVzLPaEaOC99mdfoXbk1i77TbUyKO-mGKiVThFcH4FIKpyS8ESDWtm8wzr1FCPWaEt7w&s=10' }
-    ],
-    'English': [
-      { name: 'Taylor Swift', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/500px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png' },
-      { name: 'Ed Sheeran', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ed_Sheeran-6886_%28cropped%29.jpg/500px-Ed_Sheeran-6886_%28cropped%29.jpg' },
-      { name: 'Dua Lipa', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Dua_Lipa-69798_%28cropped%29.jpg/500px-Dua_Lipa-69798_%28cropped%29.jpg' },
-      { name: 'The Weeknd', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/The_Weeknd_Portrait_by_Brian_Ziff.jpg/500px-The_Weeknd_Portrait_by_Brian_Ziff.jpg' },
-      { name: 'Billie Eilish', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/BillieEilishO2140725-39_-_54665577407_%28cropped%29.jpg/500px-BillieEilishO2140725-39_-_54665577407_%28cropped%29.jpg' },
-      { name: 'Ariana Grande', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Ariana_Grande_promoting_Wicked_%282024%29.jpg/500px-Ariana_Grande_promoting_Wicked_%282024%29.jpg' },
-      { name: 'Justin Bieber', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Justin_Bieber_in_2015.jpg/500px-Justin_Bieber_in_2015.jpg' },
-      { name: 'Bruno Mars', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/BrunoMars24KMagicWorldTourLive_%28cropped%29.jpg/500px-BrunoMars24KMagicWorldTourLive_%28cropped%29.jpg' },
-      { name: 'Eminem', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Eminem_2021_Color_Corrected.jpg/500px-Eminem_2021_Color_Corrected.jpg' },
-      { name: 'Drake', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Drake_at_The_Carter_Effect_2017_%2836818935200%29_%28cropped%29.jpg/500px-Drake_at_The_Carter_Effect_2017_%2836818935200%29_%28cropped%29.jpg' }
-    ],
-    'Punjabi': [
-      { name: 'Diljit Dosanjh', image: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Diljit_Dosanjh.jpg' },
-      { name: 'Karan Aujla', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Karan_Aujla_2020.jpg/500px-Karan_Aujla_2020.jpg' },
-      { name: 'Sidhu Moose Wala', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Sidhu_Moose_Wala_during_the_shooting_of_his_film_Moosa_Jatt_%28cropped%29.jpg/500px-Sidhu_Moose_Wala_during_the_shooting_of_his_film_Moosa_Jatt_%28cropped%29.jpg' },
-      { name: 'AP Dhillon', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/AP_Dhillon_CA.jpg/500px-AP_Dhillon_CA.jpg' },
-      { name: 'Guru Randhawa', image: 'https://upload.wikimedia.org/wikipedia/commons/b/be/Guru_Randhawa_at_the_launch_of_MTV_Unplugged_Season_8_%28cropped%29.jpg' },
-      { name: 'Harrdy Sandhu', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Harrdy_Sandhu_snapped_promoting_his_film_on_Jhalak_Dikhhla_Jaa_10.jpg/500px-Harrdy_Sandhu_snapped_promoting_his_film_on_Jhalak_Dikhhla_Jaa_10.jpg' },
-      { name: 'Ammy Virk', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Ammy_Virk_2019.jpg/500px-Ammy_Virk_2019.jpg' },
-      { name: 'Shubh', image: '' },
-      { name: 'B Praak', image: 'https://upload.wikimedia.org/wikipedia/commons/6/67/National_Awards_B_Praak_%28cropped%29.jpg' },
-      { name: 'Mankirt Aulakh', image: '' }
-    ]
-  };
+  // Top Artists Data from Spotify
+  topArtistsByLang: Record<string, TopArtist[]> = TOP_ARTISTS_BY_LANG;
 
   currentTopArtists = computed(() => {
     return this.topArtistsByLang[this.homeScreenLanguage()] || [];
@@ -323,7 +290,7 @@ export class App implements OnInit {
   allShelfDefinitions: ShelfDefinition[] = [];
 
   // Dynamic shelves signal holding loaded categories
-  loadedShelves = signal<Array<{ title: string; query: string; songs: YouTubeSearchResult[] }>>([]);
+  loadedShelves = signal<Array<{ title: string; query: string; songs: YouTubeSearchResult[]; isMadeForYou?: boolean }>>([]);
   shelvesLoading = signal<boolean>(true);
   shelfLoading = signal<boolean>(false);
   loadingShelfTitle = signal<string>('');
@@ -381,6 +348,8 @@ export class App implements OnInit {
   private manageApiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
 
   showFeedbackPopup = signal<boolean>(false);
+  feedbackPopupConfig = signal<FeedbackPopupConfig>(DEFAULT_FEEDBACK_POPUP_CONFIG);
+  private feedbackPopupTimer: any = null;
 
   carouselIndex = 0;
   private carouselInterval: any;
@@ -610,7 +579,7 @@ export class App implements OnInit {
   openShelfModal(shelf: any) {
     if (!shelf) return;
     this.activeShelfModal.set({
-      title: shelf.title,
+      title: this.getShelfDisplayTitle(shelf),
       query: shelf.query || '',
       songs: [...(shelf.songs || [])]
     });
@@ -862,6 +831,23 @@ export class App implements OnInit {
     return name.length > 20 ? name.substring(0, 20) + '...' : name;
   }
 
+  getShelfDisplayTitle(shelf: any): string {
+    if (!shelf) return '';
+    const title = shelf.title || '';
+    if (shelf.isMadeForYou || title.toLowerCase().trim() === 'made for you' || title.toLowerCase().startsWith('made for ')) {
+      const user = this.authService.currentUser();
+      if (!user) {
+        return 'Made for You';
+      }
+      const username = (this.userService.displayName() || user.displayName || (user.email ? user.email.split('@')[0] : '') || '').trim();
+      if (!username || username.toLowerCase() === 'user' || username.toLowerCase() === 'guest') {
+        return 'Made for You';
+      }
+      return `Made for ${username.length > 20 ? username.substring(0, 20) : username}`;
+    }
+    return title;
+  }
+
   togglePreferredLanguage(lang: string): void {
     const current = this.preferredLanguages();
     let nextLangs = [...current];
@@ -905,7 +891,10 @@ export class App implements OnInit {
   }
 
   shelfTrackBy(index: number, shelf: any): string {
-    return shelf.title;
+    if (shelf && (shelf.isMadeForYou || (shelf.title && shelf.title.toLowerCase().startsWith('made for')))) {
+      return 'made_for_you_shelf';
+    }
+    return shelf?.title || index.toString();
   }
 
   constructor(
@@ -960,6 +949,15 @@ export class App implements OnInit {
       if (trackToSave) {
         this.openSaveToPlaylist(trackToSave);
         this.appState.savePlaylistTrack.set(null); // Reset after opening
+      }
+    }, { allowSignalWrites: true });
+
+    // Check if songs played threshold is reached for feedback popup
+    effect(() => {
+      const count = this.playerService.songsPlayedCount();
+      const cfg = this.feedbackPopupConfig();
+      if (count > 0 && cfg?.enabled && !this.showFeedbackPopup()) {
+        this.evaluateFeedbackPopupConditions();
       }
     }, { allowSignalWrites: true });
 
@@ -1060,7 +1058,7 @@ export class App implements OnInit {
     }
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
+    ).subscribe(async (event: any) => {
       // Mark that user has navigated within the app (useful for back button logic)
       if (this.currentPage() !== 'home' || event.id > 1) {
         (window as any).hasNavigatedInApp = true;
@@ -1092,7 +1090,24 @@ export class App implements OnInit {
           this.openRecentlyPlayed();
           return;
         }
-        const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
+
+        if (this.selectedPlaylist()?.id !== playlistId) {
+          this.currentLoadingPlaylistId = playlistId; // Set tracking ID
+          this.currentPage.set('playlist');
+          this.selectedPlaylist.set(null);
+          this.loadingPageTitle.set(playlistId.startsWith('artist-') ? playlistId.replace('artist-', '') : 'Playlist');
+        }
+
+        // 1. Check if already in allPlaylists()
+        let targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+
+        // 2. If not found and custom playlists haven't finished loading yet, await them!
+        if (!targetPlaylist && !this.isCustomPlaylistsLoaded) {
+          await this.fetchCustomPlaylists();
+          if (this.currentLoadingPlaylistId !== playlistId) return;
+          targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+        }
+
         if (targetPlaylist) {
           this.loadingPageTitle.set('');
           this.selectedPlaylist.set(targetPlaylist);
@@ -1103,13 +1118,8 @@ export class App implements OnInit {
           this.currentPage.set('playlist');
           this.isSearchMode.set(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
         } else if (playlistId) {
-          if (this.selectedPlaylist()?.id !== playlistId) {
-            this.currentLoadingPlaylistId = playlistId; // Set tracking ID
-            this.currentPage.set('playlist');
-            this.selectedPlaylist.set(null);
-            this.loadingPageTitle.set(playlistId.startsWith('artist-') ? playlistId.replace('artist-', '') : 'Playlist');
-          }
           if (playlistId.startsWith('artist-')) {
             if (!(this.currentPage() === 'playlist' && this.selectedPlaylist()?.id === playlistId)) {
               let artistName = playlistId.replace('artist-', '');
@@ -1167,6 +1177,7 @@ export class App implements OnInit {
           } else {
             this.loadingPageTitle.set('');
             this.router.navigate(['/home']);
+            this.toastService.error("Playlist not found");
           }
         }
         return;
@@ -1264,7 +1275,7 @@ export class App implements OnInit {
         }
         return;
       } else if (url.startsWith('pl_')) {
-        this.fetchPublicPlaylist(url, '');
+        this.router.navigate(['/playlist', url], { replaceUrl: true });
         return;
       }
 
@@ -1314,56 +1325,75 @@ export class App implements OnInit {
     this.meta.updateTag({ property: 'og:description', content: descText });
   }
 
-  fetchCustomPlaylists(): void {
-    this.youtubeApi.getCustomPlaylists().subscribe((customData) => {
-      let playlists: PlaylistMeta[] = [];
-      // customData is { "Hindi": [ {title, coverImage, status, searchQueries, songs, id} ] }
-      Object.keys(customData).forEach(lang => {
-        const langPlaylists = customData[lang] || [];
-        langPlaylists.forEach(p => {
-          let isPublished = p.status === 'publish';
-          if (p.status === 'schedule' && p.publishDate) {
-            if (new Date(p.publishDate) <= new Date()) {
-              isPublished = true;
-            }
-          }
-          
-          if (isPublished) {
-            playlists.push({
-              id: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              slug: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              title: p.title,
-              coverImage: p.coverImage || '',
-              language: lang,
-              searchQueries: p.searchQueries || [],
-              preloadedSongs: p.songs || []
+  fetchCustomPlaylists(force: boolean = false): Promise<PlaylistMeta[]> {
+    if (this.customPlaylistsPromise && !force) {
+      return this.customPlaylistsPromise;
+    }
+
+    this.customPlaylistsPromise = new Promise((resolve) => {
+      this.youtubeApi.getCustomPlaylists().subscribe({
+        next: (customData) => {
+          let playlists: PlaylistMeta[] = [];
+          // customData is { "Hindi": [ {title, coverImage, status, searchQueries, songs, id} ] }
+          Object.keys(customData || {}).forEach(lang => {
+            const langPlaylists = customData[lang] || [];
+            langPlaylists.forEach(p => {
+              let isPublished = p.status === 'publish';
+              if (p.status === 'schedule' && p.publishDate) {
+                if (new Date(p.publishDate) <= new Date()) {
+                  isPublished = true;
+                }
+              }
+              
+              if (isPublished) {
+                playlists.push({
+                  id: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                  slug: p.id || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                  title: p.title,
+                  coverImage: p.coverImage || '',
+                  language: lang,
+                  searchQueries: p.searchQueries || [],
+                  preloadedSongs: p.songs || [],
+                  is_public: true,
+                  is_owner: false
+                });
+              }
             });
-          }
-        });
-      });
-      this.customPlaylists.set(playlists);
-      
-      // If user refreshed on a playlist page, set the selected playlist now that custom playlists are loaded
-      if (this.currentPage() === 'playlist') {
-        const playlistId = this.router.url.split('/')[2];
-        if (playlistId === 'liked-songs') {
-          if (!this.selectedPlaylist()) {
-            this.openLikedSongs();
-          }
-        } else {
-          if (playlistId.startsWith('artist-')) {
-            if (!this.selectedPlaylist()) {
-              this.openArtistPage(playlistId.replace('artist-', ''), '');
+          });
+          this.customPlaylists.set(playlists);
+          this.isCustomPlaylistsLoaded = true;
+          
+          // If user refreshed on a playlist page, set the selected playlist now that custom playlists are loaded
+          if (this.currentPage() === 'playlist') {
+            const playlistId = this.router.url.split('/')[2];
+            if (playlistId === 'liked-songs') {
+              if (!this.selectedPlaylist()) {
+                this.openLikedSongs();
+              }
+            } else if (playlistId) {
+              if (playlistId.startsWith('artist-')) {
+                if (!this.selectedPlaylist()) {
+                  this.openArtistPage(playlistId.replace('artist-', ''), '');
+                }
+              } else {
+                const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+                if (targetPlaylist && !this.selectedPlaylist()) {
+                  this.selectedPlaylist.set(targetPlaylist);
+                }
+              }
             }
-          } else {
-            const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId);
-            if (targetPlaylist && !this.selectedPlaylist()) {
-              this.selectedPlaylist.set(targetPlaylist);
-            }
           }
+          resolve(playlists);
+        },
+        error: (err) => {
+          console.error('Failed to load custom playlists', err);
+          this.isCustomPlaylistsLoaded = true;
+          resolve([]);
         }
-      }
+      });
     });
+
+    return this.customPlaylistsPromise;
   }
 
   @HostListener('window:click', ['$event'])
@@ -1844,6 +1874,120 @@ export class App implements OnInit {
     this.loadInitialShelves();
     this.startCarouselTimer();
     this.fetchHeroData(); // Fetch dynamic hero header from admin
+
+    // Prevent focus from getting trapped in iframes (e.g. YouTube player)
+    // This ensures global keyboard shortcuts (Ctrl+K, Space, Arrows) always work
+    window.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement instanceof HTMLIFrameElement) {
+          document.activeElement.blur();
+          window.focus();
+        }
+      }, 50);
+    });
+
+    // Login prompt popup — once every 12 hours for guests only
+    setTimeout(() => {
+      const user = this.authService.currentUser();
+      // Skip if another popup is already open to avoid stacking
+      if (user === null && !this.showInstallModal && !this.showLanguageModal()) {
+        const lastPrompt = parseInt(localStorage.getItem('gt_login_prompt_shown') || '0', 10);
+        const twelveHours = 12 * 60 * 60 * 1000;
+        if (!lastPrompt || Date.now() - lastPrompt > twelveHours) {
+          this.showLoginPrompt.set(true);
+          localStorage.setItem('gt_login_prompt_shown', Date.now().toString());
+        }
+      }
+    }, 10000);
+
+    // Load dynamic popup configurations from ManageGT settings (https://.../managegt/popups)
+    this.youtubeApi.getAppInitPopups().subscribe(popupsData => {
+      if (popupsData && popupsData.feedbackPopup) {
+        this.feedbackPopupConfig.set({
+          ...DEFAULT_FEEDBACK_POPUP_CONFIG,
+          ...popupsData.feedbackPopup
+        });
+      }
+      this.initFeedbackPopupScheduler();
+    });
+  }
+
+  private initFeedbackPopupScheduler(): void {
+    const config = this.feedbackPopupConfig();
+    if (!config || !config.enabled) return;
+
+    const delayMs = Math.max(5, config.delaySeconds || 40) * 1000;
+    if (this.feedbackPopupTimer) {
+      clearTimeout(this.feedbackPopupTimer);
+    }
+    this.feedbackPopupTimer = setTimeout(() => {
+      this.evaluateFeedbackPopupConditions();
+    }, delayMs);
+  }
+
+  evaluateFeedbackPopupConditions(): boolean {
+    const config = this.feedbackPopupConfig();
+    if (!config || !config.enabled) return false;
+    if (this.isAdminPage() || this.currentPage() === 'shorts' || this.currentPage() === 'rooms-view') return false;
+
+    // Check device targeting
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile && !config.showOnMobile) return false;
+      if (!isMobile && !config.showOnDesktop) return false;
+    }
+
+    // Check target audience
+    const user = this.authService.currentUser();
+    if (config.targetAudience === 'guest' && user !== null) return false;
+    if (config.targetAudience === 'user' && user === null) return false;
+
+    // Check minimum songs played threshold
+    const minSongs = config.minSongsPlayed ?? 1;
+    if (minSongs > 0 && this.playerService.songsPlayedCount() < minSongs) {
+      return false; // Still waiting for song play threshold
+    }
+
+    // Check repeat frequency (hours) after submission
+    const submitted = localStorage.getItem('gt_feedback_submitted_at') || localStorage.getItem('gt_feedback_submitted');
+    if (submitted) {
+      const freqMs = (config.frequencyHours || 720) * 60 * 60 * 1000;
+      if (submitted === 'true') {
+        return false;
+      }
+      const t = parseInt(submitted, 10);
+      if (!isNaN(t) && (Date.now() - t < freqMs)) {
+        return false;
+      }
+    }
+
+    // Check dismiss cooldown (hours) if closed with Maybe Later
+    const dismissedAt = localStorage.getItem('gt_feedback_dismissed_at');
+    if (dismissedAt) {
+      const cooldownMs = (config.dismissCooldownHours || 24) * 60 * 60 * 1000;
+      const t = parseInt(dismissedAt, 10);
+      if (!isNaN(t) && (Date.now() - t < cooldownMs)) {
+        return false;
+      }
+    }
+
+    // Check session dismiss flag
+    const sessionDismissed = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('gt_feedback_dismissed');
+    if (sessionDismissed) {
+      return false;
+    }
+
+    // Avoid collision with other open modals
+    if (this.showInstallModal || this.showLanguageModal() || this.showLoginPrompt() || this.showFeedbackPopup()) {
+      return false;
+    }
+
+    this.showFeedbackPopup.set(true);
+    return true;
+  }
+
+  openFeedbackPopup(): void {
+    this.showFeedbackPopup.set(true);
   }
 
   private fetchFallbackOEmbedAndPlay(videoId: string) {
@@ -1894,38 +2038,6 @@ export class App implements OnInit {
         this.playerService.updateTrackInfo(videoId, title, channelTitle);
       }
     });
-
-    // Prevent focus from getting trapped in iframes (e.g. YouTube player)
-    // This ensures global keyboard shortcuts (Ctrl+K, Space, Arrows) always work
-    window.addEventListener('blur', () => {
-      setTimeout(() => {
-        if (document.activeElement instanceof HTMLIFrameElement) {
-          document.activeElement.blur();
-          window.focus();
-        }
-      }, 50);
-    });
-
-    // Trigger feedback popup once per session after 60s if not submitted
-    setTimeout(() => {
-      if (!localStorage.getItem('gt_feedback_submitted')) {
-        this.showFeedbackPopup.set(true);
-      }
-    }, 60000);
-
-    // Login prompt popup — once every 12 hours for guests only
-    setTimeout(() => {
-      const user = this.authService.currentUser();
-      // Skip if another popup is already open to avoid stacking
-      if (user === null && !this.showInstallModal && !this.showLanguageModal()) {
-        const lastPrompt = parseInt(localStorage.getItem('gt_login_prompt_shown') || '0', 10);
-        const twelveHours = 12 * 60 * 60 * 1000;
-        if (!lastPrompt || Date.now() - lastPrompt > twelveHours) {
-          this.showLoginPrompt.set(true);
-          localStorage.setItem('gt_login_prompt_shown', Date.now().toString());
-        }
-      }
-    }, 10000);
   }
 
   fetchHeroData(): void {
@@ -1976,7 +2088,8 @@ export class App implements OnInit {
           title: cs.title,
           query: '', // We already have the songs, no need to query
           songs: cs.songs,
-          type: 'custom'
+          type: 'custom',
+          isMadeForYou: cs.title.toLowerCase().trim() === 'made for you' || cs.title.toLowerCase().startsWith('made for ')
         }));
 
         // Extract 'Trending' and 'Suggested for You' correctly
@@ -2048,7 +2161,7 @@ export class App implements OnInit {
             // Guard against duplicate sections (e.g. after PWA resume)
             if (shelvesList.some(s => s.title === def.title)) return shelvesList;
             const updated = [...shelvesList];
-            updated.push({ title: def.title, query: def.query, songs: dedupedSongs });
+            updated.push({ title: def.title, query: def.query, songs: dedupedSongs, isMadeForYou: def.isMadeForYou });
             return updated.sort((a, b) => {
               const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
               const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
@@ -2093,7 +2206,7 @@ export class App implements OnInit {
                   // Guard against duplicate sections (e.g. after PWA resume)
                   if (shelvesList.some(s => s.title === def.title)) return shelvesList;
                   const updated = [...shelvesList];
-                  updated.push({ title: def.title, query: def.query, songs: dedupedSongs });
+                  updated.push({ title: def.title, query: def.query, songs: dedupedSongs, isMadeForYou: def.isMadeForYou });
                   return updated.sort((a, b) => {
                     const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
                     const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
@@ -2187,7 +2300,8 @@ export class App implements OnInit {
           newShelves.push({
             title: nextDefs[index].title,
             query: nextDefs[index].query,
-            songs: dedupedSongs
+            songs: dedupedSongs,
+            isMadeForYou: nextDefs[index].isMadeForYou
           });
         }
       });    
@@ -2937,6 +3051,16 @@ export class App implements OnInit {
           this.router.navigate(['/playlist', playlistId]);
         }
       } else {
+        // Fallback: Check if target playlist exists in allPlaylists()
+        const fallbackPl = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+        if (fallbackPl) {
+          this.loadingPageTitle.set('');
+          this.selectedPlaylist.set(fallbackPl);
+          this.currentPage.set('playlist');
+          this.isSearchMode.set(false);
+          return;
+        }
+
         this.loadingPageTitle.set('');
         // Fallback if not found or private
         if (this.router.url.includes(playlistId)) {
@@ -2946,6 +3070,16 @@ export class App implements OnInit {
       }
     } catch(e) {
       if (this.currentLoadingPlaylistId !== playlistId) return;
+
+      const fallbackPl = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+      if (fallbackPl) {
+        this.loadingPageTitle.set('');
+        this.selectedPlaylist.set(fallbackPl);
+        this.currentPage.set('playlist');
+        this.isSearchMode.set(false);
+        return;
+      }
+
       this.loadingPageTitle.set('');
       
       if (this.router.url.includes(playlistId)) {
