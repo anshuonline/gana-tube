@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, inject, signal, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX, LucideTrash2 } from '@lucide/angular';
+import { LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX, LucideTrash2, LucideSearch } from '@lucide/angular';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
@@ -9,7 +9,7 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
 @Component({
   selector: 'app-save-playlist-modal',
   standalone: true,
-  imports: [CommonModule, LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX, LucideTrash2, ConfirmModalComponent],
+  imports: [CommonModule, LucideHeart, LucideListMusic, LucideCheck, LucidePlus, LucideX, LucideTrash2, LucideSearch, ConfirmModalComponent],
   templateUrl: './save-playlist-modal.html',
   styleUrls: ['./save-playlist-modal.scss']
 })
@@ -22,6 +22,8 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
   authService = inject(AuthService);
   toastService = inject(ToastService);
 
+  searchQuery = signal<string>('');
+  showInlineCreate = signal<boolean>(false);
   newPlaylistName = signal<string>('');
   newPlaylistIsPublic = signal<boolean>(true);
   isMobile = false;
@@ -48,6 +50,30 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
       event.stopPropagation();
     }
     this.closeMenu.emit();
+  }
+
+  clearSearch() {
+    this.searchQuery.set('');
+  }
+
+  toggleInlineCreate() {
+    this.showInlineCreate.update(v => !v);
+    if (!this.showInlineCreate()) {
+      this.newPlaylistName.set('');
+    }
+  }
+
+  getFilteredPlaylists(): any[] {
+    const q = this.searchQuery().trim().toLowerCase();
+    const playlists = this.getOwnedPlaylists();
+    if (!q) return playlists;
+    return playlists.filter(p => p.name && p.name.toLowerCase().includes(q));
+  }
+
+  isLikedMatchSearch(): boolean {
+    const q = this.searchQuery().trim().toLowerCase();
+    if (!q) return true;
+    return 'liked songs'.includes(q) || 'liked music'.includes(q) || 'favorites'.includes(q);
   }
 
   isLiked(): boolean {
@@ -95,6 +121,7 @@ export class SavePlaylistModalComponent implements OnInit, OnDestroy {
         await this.userService.addToPlaylist(user.email as string, name, this.track);
         this.newPlaylistName.set('');
         this.newPlaylistIsPublic.set(true);
+        this.showInlineCreate.set(false);
         this.toastService.success(`Playlist "${name}" created successfully`);
       } else {
         this.toastService.error("Failed to create playlist.");

@@ -82,8 +82,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 24px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
     .header-content {
       display: flex;
@@ -94,8 +94,9 @@
       h3 {
         color: #fff;
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1.15rem;
         font-weight: 700;
+        letter-spacing: -0.01em;
       }
 
       .close-btn {
@@ -105,6 +106,8 @@
         cursor: pointer;
         padding: 4px;
         display: flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 50%;
         transition: all 0.2s;
 
@@ -117,141 +120,349 @@
   }
 
   .modal-body {
-    padding: 0 24px 24px;
+    padding: 14px 18px 8px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
+    max-height: calc(85vh - 120px);
     
     &::-webkit-scrollbar { width: 4px; }
     &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
   }
 
+  /* Search Input (Find a playlist) */
+  .search-box-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+
+    &:focus-within {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .search-icon {
+      color: rgba(255, 255, 255, 0.45);
+      flex-shrink: 0;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 0.9rem;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+      }
+    }
+
+    .clear-search-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: color 0.15s, background 0.15s;
+
+      &:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.12);
+      }
+    }
+  }
+
+  /* New playlist action row */
+  .new-playlist-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .new-icon-box {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .new-row-label {
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+  }
+
+  /* Inline create box */
+  .inline-create-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    animation: fadeIn 0.2s ease-out;
+
+    input {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+
+      &:focus {
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+    }
+
+    .inline-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+
+      .inline-cancel-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: 14px;
+        transition: color 0.15s;
+
+        &:hover {
+          color: #fff;
+        }
+      }
+
+      .inline-submit-btn {
+        background: #ffffff;
+        color: #000000;
+        border: none;
+        padding: 6px 16px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: transform 0.15s, opacity 0.15s;
+
+        &:hover:not([disabled]) {
+          transform: scale(1.04);
+        }
+
+        &[disabled] {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  /* Playlist items list */
   .playlist-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 16px;
+    gap: 4px;
+    margin-top: 4px;
+    max-height: 320px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
   }
 
   .playlist-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 12px;
-    border-radius: 8px;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.15s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
+
+      .delete-btn {
+        opacity: 1;
+      }
     }
 
     .playlist-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+
+      &.liked-icon {
+        background: linear-gradient(135deg, #450af5 0%, #8e8ee5 100%);
+      }
+
+      &.custom-icon {
+        background: rgba(255, 255, 255, 0.08);
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
     }
 
     .playlist-info {
       display: flex;
       flex-direction: column;
+      gap: 2px;
       flex: 1;
+      min-width: 0;
 
-      h4 {
-        color: #fff;
-        margin: 0 0 4px 0;
-        font-size: 1rem;
-        font-weight: 500;
+      .playlist-name {
+        color: #ffffff;
+        font-size: 0.92rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
-      span {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 0.85rem;
+      .playlist-subtext {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.76rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
     
-    .check-icon {
-      color: #3ea6ff; /* A nice blue/primary color for checked state */
+    .playlist-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-left: auto;
+      flex-shrink: 0;
+
+      .pin-icon {
+        flex-shrink: 0;
+      }
+
+      .delete-btn {
+        opacity: 0;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.45);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+
+        &:hover {
+          color: #ef4444;
+          background: rgba(239, 68, 68, 0.12);
+        }
+      }
+
+      .check-circle {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .hollow-ring {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.35);
+          transition: all 0.15s ease;
+        }
+
+        &:hover .hollow-ring {
+          border-color: rgba(255, 255, 255, 0.75);
+          transform: scale(1.05);
+        }
+
+        &.checked svg {
+          display: block;
+        }
+      }
     }
   }
 
-  .new-playlist-input {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  .empty-search {
+    padding: 24px 12px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.88rem;
 
-    input[type="text"] {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 12px 16px;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
-
-      &:focus {
-        border-color: rgba(255, 255, 255, 0.5);
-      }
-      
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-      }
+    p {
+      margin: 0;
     }
-    
-    .create-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 4px;
-      
-      .public-toggle {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        
-        input[type="checkbox"] {
-          accent-color: #ffffff;
-          width: 16px;
-          height: 16px;
-        }
-        
-        span {
-          font-size: 0.9rem;
-          color: rgba(255,255,255,0.8);
-        }
-      }
-      
-      .create-btn {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 0.95rem;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
+  }
 
-        &:hover:not([disabled]) {
-          background: rgba(255, 255, 255, 0.2);
-        }
-        
-        &[disabled] {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
+  /* Modal Footer */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 18px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+    .cancel-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      &:active {
+        background: rgba(255, 255, 255, 0.15);
       }
     }
   }

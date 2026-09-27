@@ -168,6 +168,49 @@
   }
 }
 
+// Spotify-style (+) Add to Playlist Button in Mini Player
+.track-add-playlist-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 6px;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.08);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+
+  &.saved {
+    color: #22c55e;
+
+    &:hover {
+      color: #4ade80;
+      background: rgba(34, 197, 94, 0.12);
+      transform: scale(1.08);
+    }
+  }
+
+  svg {
+    display: block;
+    pointer-events: none;
+  }
+}
+
 // ---- Center: Controls + Progress ----
 .player-center {
   display: flex;
@@ -479,6 +522,13 @@
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       display: block !important;
+    }
+
+    .track-add-playlist-btn {
+      width: 32px !important;
+      height: 32px !important;
+      margin-left: 2px !important;
+      flex-shrink: 0 !important;
     }
   }
 

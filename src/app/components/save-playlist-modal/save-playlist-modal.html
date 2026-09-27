@@ -11,61 +11,116 @@
       </div>
       
       <div class="header-content">
-        <h3>Save to playlist</h3>
-        <button class="close-btn" (click)="close($event)" *ngIf="!isMobile">
-          <svg lucideX [attr.size]="24"></svg>
+        <h3>Add to playlist</h3>
+        <button class="close-btn" (click)="close($event)" title="Close">
+          <svg lucideX [attr.size]="20"></svg>
         </button>
       </div>
     </div>
 
-    <!-- Playlists List -->
+    <!-- Modal Body -->
     <div class="modal-body">
-      <div class="playlist-list">
-        <!-- Default Like Playlist -->
-        <div class="playlist-item" (click)="toggleLikeTrack()">
-          <div class="playlist-icon" style="background: #a18cd1; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
-            <svg lucideHeart [attr.size]="20" stroke="white" fill="white"></svg>
-          </div>
-          <div class="playlist-info">
-            <h4>Liked music</h4>
-            <span>{{ userService.likedSongs().length }} songs</span>
-          </div>
-          <svg *ngIf="isLiked()" lucideCheck [attr.size]="20" class="check-icon"></svg>
-        </div>
-
-        <!-- Custom Playlists -->
-        <div class="playlist-item" *ngFor="let pl of getOwnedPlaylists()" (click)="toggleInCustomPlaylist(pl)">
-          <div class="playlist-icon" style="padding: 0; overflow: hidden;">
-            <img *ngIf="pl.tracks && pl.tracks.length > 0" [src]="pl.tracks[0].thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
-            <svg *ngIf="!pl.tracks || pl.tracks.length === 0" lucideListMusic [attr.size]="20" stroke="white"></svg>
-          </div>
-          <div class="playlist-info">
-            <h4>{{ pl.name }}</h4>
-            <span>{{ pl.tracks.length }} tracks</span>
-          </div>
-          
-          <div class="playlist-actions" style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
-            <svg *ngIf="isInPlaylist(pl)" lucideCheck [attr.size]="20" class="check-icon" style="color: #4facfe;"></svg>
-            <button class="icon-btn delete-btn" (click)="deletePlaylistInit(pl, $event)" title="Delete Playlist" style="background: transparent; border: none; color: rgba(255,255,255,0.5); cursor: pointer;">
-              <svg lucideTrash2 [attr.size]="18" class="hover-red"></svg>
-            </button>
-          </div>
-        </div>
+      <!-- Search Input (Find a playlist) -->
+      <div class="search-box-wrap">
+        <svg lucideSearch [attr.size]="18" class="search-icon"></svg>
+        <input 
+          type="text" 
+          placeholder="Find a playlist" 
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+        />
+        <button type="button" class="clear-search-btn" *ngIf="searchQuery()" (click)="clearSearch()" title="Clear">
+          <svg lucideX [attr.size]="14"></svg>
+        </button>
       </div>
 
-      <!-- Create New Playlist Form -->
-      <div class="new-playlist-input">
-        <input type="text" placeholder="New playlist name..." [value]="newPlaylistName()" (input)="newPlaylistName.set($any($event.target).value)" (keyup.enter)="createAndAddToPlaylist()">
-        
-        <div class="create-actions">
+      <!-- New Playlist Action Row -->
+      <div class="new-playlist-row" (click)="toggleInlineCreate()">
+        <div class="new-icon-box">
+          <svg lucidePlus [attr.size]="20"></svg>
+        </div>
+        <span class="new-row-label">New playlist</span>
+      </div>
 
-          
-          <button class="create-btn" (click)="createAndAddToPlaylist()" [disabled]="!newPlaylistName().trim() || isCreating()">
-            <svg lucidePlus [attr.size]="18" *ngIf="!isCreating()"></svg>
+      <!-- Inline Create Playlist Form -->
+      <div class="inline-create-box" *ngIf="showInlineCreate()">
+        <input 
+          type="text" 
+          placeholder="Playlist name..." 
+          [value]="newPlaylistName()" 
+          (input)="newPlaylistName.set($any($event.target).value)" 
+          (keyup.enter)="createAndAddToPlaylist()"
+          autofocus
+        />
+        <div class="inline-actions">
+          <button type="button" class="inline-cancel-btn" (click)="toggleInlineCreate()">Cancel</button>
+          <button type="button" class="inline-submit-btn" (click)="createAndAddToPlaylist()" [disabled]="!newPlaylistName().trim() || isCreating()">
             {{ isCreating() ? 'Creating...' : 'Create' }}
           </button>
         </div>
       </div>
+
+      <!-- Playlists Scrollable List -->
+      <div class="playlist-list">
+        <!-- Liked Songs (Pinned First) -->
+        <div class="playlist-item" *ngIf="isLikedMatchSearch()" (click)="toggleLikeTrack()">
+          <div class="playlist-icon liked-icon">
+            <svg lucideHeart [attr.size]="20" stroke="white" fill="white"></svg>
+          </div>
+          <div class="playlist-info">
+            <span class="playlist-name">Liked Songs</span>
+            <span class="playlist-subtext">Playlist • {{ userService.likedSongs().length }} songs</span>
+          </div>
+          <div class="playlist-right">
+            <!-- Green Pin Icon -->
+            <svg class="pin-icon" viewBox="0 0 24 24" width="16" height="16" fill="#22c55e">
+              <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+            </svg>
+            <!-- Selection Circle -->
+            <div class="check-circle" [class.checked]="isLiked()">
+              <svg *ngIf="isLiked()" viewBox="0 0 24 24" width="22" height="22" fill="#22c55e">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.707 8.707l-5.414 5.414a1 1 0 01-1.414 0L7.293 13.535a1 1 0 011.414-1.414l2.172 2.171 4.707-4.707a1 1 0 011.414 1.414z"/>
+              </svg>
+              <div *ngIf="!isLiked()" class="hollow-ring"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Playlists -->
+        <div class="playlist-item" *ngFor="let pl of getFilteredPlaylists()" (click)="toggleInCustomPlaylist(pl)">
+          <div class="playlist-icon custom-icon">
+            <img *ngIf="pl.tracks && pl.tracks.length > 0" [src]="pl.tracks[0].thumbnail" alt="" />
+            <svg *ngIf="!pl.tracks || pl.tracks.length === 0" lucideListMusic [attr.size]="20" stroke="rgba(255,255,255,0.7)"></svg>
+          </div>
+          <div class="playlist-info">
+            <span class="playlist-name">{{ pl.name }}</span>
+            <span class="playlist-subtext">Playlist • {{ pl.tracks?.length || 0 }} songs</span>
+          </div>
+          <div class="playlist-right">
+            <!-- Delete Button (Rule 6: red hover) -->
+            <button type="button" class="icon-btn delete-btn" (click)="deletePlaylistInit(pl, $event)" title="Delete Playlist">
+              <svg lucideTrash2 [attr.size]="16"></svg>
+            </button>
+            <!-- Selection Circle -->
+            <div class="check-circle" [class.checked]="isInPlaylist(pl)">
+              <svg *ngIf="isInPlaylist(pl)" viewBox="0 0 24 24" width="22" height="22" fill="#22c55e">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.707 8.707l-5.414 5.414a1 1 0 01-1.414 0L7.293 13.535a1 1 0 011.414-1.414l2.172 2.171 4.707-4.707a1 1 0 011.414 1.414z"/>
+              </svg>
+              <div *ngIf="!isInPlaylist(pl)" class="hollow-ring"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Playlists Found -->
+        <div class="empty-search" *ngIf="getFilteredPlaylists().length === 0 && !isLikedMatchSearch()">
+          <p>No playlists found for "{{ searchQuery() }}"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer: Cancel / Done -->
+    <div class="modal-footer">
+      <button type="button" class="cancel-btn" (click)="close($event)">Cancel</button>
     </div>
 
   </div>

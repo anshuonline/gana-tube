@@ -630,6 +630,28 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     this.showMenu = false;
   }
 
+  isCurrentTrackSaved(): boolean {
+    const track = this.effectiveTrack() || this.playerService.currentTrack();
+    if (!track) return false;
+    const vId = track.videoId || (track as any).id;
+    if (!vId) return false;
+    const isLiked = this.userService.likedSongs().some(song => (typeof song === 'string' ? song : song.videoId || (song as any).id) === vId);
+    if (isLiked) return true;
+    return this.userService.customPlaylists().some(p => 
+      p.tracks && p.tracks.some((t: any) => (t.videoId || (t as any).id) === vId)
+    );
+  }
+
+  onAddPlaylistClick(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const track = this.effectiveTrack() || this.playerService.currentTrack();
+    if (track) {
+      this.openPlaylist.emit(track);
+    }
+  }
+
   toggleView(view: 'artwork' | 'queue' | 'lyrics' | 'related' | 'search'): void {
     if (this.isDesktop) {
       if (this.activeView === view && this.isSidebarVisible) {

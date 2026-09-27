@@ -107,6 +107,27 @@ import { CastService } from '../../services/cast.service';
           </div>
           <div class="track-artist" [title]="playerService.currentTrack()?.channelTitle || ''">{{ playerService.currentTrack()?.channelTitle || '---' }}</div>
         </div>
+
+        <!-- Spotify-style (+) Add to Playlist Button -->
+        <button
+          *ngIf="playerService.currentTrack() !== null"
+          type="button"
+          class="track-add-playlist-btn"
+          [class.saved]="isCurrentTrackSaved()"
+          (click)="onAddPlaylistClick($event)"
+          [title]="isCurrentTrackSaved() ? 'Added to playlist' : 'Add to playlist'"
+        >
+          <!-- When saved: Spotify-style green checkmark circle -->
+          <svg *ngIf="isCurrentTrackSaved()" viewBox="0 0 24 24" width="20" height="20" fill="#22c55e">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.707 8.707l-5.414 5.414a1 1 0 01-1.414 0L7.293 13.535a1 1 0 011.414-1.414l2.172 2.171 4.707-4.707a1 1 0 011.414 1.414z"/>
+          </svg>
+          <!-- When not saved: circular plus icon (Spotify style from user screenshot) -->
+          <svg *ngIf="!isCurrentTrackSaved()" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </button>
       </div>
 
       <!-- Hidden SVG Defs for Gradients -->
@@ -490,6 +511,7 @@ import { CastService } from '../../services/cast.service';
 })
 export class MusicPlayerComponent implements OnDestroy {
   @Output() expand = new EventEmitter<void>();
+  @Output() openPlaylist = new EventEmitter<any>();
   
   isFullScreen = signal<boolean>(false);
   showQueue = signal<boolean>(false);
@@ -515,6 +537,26 @@ export class MusicPlayerComponent implements OnDestroy {
     private toastService: ToastService,
     public roomService: RoomService
   ) {}
+
+  isCurrentTrackSaved(): boolean {
+    const track = this.playerService.currentTrack();
+    if (!track) return false;
+    const vId = track.videoId || (track as any).id;
+    if (!vId) return false;
+    const isLiked = this.userService.likedSongs().some(t => (t.videoId || (t as any).id) === vId);
+    if (isLiked) return true;
+    return this.userService.customPlaylists().some(p => 
+      p.tracks && p.tracks.some((t: any) => (t.videoId || (t as any).id) === vId)
+    );
+  }
+
+  onAddPlaylistClick(event: Event) {
+    event.stopPropagation();
+    const track = this.playerService.currentTrack();
+    if (track) {
+      this.openPlaylist.emit(track);
+    }
+  }
 
   isDownloaded(): boolean {
     const track = this.playerService.currentTrack();

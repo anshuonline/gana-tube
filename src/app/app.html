@@ -1080,7 +1080,8 @@
   <!-- Fixed Music Player -->
   <app-music-player 
     *ngIf="currentPage() !== 'managegt' && currentPage() !== 'admin' && currentPage() !== 'shorts' && currentPage() !== 'rooms-view'"
-    (expand)="openFullScreenPlayer()">
+    (expand)="openFullScreenPlayer()"
+    (openPlaylist)="openSaveToPlaylist($event)">
   </app-music-player>
 
   <!-- Full Screen Player Overlay -->

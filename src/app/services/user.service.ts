@@ -114,7 +114,8 @@ export class UserService {
           this.likedSongs.set(response.liked_songs);
         }
         if (response.recent_plays) {
-          this.recentPlays.set(response.recent_plays);
+          const plays = Array.isArray(response.recent_plays) ? response.recent_plays.slice(0, 100) : [];
+          this.recentPlays.set(plays);
         }
         if (response.listening_preferences) {
           this.listeningPreferences.set(response.listening_preferences);
@@ -215,6 +216,10 @@ export class UserService {
     plays = plays.filter(song => typeof song === 'string' ? song !== songObj.videoId : song.videoId !== songObj.videoId);
     
     plays.unshift(songObj);
+    // Cap to maximum 100 recent plays to keep payload light, super fast, and protect server RAM
+    if (plays.length > 100) {
+      plays = plays.slice(0, 100);
+    }
     
     this.recentPlays.set(plays);
     
