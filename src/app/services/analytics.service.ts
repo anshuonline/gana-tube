@@ -287,4 +287,10 @@ export class AnalyticsService {
   getQueryDetails(password: string, query: string) {
     return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getQueryDetails&pwd=${encodeURIComponent(password)}&query=${encodeURIComponent(query)}`);
   }
+
+  getDailySummary(password: string, date: string = '') {
+    let url = `${this.apiUrl}?action=getDailySummary&pwd=${encodeURIComponent(password)}`;
+    if (date) url += `&date=${encodeURIComponent(date)}`;
+    return this.http.get<{status: string, data?: any, message?: string}>(url);
+  }
 }

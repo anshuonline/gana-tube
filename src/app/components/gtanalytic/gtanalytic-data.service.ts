@@ -108,6 +108,14 @@ export class GtanalyticDataService {
     return this.analyticsService.getGuestGeography(pwd, range);
   }
 
+  getDailySummary(date: string = ''): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) {
+      return of({ status: 'error', message: 'Unauthorized' });
+    }
+    return this.analyticsService.getDailySummary(pwd, date);
+  }
+
   startAutoRefresh() {
     if (this.autoRefreshTimer) return;
     this.autoRefreshTimer = setInterval(() => {
