@@ -27,6 +27,13 @@
     <p>Loading daily summary...</p>
   </div>
 
+  <!-- Error / Offline State -->
+  <div *ngIf="errorMsg() && !loading() && !dailyData()" class="loading-state error-card">
+    <div class="error-icon">⚠️</div>
+    <p class="error-text">{{ errorMsg() }}</p>
+    <button (click)="loadData()" class="date-pill active" style="margin-top: 12px; cursor: pointer;">Retry</button>
+  </div>
+
   <div *ngIf="dailyData()">
 
     <!-- Date Badge -->

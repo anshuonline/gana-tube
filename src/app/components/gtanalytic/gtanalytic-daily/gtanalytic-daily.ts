@@ -17,6 +17,7 @@ export class GtanalyticDailyComponent implements OnInit {
 
   loading = signal<boolean>(false);
   dailyData = signal<any>(null);
+  errorMsg = signal<string>('');
   selectedDate = signal<string>(this.todayStr());
   activeTab = signal<'songs' | 'guests' | 'users'>('songs');
 
@@ -136,14 +137,19 @@ export class GtanalyticDailyComponent implements OnInit {
 
   loadData() {
     this.loading.set(true);
+    this.errorMsg.set('');
     this.dataService.getDailySummary(this.selectedDate()).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.dailyData.set(res.data);
+          this.errorMsg.set('');
+        } else {
+          this.errorMsg.set(res.message || 'Failed to load daily summary data');
         }
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
+        this.errorMsg.set(err?.message || 'Failed to connect to analytics server');
         this.loading.set(false);
       }
     });

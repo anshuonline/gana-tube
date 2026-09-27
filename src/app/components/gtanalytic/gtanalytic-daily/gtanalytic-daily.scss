@@ -175,6 +175,18 @@
     color: rgba(255, 255, 255, 0.6);
     margin: 0;
   }
+
+  &.error-card {
+    border-color: rgba(239, 68, 68, 0.2);
+    .error-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .error-text {
+      color: #f87171;
+      font-size: 14px;
+    }
+  }
 }
 
 @keyframes spin {
