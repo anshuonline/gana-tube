@@ -1,5 +1,5 @@
 <!-- Intro Video Overlay -->
-<app-intro-video></app-intro-video>
+<app-intro-video *ngIf="isIntroAnimationEnabled()"></app-intro-video>
 
 <div class="app-container" [class.player-active]="playerService.currentTrack() !== null">
   <!-- Hidden YouTube Player -->
@@ -339,6 +339,20 @@
               <span class="toggle-knob"></span>
             </button>
           </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <h3>Startup Intro Animation</h3>
+              <p>Play the animated "GanaTube.in" signature when opening the app.</p>
+            </div>
+            <button class="toggle-switch" 
+                    [class.on]="isIntroAnimationEnabled()" 
+                    (click)="toggleIntroAnimation()" 
+                    aria-label="Toggle Startup Intro Animation" 
+                    [attr.aria-pressed]="isIntroAnimationEnabled()">
+              <span class="toggle-knob"></span>
+            </button>
+          </div>
         </div>
 
         <!-- Languages -->
@@ -398,6 +412,24 @@
               <p>Always-live listening rooms with hosts, synced music and live chat.</p>
             </div>
             <button class="q-btn" (click)="openRoomsPage()">Explore</button>
+          </div>
+        </div>
+
+        <!-- Storage & Data -->
+        <div class="settings-group group-storage">
+          <h2 class="group-title">Storage & Data</h2>
+          <div class="setting-item">
+            <div class="setting-info">
+              <h3>Clear Local Storage</h3>
+              <p>Reset local preferences, cache, and history. Reloads the app once.</p>
+            </div>
+            <button type="button" class="btn-clear-storage" (click)="clearLocalStorageAndReload()" title="Clear Local Storage & Reload">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Clear & Reload</span>
+            </button>
           </div>
         </div>
 
@@ -526,52 +558,108 @@
     <app-shorts-page *ngIf="currentPage() === 'shorts'"></app-shorts-page>
 
     <div *ngIf="currentPage() === 'home' || currentPage() === 'search'" class="home-content">
-      <!-- Hero Banner (Hidden in Search Mode) -->
-      <section class="hero-section" *ngIf="!hasSearched() && !isSearchMode()">
-        <div class="hero-inner-wrap full-width" #heroInner>
-          
-          <div class="hero-content-grid">
-            <div class="hero-text-content">
-              
-              <div class="hero-suggestions-header">
-                <span class="suggestions-title">YOUR MUSIC PREFERENCES</span>
-                <div class="hero-language-tabs" *ngIf="!isMobileView()">
-                  <a *ngFor="let lang of preferredLanguages()"
-                          class="hero-tab"
-                          [class.active]="homeScreenLanguage() === lang"
-                          [routerLink]="['/language', lang.toLowerCase()]"
-                          style="text-decoration: none; display: inline-block;">
-                    {{ lang }}
-                  </a>
-                </div>
-                <button class="hero-lang-btn" *ngIf="isMobileView()" (click)="openLanguageModal()">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                  <span>{{ homeScreenLanguage() }}</span>
-                </button>
-              </div>
+      <!-- Netflix / Amazon Prime Inspired Cinematic Hero Carousel -->
+      <section class="hero-carousel-section" *ngIf="!hasSearched() && !isSearchMode()"
+               (mouseenter)="onHeroMouseEnter()"
+               (mouseleave)="onHeroMouseLeave()"
+               (touchstart)="onHeroTouchStart($event)"
+               (touchend)="onHeroTouchEnd($event)">
+        
+        <!-- Ambient Glow Backdrop -->
+        <div class="hero-ambient-glow" [style.background]="currentHeroSlide().ambientGlow"></div>
 
-              <div class="hero-main-text">
-                <span class="hero-badge">{{ heroData()[homeScreenLanguage()]?.badge || 'TRENDING PLAYLIST' }}</span>
-                <h1 class="hero-title">{{ getHeroTitle(homeScreenLanguage()) }}</h1>
-                <p class="hero-subtitle">{{ getHeroSubtitle(homeScreenLanguage()) }}</p>
-                
-                <button class="explore-btn" (click)="explorePlaylist(homeScreenLanguage())">
-                  <svg lucidePlay [attr.size]="24" [attr.fill]="'currentColor'"></svg>
-                  <span>{{ heroData()[homeScreenLanguage()]?.buttonText || 'EXPLORE PLAYLIST' }}</span>
-                </button>
-              </div>
+        <div class="hero-carousel-card">
+          <!-- Slide Dynamic Backdrop Gradient -->
+          <div class="hero-card-backdrop" [style.background]="currentHeroSlide().gradient"></div>
+
+          <!-- Top Language Bar / Quick Carousel Switcher -->
+          <div class="hero-lang-bar">
+            <div class="hero-lang-scroll">
+              <button *ngFor="let slide of heroSlides; let i = index"
+                      class="hero-lang-chip"
+                      [class.active]="currentHeroSlideIndex() === i"
+                      (click)="selectHeroSlide(i)"
+                      type="button">
+                <span class="lang-dot" [style.background]="slide.accentColor"></span>
+                <span>{{ slide.lang }}</span>
+              </button>
             </div>
             
-            <div class="hero-image-content">
-              <img *ngFor="let lang of preferredLanguages()"
-                   [src]="getHeroImage(lang)" 
-                   [alt]="lang + ' Singers'" 
-                   class="hero-singers-img"
-                   [attr.fetchpriority]="homeScreenLanguage() === lang ? 'high' : 'low'"
-                   [attr.loading]="homeScreenLanguage() === lang ? 'eager' : 'lazy'"
-                   decoding="async"
-                   [class.active]="homeScreenLanguage() === lang">
+            <button class="hero-manage-lang-btn" (click)="openLanguageModal()" title="Customize Preferred Languages" type="button">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/>
+              </svg>
+              <span class="manage-text">Languages</span>
+            </button>
+          </div>
+
+          <!-- Main Carousel Content Grid -->
+          <div class="hero-card-content">
+            <!-- Left Info Panel -->
+            <div class="hero-info-panel">
+              <div class="hero-badge-row">
+                <span class="hero-spotlight-badge" [style.border-color]="currentHeroSlide().accentColor + '55'" [style.color]="currentHeroSlide().accentColor">
+                  <span class="badge-pulse" [style.background]="currentHeroSlide().accentColor"></span>
+                  {{ currentHeroSlide().badge }}
+                </span>
+                <span class="hero-lang-tag">{{ currentHeroSlide().lang }} Spotlight</span>
+              </div>
+
+              <h1 class="hero-carousel-title">{{ currentHeroSlide().title }}</h1>
+              
+              <p class="hero-carousel-artists" [title]="currentHeroSlide().artists">
+                {{ currentHeroSlide().artists }}
+              </p>
+              
+              <p class="hero-carousel-desc">
+                {{ currentHeroSlide().subtitle }}
+              </p>
+
+              <!-- Action CTAs -->
+              <div class="hero-action-row">
+                <button class="hero-btn-primary" (click)="explorePlaylist(currentHeroSlide().lang)" type="button">
+                  <svg lucidePlay [attr.size]="20" fill="currentColor"></svg>
+                  <span>{{ currentHeroSlide().buttonText || 'Listen Now' }}</span>
+                </button>
+
+                <button class="hero-btn-secondary" (click)="browseLanguage(currentHeroSlide().lang)" type="button">
+                  <span>Explore {{ currentHeroSlide().lang }}</span>
+                  <svg lucideChevronRight [attr.size]="18"></svg>
+                </button>
+              </div>
             </div>
+
+            <!-- Right Artwork / Singers Visual -->
+            <div class="hero-visual-panel">
+              <div class="hero-visual-glow" [style.background]="currentHeroSlide().ambientGlow"></div>
+              <img *ngFor="let slide of heroSlides; let i = index"
+                   [src]="slide.image"
+                   [alt]="slide.lang + ' Top Artists'"
+                   class="hero-singer-cutout"
+                   [class.active]="currentHeroSlideIndex() === i"
+                   [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                   decoding="async">
+            </div>
+          </div>
+
+          <!-- Left / Right Carousel Controls -->
+          <button class="hero-nav-arrow prev" (click)="prevHeroSlide()" aria-label="Previous Slide" title="Previous Slide" type="button">
+            <svg lucideChevronLeft [attr.size]="22"></svg>
+          </button>
+          <button class="hero-nav-arrow next" (click)="nextHeroSlide()" aria-label="Next Slide" title="Next Slide" type="button">
+            <svg lucideChevronRight [attr.size]="22"></svg>
+          </button>
+
+          <!-- Bottom Indicator Dots / Progress Bars -->
+          <div class="hero-indicators">
+            <button *ngFor="let slide of heroSlides; let i = index"
+                    class="hero-indicator-dot"
+                    [class.active]="currentHeroSlideIndex() === i"
+                    (click)="goToHeroSlide(i)"
+                    [attr.aria-label]="'Go to ' + slide.lang + ' slide'"
+                    type="button">
+              <span class="indicator-bar" [style.background]="currentHeroSlideIndex() === i ? slide.accentColor : ''"></span>
+            </button>
           </div>
         </div>
       </section>

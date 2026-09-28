@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideHeart, LucideClock, LucideArrowLeft, LucideFileText, LucideStar } from '@lucide/angular';
+  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideChevronLeft, LucideChevronRight, LucideHeart, LucideClock, LucideArrowLeft, LucideFileText, LucideStar } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -65,6 +65,19 @@ export interface SponsoredAd {
   customCode?: string;
 }
 
+export interface HeroSlide {
+  lang: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  artists: string;
+  image: string;
+  gradient: string;
+  accentColor: string;
+  ambientGlow: string;
+  buttonText?: string;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -92,6 +105,8 @@ export interface SponsoredAd {
     LucideRadio,
     LucideSparkles,
     LucideChevronDown,
+    LucideChevronLeft,
+    LucideChevronRight,
     LucideHeart,
     LucideClock,
     LucideStar,
@@ -187,10 +202,114 @@ export class App implements OnInit {
   currentQuery = '';
 
   // Language filter
-  availableLanguages = ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi', 'Tamil'];
+  availableLanguages = ['Hindi', 'Punjabi', 'English', 'Bhojpuri', 'Haryanvi', 'Bengali', 'Tamil'];
   homeScreenLanguage = signal<string>('Hindi');
   showLanguageModal = signal<boolean>(false);
   isMobileView = signal<boolean>(false);
+
+  // Netflix / Amazon Prime Style Hero Carousel Slides
+  heroSlides: HeroSlide[] = [
+    {
+      lang: 'Hindi',
+      badge: '🔥 #1 ON GANATUBE',
+      title: 'Bollywood Blockbusters',
+      subtitle: 'The hottest Hindi anthems, soulful romantic melodies and club chartbusters',
+      artists: 'Arijit Singh • Shreya Ghoshal • Badshah • Pritam • Sachin-Jigar',
+      image: 'images/hindi-singers.png',
+      gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.35) 0%, rgba(168, 85, 247, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      accentColor: '#ec4899',
+      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(236, 72, 153, 0.35) 0%, rgba(168, 85, 247, 0.2) 45%, transparent 70%)'
+    },
+    {
+      lang: 'Punjabi',
+      badge: '⚡ HIGH VOLTAGE BEATS',
+      title: 'Punjabi Powerhouse',
+      subtitle: 'Chart-topping dhol rhythms, trap anthems and unstoppable Punjabi energy',
+      artists: 'Diljit Dosanjh • Sidhu Moose Wala • Karan Aujla • AP Dhillon',
+      image: 'images/punjabi-singers.png',
+      gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(239, 68, 68, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      accentColor: '#f59e0b',
+      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(245, 158, 11, 0.35) 0%, rgba(239, 68, 68, 0.2) 45%, transparent 70%)'
+    },
+    {
+      lang: 'English',
+      badge: '🌐 GLOBAL ESSENTIALS',
+      title: 'Global Top Hits',
+      subtitle: 'The biggest international chartbusters dominating Spotify and Billboard charts',
+      artists: 'The Weeknd • Taylor Swift • Drake • Dua Lipa • Bruno Mars',
+      image: 'images/english-singers.png',
+      gradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.35) 0%, rgba(6, 182, 212, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      accentColor: '#6366f1',
+      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(99, 102, 241, 0.35) 0%, rgba(6, 182, 212, 0.2) 45%, transparent 70%)'
+    },
+    {
+      lang: 'Bhojpuri',
+      badge: '💥 VIRAL DESI GROOVES',
+      title: 'Bhojpuri Chartbusters',
+      subtitle: 'Electrifying festive beats, trending reels music and viral dance numbers',
+      artists: 'Pawan Singh • Khesari Lal Yadav • Shilpi Raj • Arvind Akela Kallu',
+      image: 'images/bhojpuri-singers.png',
+      gradient: 'linear-gradient(135deg, rgba(239, 68, 68, 0.35) 0%, rgba(234, 179, 8, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      accentColor: '#ef4444',
+      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(239, 68, 68, 0.35) 0%, rgba(234, 179, 8, 0.2) 45%, transparent 70%)'
+    },
+    {
+      lang: 'Haryanvi',
+      badge: '🔥 RAGNI & SWAG',
+      title: 'Haryanvi Dominance',
+      subtitle: 'Heavy basslines, desi swag and trending regional club tracks ruling north India',
+      artists: 'Gulzaar Chhaniwala • Renuka Panwar • Masoom Sharma • Diler Kharkiya',
+      image: 'images/haryanvi-singers.png',
+      gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(132, 204, 22, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      accentColor: '#10b981',
+      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(16, 185, 129, 0.35) 0%, rgba(132, 204, 22, 0.2) 45%, transparent 70%)'
+    },
+    {
+      lang: 'Bengali',
+      badge: '✨ SOULFUL HARMONIES',
+      title: 'Soulful Bengali',
+      subtitle: 'Timeless poetic melodies, rich lyrical legacy and contemporary Bengali pop',
+      artists: 'Arijit Singh • Shreya Ghoshal • Anupam Roy • Jeet Gannguli',
+      image: 'images/bengali-singers.png',
+      gradient: 'linear-gradient(135deg, rgba(20, 184, 166, 0.35) 0%, rgba(244, 114, 182, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      accentColor: '#14b8a6',
+      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(20, 184, 166, 0.35) 0%, rgba(244, 114, 182, 0.2) 45%, transparent 70%)'
+    },
+    {
+      lang: 'Tamil',
+      badge: '🎵 KOLLYWOOD SUPREME',
+      title: 'Tamil Blockbusters',
+      subtitle: 'Legendary cinematic compositions, mass hero intros and electrifying hooks',
+      artists: 'Anirudh Ravichander • A.R. Rahman • Sid Sriram • Yuvan Shankar Raja',
+      image: 'images/tamil-singers.png',
+      gradient: 'linear-gradient(135deg, rgba(234, 179, 8, 0.35) 0%, rgba(147, 51, 234, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      accentColor: '#eab308',
+      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(234, 179, 8, 0.35) 0%, rgba(147, 51, 234, 0.2) 45%, transparent 70%)'
+    }
+  ];
+
+  currentHeroSlideIndex = signal<number>(0);
+  isHeroPaused = signal<boolean>(false);
+  private heroTimer: any = null;
+  private heroTouchStartX = 0;
+  private heroTouchStartY = 0;
+
+  currentHeroSlide = computed(() => {
+    const idx = this.currentHeroSlideIndex();
+    const defaultSlide = this.heroSlides[idx] || this.heroSlides[0];
+    const custom = this.heroData()[defaultSlide.lang];
+    if (custom) {
+      return {
+        ...defaultSlide,
+        badge: custom.badge || defaultSlide.badge,
+        title: custom.title || defaultSlide.title,
+        subtitle: custom.subtitle || defaultSlide.subtitle,
+        image: custom.imageUrl || defaultSlide.image,
+        buttonText: custom.buttonText || defaultSlide.buttonText || 'Listen Now'
+      };
+    }
+    return defaultSlide;
+  });
 
   // Playlists State
   customPlaylists = signal<PlaylistMeta[]>([]);
@@ -244,6 +363,39 @@ export class App implements OnInit {
     } else {
       this.toastService.show('Auto-hide enabled (Hides on scroll)', 'info');
     }
+  }
+
+  isIntroAnimationEnabled = signal<boolean>(
+    typeof localStorage !== 'undefined'
+      ? localStorage.getItem('disable_intro_animation') !== 'true'
+      : true
+  );
+
+  toggleIntroAnimation(): void {
+    const newVal = !this.isIntroAnimationEnabled();
+    this.isIntroAnimationEnabled.set(newVal);
+    if (typeof localStorage !== 'undefined') {
+      if (!newVal) {
+        localStorage.setItem('disable_intro_animation', 'true');
+        this.toastService.show('Startup intro animation disabled', 'info');
+      } else {
+        localStorage.removeItem('disable_intro_animation');
+        this.toastService.show('Startup intro animation enabled', 'info');
+      }
+    }
+  }
+
+  clearLocalStorageAndReload(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.clear();
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.clear();
+    }
+    this.toastService.show('Local storage cleared. Reloading app...', 'info');
+    setTimeout(() => {
+      window.location.reload();
+    }, 350);
   }
 
   isSearchMode = signal<boolean>(false);
@@ -1213,6 +1365,10 @@ export class App implements OnInit {
           if (this.availableLanguages.includes(capitalizedLang)) {
             this.homeScreenLanguage.set(capitalizedLang);
             localStorage.setItem('homeScreenLanguage', capitalizedLang);
+            const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === capitalizedLang.toLowerCase());
+            if (slideIdx !== -1) {
+              this.currentHeroSlideIndex.set(slideIdx);
+            }
 
             // Put the selected language at the front of preferredLanguages
             let currentPrefs = [...this.preferredLanguages()];
@@ -1809,7 +1965,12 @@ export class App implements OnInit {
     const savedLang = localStorage.getItem('homeScreenLanguage');
     if (savedLang && this.availableLanguages.includes(savedLang)) {
       this.homeScreenLanguage.set(savedLang);
+      const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === savedLang.toLowerCase());
+      if (slideIdx !== -1) {
+        this.currentHeroSlideIndex.set(slideIdx);
+      }
     }
+    this.startHeroTimer();
 
     // Dynamic API URL for Localhost vs Live Domain (ganatube.in)
     const host = window.location.hostname;
@@ -2829,28 +2990,6 @@ export class App implements OnInit {
     }
     this.lastScrollOffset = scrollOffset;
 
-    // Parallax: use cached DOM references
-    if (!this.cachedHeroEl) {
-      this.cachedHeroEl = document.querySelector('.hero-section') as HTMLElement;
-      if (this.cachedHeroEl) {
-        this.cachedHeroImgs = Array.from(document.querySelectorAll('.hero-image-content img')) as HTMLElement[];
-      }
-    }
-    
-    if (this.cachedHeroEl) {
-      const heroHeight = this.cachedHeroEl.offsetHeight || 500;
-      const scrollProgress = scrollOffset / heroHeight;
-      const ratio = Math.min(scrollProgress * 1.5, 1);
-      
-      for (let i = 0; i < this.cachedHeroImgs.length; i++) {
-        const scale = Math.max(1 - (scrollProgress * 0.2), 0.8);
-        const translateY = scrollOffset * 0.4;
-        this.cachedHeroImgs[i].style.transform = `translateY(${translateY}px) scale(${scale})`;
-      }
-      
-      this.cachedHeroEl.style.opacity = `${1 - ratio}`;
-    }
-
     if (this.isLoading() || this.isLazyLoading() || this.shelfLoading() || this.shelvesLoading()) {
       return;
     }
@@ -2991,6 +3130,97 @@ export class App implements OnInit {
     } else {
       // Fallback if playlist not found
       this.onSuggestSearch(`${lang} Hits`);
+    }
+  }
+
+  startHeroTimer(): void {
+    this.stopHeroTimer();
+    if (typeof window !== 'undefined') {
+      this.heroTimer = setInterval(() => {
+        if (!this.isHeroPaused() && this.currentPage() === 'home' && !this.isSearchMode()) {
+          this.nextHeroSlide(false);
+        }
+      }, 5500);
+    }
+  }
+
+  stopHeroTimer(): void {
+    if (this.heroTimer) {
+      clearInterval(this.heroTimer);
+      this.heroTimer = null;
+    }
+  }
+
+  nextHeroSlide(userTriggered = true): void {
+    if (userTriggered) this.resetHeroTimer();
+    const nextIdx = (this.currentHeroSlideIndex() + 1) % this.heroSlides.length;
+    this.currentHeroSlideIndex.set(nextIdx);
+  }
+
+  prevHeroSlide(): void {
+    this.resetHeroTimer();
+    const prevIdx = (this.currentHeroSlideIndex() - 1 + this.heroSlides.length) % this.heroSlides.length;
+    this.currentHeroSlideIndex.set(prevIdx);
+  }
+
+  goToHeroSlide(index: number): void {
+    if (index >= 0 && index < this.heroSlides.length) {
+      this.resetHeroTimer();
+      this.currentHeroSlideIndex.set(index);
+    }
+  }
+
+  selectHeroSlide(index: number): void {
+    this.goToHeroSlide(index);
+    const targetSlide = this.heroSlides[index];
+    if (targetSlide && targetSlide.lang !== this.homeScreenLanguage()) {
+      this.setLanguage(targetSlide.lang);
+    }
+  }
+
+  browseLanguage(lang: string): void {
+    this.setLanguage(lang);
+    if (typeof document !== 'undefined') {
+      const resultsEl = document.querySelector('.results-container');
+      if (resultsEl) {
+        resultsEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+
+  resetHeroTimer(): void {
+    this.stopHeroTimer();
+    this.startHeroTimer();
+  }
+
+  onHeroMouseEnter(): void {
+    this.isHeroPaused.set(true);
+  }
+
+  onHeroMouseLeave(): void {
+    this.isHeroPaused.set(false);
+  }
+
+  onHeroTouchStart(event: TouchEvent): void {
+    if (event.touches && event.touches[0]) {
+      this.heroTouchStartX = event.touches[0].clientX;
+      this.heroTouchStartY = event.touches[0].clientY;
+      this.isHeroPaused.set(true);
+    }
+  }
+
+  onHeroTouchEnd(event: TouchEvent): void {
+    this.isHeroPaused.set(false);
+    if (event.changedTouches && event.changedTouches[0]) {
+      const diffX = event.changedTouches[0].clientX - this.heroTouchStartX;
+      const diffY = event.changedTouches[0].clientY - this.heroTouchStartY;
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+        if (diffX < 0) {
+          this.nextHeroSlide(true);
+        } else {
+          this.prevHeroSlide();
+        }
+      }
     }
   }
 
@@ -3392,6 +3622,7 @@ export class App implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.stopHeroTimer();
     this.sentinelObserver?.disconnect();
     if (this.carouselInterval) {
       clearInterval(this.carouselInterval);

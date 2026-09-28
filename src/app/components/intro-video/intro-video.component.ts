@@ -13,6 +13,10 @@ export class IntroVideoComponent implements OnInit {
   fadingOut = signal(false);
 
   ngOnInit(): void {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('disable_intro_animation') === 'true') {
+      this.showOverlay.set(false);
+      return;
+    }
     this.showOverlay.set(true);
     setTimeout(() => {
       this.dismiss();
