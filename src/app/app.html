@@ -589,6 +589,22 @@
           <!-- Slide Dynamic Backdrop Gradient -->
           <div class="hero-card-backdrop" [style.background]="currentHeroSlide().gradient"></div>
 
+          <!-- Right Artwork / Singers Visual (Spans full height & edge-to-edge right side) -->
+          <div class="hero-visual-panel">
+            <div class="hero-visual-glow" [style.background]="currentHeroSlide().ambientGlow"></div>
+            <div class="hero-visual-images">
+              <img *ngFor="let slide of computedHeroSlides(); let i = index"
+                   [src]="slide.image"
+                   [alt]="slide.lang + ' Top Artists'"
+                   class="hero-singer-cutout"
+                   [class.active]="currentHeroSlideIndex() === i"
+                   (error)="onHeroImageError(slide, i, $event)"
+                   [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                   decoding="async">
+            </div>
+            <div class="hero-visual-overlay"></div>
+          </div>
+
           <!-- Top Language Bar / Quick Carousel Switcher -->
           <div class="hero-lang-bar">
             <div class="hero-lang-scroll">
@@ -644,22 +660,6 @@
                   <svg lucideChevronRight [attr.size]="14"></svg>
                 </button>
               </div>
-            </div>
-
-            <!-- Right Artwork / Singers Visual -->
-            <div class="hero-visual-panel">
-              <div class="hero-visual-glow" [style.background]="currentHeroSlide().ambientGlow"></div>
-              <div class="hero-visual-images">
-                <img *ngFor="let slide of computedHeroSlides(); let i = index"
-                     [src]="slide.image"
-                     [alt]="slide.lang + ' Top Artists'"
-                     class="hero-singer-cutout"
-                     [class.active]="currentHeroSlideIndex() === i"
-                     (error)="onHeroImageError(slide, i, $event)"
-                     [attr.loading]="i === 0 ? 'eager' : 'lazy'"
-                     decoding="async">
-              </div>
-              <div class="hero-visual-overlay"></div>
             </div>
           </div>
 
