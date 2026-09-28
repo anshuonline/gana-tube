@@ -55,7 +55,7 @@
   </nav>
 
   <!-- Header -->
-  <header class="app-header" [class.scrolled]="isScrolled()" [class.header-hidden]="isNavbarHidden() && isNavbarAutoHide()" *ngIf="currentPage() !== 'rooms-view' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog'">
+  <header class="app-header" [class.scrolled]="isScrolled()" [class.header-hidden]="isNavbarHidden() && isNavbarAutoHide()" *ngIf="currentPage() !== 'rooms-view' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog' && currentPage() !== 'profile'">
     <div class="header-inner">
       <div class="header-left">
         <!-- Mobile Hamburger Menu -->
@@ -121,13 +121,33 @@
         <div class="ambient-glow glow-2"></div>
       </div>
 
-      <!-- New Banner Layout -->
+      <!-- Profile Banner with Calligraphy Art -->
       <div class="profile-banner-wrapper">
-        <div class="profile-banner" [ngClass]="'banner-bg-' + profileBannerIndex()">
-          <div class="banner-tint" aria-hidden="true"></div>
-          <button class="change-banner-btn" (click)="changeProfileBanner()" title="Change Banner">
-            <svg lucideImage [attr.size]="18"></svg>
+        <div class="profile-banner">
+          <!-- Back button to return to previous page/home -->
+          <button class="profile-back-nav-btn" (click)="goBack()" title="Back">
+            <svg lucideArrowLeft [attr.size]="18"></svg>
+            <span>Back</span>
           </button>
+
+          <!-- Ambient Nebula Gradients -->
+          <div class="profile-banner-mesh" aria-hidden="true">
+            <div class="mesh-orb orb-1"></div>
+            <div class="mesh-orb orb-2"></div>
+            <div class="mesh-orb orb-3"></div>
+          </div>
+
+          <!-- Calligraphy Typography Centerpiece -->
+          <div class="profile-calligraphy-container" aria-hidden="true">
+            <span class="calligraphy-script-text">ganatube.in</span>
+            <div class="calligraphy-sub-flourish">
+              <span class="flourish-line"></span>
+              <span class="flourish-sparkle">✦</span>
+              <span class="flourish-line"></span>
+            </div>
+          </div>
+
+          <div class="banner-bottom-fade" aria-hidden="true"></div>
         </div>
 
         <div class="profile-header-content">
@@ -565,9 +585,6 @@
                (touchstart)="onHeroTouchStart($event)"
                (touchend)="onHeroTouchEnd($event)">
         
-        <!-- Ambient Glow Backdrop -->
-        <div class="hero-ambient-glow" [style.background]="currentHeroSlide().ambientGlow"></div>
-
         <div class="hero-carousel-card">
           <!-- Slide Dynamic Backdrop Gradient -->
           <div class="hero-card-backdrop" [style.background]="currentHeroSlide().gradient"></div>
@@ -575,7 +592,7 @@
           <!-- Top Language Bar / Quick Carousel Switcher -->
           <div class="hero-lang-bar">
             <div class="hero-lang-scroll">
-              <button *ngFor="let slide of heroSlides; let i = index"
+              <button *ngFor="let slide of computedHeroSlides(); let i = index"
                       class="hero-lang-chip"
                       [class.active]="currentHeroSlideIndex() === i"
                       (click)="selectHeroSlide(i)"
@@ -618,13 +635,13 @@
               <!-- Action CTAs -->
               <div class="hero-action-row">
                 <button class="hero-btn-primary" (click)="explorePlaylist(currentHeroSlide().lang)" type="button">
-                  <svg lucidePlay [attr.size]="20" fill="currentColor"></svg>
+                  <svg lucidePlay [attr.size]="16" fill="currentColor"></svg>
                   <span>{{ currentHeroSlide().buttonText || 'Listen Now' }}</span>
                 </button>
 
                 <button class="hero-btn-secondary" (click)="browseLanguage(currentHeroSlide().lang)" type="button">
                   <span>Explore {{ currentHeroSlide().lang }}</span>
-                  <svg lucideChevronRight [attr.size]="18"></svg>
+                  <svg lucideChevronRight [attr.size]="14"></svg>
                 </button>
               </div>
             </div>
@@ -632,13 +649,17 @@
             <!-- Right Artwork / Singers Visual -->
             <div class="hero-visual-panel">
               <div class="hero-visual-glow" [style.background]="currentHeroSlide().ambientGlow"></div>
-              <img *ngFor="let slide of heroSlides; let i = index"
-                   [src]="slide.image"
-                   [alt]="slide.lang + ' Top Artists'"
-                   class="hero-singer-cutout"
-                   [class.active]="currentHeroSlideIndex() === i"
-                   [attr.loading]="i === 0 ? 'eager' : 'lazy'"
-                   decoding="async">
+              <div class="hero-visual-images">
+                <img *ngFor="let slide of computedHeroSlides(); let i = index"
+                     [src]="slide.image"
+                     [alt]="slide.lang + ' Top Artists'"
+                     class="hero-singer-cutout"
+                     [class.active]="currentHeroSlideIndex() === i"
+                     (error)="onHeroImageError(slide, i, $event)"
+                     [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                     decoding="async">
+              </div>
+              <div class="hero-visual-overlay"></div>
             </div>
           </div>
 
@@ -651,14 +672,18 @@
           </button>
 
           <!-- Bottom Indicator Dots / Progress Bars -->
-          <div class="hero-indicators">
-            <button *ngFor="let slide of heroSlides; let i = index"
+          <div class="hero-indicators" [class.paused]="isHeroPaused()">
+            <button *ngFor="let slide of computedHeroSlides(); let i = index"
                     class="hero-indicator-dot"
                     [class.active]="currentHeroSlideIndex() === i"
                     (click)="goToHeroSlide(i)"
                     [attr.aria-label]="'Go to ' + slide.lang + ' slide'"
                     type="button">
-              <span class="indicator-bar" [style.background]="currentHeroSlideIndex() === i ? slide.accentColor : ''"></span>
+              <span class="indicator-track">
+                <span class="indicator-fill" 
+                      *ngIf="currentHeroSlideIndex() === i"
+                      [style.background]="slide.accentColor || 'linear-gradient(90deg, #a855f7, #ec4899)'"></span>
+              </span>
             </button>
           </div>
         </div>

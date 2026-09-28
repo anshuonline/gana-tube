@@ -76,6 +76,7 @@ export interface HeroSlide {
   accentColor: string;
   ambientGlow: string;
   buttonText?: string;
+  buttonLink?: string;
 }
 
 @Component({
@@ -294,22 +295,55 @@ export class App implements OnInit {
   private heroTouchStartX = 0;
   private heroTouchStartY = 0;
 
-  currentHeroSlide = computed(() => {
-    const idx = this.currentHeroSlideIndex();
-    const defaultSlide = this.heroSlides[idx] || this.heroSlides[0];
-    const custom = this.heroData()[defaultSlide.lang];
-    if (custom) {
-      return {
-        ...defaultSlide,
-        badge: custom.badge || defaultSlide.badge,
-        title: custom.title || defaultSlide.title,
-        subtitle: custom.subtitle || defaultSlide.subtitle,
-        image: custom.imageUrl || defaultSlide.image,
-        buttonText: custom.buttonText || defaultSlide.buttonText || 'Listen Now'
-      };
-    }
-    return defaultSlide;
+  computedHeroSlides = computed(() => {
+    const heroDataMap = this.heroData() || {};
+    return this.heroSlides.map(slide => {
+      // Find matching key case-insensitively
+      const customKey = Object.keys(heroDataMap).find(
+        k => k.toLowerCase() === slide.lang.toLowerCase()
+      );
+      const custom = customKey ? heroDataMap[customKey] : undefined;
+      if (custom) {
+        const customImg = this.formatHeroImageUrl(custom.imageUrl);
+        return {
+          ...slide,
+          badge: custom.badge || slide.badge,
+          title: custom.title || slide.title,
+          subtitle: custom.subtitle || slide.subtitle,
+          image: customImg || slide.image,
+          buttonText: custom.buttonText || slide.buttonText || 'Listen Now',
+          buttonLink: custom.buttonLink || ''
+        };
+      }
+      return slide;
+    });
   });
+
+  currentHeroSlide = computed(() => {
+    const slides = this.computedHeroSlides();
+    const idx = this.currentHeroSlideIndex();
+    return slides[idx] || slides[0];
+  });
+
+  formatHeroImageUrl(url?: string): string {
+    if (!url || typeof url !== 'string' || !url.trim()) return '';
+    const trimmed = url.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('//') || trimmed.startsWith('data:')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('/uploads/') || trimmed.startsWith('uploads/')) {
+      const cleanPath = trimmed.startsWith('/') ? trimmed : '/' + trimmed;
+      return `https://manageads.ganatube.in${cleanPath}`;
+    }
+    return trimmed;
+  }
+
+  onHeroImageError(slide: HeroSlide, index: number, event: Event): void {
+    const defaultSlide = this.heroSlides[index];
+    if (defaultSlide && (event.target as HTMLImageElement).src !== defaultSlide.image) {
+      (event.target as HTMLImageElement).src = defaultSlide.image;
+    }
+  }
 
   // Playlists State
   customPlaylists = signal<PlaylistMeta[]>([]);
@@ -1598,6 +1632,14 @@ export class App implements OnInit {
     this.router.navigate(['/profile']);
   }
 
+  goBack(): void {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/']);
+    }
+  }
+
   openAdvertisePage(): void {
     this.router.navigate(['/home']);
     this.isSearchMode.set(false);
@@ -2222,8 +2264,20 @@ export class App implements OnInit {
 
   fetchHeroData(): void {
     this.youtubeApi.getAppInitHeader().subscribe(data => {
-      if (data && typeof data === 'object' && !Array.isArray(data)) {
+      if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) {
         this.heroData.set(data);
+      } else {
+        // Direct fetch fallback in case app_init didn't contain custom_header
+        const apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') 
+          ? 'http://localhost/manageads/managegt-api.php' 
+          : 'https://manageads.ganatube.in/managegt-api.php';
+        this.http.get<any>(`${apiUrl}?action=get_header&t=${Date.now()}`).pipe(
+          catchError(() => of({}))
+        ).subscribe(directData => {
+          if (directData && typeof directData === 'object' && !Array.isArray(directData) && Object.keys(directData).length > 0) {
+            this.heroData.set(directData);
+          }
+        });
       }
     });
   }
@@ -3112,8 +3166,16 @@ export class App implements OnInit {
   explorePlaylist(lang: string): void {
     const dynamic = this.heroData()[lang];
     if (dynamic?.buttonLink) {
-      const link = dynamic.buttonLink;
-      if (link.startsWith('http')) {
+      const link = dynamic.buttonLink.trim();
+      const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+      if (link.startsWith('http://') || link.startsWith('https://')) {
+        try {
+          const urlObj = new URL(link);
+          if (urlObj.hostname === 'ganatube.in' || urlObj.hostname === 'www.ganatube.in' || (currentOrigin && urlObj.origin === currentOrigin)) {
+            this.router.navigateByUrl(urlObj.pathname + urlObj.search + urlObj.hash);
+            return;
+          }
+        } catch (e) {}
         window.open(link, '_blank');
       } else {
         this.router.navigateByUrl(link);
@@ -3153,18 +3215,21 @@ export class App implements OnInit {
 
   nextHeroSlide(userTriggered = true): void {
     if (userTriggered) this.resetHeroTimer();
-    const nextIdx = (this.currentHeroSlideIndex() + 1) % this.heroSlides.length;
+    const slides = this.computedHeroSlides();
+    const nextIdx = (this.currentHeroSlideIndex() + 1) % slides.length;
     this.currentHeroSlideIndex.set(nextIdx);
   }
 
   prevHeroSlide(): void {
     this.resetHeroTimer();
-    const prevIdx = (this.currentHeroSlideIndex() - 1 + this.heroSlides.length) % this.heroSlides.length;
+    const slides = this.computedHeroSlides();
+    const prevIdx = (this.currentHeroSlideIndex() - 1 + slides.length) % slides.length;
     this.currentHeroSlideIndex.set(prevIdx);
   }
 
   goToHeroSlide(index: number): void {
-    if (index >= 0 && index < this.heroSlides.length) {
+    const slides = this.computedHeroSlides();
+    if (index >= 0 && index < slides.length) {
       this.resetHeroTimer();
       this.currentHeroSlideIndex.set(index);
     }
@@ -3172,7 +3237,8 @@ export class App implements OnInit {
 
   selectHeroSlide(index: number): void {
     this.goToHeroSlide(index);
-    const targetSlide = this.heroSlides[index];
+    const slides = this.computedHeroSlides();
+    const targetSlide = slides[index];
     if (targetSlide && targetSlide.lang !== this.homeScreenLanguage()) {
       this.setLanguage(targetSlide.lang);
     }

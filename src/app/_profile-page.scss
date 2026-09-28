@@ -1,11 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@1,400;1,600&display=swap');
+
 /* --- PROFILE PAGE (Ambient Black / White / Purple / Pink) --- */
 .profile-page-container {
   position: relative;
   max-width: 100%;
   margin: 0;
-  padding: 48px 0 40px;
+  padding: 16px 0 40px;
   animation: fadeIn 0.4s ease;
   overflow-x: clip;
+
+  @media (min-width: 768px) {
+    padding: 20px 0 40px;
+  }
 }
 
 /* --- Ambient Background Glows --- */
@@ -49,58 +55,195 @@
 
 .profile-banner {
   width: 100%;
-  aspect-ratio: 21 / 9;
-  max-height: 240px;
-  background-size: cover;
-  background-position: center;
+  min-height: 240px;
+  max-height: 280px;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
-
-  .banner-tint {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(115deg, rgba(139, 92, 246, 0.28) 0%, rgba(0, 0, 0, 0.1) 45%, rgba(236, 72, 153, 0.26) 100%);
-    mix-blend-mode: screen;
-  }
-}
-
-.banner-bg-1 {
-  background-image: url('../assets/images/profile-bg-1.jpg');
-}
-
-.banner-bg-2 {
-  background-image: url('../assets/images/profile-bg-2.jpg');
-}
-
-.change-banner-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: white;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  border-radius: 20px;
+  /* Ultra-luxurious AMOLED dark canvas with subtle vignette */
+  background: radial-gradient(ellipse at 50% 30%, #150d24 0%, #0a0714 55%, #040407 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+
+  @media (max-width: 768px) {
+    min-height: 200px;
+    max-height: 230px;
+    border-radius: 16px;
+  }
+}
+
+/* Back Navigation Button */
+.profile-back-nav-btn {
+  position: absolute;
+  top: 18px;
+  left: 20px;
   z-index: 10;
-  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  svg {
+    transition: transform 0.25s ease;
+  }
 
   &:hover {
-    background: rgba(139, 92, 246, 0.35);
-    border-color: rgba(139, 92, 246, 0.6);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateX(-3px);
+
+    svg {
+      transform: translateX(-2px);
+    }
   }
+
+  &:active {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 768px) {
+    top: 12px;
+    left: 12px;
+    padding: 5px 12px;
+    font-size: 0.74rem;
+  }
+}
+
+/* Ambient Nebula Mesh Orbs */
+.profile-banner-mesh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+
+  .mesh-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(75px);
+    pointer-events: none;
+
+    &.orb-1 {
+      width: 380px;
+      height: 260px;
+      top: -40px;
+      left: 10%;
+      background: radial-gradient(circle, rgba(147, 51, 234, 0.28) 0%, transparent 70%);
+    }
+
+    &.orb-2 {
+      width: 420px;
+      height: 280px;
+      top: -20px;
+      right: 15%;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.22) 0%, transparent 70%);
+    }
+
+    &.orb-3 {
+      width: 320px;
+      height: 200px;
+      bottom: 0;
+      left: 35%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%);
+    }
+  }
+}
+
+/* Calligraphy Typography Centerpiece */
+.profile-calligraphy-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 24px;
+  pointer-events: none;
+  z-index: 2;
+  user-select: none;
+}
+
+.calligraphy-script-text {
+  font-family: 'Great Vibes', 'Playfair Display', 'Dancing Script', 'Brush Script MT', cursive;
+  font-size: clamp(3.2rem, 9vw, 6.2rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.65) 0%, 
+    rgba(216, 180, 254, 0.5) 35%, 
+    rgba(244, 114, 182, 0.45) 70%, 
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 24px rgba(168, 85, 247, 0.35));
+  white-space: nowrap;
+  animation: calligraphyFloat 6s ease-in-out infinite alternate;
+
+  @media (max-width: 768px) {
+    font-size: clamp(2.6rem, 11vw, 3.8rem);
+  }
+}
+
+@keyframes calligraphyFloat {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+.calligraphy-sub-flourish {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -4px;
+  opacity: 0.6;
+
+  .flourish-line {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.6), transparent);
+
+    @media (max-width: 768px) {
+      width: 40px;
+    }
+  }
+
+  .flourish-sparkle {
+    font-size: 0.75rem;
+    color: #f472b6;
+    text-shadow: 0 0 10px rgba(244, 114, 182, 0.8);
+  }
+}
+
+.banner-bottom-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, #000000);
+  pointer-events: none;
+  z-index: 3;
 }
 
 .profile-header-content {
