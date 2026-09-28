@@ -1158,46 +1158,37 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  /* Ultra-smooth cinematic fade out on left: 0% at left edge, feathered blend into center, 100% solid on right */
+  /* Continuous smooth fade: no flat zones, gradual ramp from fully transparent to fully opaque */
   mask-image: linear-gradient(
     to right,
-    transparent 0%,
-    transparent 8%,
-    rgba(0, 0, 0, 0.05) 18%,
-    rgba(0, 0, 0, 0.18) 28%,
-    rgba(0, 0, 0, 0.45) 42%,
-    rgba(0, 0, 0, 0.76) 58%,
-    rgba(0, 0, 0, 0.95) 74%,
-    rgba(0, 0, 0, 1) 85%,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.03) 10%,
+    rgba(0, 0, 0, 0.08) 20%,
+    rgba(0, 0, 0, 0.16) 30%,
+    rgba(0, 0, 0, 0.3) 40%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.7) 60%,
+    rgba(0, 0, 0, 0.88) 72%,
+    rgba(0, 0, 0, 1) 84%,
     rgba(0, 0, 0, 1) 100%
   );
   -webkit-mask-image: linear-gradient(
     to right,
-    transparent 0%,
-    transparent 8%,
-    rgba(0, 0, 0, 0.05) 18%,
-    rgba(0, 0, 0, 0.18) 28%,
-    rgba(0, 0, 0, 0.45) 42%,
-    rgba(0, 0, 0, 0.76) 58%,
-    rgba(0, 0, 0, 0.95) 74%,
-    rgba(0, 0, 0, 1) 85%,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.03) 10%,
+    rgba(0, 0, 0, 0.08) 20%,
+    rgba(0, 0, 0, 0.16) 30%,
+    rgba(0, 0, 0, 0.3) 40%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.7) 60%,
+    rgba(0, 0, 0, 0.88) 72%,
+    rgba(0, 0, 0, 1) 84%,
     rgba(0, 0, 0, 1) 100%
   );
 }
 
 .hero-visual-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  /* Only gentle top and bottom vignette for UI controls - NO opaque black color on the left to avoid hard bands */
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.32) 0%,
-    transparent 20%,
-    transparent 80%,
-    rgba(0, 0, 0, 0.42) 100%
-  );
+  display: none;
 }
 
 .hero-singer-cutout {
