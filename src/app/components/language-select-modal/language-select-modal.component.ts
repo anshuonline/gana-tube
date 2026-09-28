@@ -27,18 +27,13 @@ export class LanguageSelectModalComponent implements OnInit {
   activeLanguage = signal<string>('Hindi');
 
   languages: LanguageOption[] = [
-    { code: 'Hindi', native: 'हिन्दी', subtitle: 'Bollywood & Indie Pop', badge: 'Most Popular', isPopular: true },
-    { code: 'English', native: 'English', subtitle: 'Global & Pop Hits', badge: 'Global', isPopular: true },
-    { code: 'Punjabi', native: 'ਪੰਜਾਬੀ', subtitle: 'Bhangra & Pop Beats', badge: 'Trending', isPopular: true },
-    { code: 'Bhojpuri', native: 'भोजपुरी', subtitle: 'Viral Dance & Folk', badge: 'Trending', isPopular: true },
-    { code: 'Haryanvi', native: 'हरियाणवी', subtitle: 'Desi Ragni & Beats', badge: 'Popular', isPopular: true },
-    { code: 'Bengali', native: 'বাংলা', subtitle: 'Rabindra & Modern Melodies', isPopular: true },
-    { code: 'Tamil', native: 'தமிழ்', subtitle: 'Kollywood & Melodies', badge: 'Popular', isPopular: true },
-    { code: 'Telugu', native: 'తెలుగు', subtitle: 'Tollywood Mass & Hits', badge: 'Trending', isPopular: true },
-    { code: 'Malayalam', native: 'മലയാളം', subtitle: 'Mollywood & Soulful Tunes' },
-    { code: 'Kannada', native: 'ಕನ್ನಡ', subtitle: 'Sandalwood & Grooves' },
-    { code: 'Marathi', native: 'मराठी', subtitle: 'Natya, Lavani & Beats' },
-    { code: 'Gujarati', native: 'ગુજરાતી', subtitle: 'Garba, Folk & Pop' }
+    { code: 'Hindi', native: 'हिन्दी', subtitle: 'Bollywood & Indie Pop' },
+    { code: 'English', native: 'English', subtitle: 'Global & Pop Hits' },
+    { code: 'Punjabi', native: 'ਪੰਜਾਬੀ', subtitle: 'Bhangra & Pop Beats' },
+    { code: 'Bhojpuri', native: 'भोजपुरी', subtitle: 'Viral Dance & Folk' },
+    { code: 'Haryanvi', native: 'हरियाणवी', subtitle: 'Desi Ragni & Beats' },
+    { code: 'Bengali', native: 'বাংলা', subtitle: 'Rabindra & Modern Melodies' },
+    { code: 'Tamil', native: 'தமிழ்', subtitle: 'Kollywood & Melodies' }
   ];
 
   ngOnInit(): void {
@@ -81,7 +76,7 @@ export class LanguageSelectModalComponent implements OnInit {
   }
 
   resetToDefaults(): void {
-    this.selectedLanguages.set(['Hindi', 'English', 'Punjabi']);
+    this.selectedLanguages.set(['English', 'Hindi', 'Tamil', 'Punjabi']);
     this.activeLanguage.set('Hindi');
   }
 

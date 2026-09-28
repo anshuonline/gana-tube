@@ -187,7 +187,7 @@ export class App implements OnInit {
   currentQuery = '';
 
   // Language filter
-  availableLanguages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Haryanvi', 'Bengali', 'Tamil', 'Telugu', 'Malayalam', 'Kannada', 'Marathi', 'Gujarati'];
+  availableLanguages = ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi', 'Tamil'];
   homeScreenLanguage = signal<string>('Hindi');
   showLanguageModal = signal<boolean>(false);
   isMobileView = signal<boolean>(false);
