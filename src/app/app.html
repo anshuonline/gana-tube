@@ -780,7 +780,7 @@
           <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index; trackBy: shelfTrackBy">
             
             <!-- Standard Shelf Layout -->
-            <ng-container *ngIf="shelf.title !== 'Suggested for You'">
+            <ng-container *ngIf="!isSuggestedListLayout(shelf, shelfIdx)">
               <div class="shelf-header">
                 <h2 class="shelf-title">{{ getShelfDisplayTitle(shelf) }}</h2>
                 <div class="shelf-controls">
@@ -822,9 +822,9 @@
             </ng-container>
             
             <!-- Suggested for You List Layout (Hidden on Mobile) -->
-            <ng-container *ngIf="shelf.title === 'Suggested for You' && !isMobileView()">
+            <ng-container *ngIf="isSuggestedListLayout(shelf, shelfIdx)">
               <div class="shelf-header">
-                <h2 class="shelf-title">{{ shelf.title }}</h2>
+                <h2 class="shelf-title">{{ getShelfDisplayTitle(shelf) }}</h2>
               </div>
               <div class="suggested-list-grid">
                 <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8); trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">

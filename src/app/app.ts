@@ -476,7 +476,7 @@ export class App implements OnInit {
   allShelfDefinitions: ShelfDefinition[] = [];
 
   // Dynamic shelves signal holding loaded categories
-  loadedShelves = signal<Array<{ title: string; query: string; songs: YouTubeSearchResult[]; isMadeForYou?: boolean }>>([]);
+  loadedShelves = signal<Array<{ title: string; query: string; songs: YouTubeSearchResult[]; isMadeForYou?: boolean; language?: string }>>([]);
   shelvesLoading = signal<boolean>(true);
   shelfLoading = signal<boolean>(false);
   loadingShelfTitle = signal<string>('');
@@ -1022,16 +1022,22 @@ export class App implements OnInit {
     const title = shelf.title || '';
     if (shelf.isMadeForYou || title.toLowerCase().trim() === 'made for you' || title.toLowerCase().startsWith('made for ')) {
       const user = this.authService.currentUser();
+      const langSuffix = shelf.language && this.preferredLanguages().length > 1 ? ` (${shelf.language})` : '';
       if (!user) {
-        return 'Made for You';
+        return `Made for You${langSuffix}`;
       }
       const username = (this.userService.displayName() || user.displayName || (user.email ? user.email.split('@')[0] : '') || '').trim();
       if (!username || username.toLowerCase() === 'user' || username.toLowerCase() === 'guest') {
-        return 'Made for You';
+        return `Made for You${langSuffix}`;
       }
-      return `Made for ${username.length > 20 ? username.substring(0, 20) : username}`;
+      return `Made for ${username.length > 20 ? username.substring(0, 20) : username}${langSuffix}`;
     }
     return title;
+  }
+
+  isSuggestedListLayout(shelf: any, shelfIdx: number): boolean {
+    if (!shelf || !shelf.title) return false;
+    return shelfIdx === 0 && shelf.title.startsWith('Suggested for You') && !this.isMobileView();
   }
 
   togglePreferredLanguage(lang: string): void {
@@ -1043,12 +1049,17 @@ export class App implements OnInit {
         nextLangs = current.filter(l => l !== lang);
         this.preferredLanguages.set(nextLangs);
         if (this.homeScreenLanguage() === lang) {
-          this.setLanguage(nextLangs[0]);
+          this.homeScreenLanguage.set(nextLangs[0]);
         }
       }
     } else {
       nextLangs = [...current, lang];
       this.preferredLanguages.set(nextLangs);
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_preferred_languages', JSON.stringify(nextLangs));
+      localStorage.setItem('homeScreenLanguage', this.homeScreenLanguage());
     }
 
     // Sync to DB if logged in
@@ -1061,6 +1072,10 @@ export class App implements OnInit {
         recent_plays: this.userService.recentPlays(),
         listening_preferences: this.userService.listeningPreferences()
       });
+    }
+
+    if (this.currentPage() === 'home') {
+      this.loadInitialShelves();
     }
   }
 
@@ -1688,6 +1703,9 @@ export class App implements OnInit {
     if (this.searchBar) {
       this.searchBar.clearQuery();
     }
+    if (this.preferredLanguages().length > 1) {
+      this.loadInitialShelves();
+    }
   }
 
   setSearchFilter(filter: 'all' | 'songs' | 'albums' | 'playlists' | 'artists'): void {
@@ -2283,92 +2301,190 @@ export class App implements OnInit {
   }
 
   loadInitialShelves(language?: string): void {
-    const lang = language || this.homeScreenLanguage();
+    const targetLanguages: string[] = language 
+      ? [language] 
+      : (this.preferredLanguages().length > 0 ? [...this.preferredLanguages()] : [this.homeScreenLanguage()]);
+    const isMultiLang = targetLanguages.length > 1;
+    const primaryLang = language || this.homeScreenLanguage();
+
     this.shelvesLoading.set(true);
     this.shelfLoading.set(false);
     this.loadedShelves.set([]);
 
-    // Fetch dynamic YTMusic playlists for this language
-    this.youtubeApi.searchMusic(`${lang} top hit songs playlist`, 6, 'playlist').subscribe({
-      next: (results) => {
-        const mapped: PlaylistMeta[] = results.map(r => ({
-          id: r.videoId,
-          title: r.title,
-          language: lang,
-          coverImage: r.thumbnailHigh || r.thumbnail,
-          searchQueries: [],
-          creator: r.channelTitle
-        }));
-        this.ytPlaylistsForHome.set(mapped);
-      },
-      error: () => {
-        this.ytPlaylistsForHome.set([]);
-      }
-    });
+    // Fetch dynamic YTMusic playlists for home
+    if (isMultiLang) {
+      const perLangCount = Math.max(2, Math.floor(6 / targetLanguages.length));
+      const playlistObservables = targetLanguages.map(l =>
+        this.youtubeApi.searchMusic(`${l} top hit songs playlist`, perLangCount, 'playlist').pipe(
+          catchError(() => of([]))
+        )
+      );
+      forkJoin(playlistObservables).subscribe((resultsArr: YouTubeSearchResult[][]) => {
+        const allMapped: PlaylistMeta[] = [];
+        resultsArr.forEach((results, idx) => {
+          const l = targetLanguages[idx];
+          results.forEach(r => {
+            allMapped.push({
+              id: r.videoId,
+              title: r.title,
+              language: l,
+              coverImage: r.thumbnailHigh || r.thumbnail,
+              searchQueries: [],
+              creator: r.channelTitle
+            });
+          });
+        });
+        this.ytPlaylistsForHome.set(allMapped);
+      });
+    } else {
+      this.youtubeApi.searchMusic(`${targetLanguages[0]} top hit songs playlist`, 6, 'playlist').subscribe({
+        next: (results) => {
+          const mapped: PlaylistMeta[] = results.map(r => ({
+            id: r.videoId,
+            title: r.title,
+            language: targetLanguages[0],
+            coverImage: r.thumbnailHigh || r.thumbnail,
+            searchQueries: [],
+            creator: r.channelTitle
+          }));
+          this.ytPlaylistsForHome.set(mapped);
+        },
+        error: () => {
+          this.ytPlaylistsForHome.set([]);
+        }
+      });
+    }
 
-    // Fetch algorithmic dynamic shelves
+    // Fetch algorithmic dynamic shelves for each target language
     this.displayedVideoIds.clear();
-    this.algorithmService.getVariableRewardShelves(lang).subscribe(algorithmicShelves => {
-      if (language && language !== this.homeScreenLanguage()) return;
-      
-      // Fetch custom sections created by Admin in ManageGT
-      this.youtubeApi.getCustomSections().subscribe((customData) => {
+
+    const algoObservables = targetLanguages.map(l =>
+      this.algorithmService.getVariableRewardShelves(l).pipe(
+        catchError(err => {
+          console.error(`Failed to get algorithm shelves for ${l}:`, err);
+          return of([]);
+        })
+      )
+    );
+
+    forkJoin({
+      algoShelvesResults: forkJoin(algoObservables),
+      customData: this.youtubeApi.getCustomSections().pipe(
+        catchError(err => {
+          console.error('Failed to get custom sections:', err);
+          return of({});
+        })
+      )
+    }).subscribe({
+      next: ({ algoShelvesResults, customData }) => {
         if (language && language !== this.homeScreenLanguage()) return;
-        
-        const langCustomSections: any[] = customData[lang] || [];
-        
-        // Convert Custom Sections to ShelfDefinition format for the UI
-        const customShelves: ShelfDefinition[] = langCustomSections.map(cs => ({
-          title: cs.title,
-          query: '', // We already have the songs, no need to query
-          songs: cs.songs,
-          type: 'custom',
-          isMadeForYou: cs.title.toLowerCase().trim() === 'made for you' || cs.title.toLowerCase().startsWith('made for ')
-        }));
 
-        // Extract 'Trending' and 'Suggested for You' correctly
-        const trendingShelf = algorithmicShelves.length > 0 ? [algorithmicShelves[0]] : [];
-        const suggestedShelf = algorithmicShelves.length > 1 ? [algorithmicShelves[1]] : [];
-        const restOfAlgorithmicShelves = algorithmicShelves.length > 2 ? algorithmicShelves.slice(2) : [];
+        const shelvesByLanguage: ShelfDefinition[][] = [];
 
-        // Save a reference to all pool songs for offline suggestions
-        const offlinePool = customShelves.flatMap(s => s.songs || []);
-        
-        // Populate offline suggestions directly in 'Suggested for You' to avoid API call
-        if (suggestedShelf.length > 0 && offlinePool.length > 0) {
-          // Keep track of recently suggested to avoid repeats
-          let recentSuggested: string[] = [];
-          try {
-            recentSuggested = JSON.parse(localStorage.getItem('gt_recent_suggested') || '[]');
-          } catch(e) {}
-          
-          // Filter out recently suggested songs to give fresh recommendations
-          let freshPool = offlinePool.filter(s => !recentSuggested.includes(s.videoId));
-          if (freshPool.length < 10) {
-            freshPool = offlinePool; // Reset if we run out of fresh songs
-            recentSuggested = [];
+        targetLanguages.forEach((l, lIdx) => {
+          const algoShelves = (algoShelvesResults[lIdx] || []).map(s => ({ ...s }));
+          const langCustomSections: any[] = (customData as Record<string, any[]>)[l] || [];
+
+          // Convert Custom Sections to ShelfDefinition format
+          const customShelves: ShelfDefinition[] = langCustomSections.map(cs => {
+            let shelfTitle = cs.title;
+            if (isMultiLang) {
+              const hasLang = shelfTitle.toLowerCase().includes(l.toLowerCase()) ||
+                              (l.toLowerCase() === 'hindi' && shelfTitle.toLowerCase().includes('bollywood'));
+              if (!hasLang) {
+                shelfTitle = `${shelfTitle} (${l})`;
+              }
+            }
+            return {
+              title: shelfTitle,
+              query: '',
+              songs: cs.songs,
+              type: 'custom' as const,
+              language: l,
+              isMadeForYou: cs.title.toLowerCase().trim() === 'made for you' || cs.title.toLowerCase().startsWith('made for ')
+            };
+          });
+
+          // Extract 'Trending' and 'Suggested for You'
+          const trendingShelf = algoShelves.length > 0 ? [algoShelves[0]] : [];
+          const suggestedShelf = algoShelves.length > 1 ? [algoShelves[1]] : [];
+          const restOfAlgorithmicShelves = algoShelves.length > 2 ? algoShelves.slice(2) : [];
+
+          // If multiple languages, tag algorithmic titles with language name
+          if (isMultiLang) {
+            if (trendingShelf.length > 0) {
+              trendingShelf[0].title = `${trendingShelf[0].title} (${l})`;
+              trendingShelf[0].language = l;
+            }
+            if (suggestedShelf.length > 0) {
+              suggestedShelf[0].title = `${suggestedShelf[0].title} (${l})`;
+              suggestedShelf[0].language = l;
+            }
+            restOfAlgorithmicShelves.forEach(s => {
+              s.title = `${s.title} (${l})`;
+              s.language = l;
+            });
+          } else {
+            if (trendingShelf.length > 0) trendingShelf[0].language = l;
+            if (suggestedShelf.length > 0) suggestedShelf[0].language = l;
+            restOfAlgorithmicShelves.forEach(s => { s.language = l; });
           }
-          
-          // Shuffle and pick top 15
-          const shuffledPool = [...freshPool].sort(() => 0.5 - Math.random()).slice(0, 15);
-          
-          // Save new batch to recent
-          const newRecent = [...recentSuggested, ...shuffledPool.map(s => s.videoId)].slice(-50); // Keep last 50
-          try {
-            localStorage.setItem('gt_recent_suggested', JSON.stringify(newRecent));
-          } catch(e) { console.warn('localStorage full'); }
 
-          suggestedShelf[0].songs = shuffledPool;
-          suggestedShelf[0].type = 'custom'; // Mark as custom so it doesn't fetch
+          // Populate offline suggestions directly in 'Suggested for You' to avoid API call
+          const offlinePool = customShelves.flatMap(s => s.songs || []);
+          if (suggestedShelf.length > 0 && offlinePool.length > 0) {
+            let recentSuggested: string[] = [];
+            try {
+              recentSuggested = JSON.parse(localStorage.getItem(`gt_recent_suggested_${l}`) || '[]');
+            } catch(e) {}
+
+            let freshPool = offlinePool.filter(s => !recentSuggested.includes(s.videoId));
+            if (freshPool.length < 10) {
+              freshPool = offlinePool;
+              recentSuggested = [];
+            }
+
+            const shuffledPool = [...freshPool].sort(() => 0.5 - Math.random()).slice(0, 15);
+            const newRecent = [...recentSuggested, ...shuffledPool.map(s => s.videoId)].slice(-50);
+            try {
+              localStorage.setItem(`gt_recent_suggested_${l}`, JSON.stringify(newRecent));
+            } catch(e) {}
+
+            suggestedShelf[0].songs = shuffledPool;
+            suggestedShelf[0].type = 'custom';
+          }
+
+          shelvesByLanguage.push([
+            ...trendingShelf,
+            ...suggestedShelf,
+            ...restOfAlgorithmicShelves,
+            ...customShelves
+          ]);
+        });
+
+        // Assemble allShelfDefinitions
+        if (!isMultiLang) {
+          this.allShelfDefinitions = shelvesByLanguage[0] || [];
+        } else {
+          // Multi-language: Interleave and shuffle across selected languages
+          const maxShelves = Math.max(...shelvesByLanguage.map(arr => arr.length), 0);
+          const interleaved: ShelfDefinition[] = [];
+
+          for (let r = 0; r < maxShelves; r++) {
+            const round: ShelfDefinition[] = [];
+            for (let langIdx = 0; langIdx < targetLanguages.length; langIdx++) {
+              if (shelvesByLanguage[langIdx] && shelvesByLanguage[langIdx][r]) {
+                round.push(shelvesByLanguage[langIdx][r]);
+              }
+            }
+            // Shuffle round order to balance language exposure dynamically
+            const shuffledRound = round.sort(() => 0.5 - Math.random());
+            interleaved.push(...shuffledRound);
+          }
+
+          this.allShelfDefinitions = interleaved;
         }
 
-        this.allShelfDefinitions = [
-          ...trendingShelf,
-          ...suggestedShelf,
-          ...restOfAlgorithmicShelves,
-          ...customShelves
-        ];
-        
         const initialDefinitions = this.allShelfDefinitions.slice(0, 7);
         let loadedCount = 0;
 
@@ -2377,100 +2493,102 @@ export class App implements OnInit {
           return;
         }
 
-      initialDefinitions.forEach((def) => {
-        if (def.songs && def.songs.length > 0) {
-          // Custom section, already has songs!
-          
-          let dedupedSongs = def.songs.filter(s => {
-            if (!s || !s.videoId) return false;
-            // Never deduplicate custom shelves, always show what the admin curated
-            if (def.type === 'custom') return true;
-            
-            if (this.displayedVideoIds.has(s.videoId)) return false;
-            this.displayedVideoIds.add(s.videoId);
-            return true;
-          });
-          
-          this.loadedShelves.update(shelvesList => {
-            // Guard against duplicate sections (e.g. after PWA resume)
-            if (shelvesList.some(s => s.title === def.title)) return shelvesList;
-            const updated = [...shelvesList];
-            updated.push({ title: def.title, query: def.query, songs: dedupedSongs, isMadeForYou: def.isMadeForYou });
-            return updated.sort((a, b) => {
-              const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
-              const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
-              return idxA - idxB;
+        initialDefinitions.forEach((def) => {
+          if (def.songs && def.songs.length > 0) {
+            let dedupedSongs = def.songs.filter(s => {
+              if (!s || !s.videoId) return false;
+              if (def.type === 'custom') return true;
+              if (this.displayedVideoIds.has(s.videoId)) return false;
+              this.displayedVideoIds.add(s.videoId);
+              return true;
             });
-          });
-          loadedCount++;
-          if (loadedCount >= initialDefinitions.length) {
-            this.shelvesLoading.set(false);
-          }
-        } else {
-          // Algorithmic shelf, needs fetching
-          const fetchObservable = def.type === 'trending' 
-            ? this.youtubeApi.getTrendingMusic(lang, 12)
-            : this.youtubeApi.searchMusic(def.query, 15);
 
-          fetchObservable.subscribe({
-            next: (songs) => {
-              if (language && language !== this.homeScreenLanguage()) {
-                // Stale callback, just increment count to prevent hanging if it was the current one somehow
-                loadedCount++;
-                if (loadedCount >= initialDefinitions.length) {
-                  this.shelvesLoading.set(false);
-                }
-                return; 
-              }
-              
-              if (songs && songs.length > 0) {
-                if (def.title === 'Suggested for You') {
-                  songs = songs.sort(() => 0.5 - Math.random());
-                }
-                
-                let dedupedSongs = songs.filter(s => {
-                  if (!s || !s.videoId) return false;
-                  if (def.type === 'custom') return true;
-                  if (this.displayedVideoIds.has(s.videoId)) return false;
-                  this.displayedVideoIds.add(s.videoId);
-                  return true;
-                });
-                
-                this.loadedShelves.update(shelvesList => {
-                  // Guard against duplicate sections (e.g. after PWA resume)
-                  if (shelvesList.some(s => s.title === def.title)) return shelvesList;
-                  const updated = [...shelvesList];
-                  updated.push({ title: def.title, query: def.query, songs: dedupedSongs, isMadeForYou: def.isMadeForYou });
-                  return updated.sort((a, b) => {
-                    const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
-                    const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
-                    return idxA - idxB;
-                  });
-                });
-              }
-              loadedCount++;
-              if (loadedCount >= initialDefinitions.length) {
-                this.shelvesLoading.set(false);
-              }
-            },
-            error: (err) => {
-              console.error(`Failed to load shelf: ${def.title}`, err);
-              if (language && language !== this.homeScreenLanguage()) {
-                loadedCount++;
-                if (loadedCount >= initialDefinitions.length) {
-                  this.shelvesLoading.set(false);
-                }
-                return;
-              }
-              loadedCount++;
-              if (loadedCount >= initialDefinitions.length) {
-                this.shelvesLoading.set(false);
-              }
+            this.loadedShelves.update(shelvesList => {
+              if (shelvesList.some(s => s.title === def.title)) return shelvesList;
+              const updated = [...shelvesList];
+              updated.push({
+                title: def.title,
+                query: def.query,
+                songs: dedupedSongs,
+                isMadeForYou: def.isMadeForYou,
+                language: def.language
+              });
+              return updated.sort((a, b) => {
+                const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
+                const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
+                return idxA - idxB;
+              });
+            });
+            loadedCount++;
+            if (loadedCount >= initialDefinitions.length) {
+              this.shelvesLoading.set(false);
             }
-          });
-        }
-      });
-    });
+          } else {
+            const shelfLang = def.language || primaryLang;
+            const fetchObservable = def.type === 'trending'
+              ? this.youtubeApi.getTrendingMusic(shelfLang, 12)
+              : this.youtubeApi.searchMusic(def.query, 15);
+
+            fetchObservable.subscribe({
+              next: (songs) => {
+                if (language && language !== this.homeScreenLanguage()) {
+                  loadedCount++;
+                  if (loadedCount >= initialDefinitions.length) {
+                    this.shelvesLoading.set(false);
+                  }
+                  return;
+                }
+
+                if (songs && songs.length > 0) {
+                  if (def.title.startsWith('Suggested for You')) {
+                    songs = songs.sort(() => 0.5 - Math.random());
+                  }
+
+                  let dedupedSongs = songs.filter(s => {
+                    if (!s || !s.videoId) return false;
+                    if (def.type === 'custom') return true;
+                    if (this.displayedVideoIds.has(s.videoId)) return false;
+                    this.displayedVideoIds.add(s.videoId);
+                    return true;
+                  });
+
+                  this.loadedShelves.update(shelvesList => {
+                    if (shelvesList.some(s => s.title === def.title)) return shelvesList;
+                    const updated = [...shelvesList];
+                    updated.push({
+                      title: def.title,
+                      query: def.query,
+                      songs: dedupedSongs,
+                      isMadeForYou: def.isMadeForYou,
+                      language: def.language
+                    });
+                    return updated.sort((a, b) => {
+                      const idxA = this.allShelfDefinitions.findIndex(d => d.title === a.title);
+                      const idxB = this.allShelfDefinitions.findIndex(d => d.title === b.title);
+                      return idxA - idxB;
+                    });
+                  });
+                }
+                loadedCount++;
+                if (loadedCount >= initialDefinitions.length) {
+                  this.shelvesLoading.set(false);
+                }
+              },
+              error: (err) => {
+                console.error(`Failed to load shelf: ${def.title}`, err);
+                loadedCount++;
+                if (loadedCount >= initialDefinitions.length) {
+                  this.shelvesLoading.set(false);
+                }
+              }
+            });
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load home shelves:', err);
+        this.shelvesLoading.set(false);
+      }
     });
   }
 
@@ -2479,30 +2597,28 @@ export class App implements OnInit {
       return;
     }
 
-    // Title-based pending list — immune to section insertions (e.g. 'Recently Played')
     const loadedTitles = new Set(this.loadedShelves().map(s => s.title));
     const pendingDefs = this.allShelfDefinitions.filter(d => !loadedTitles.has(d.title));
     if (pendingDefs.length === 0 || this.loadedShelves().length >= this.allShelfDefinitions.length) {
       return;
     }
 
-    // Load 3 shelves at a time for smoother lazy loading
     const batchSize = 3;
     const nextDefs = pendingDefs.slice(0, batchSize);
     
-    this.loadingShelfTitle.set(nextDefs[0].title + (nextDefs.length > 1 ? ' & more...' : ''));
+    this.loadingShelfTitle.set(this.getShelfDisplayTitle(nextDefs[0]) + (nextDefs.length > 1 ? ' & more...' : ''));
     this.shelfLoading.set(true);
 
     const observables = nextDefs.map(def => {
       if (def.songs && def.songs.length > 0) {
         return of(def.songs);
       } else {
+        const shelfLang = def.language || language || this.homeScreenLanguage();
         const fetchObservable = def.type === 'trending'
-          ? this.youtubeApi.getTrendingMusic(language || this.homeScreenLanguage(), 12)
+          ? this.youtubeApi.getTrendingMusic(shelfLang, 12)
           : this.youtubeApi.searchMusic(def.query, 15);
 
         return fetchObservable.pipe(
-          // Catch errors for individual shelf loads so the whole batch doesn't fail
           catchError((err: any) => {
             console.error(`Failed to load shelf: ${def.title}`, err);
             return of(null);
@@ -2514,46 +2630,44 @@ export class App implements OnInit {
     forkJoin(observables).subscribe({
       next: (results: any[]) => {
         if (language && language !== this.homeScreenLanguage()) {
-           return; // Ignore stale callback
+           return;
         }
         const newShelves: any[] = [];
-      results.forEach((songs: any, index: number) => {
-        if (songs && songs.length > 0) {
-          
-          if (nextDefs[index].title === 'Suggested for You') {
-            songs = songs.sort(() => 0.5 - Math.random());
-          }
-          
-          let dedupedSongs = songs.filter((s: any) => {
-            if (!s || !s.videoId) return false;
-            if (this.displayedVideoIds.has(s.videoId)) return false;
-            this.displayedVideoIds.add(s.videoId);
-            return true;
-          });
+        results.forEach((songs: any, index: number) => {
+          if (songs && songs.length > 0) {
+            if (nextDefs[index].title.startsWith('Suggested for You')) {
+              songs = songs.sort(() => 0.5 - Math.random());
+            }
+            
+            let dedupedSongs = songs.filter((s: any) => {
+              if (!s || !s.videoId) return false;
+              if (this.displayedVideoIds.has(s.videoId)) return false;
+              this.displayedVideoIds.add(s.videoId);
+              return true;
+            });
 
-          newShelves.push({
-            title: nextDefs[index].title,
-            query: nextDefs[index].query,
-            songs: dedupedSongs,
-            isMadeForYou: nextDefs[index].isMadeForYou
-          });
-        }
-      });    
+            newShelves.push({
+              title: nextDefs[index].title,
+              query: nextDefs[index].query,
+              songs: dedupedSongs,
+              isMadeForYou: nextDefs[index].isMadeForYou,
+              language: nextDefs[index].language
+            });
+          }
+        });    
         
         if (newShelves.length > 0) {
           this.loadedShelves.update(shelves => {
-            // Guard against duplicate sections
             const existing = new Set(shelves.map(s => s.title));
             const toAdd = newShelves.filter(s => !existing.has(s.title));
             return toAdd.length > 0 ? [...shelves, ...toAdd] : shelves;
           });
         }
         this.shelfLoading.set(false);
-        // Note: Automatic recursive loading removed to allow scroll-based lazy loading
       },
       error: (err: any) => {
         console.error('Failed to load shelf batch', err);
-        if (language && language !== this.homeScreenLanguage()) return; // Ignore stale callback
+        if (language && language !== this.homeScreenLanguage()) return;
         this.shelfLoading.set(false);
       }
     });
@@ -3118,7 +3232,19 @@ export class App implements OnInit {
       });
     }
 
-    this.setLanguage(targetLang);
+    const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === targetLang.toLowerCase());
+    if (slideIdx !== -1) {
+      this.currentHeroSlideIndex.set(slideIdx);
+    }
+
+    if (event.selected.length > 1) {
+      this.currentPage.set('home');
+      this.router.navigate(['/home']);
+      this.loadInitialShelves();
+    } else {
+      this.setLanguage(targetLang);
+    }
+
     this.toastService.success(`Preferences updated: ${event.selected.length} languages saved! 🎵`);
   }
 

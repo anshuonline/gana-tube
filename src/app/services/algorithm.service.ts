@@ -33,6 +33,7 @@ export interface ShelfDefinition {
   type?: 'search' | 'trending' | 'custom';
   songs?: YouTubeSearchResult[];
   isMadeForYou?: boolean;
+  language?: string;
 }
 
 @Injectable({
