@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, computed, inject, HostListener, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, computed, inject, HostListener, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl, Title, Meta } from '@angular/platform-browser';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
@@ -32,6 +32,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   songs = signal<YouTubeSearchResult[]>([]);
   displayLimit = signal<number>(20);
   displayedSongs = computed(() => this.songs().slice(0, this.displayLimit()));
+  hasMoreSongs = computed(() => this.displayLimit() < this.songs().length);
+  isLoadingMore = signal<boolean>(false);
   isLoading = signal<boolean>(true);
   isCopied = signal<boolean>(false);
   playlistAd = signal<SponsoredAd | null>(null);
@@ -41,6 +43,50 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   isLoadingSuggestions = signal<boolean>(false);
   suggestionQuery = signal<string>('');
   private suggestionAttempts = 0;
+
+  private observer: IntersectionObserver | null = null;
+  private sentinelElement: HTMLElement | null = null;
+
+  @ViewChild('playlistScrollSentinel') set sentinelRef(ref: ElementRef<HTMLElement> | undefined) {
+    if (ref && ref.nativeElement) {
+      this.sentinelElement = ref.nativeElement;
+      if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+        this.setupObserver(ref.nativeElement);
+      }
+    } else {
+      this.sentinelElement = null;
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+    }
+  }
+
+  private setupObserver(element: HTMLElement): void {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    this.observer = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) {
+        this.loadMoreSongs();
+      }
+    }, {
+      rootMargin: '0px 0px 600px 0px',
+      threshold: 0
+    });
+    this.observer.observe(element);
+  }
+
+  loadMoreSongs(): void {
+    if (this.isLoadingMore() || !this.hasMoreSongs()) return;
+    this.isLoadingMore.set(true);
+    setTimeout(() => {
+      const nextLimit = this.displayLimit() + 20;
+      this.displayLimit.set(nextLimit);
+      this.isLoadingMore.set(false);
+      this.fetchMissingDurations(this.displayedSongs());
+    }, 200);
+  }
 
   get canAddDirectly(): boolean {
     return (!!this.playlist?.is_owner || this.playlist?.id === 'liked-songs') && !this.playlist?.id?.startsWith('search-');
@@ -66,16 +112,23 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
 
   @HostListener('window:scroll')
   onScroll(): void {
-    const windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
-    const body = document.body;
-    const html = document.documentElement;
-    const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-    const windowBottom = windowHeight + window.pageYOffset;
-    
-    // If user scrolled to near the bottom (within 500px)
-    if (windowBottom >= docHeight - 500) {
-      if (this.displayLimit() < this.songs().length) {
-        this.displayLimit.update(limit => limit + 20);
+    if (!this.hasMoreSongs() || this.isLoadingMore()) return;
+
+    const sentinel = this.sentinelElement || (typeof document !== 'undefined' ? document.getElementById('playlistScrollSentinel') : null);
+    if (sentinel) {
+      const rect = sentinel.getBoundingClientRect();
+      const windowHeight = window.innerHeight || (document.documentElement ? document.documentElement.clientHeight : 800);
+      if (rect.top <= windowHeight + 600) {
+        this.loadMoreSongs();
+      }
+    } else if (typeof document !== 'undefined') {
+      const dropList = document.querySelector('.songs-drop-list');
+      if (dropList) {
+        const rect = dropList.getBoundingClientRect();
+        const windowHeight = window.innerHeight || (document.documentElement ? document.documentElement.clientHeight : 800);
+        if (rect.bottom <= windowHeight + 600) {
+          this.loadMoreSongs();
+        }
       }
     }
   }
@@ -102,6 +155,10 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
     this.destroy$.next();
     this.destroy$.complete();
     if (this.originalTitle) {
@@ -156,6 +213,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   safePlaylistAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('playlist_in_feed_banner'));
 
   loadSongs(): void {
+    this.displayLimit.set(20);
+    this.isLoadingMore.set(false);
     if (this.playlist.preloadedSongs && this.playlist.preloadedSongs.length > 0) {
       // Check if they are legacy dummy songs (Unknown Title)
       const hasDummies = this.playlist.preloadedSongs.some(s => s.title === 'Unknown Title');

@@ -187,8 +187,8 @@ export class App implements OnInit {
   currentQuery = '';
 
   // Language filter
-  availableLanguages = ['English', 'Hindi', 'Punjabi', 'Bhojpuri', 'Bengali', 'Haryanvi', 'Tamil'];
-  homeScreenLanguage = signal<string>('English');
+  availableLanguages = ['Hindi', 'English', 'Punjabi', 'Bhojpuri', 'Haryanvi', 'Bengali', 'Tamil', 'Telugu', 'Malayalam', 'Kannada', 'Marathi', 'Gujarati'];
+  homeScreenLanguage = signal<string>('Hindi');
   showLanguageModal = signal<boolean>(false);
   isMobileView = signal<boolean>(false);
 
@@ -1764,11 +1764,30 @@ export class App implements OnInit {
     // Detect mobile view
     this.isMobileView.set(window.innerWidth <= 768);
 
-    // Auto-show language select popup on mobile every session
-    if (this.isMobileView()) {
+    // Load saved preferred languages from localStorage if available
+    if (typeof localStorage !== 'undefined') {
+      const savedPrefs = localStorage.getItem('gt_preferred_languages');
+      if (savedPrefs) {
+        try {
+          const parsed = JSON.parse(savedPrefs);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.preferredLanguages.set(parsed);
+            this.userService.preferredLanguages.set(parsed);
+          }
+        } catch (e) {}
+      }
+    }
+
+    // Auto-show language select popup on first visit / session (PC and Mobile)
+    const hasPrompted = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('gt_lang_prompt_shown') : null;
+    const hasConfigured = typeof localStorage !== 'undefined' ? localStorage.getItem('gt_languages_configured') : null;
+    if (!hasPrompted && !hasConfigured) {
       setTimeout(() => {
         if (this.currentPage() === 'home' && !this.isSearchMode() && !this.hasSearched()) {
           this.showLanguageModal.set(true);
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem('gt_lang_prompt_shown', 'true');
+          }
         }
       }, 1500);
     }
@@ -2874,6 +2893,40 @@ export class App implements OnInit {
   onLanguageSelect(lang: string): void {
     this.closeLanguageModal();
     this.setLanguage(lang);
+  }
+
+  onLanguagesSaved(event: { selected: string[]; active: string }): void {
+    this.closeLanguageModal();
+    if (!event.selected || event.selected.length === 0) return;
+
+    this.preferredLanguages.set(event.selected);
+    this.userService.preferredLanguages.set(event.selected);
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_preferred_languages', JSON.stringify(event.selected));
+      localStorage.setItem('gt_languages_configured', 'true');
+      if (event.active) {
+        localStorage.setItem('homeScreenLanguage', event.active);
+      }
+    }
+
+    const targetLang = event.selected.includes(event.active) ? event.active : event.selected[0];
+    this.homeScreenLanguage.set(targetLang);
+
+    // Save to Database if user is logged in
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      this.userService.syncProfile({
+        email: user.email,
+        preferred_languages: event.selected,
+        liked_songs: this.userService.likedSongs(),
+        recent_plays: this.userService.recentPlays(),
+        listening_preferences: this.userService.listeningPreferences()
+      });
+    }
+
+    this.setLanguage(targetLang);
+    this.toastService.success(`Preferences updated: ${event.selected.length} languages saved! 🎵`);
   }
 
   getHeroImage(lang: string): string {

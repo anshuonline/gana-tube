@@ -129,6 +129,30 @@
         </div>
       </ng-container>
       </div>
+
+      <!-- Loading More Songs Spinner -->
+      <div class="playlist-loading-more" 
+           id="playlistScrollSentinel" 
+           #playlistScrollSentinel 
+           *ngIf="hasMoreSongs()" 
+           (click)="loadMoreSongs()">
+        <div class="spinner-small"></div>
+        <div class="loading-more-text">
+          <span class="loading-more-title">
+            {{ isLoadingMore() ? 'Loading next tracks...' : 'Scroll for more tracks' }}
+          </span>
+          <span class="loading-more-count">
+            Showing {{ displayedSongs().length }} of {{ songs().length }} songs
+          </span>
+        </div>
+      </div>
+
+      <!-- All Loaded Indicator -->
+      <div class="playlist-all-loaded" *ngIf="!isLoading() && songs().length > 20 && !hasMoreSongs()">
+        <span class="all-loaded-line"></span>
+        <span class="all-loaded-text">All {{ songs().length }} songs loaded</span>
+        <span class="all-loaded-line"></span>
+      </div>
     </div>
 
     <!-- Suggested Songs Section -->
