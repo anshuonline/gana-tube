@@ -85,20 +85,7 @@ export class PlayerService {
   }
 
   private resolveAutoQuality(): void {
-    if (typeof navigator === 'undefined') return;
-    const conn = (navigator as any).connection;
-    if (!conn) return;
-    const type = conn.effectiveType || '4g';
-    const downlink = typeof conn.downlink === 'number' ? conn.downlink : 10;
-    let q: 'Data Saver' | 'Standard' | 'High' | 'Max' = 'High';
-    if (type === 'slow-2g' || type === '2g') {
-      q = 'Data Saver';
-    } else if (type === '3g') {
-      q = 'Standard';
-    } else if (downlink >= 10) {
-      q = 'Max';
-    }
-    this.effectiveQuality.set(q);
+    // Deprecated since Auto mode is removed
   }
 
   // Signals for state management
@@ -126,20 +113,17 @@ export class PlayerService {
   /** Tracks how many songs have been initiated/played in the current session */
   songsPlayedCount = signal<number>(0);
 
-  // Audio Quality (Default to 'Standard' / Low for fast buffering and instant playback)
-  musicQuality = signal<'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'>(
+  // Audio Quality (Default to 'Standard')
+  musicQuality = signal<'Low' | 'Standard' | 'Best'>(
     (() => {
-      const valid = ['Auto', 'Data Saver', 'Standard', 'High', 'Max'] as const;
+      const valid = ['Low', 'Standard', 'Best'] as const;
       const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('gt_music_quality') : null;
-      return valid.includes(saved as any) ? (saved as 'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max') : 'Standard';
+      return valid.includes(saved as any) ? (saved as 'Low' | 'Standard' | 'Best') : 'Standard';
     })()
   );
 
-  // Network-resolved quality used when musicQuality is 'Auto'
-  private effectiveQuality = signal<'Data Saver' | 'Standard' | 'High' | 'Max'>('Standard');
-  resolvedQuality = computed<'Data Saver' | 'Standard' | 'High' | 'Max'>(() => {
-    const q = this.musicQuality();
-    return q === 'Auto' ? this.effectiveQuality() : (q as 'Data Saver' | 'Standard' | 'High' | 'Max');
+  resolvedQuality = computed<'Low' | 'Standard' | 'Best'>(() => {
+    return this.musicQuality();
   });
 
   // Computed signal for the current track
@@ -726,21 +710,19 @@ export class PlayerService {
     }
   }
 
-  setMusicQuality(quality: 'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'): void {
+  setMusicQuality(quality: 'Low' | 'Standard' | 'Best'): void {
     this.musicQuality.set(quality);
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('gt_music_quality', quality);
     }
     // Change quality of currently playing video
     if (this.ytPlayer && this.ytPlayer.setPlaybackQuality) {
-      const q = quality === 'Auto' ? this.effectiveQuality() : quality;
       const qMap = {
-        'Data Saver': 'small',
+        'Low': 'small',
         'Standard': 'medium',
-        'High': 'hd720',
-        'Max': 'hd2160'
+        'Best': 'hd720'
       };
-      this.ytPlayer.setPlaybackQuality(qMap[q]);
+      this.ytPlayer.setPlaybackQuality(qMap[quality]);
     }
   }
 

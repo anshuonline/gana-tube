@@ -1660,7 +1660,7 @@ export class App implements OnInit {
     this.isSearchMode.set(false);
   }
 
-  setMusicQuality(quality: 'Auto' | 'Data Saver' | 'Standard' | 'High' | 'Max'): void {
+  setMusicQuality(quality: 'Low' | 'Standard' | 'Best'): void {
     this.playerService.setMusicQuality(quality);
   }
 

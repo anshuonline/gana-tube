@@ -744,6 +744,15 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .q-rec {
+    font-size: 0.65rem;
+    color: rgba(168, 85, 247, 0.9); /* Purple tint */
+    font-weight: 500;
+  }
 
   &:hover {
     background: rgba(255,255,255,0.08);

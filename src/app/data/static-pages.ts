@@ -21,12 +21,12 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <p>Once installed, GanaTube will launch as a standalone application without the browser interface, providing a more immersive experience.</p>
 
         <h4>3. Creating an Account (Optional)</h4>
-        <p>GanaTube is 100% free and you can start listening immediately without signing up. However, utilizing the optional Google Login unlocks essential features:</p>
+        <p>GanaTube is 100% free and you can start listening immediately without signing up. However, utilizing the optional Secure Social Login unlocks essential features:</p>
         <ul class="feature-list">
           <li><strong>Cross-Device Sync:</strong> Your Liked Songs, custom playlists, and listening history will sync seamlessly across all your devices.</li>
           <li><strong>Personalized Recommendations:</strong> Over time, the app learns your preferences to curate better discovery playlists.</li>
         </ul>
-        <p>Simply click the "Login with Google" button. We only request basic profile information and do not post on your behalf or access your personal data.</p>
+        <p>Simply click the "Login with Authentication Provider" button. We only request basic profile information and do not post on your behalf or access your personal data.</p>
 
         <h3>Core Playback Features</h3>
         <h4>The Player Interface</h4>
@@ -34,7 +34,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <ul class="feature-list">
           <li><strong>Standard Controls:</strong> Play, pause, skip forward, skip backward.</li>
           <li><strong>Loop & Shuffle:</strong> Repeat a single track, repeat the queue, or shuffle your current list.</li>
-          <li><strong>Audio Quality Selector:</strong> Tap the settings gear to choose between High, Standard, or Data Saver modes depending on your internet connection.</li>
+          <li><strong>Audio Quality Selector:</strong> Tap the settings gear to choose between Best or Smart modes depending on your internet connection.</li>
           <li><strong>Lyrics (Where Available):</strong> Sing along with synchronized lyrics accessible directly from the player.</li>
         </ul>
 
@@ -86,7 +86,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <li><strong>Smart Algorithmic Queuing:</strong> Our intelligent engine auto-generates infinite, perfectly tailored queues based on the track, artist, or genre you are currently enjoying. The music never has to stop.</li>
           <li><strong>Car Mode:</strong> A simplified, high-contrast interface with massive buttons designed specifically for safe operation while driving.</li>
           <li><strong>Minimize Mode:</strong> A floating mini-player that lets you navigate the app, search, and manage playlists without losing sight or control of the current track.</li>
-          <li><strong>Music Quality Selector:</strong> Optimize your data usage. Choose between High Quality (for Wi-Fi and audiophiles), Standard, and Data Saver modes (perfect for poor network conditions or limited mobile data plans).</li>
+          <li><strong>Music Quality Selector:</strong> Optimize your data usage. Choose between Best Quality (for Wi-Fi and audiophiles), and Smart mode (perfect for poor network conditions or limited mobile data plans).</li>
         </ul>
 
         <h3>Seamless Integration & Technology</h3>
@@ -100,7 +100,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <ul class="feature-list">
           <li><strong>Language-Based dynamic UI:</strong> Select your preferred regional languages (Hindi, Punjabi, Tamil, Telugu, Bhojpuri, English, etc.) and watch the homepage transform with customized recommendations, trending tracks, and editorial playlists specific to your choices.</li>
           <li><strong>Listen Together Rooms:</strong> Generate a unique room link, share it with friends, and enjoy synchronized, collaborative listening sessions. Anyone can add to the queue.</li>
-          <li><strong>Cross-Device Sync (Google Login):</strong> Optionally log in with Google to ensure your Liked Songs, custom created playlists, and listening history are instantly available on your phone, tablet, and PC.</li>
+          <li><strong>Cross-Device Sync (Secure Social Login):</strong> Optionally log in with Authentication Provider to ensure your Liked Songs, custom created playlists, and listening history are instantly available on your phone, tablet, and PC.</li>
           <li><strong>Curated Editorial Playlists:</strong> Expertly crafted playlists for every mood, activity, and genre, updated regularly.</li>
           <li><strong>Advanced Search Filters:</strong> Don't just search; find. Filter your queries specifically by Artists, Albums, Songs, or Playlists to cut through the noise.</li>
         </ul>
@@ -133,14 +133,14 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <div class="faq-item">
           <h3>3. Where does GanaTube get its music?</h3>
-          <p>GanaTube acts as a highly optimized, custom interface. We utilize official third-party APIs (primarily the YouTube API) to source and stream audio content. We do not host, store, or distribute any copyrighted audio files on our own servers. We simply provide a superior player experience for publicly available streams.</p>
+          <p>GanaTube acts as a highly optimized, custom interface. We utilize official third-party APIs (primarily licensed third-party APIs) to source and stream audio content. We do not host, store, or distribute any copyrighted audio files on our own servers. We simply provide a superior player experience for publicly available streams.</p>
         </div>
 
 
 
         <div class="faq-item">
           <h3>6. Do I need to create an account?</h3>
-          <p>No, an account is entirely optional. You can use almost all features anonymously. However, if you want your Liked Songs and custom playlists to sync between your phone and your computer, you will need to log in using the optional Google Login.</p>
+          <p>No, an account is entirely optional. You can use almost all features anonymously. However, if you want your Liked Songs and custom playlists to sync between your phone and your computer, you will need to log in using the optional Secure Social Login.</p>
         </div>
 
         <div class="faq-item">
@@ -165,7 +165,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <div class="faq-item">
           <h3>11. How can I save cellular data while streaming?</h3>
-          <p>Open the player settings (gear icon) and change the Music Quality from "High" or "Standard" to "Data Saver". This streams the audio at a lower bitrate, consuming significantly less mobile data.</p>
+          <p>Open the player settings (gear icon) and change the Music Quality to "Smart". This streams the audio at a lower bitrate, consuming significantly less mobile data.</p>
         </div>
 
 
@@ -227,7 +227,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         </ul>
 
         <h3>The Tech Behind the Magic</h3>
-        <p>GanaTube does not operate massive server farms hosting petabytes of copyrighted MP3s. Instead, we are an incredibly lightweight, lightning-fast client built with Angular. We utilize public APIs (primarily the YouTube API) to dynamically fetch and stream audio data on the fly. By acting as a sophisticated, beautifully designed wrapper around existing public infrastructure, we keep our operating costs low, which allows us to pass the savings (100% free usage) entirely to you.</p>
+        <p>GanaTube does not operate massive server farms hosting petabytes of copyrighted MP3s. Instead, we are an incredibly lightweight, lightning-fast client built with Angular. We utilize public APIs (primarily licensed third-party APIs) to dynamically fetch and stream audio data on the fly. By acting as a sophisticated, beautifully designed wrapper around existing public infrastructure, we keep our operating costs low, which allows us to pass the savings (100% free usage) entirely to you.</p>
 
         <p>Join us on this journey. Install the app, build your playlists, and let the music play.</p>
       </div>
@@ -249,7 +249,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <h4>1.1 Information Provided by You</h4>
         <ul class="feature-list">
-          <li><strong>Account Information (Optional):</strong> If you choose to log in using our Google Single Sign-On (SSO) integration, we receive basic profile information provided by Google. This includes your name, email address, and profile picture. We use this strictly to authenticate you and sync your library across devices. We do not have access to your Google password.</li>
+          <li><strong>Account Information (Optional):</strong> If you choose to log in using our Secure Single Sign-On (SSO) integration, we receive basic profile information provided by Authentication Provider. This includes your name, email address, and profile picture. We use this strictly to authenticate you and sync your library across devices. We do not have access to your Authentication Provider password.</li>
           <li><strong>Communications:</strong> If you contact us directly via support@ganatube.in, we will collect your email address, the contents of your message, and any attachments you provide.</li>
         </ul>
 
@@ -271,9 +271,9 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>3. Data Sharing and Disclosure</h3>
         <p><strong>We do not sell, rent, or trade your personal information to third parties.</strong> We only share information in the following limited circumstances:</p>
         <ul class="feature-list">
-          <li><strong>Advertising Partners (Google AdSense):</strong> We partner with Google AdSense to display visual advertisements. Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to our website or other websites. You may opt out of personalized advertising at any time by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Ads Settings</a>.</li>
+          <li><strong>Advertising Partners (Authentication Provider AdSense):</strong> We partner with Authentication Provider AdSense to display visual advertisements. Third-party vendors, including Authentication Provider, use cookies to serve ads based on a user's prior visits to our website or other websites. You may opt out of personalized advertising at any time by visiting <a href="https://adssettings.Authentication Provider.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Authentication Provider Ads Settings</a>.</li>
           <li><strong>Service Providers:</strong> We may employ third-party companies (e.g., cloud hosting providers, analytics services) to facilitate our Service. These third parties have access to your Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</li>
-          <li><strong>API Partners (YouTube API Services):</strong> GanaTube utilizes official YouTube API Services to power its search and streaming experience. By using our Service, you acknowledge and agree that your data is accessed and processed in accordance with the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Privacy Policy</a> and the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">YouTube Terms of Service</a>.</li>
+          <li><strong>API Partners:</strong> GanaTube utilizes licensed third-party APIs to power its search and streaming experience. By using our Service, you acknowledge and agree that your data is accessed and processed in accordance with the <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Privacy Policies of our Content Providers</a> and the <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Terms of Service of our Content Providers</a>.</li>
           <li><strong>Legal Requirements:</strong> We may disclose your information if required to do so by law or in response to valid requests by public authorities (e.g., a court or a government agency).</li>
         </ul>
 
@@ -282,7 +282,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <ul class="feature-list">
           <li><strong>Access & Portability:</strong> Request a copy of the personal information we hold about you.</li>
           <li><strong>Rectification & Deletion:</strong> Request that we correct inaccuracies or completely delete your account data and saved playlists.</li>
-          <li><strong>Opt-Out of Personalized Ads:</strong> Manage your ad preferences via <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Ads Settings</a>.</li>
+          <li><strong>Opt-Out of Personalized Ads:</strong> Manage your ad preferences via <a href="https://adssettings.Authentication Provider.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Authentication Provider Ads Settings</a>.</li>
         </ul>
         <p>To exercise any of these rights, please email us directly at <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a>.</p>
 
@@ -314,8 +314,8 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users, and others who access or use the Service. By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.</p>
 
         <h3>1. Description of Service & Third-Party APIs</h3>
-        <p>GanaTube is an independent media player and content discovery application. The Service acts as an interface that allows users to search for, organize, and stream publicly available media content sourced from third-party platforms via their official Application Programming Interfaces (APIs), primarily the official YouTube API Services. GanaTube does not host, upload, or control any of the audio content accessed through the Service.</p>
-        <p><strong>By accessing or using GanaTube, you expressly agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">YouTube Terms of Service</a> and acknowledge the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Privacy Policy</a>.</strong></p>
+        <p>GanaTube is an independent media player and content discovery application. The Service acts as an interface that allows users to search for, organize, and stream publicly available media content sourced from third-party platforms via their official Application Programming Interfaces (APIs), primarily the licensed third-party APIs. GanaTube does not host, upload, or control any of the audio content accessed through the Service.</p>
+        <p><strong>By accessing or using GanaTube, you expressly agree to be bound by the <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Terms of Service of our Content Providers</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Privacy Policies of our Content Providers</a>.</strong></p>
 
         <h3>2. Acceptable Use</h3>
         <p>You agree not to use the Service in any way that causes, or may cause, damage to the Service or impairment of the availability or accessibility of the Service; or in any way which is unlawful, illegal, fraudulent, or harmful. Specifically, you agree NOT to:</p>
@@ -328,10 +328,10 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
 
         <h3>3. Intellectual Property and Third-Party Content</h3>
         <p>The Service, including its original code, design, interface, and branding (excluding the third-party audio and video content streamed through it), are and will remain the exclusive property of GanaTube and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of GanaTube.</p>
-        <p>All audio content, video streams, album artwork, and metadata streamed via the Service belong to their respective copyright holders. GanaTube accesses this content through official public APIs in full compliance with third-party developer terms, including the YouTube API Services Developer Policies. GanaTube claims no ownership over this third-party content. If you are a copyright holder and believe your content is being inappropriately accessed, please refer to our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>.</p>
+        <p>All audio content, video streams, album artwork, and metadata streamed via the Service belong to their respective copyright holders. GanaTube accesses this content through official public APIs in full compliance with third-party developer terms, including licensed third-party APIs Services Developer Policies. GanaTube claims no ownership over this third-party content. If you are a copyright holder and believe your content is being inappropriately accessed, please refer to our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>.</p>
 
         <h3>4. User Accounts</h3>
-        <p>While using GanaTube does not require an account, you may opt to log in via Google SSO. When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service. You are responsible for safeguarding the password (managed by Google) that you use to access the Service.</p>
+        <p>While using GanaTube does not require an account, you may opt to log in via Authentication Provider SSO. When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service. You are responsible for safeguarding the password (managed by your authentication provider) that you use to access the Service.</p>
 
         <h3>5. Termination</h3>
         <p>We may terminate or suspend access to our Service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. All provisions of the Terms which by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
@@ -372,14 +372,14 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <ul class="feature-list">
           <li><strong>Player State:</strong> Storing current track queue, playback timestamps, repeat/shuffle status, and volume level so playback does not restart upon navigation.</li>
           <li><strong>User Interface Preferences:</strong> Saving your language selections, audio quality settings, and AMOLED dark mode preferences.</li>
-          <li><strong>Authentication:</strong> Preserving login sessions securely if you sign in with Google SSO.</li>
+          <li><strong>Authentication:</strong> Preserving login sessions securely if you sign in with Authentication Provider SSO.</li>
         </ul>
 
-        <h4>B. Advertising & Third-Party Cookies (Google AdSense)</h4>
-        <p>GanaTube uses third-party advertising partners, including <strong>Google AdSense</strong>, to help support the cost of running a free, uninterrupted streaming service:</p>
+        <h4>B. Advertising & Third-Party Cookies (Authentication Provider AdSense)</h4>
+        <p>GanaTube uses third-party advertising partners, including <strong>Authentication Provider AdSense</strong>, to help support the cost of running a free, uninterrupted streaming service:</p>
         <ul class="feature-list">
-          <li><strong>Third-Party Vendor Cookies:</strong> Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to ganatube.in or other websites.</li>
-          <li><strong>Personalized Advertising:</strong> Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our sites and/or other sites on the Internet.</li>
+          <li><strong>Third-Party Vendor Cookies:</strong> Third-party vendors, including Authentication Provider, use cookies to serve ads based on a user's prior visits to ganatube.in or other websites.</li>
+          <li><strong>Personalized Advertising:</strong> Authentication Provider's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our sites and/or other sites on the Internet.</li>
           <li><strong>Non-Personalized Ads Option:</strong> In regions where applicable, non-personalized advertising cookies may be used for frequency capping, aggregated ad reporting, and fraud prevention.</li>
         </ul>
 
@@ -389,7 +389,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <h3>3. How You Can Control and Opt Out of Cookies</h3>
         <p>You have the full right to decide whether to accept or reject cookies:</p>
         <ul class="feature-list">
-          <li><strong>Opting Out of Google Personalized Ads:</strong> You can opt out of personalized advertising by visiting Google's official <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Ads Settings</a>.</li>
+          <li><strong>Opting Out of Authentication Provider Personalized Ads:</strong> You can opt out of personalized advertising by visiting Authentication Provider's official <a href="https://adssettings.Authentication Provider.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Authentication Provider Ads Settings</a>.</li>
           <li><strong>Third-Party Ad Network Opt-Out:</strong> You can also opt out of many third-party advertising cookies by visiting <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">aboutads.info/choices/</a> or <a href="https://www.youronlinechoices.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Your Online Choices</a>.</li>
           <li><strong>Browser Cookie Controls:</strong> You can modify your browser settings to decline or clear cookies. Please refer to your browser's help menu (Chrome, Safari, Firefox, Edge) for step-by-step instructions.</li>
         </ul>
@@ -442,16 +442,16 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
         <p><strong>Effective Date:</strong> September 20, 2026</p>
 
         <h3>1. Content Source and Third-Party APIs</h3>
-        <p>The GanaTube platform (accessible at ganatube.in) acts solely as a specialized media player interface and search directory. <strong>GanaTube does not host, upload, or store any audio files, music tracks, or copyrighted video streams on its servers.</strong> All multimedia content streamed through the Service is sourced dynamically via official third-party APIs, primarily the YouTube IFrame and Data APIs. By using GanaTube, users acknowledge that they are accessing third-party content in accordance with the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">YouTube Terms of Service</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Google Privacy Policy</a>.</p>
+        <p>The GanaTube platform (accessible at ganatube.in) acts solely as a specialized media player interface and search directory. <strong>GanaTube does not host, upload, or store any audio files, music tracks, or copyrighted video streams on its servers.</strong> All multimedia content streamed through the Service is sourced dynamically via official third-party APIs, primarily the official third-party content delivery APIs. By using GanaTube, users acknowledge that they are accessing third-party content in accordance with the <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Terms of Service of our Content Providers</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Privacy Policies of our Content Providers</a>.</p>
 
         <h3>2. Copyright Infringement and Liability</h3>
-        <p>Because GanaTube does not control the content uploaded to or hosted on third-party networks, we cannot be held liable for copyright claims or external content. We do not exercise editorial control over metadata, album artwork, or audio streams provided through public APIs. All legal claims or takedown notices regarding the underlying media must be directed to the source host (YouTube/Google LLC) or submitted via our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>. Removal from the source platform automatically and permanently removes the content from GanaTube.</p>
+        <p>Because GanaTube does not control the content uploaded to or hosted on third-party networks, we cannot be held liable for copyright claims or external content. We do not exercise editorial control over metadata, album artwork, or audio streams provided through public APIs. All legal claims or takedown notices regarding the underlying media must be directed to the source host (the respective source host) or submitted via our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>. Removal from the source platform automatically and permanently removes the content from GanaTube.</p>
 
         <h3>3. Service Availability and Performance</h3>
         <p>The GanaTube service is provided on an "as is" and "as available" basis. While we strive to maintain 100% uptime, the functionality of the platform relies heavily on the availability and stability of third-party APIs. If these underlying APIs change their structure, experience downtime, or restrict our access, the GanaTube platform may temporarily or permanently lose functionality without prior notice. We make no guarantees regarding uninterrupted access, speed, or flawless operation.</p>
 
         <h3>4. Data Usage</h3>
-        <p>Users who utilize the platform on mobile networks are solely responsible for any data charges incurred. While GanaTube provides a "Data Saver" mode, audio streaming can consume significant bandwidth.</p>
+        <p>Users who utilize the platform on mobile networks are solely responsible for any data charges incurred. While GanaTube provides a "Smart" mode, audio streaming can consume significant bandwidth.</p>
 
         <h3>5. "Zero Audio Ads" Clarification</h3>
         <p>Our promise of "Zero Audio Ads" refers strictly to our commitment that GanaTube does not inject its own audio advertisements or interruptions into the user's listening experience. GanaTube is supported exclusively through non-intrusive visual display advertising on the website to cover server and bandwidth costs.</p>

@@ -243,11 +243,9 @@
               <p>Auto adapts quality to your network speed.</p>
             </div>
             <div class="setting-actions quality-selector">
-              <button class="q-btn" [class.active]="musicQuality() === 'Auto'" (click)="setMusicQuality('Auto')">Auto</button>
-              <button class="q-btn" [class.active]="musicQuality() === 'Data Saver'" (click)="setMusicQuality('Data Saver')">92k</button>
-              <button class="q-btn" [class.active]="musicQuality() === 'Standard'" (click)="setMusicQuality('Standard')">Low</button>
-              <button class="q-btn" [class.active]="musicQuality() === 'High'" (click)="setMusicQuality('High')">High</button>
-              <button class="q-btn" [class.active]="musicQuality() === 'Max'" (click)="setMusicQuality('Max')">Max</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Low'" (click)="setMusicQuality('Low')">Low</button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Standard'" (click)="setMusicQuality('Standard')">Standard <span class="q-rec">(Recommended)</span></button>
+              <button class="q-btn" [class.active]="musicQuality() === 'Best'" (click)="setMusicQuality('Best')">Best</button>
             </div>
           </div>
         </div>

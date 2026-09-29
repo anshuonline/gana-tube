@@ -108,10 +108,9 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       const q = this.playerService.resolvedQuality();
       let initW = '1';
       let initH = '1';
-      if (q === 'High') { initW = '1920'; initH = '1080'; }
+      if (q === 'Best') { initW = '1920'; initH = '1080'; }
       else if (q === 'Standard') { initW = '640'; initH = '360'; }
-      else if (q === 'Max') { initW = '2560'; initH = '1440'; }
-
+      else if (q === 'Low') { initW = '320'; initH = '240'; }
       for (let i = 0; i < this.totalPlayers; i++) {
         this.players[i] = new YT.Player(`yt-player-element-${i}`, {
           height: initH,
@@ -196,8 +195,7 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         let w = 1, h = 1;
         if (quality === 'hd720') { w = 1920; h = 1080; }
         else if (quality === 'medium') { w = 640; h = 360; }
-        else if (quality === 'hd2160') { w = 2560; h = 1440; }
-        
+        else if (quality === 'small') { w = 320; h = 240; }        
         this.players.forEach(player => {
           if (player && typeof player.setSize === 'function') {
             player.setSize(w, h);
@@ -233,10 +231,10 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private getSuggestedQuality(): string {
     const q = this.playerService.resolvedQuality();
-    if (q === 'Data Saver') return 'small';
+    if (q === 'Low') return 'small';
     if (q === 'Standard') return 'medium';
-    if (q === 'Max') return 'hd2160';
-    return 'hd720';
+    if (q === 'Best') return 'hd720';
+    return 'medium';
   }
 
   private applyVideoMode(on: boolean): void {
