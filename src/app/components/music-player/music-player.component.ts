@@ -143,15 +143,7 @@ import { CastService } from '../../services/cast.service';
       <!-- Center: Controls -->
       <div class="player-center">
         <div class="control-buttons">
-          <button
-            class="ctrl-btn secondary desktop-only"
-            [class.active-heart]="isCurrentTrackLiked()"
-            (click)="toggleLike($event)"
-            title="Like"
-            *ngIf="playerService.currentTrack() !== null"
-          >
-            <svg lucideHeart [attr.size]="20" [attr.fill]="isCurrentTrackLiked() ? 'currentColor' : 'none'"></svg>
-          </button>
+
           <button
             class="ctrl-btn secondary desktop-only"
             [class.active]="playerService.isShuffled()"
