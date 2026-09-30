@@ -212,28 +212,29 @@ import { CastService } from '../../services/cast.service';
         >
           <svg lucideListMusic [attr.size]="18"></svg>
         </button>
-        <button class="ctrl-btn secondary cast-btn" (click)="castService.requestCastSession(); $event.stopPropagation()" [class.active]="castService.isCasting()" [title]="castService.isCasting() ? 'Casting to ' + castService.connectedDeviceName() : 'Cast to TV or Speakers'">
-          <svg lucideCast [attr.size]="18"></svg>
-        </button>
         <button class="ctrl-btn secondary" (click)="copyShareLink()" title="Share Link">
           <svg lucideShare2 [attr.size]="18"></svg>
         </button>
-        <button class="ctrl-btn secondary" (click)="playerService.toggleMute()" title="Toggle Mute">
-          <svg *ngIf="playerService.isMuted() || playerService.volume() === 0" lucideVolumeX [attr.size]="18"></svg>
-          <svg *ngIf="!playerService.isMuted() && playerService.volume() > 0 && playerService.volume() < 50" lucideVolume1 [attr.size]="18"></svg>
-          <svg *ngIf="!playerService.isMuted() && playerService.volume() >= 50" lucideVolume2 [attr.size]="18"></svg>
-        </button>
-        <input
-          type="range"
-          class="volume-slider"
-          min="0"
-          max="100"
-          [value]="playerService.isMuted() ? 0 : playerService.volume()"
-          [class.zero-volume]="playerService.isMuted() || playerService.volume() === 0"
-          [style.background]="getVolumeBackground()"
-          (input)="onVolumeChange($event)"
-          title="Volume"
-        />
+        <div class="player-volume-group">
+          <button class="ctrl-btn secondary volume-icon-btn" (click)="playerService.toggleMute()" title="Toggle Mute">
+            <svg *ngIf="playerService.isMuted() || playerService.volume() === 0" lucideVolumeX [attr.size]="18"></svg>
+            <svg *ngIf="!playerService.isMuted() && playerService.volume() > 0 && playerService.volume() < 50" lucideVolume1 [attr.size]="18"></svg>
+            <svg *ngIf="!playerService.isMuted() && playerService.volume() >= 50" lucideVolume2 [attr.size]="18"></svg>
+          </button>
+          <div class="player-volume-slider-wrap">
+            <input
+              type="range"
+              class="volume-slider"
+              min="0"
+              max="100"
+              [value]="playerService.isMuted() ? 0 : playerService.volume()"
+              [class.zero-volume]="playerService.isMuted() || playerService.volume() === 0"
+              [style.background]="getVolumeBackground()"
+              (input)="onVolumeChange($event)"
+              title="Volume"
+            />
+          </div>
+        </div>
         <button class="ctrl-btn secondary maximize-btn" (click)="toggleFullScreen()" title="Expand Player">
           <svg lucideMaximize2 [attr.size]="18"></svg>
         </button>
