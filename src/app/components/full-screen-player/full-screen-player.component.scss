@@ -435,6 +435,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
   }
 }
 

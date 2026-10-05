@@ -52,11 +52,6 @@
         </div>
       </div>
 
-      <!-- Playing From text for Artwork View -->
-      <div class="fs-header-text" *ngIf="!isDesktop">
-        <span class="fs-now-playing">NOW PLAYING</span>
-        <span class="fs-source">{{ effectiveTrack()?.channelTitle }}</span>
-      </div>
 
       <div class="fs-header-right">
         <button class="icon-btn" title="Car Mode" (click)="openCarMode.emit()">
@@ -327,7 +322,7 @@
               {{ effectiveTrack()?.title || 'Not Playing' }}
             </span>
           </div>
-          <span class="fs-bar-artist track-transition" [title]="effectiveTrack()?.channelTitle" [class.track-changing]="isChanging">
+          <span class="fs-bar-artist track-transition" [title]="'View ' + (effectiveTrack()?.channelTitle || 'Artist')" [class.track-changing]="isChanging" (click)="goToArtist(effectiveTrack()?.channelTitle, $event)">
             {{ effectiveTrack()?.channelTitle || '---' }}
           </span>
         </div>

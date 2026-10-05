@@ -397,6 +397,21 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
+  goToArtist(artistName?: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (!artistName || artistName === '---') return;
+    let cleanName = artistName;
+    try {
+      while (cleanName.includes('%')) {
+        const decoded = decodeURIComponent(cleanName);
+        if (decoded === cleanName) break;
+        cleanName = decoded;
+      }
+    } catch {}
+    this.close();
+    this.router.navigate(['/artist', cleanName]);
+  }
+
   fetchSearch(query: string): void {
     if (this.searchSub) {
       this.searchSub.unsubscribe();

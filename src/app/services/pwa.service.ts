@@ -15,10 +15,12 @@ export class PwaService {
 
   private init() {
     if (typeof window !== 'undefined') {
-      // Check if already running as installed PWA
+      // Check if already running as installed PWA (standalone or fullscreen)
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || window.matchMedia('(display-mode: fullscreen)').matches
         || (window.navigator as any).standalone === true;
       this.isInstalledPWA.set(isStandalone);
+      this.setupAutoFullscreen();
 
       window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent the mini-infobar from appearing on mobile
@@ -37,6 +39,32 @@ export class PwaService {
         console.log('PWA was installed');
       });
     }
+  }
+
+  private setupAutoFullscreen() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const requestFs = () => {
+      if (!this.isInstalledPWA()) return;
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    };
+
+    // Immediate attempt if browser allows
+    requestFs();
+
+    // Interaction fallback for browsers enforcing user gesture
+    let triggered = false;
+    const onFirstUserAction = () => {
+      if (triggered) return;
+      triggered = true;
+      requestFs();
+    };
+
+    window.addEventListener('click', onFirstUserAction, { once: true, passive: true });
+    window.addEventListener('pointerdown', onFirstUserAction, { once: true, passive: true });
+    window.addEventListener('keydown', onFirstUserAction, { once: true, passive: true });
   }
 
   private toastService = inject(ToastService);

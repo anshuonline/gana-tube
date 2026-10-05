@@ -97,8 +97,30 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1">
     <link rel="shortcut icon" href="/favicon.ico?v=1">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GanaTube">
-    <link rel="manifest" href="/site.webmanifest?v=1">
+    <link rel="manifest" href="/site.webmanifest?v=2">
+    <!-- PWA Auto-Fullscreen without F11 -->
+    <script>
+      (function() {
+        var isPwa = window.matchMedia('(display-mode: standalone)').matches ||
+                    window.matchMedia('(display-mode: fullscreen)').matches ||
+                    window.navigator.standalone === true;
+        if (isPwa) {
+          var enterFullscreen = function() {
+            if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+              document.documentElement.requestFullscreen().catch(function() {});
+            }
+          };
+          enterFullscreen();
+          window.addEventListener('click', enterFullscreen, { once: true, passive: true });
+          window.addEventListener('pointerdown', enterFullscreen, { once: true, passive: true });
+          window.addEventListener('keydown', enterFullscreen, { once: true, passive: true });
+        }
+      })();
+    </script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -173,5 +195,5 @@
       });
       document.addEventListener('dragstart', event => event.preventDefault());
     </script>
-  <script src="main-L7VSYJKX.js" type="module"></script></body>
+  <script src="main-JZGSV26X.js" type="module"></script></body>
 </html>

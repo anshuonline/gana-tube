@@ -92,6 +92,18 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     return (!!this.playlist?.is_owner || this.playlist?.id === 'liked-songs') && !this.playlist?.id?.startsWith('search-');
   }
 
+  get displayTitle(): string {
+    let t = this.playlist?.title || '';
+    try {
+      while (t.includes('%')) {
+        const decoded = decodeURIComponent(t);
+        if (decoded === t) break;
+        t = decoded;
+      }
+    } catch {}
+    return t;
+  }
+
   private sanitizer = inject(DomSanitizer);
   private youtubeApi = inject(YoutubeApiService);
   public playerService = inject(PlayerService);
@@ -144,10 +156,10 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     this.originalDescription = this.metaService.getTag('name="description"')?.content || '';
     
     if (this.playlist) {
-      this.titleService.setTitle(`${this.playlist.title} - Listen on GanaTube`);
+      this.titleService.setTitle(`${this.displayTitle} - Listen on GanaTube`);
       this.metaService.updateTag({ 
         name: 'description', 
-        content: `Listen to ${this.playlist.title} ${this.playlist.language ? '- ' + this.playlist.language : ''} songs on GanaTube. Unlimited free music without audio ads.` 
+        content: `Listen to ${this.displayTitle} ${this.playlist.language ? '- ' + this.playlist.language : ''} songs on GanaTube. Unlimited free music without audio ads.` 
       });
       this.loadSongs();
     }

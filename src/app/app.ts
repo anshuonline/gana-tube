@@ -1281,8 +1281,7 @@ export class App implements OnInit {
       }
       
       if (url === 'playlist') {
-        let playlistId = event.urlAfterRedirects.split('/')[2] || '';
-        try { playlistId = decodeURIComponent(playlistId); } catch { /* keep raw segment */ }
+        let playlistId = this.safeDecode(event.urlAfterRedirects.split('/')[2] || '');
         if (playlistId === 'liked-songs') {
           this.openLikedSongs();
           return;
@@ -1296,7 +1295,8 @@ export class App implements OnInit {
           this.currentLoadingPlaylistId = playlistId; // Set tracking ID
           this.currentPage.set('playlist');
           this.selectedPlaylist.set(null);
-          this.loadingPageTitle.set(playlistId.startsWith('artist-') ? playlistId.replace('artist-', '') : 'Playlist');
+          const rawTitle = playlistId.startsWith('artist-') ? this.safeDecode(playlistId.replace('artist-', '')) : 'Playlist';
+          this.loadingPageTitle.set(rawTitle);
         }
 
         // 1. Check if already in allPlaylists()
@@ -1323,8 +1323,7 @@ export class App implements OnInit {
         } else if (playlistId) {
           if (playlistId.startsWith('artist-')) {
             if (!(this.currentPage() === 'playlist' && this.selectedPlaylist()?.id === playlistId)) {
-              let artistName = playlistId.replace('artist-', '');
-              try { artistName = decodeURIComponent(artistName); } catch { /* already raw */ }
+              let artistName = this.safeDecode(playlistId.replace('artist-', ''));
               this.openArtistPage(artistName, '');
             }
           } else if (playlistId.startsWith('pl_') || playlistId.startsWith('cp-')) {
@@ -1413,30 +1412,9 @@ export class App implements OnInit {
           const capitalizedLang = langParam.charAt(0).toUpperCase() + langParam.slice(1);
           if (this.availableLanguages.includes(capitalizedLang)) {
             this.homeScreenLanguage.set(capitalizedLang);
-            localStorage.setItem('homeScreenLanguage', capitalizedLang);
             const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === capitalizedLang.toLowerCase());
             if (slideIdx !== -1) {
               this.currentHeroSlideIndex.set(slideIdx);
-            }
-
-            // Put the selected language at the front of preferredLanguages
-            let currentPrefs = [...this.preferredLanguages()];
-            if (currentPrefs.includes(capitalizedLang)) {
-              currentPrefs = currentPrefs.filter(l => l !== capitalizedLang);
-            }
-            currentPrefs.unshift(capitalizedLang);
-            this.preferredLanguages.set(currentPrefs);
-
-            // Save to Database if user is logged in
-            const userEmail = this.authService.currentUser()?.email;
-            if (userEmail) {
-              this.userService.syncProfile({
-                email: userEmail,
-                preferred_languages: currentPrefs,
-                liked_songs: this.userService.likedSongs(),
-                recent_plays: this.userService.recentPlays(),
-                listening_preferences: this.userService.listeningPreferences()
-              });
             }
           }
           this.loadInitialShelves(capitalizedLang);
@@ -1450,7 +1428,7 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       } else if (url === 'artist') {
-        const artistParam = decodeURIComponent(event.urlAfterRedirects.split('/')[2] || '');
+        const artistParam = this.safeDecode(event.urlAfterRedirects.split('/')[2] || '');
         if (artistParam) {
           this.closeFullScreenPlayer();
           const targetId = `artist-${artistParam}`;
@@ -1578,7 +1556,7 @@ export class App implements OnInit {
             } else if (playlistId) {
               if (playlistId.startsWith('artist-')) {
                 if (!this.selectedPlaylist()) {
-                  this.openArtistPage(playlistId.replace('artist-', ''), '');
+                  this.openArtistPage(this.safeDecode(playlistId.replace('artist-', '')), '');
                 }
               } else {
                 const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
@@ -1749,8 +1727,22 @@ export class App implements OnInit {
     });
   }
 
+  safeDecode(val: string): string {
+    let res = val || '';
+    try {
+      while (res.includes('%')) {
+        const decoded = decodeURIComponent(res);
+        if (decoded === res) break;
+        res = decoded;
+      }
+    } catch {}
+    return res;
+  }
+
   openArtistPage(artistOrName: string, fallbackName: string = ''): void {
     if (!artistOrName) return;
+    artistOrName = this.safeDecode(artistOrName);
+    fallbackName = this.safeDecode(fallbackName);
     const looksLikeId = /^UC[\w-]{20,}$/.test(artistOrName);
     const displayName = fallbackName || (looksLikeId ? '' : artistOrName);
     const expectedId = looksLikeId ? `artist-${artistOrName}` : `artist-${displayName || artistOrName}`;
@@ -1764,6 +1756,7 @@ export class App implements OnInit {
     }
 
     const fallbackToArtistPlaylist = (artistName: string) => {
+      artistName = this.safeDecode(artistName);
       this.isLoading.set(true);
       if (artistName) this.loadingPageTitle.set(artistName);
       this.youtubeApi.searchMusic(artistName + ' songs', 40, 'song').pipe(takeUntil(this.destroy$)).subscribe({
@@ -1799,6 +1792,7 @@ export class App implements OnInit {
       const id = `artist-${artistId}`;
       this.currentLoadingPlaylistId = id;
       this.isLoading.set(true);
+      name = this.safeDecode(name);
       if (name) this.loadingPageTitle.set(name);
 
       this.youtubeApi.getArtist(artistId).pipe(takeUntil(this.destroy$)).subscribe({
@@ -1807,9 +1801,10 @@ export class App implements OnInit {
           this.isLoading.set(false);
 
           if (artist && artist.name && artist.songs && artist.songs.length > 0) {
+            const cleanTitle = this.safeDecode(artist.name || name || 'Artist');
             const playlistMeta: PlaylistMeta = {
               id: id,
-              title: artist.name || name || 'Artist',
+              title: cleanTitle,
               language: '',
               coverImage: artist.thumb || artist.songs[0]?.thumbnailHigh || artist.songs[0]?.thumbnail || 'ganatubenewlogo.png',
               preloadedSongs: artist.songs,
@@ -3418,12 +3413,16 @@ export class App implements OnInit {
 
   openPlaylist(playlist: PlaylistMeta): void {
     this.loadingPageTitle.set('');
+    if (playlist) {
+      if (playlist.title) playlist.title = this.safeDecode(playlist.title);
+      if (playlist.id) playlist.id = this.safeDecode(playlist.id);
+    }
     this.selectedPlaylist.set(playlist);
     this.currentPage.set('playlist');
     this.isSearchMode.set(false);
     
     const targetUrl = `/playlist/${encodeURIComponent(playlist.id)}`;
-    if (!this.router.url.includes(targetUrl)) {
+    if (!this.router.url.includes(targetUrl) && this.safeDecode(this.router.url) !== `/playlist/${playlist.id}`) {
       const isRedirect = this.router.url.includes('/artist/') || this.router.url.includes('/user/');
       this.router.navigate(['/playlist', playlist.id], { replaceUrl: isRedirect });
     }

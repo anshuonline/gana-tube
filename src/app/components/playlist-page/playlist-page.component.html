@@ -5,7 +5,7 @@
 
   <div class="playlist-header">
     <div class="playlist-cover-container">
-      <img *ngIf="playlist.id !== 'liked-songs'" [src]="playlist.coverImage" [alt]="playlist.title" class="playlist-cover" loading="eager" fetchpriority="high" width="300" height="300" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + playlist.title + '&background=random&color=fff&size=400'">
+      <img *ngIf="playlist.id !== 'liked-songs'" [src]="playlist.coverImage" [alt]="displayTitle" class="playlist-cover" loading="eager" fetchpriority="high" width="300" height="300" (error)="$event.target.src = 'https://ui-avatars.com/api/?name=' + displayTitle + '&background=random&color=fff&size=400'">
       
 
       <div *ngIf="playlist.id === 'liked-songs'" class="liked-songs-cover">
@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="playlist-info">
-      <h1 class="playlist-title">{{ playlist.title }}</h1>
+      <h1 class="playlist-title">{{ displayTitle }}</h1>
       <p class="playlist-meta">
         {{ playlist.creator ? playlist.creator : 'GanaTube Curated' }}
         <span *ngIf="playlist.is_public !== undefined"> • {{ playlist.is_public ? 'Public' : 'Private' }}</span>
@@ -164,8 +164,8 @@
             <span>RECOMMENDED</span>
           </div>
           <h2 class="suggested-title">Suggested Songs</h2>
-          <p class="suggested-subtitle" *ngIf="playlist.title">
-            Recommended based on tracks in <span>{{ playlist.title }}</span>
+          <p class="suggested-subtitle" *ngIf="displayTitle">
+            Recommended based on tracks in <span>{{ displayTitle }}</span>
           </p>
         </div>
         

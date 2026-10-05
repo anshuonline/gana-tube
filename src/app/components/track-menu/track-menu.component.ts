@@ -310,7 +310,15 @@ export class TrackMenuComponent implements OnChanges {
   goToArtist(artistName: string, event: Event) {
     event.stopPropagation();
     if (artistName) {
-      this.router.navigate(['/artist', encodeURIComponent(artistName)]);
+      let cleanName = artistName;
+      try {
+        while (cleanName.includes('%')) {
+          const decoded = decodeURIComponent(cleanName);
+          if (decoded === cleanName) break;
+          cleanName = decoded;
+        }
+      } catch {}
+      this.router.navigate(['/artist', cleanName]);
     }
     this.close();
   }
