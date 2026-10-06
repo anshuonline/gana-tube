@@ -98,6 +98,33 @@ export class GtanalyticDailyComponent implements OnInit {
     ];
   });
 
+  totalPlaySeconds = computed(() => {
+    const data = this.dailyData();
+    if (!data) return 0;
+    if (data.total_play_seconds && data.total_play_seconds > 0) return data.total_play_seconds;
+    if (data.total_play_hours && data.total_play_hours > 0) return Math.round(data.total_play_hours * 3600);
+    const plays = data.total_plays || 0;
+    return Math.round(plays * 210);
+  });
+
+  userPlaySeconds = computed(() => {
+    const data = this.dailyData();
+    if (!data) return 0;
+    if (data.user_play_seconds && data.user_play_seconds > 0) return data.user_play_seconds;
+    if (data.user_play_hours && data.user_play_hours > 0) return Math.round(data.user_play_hours * 3600);
+    const uPlays = data.user_plays ?? Math.max(0, (data.total_plays || 0) - (data.guest_plays || 0));
+    return Math.round(uPlays * 210);
+  });
+
+  guestPlaySeconds = computed(() => {
+    const data = this.dailyData();
+    if (!data) return 0;
+    if (data.guest_play_seconds && data.guest_play_seconds > 0) return data.guest_play_seconds;
+    if (data.guest_play_hours && data.guest_play_hours > 0) return Math.round(data.guest_play_hours * 3600);
+    const gPlays = data.guest_plays || 0;
+    return Math.round(gPlays * 210);
+  });
+
   hoursChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -133,7 +160,12 @@ export class GtanalyticDailyComponent implements OnInit {
     const days = this.dailyData()?.recent_days || [];
     return [
       {
-        data: days.map((d: any) => d.total_play_hours ?? (d.total_play_seconds ? +(d.total_play_seconds / 3600).toFixed(1) : 0)),
+        data: days.map((d: any) => {
+          if (d.total_play_hours && d.total_play_hours > 0) return d.total_play_hours;
+          if (d.total_play_seconds && d.total_play_seconds > 0) return +(d.total_play_seconds / 3600).toFixed(1);
+          const plays = d.total_plays || 0;
+          return +(plays * 210 / 3600).toFixed(1);
+        }),
         label: 'Total Hours',
         backgroundColor: 'rgba(245, 158, 11, 0.15)',
         borderColor: '#f59e0b',
@@ -144,7 +176,12 @@ export class GtanalyticDailyComponent implements OnInit {
         pointBackgroundColor: '#f59e0b'
       },
       {
-        data: days.map((d: any) => d.user_play_hours ?? (d.user_play_seconds ? +(d.user_play_seconds / 3600).toFixed(1) : 0)),
+        data: days.map((d: any) => {
+          if (d.user_play_hours && d.user_play_hours > 0) return d.user_play_hours;
+          if (d.user_play_seconds && d.user_play_seconds > 0) return +(d.user_play_seconds / 3600).toFixed(1);
+          const uPlays = Math.max(0, (d.total_plays || 0) - (d.guest_plays || 0));
+          return +(uPlays * 210 / 3600).toFixed(1);
+        }),
         label: 'User Hours',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
         borderColor: '#3b82f6',
@@ -155,7 +192,12 @@ export class GtanalyticDailyComponent implements OnInit {
         pointBackgroundColor: '#3b82f6'
       },
       {
-        data: days.map((d: any) => d.guest_play_hours ?? (d.guest_play_seconds ? +(d.guest_play_seconds / 3600).toFixed(1) : 0)),
+        data: days.map((d: any) => {
+          if (d.guest_play_hours && d.guest_play_hours > 0) return d.guest_play_hours;
+          if (d.guest_play_seconds && d.guest_play_seconds > 0) return +(d.guest_play_seconds / 3600).toFixed(1);
+          const gPlays = d.guest_plays || 0;
+          return +(gPlays * 210 / 3600).toFixed(1);
+        }),
         label: 'Guest Hours',
         backgroundColor: 'rgba(236, 72, 153, 0.1)',
         borderColor: '#ec4899',

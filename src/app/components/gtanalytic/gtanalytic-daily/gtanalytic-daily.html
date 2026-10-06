@@ -51,7 +51,7 @@
     <div class="kpi-grid">
 
       <!-- Total Play Time (Users + Guests Combined) -->
-      <div class="kpi-card amber-glow" [title]="formatSeconds(dailyData().total_play_seconds || ((dailyData().total_play_hours || 0) * 3600))">
+      <div class="kpi-card amber-glow" [title]="formatSeconds(totalPlaySeconds())">
         <div class="kpi-header">
           <span class="kpi-label">Total Play Time</span>
           <div class="kpi-icon amber-icon">
@@ -59,12 +59,12 @@
           </div>
         </div>
         <div class="kpi-value amber">
-          {{ formatHours(dailyData().total_play_seconds || ((dailyData().total_play_hours || 0) * 3600)) }}
+          {{ formatHours(totalPlaySeconds()) }}
         </div>
         <div class="kpi-sub">
-          <span class="sub-item user">{{ formatHours(dailyData().user_play_seconds || ((dailyData().user_play_hours || 0) * 3600)) }} Users</span>
+          <span class="sub-item user">{{ formatHours(userPlaySeconds()) }} Users</span>
           <span class="sub-divider">·</span>
-          <span class="sub-item guest">{{ formatHours(dailyData().guest_play_seconds || ((dailyData().guest_play_hours || 0) * 3600)) }} Guests</span>
+          <span class="sub-item guest">{{ formatHours(guestPlaySeconds()) }} Guests</span>
         </div>
       </div>
 
