@@ -714,22 +714,6 @@ export class App implements OnInit {
     } catch (e) {}
   }
 
-  private adBlockObserver: MutationObserver | null = null;
-
-  private setupAdBlockObserver(): void {
-    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') return;
-    if (this.adBlockObserver) return;
-    this.adBlockObserver = new MutationObserver(() => {
-      if (this.isAnalyticsOrManageGt()) {
-        this.purgeAdElements();
-      }
-    });
-    this.adBlockObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  }
-
   injectHeaderScript(customHtml: string): void {
     if (typeof window === 'undefined' || !customHtml) return;
     
@@ -1381,7 +1365,6 @@ export class App implements OnInit {
 
     if (typeof window !== 'undefined') {
       this.syncAdSuppressionForCurrentRoute(window.location.pathname);
-      this.setupAdBlockObserver();
       window.addEventListener('offline', () => {
         this.toastService.error('You are currently offline. Check your internet connection.');
       });
