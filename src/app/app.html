@@ -112,7 +112,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'" [class.is-gtanalytic]="currentPage() === 'gtanalytic'" [class.is-managegt]="currentPage() === 'managegt'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
 
       <!-- Ambient Background -->
@@ -1415,19 +1415,42 @@
 
 <!-- Install PWA Modal -->
 <div class="gt-install-modal-backdrop" *ngIf="showInstallModal" (click)="closeInstallModal()"></div>
-<div class="gt-install-modal" *ngIf="showInstallModal">
-  <button class="close-btn" (click)="closeInstallModal()">
-    <svg lucideX [attr.size]="20"></svg>
+<div class="gt-install-modal" *ngIf="showInstallModal" role="dialog" aria-modal="true" aria-labelledby="gtInstallTitle">
+  <div class="install-ambient-glow"></div>
+  <button class="close-btn" (click)="closeInstallModal()" aria-label="Close modal">
+    <svg lucideX [attr.size]="18"></svg>
   </button>
   <div class="modal-content">
     <div class="icon-wrapper">
-      <svg lucideDownload [attr.size]="32"></svg>
+      <svg lucideDownload [attr.size]="30"></svg>
     </div>
-    <h3>Install GanaTube</h3>
+    <h3 id="gtInstallTitle">Install GanaTube</h3>
     <p>Get the best music experience right on your device. Faster loading, offline library access, and ad-free listening.</p>
-    <button class="asmr-install-btn" (click)="triggerInstall()">
-      <span>Install App Now</span>
-    </button>
+    
+    <!-- Action buttons: Later & Install Now -->
+    <div class="install-actions">
+      <button class="btn-later" type="button" (click)="closeInstallModal()">
+        <span>Later</span>
+      </button>
+      <button class="btn-install-now" type="button" (click)="triggerInstall()">
+        <svg lucideDownload [attr.size]="17"></svg>
+        <span>Install Now</span>
+      </button>
+    </div>
+
+    <!-- Don't show again checkbox -->
+    <label class="dont-show-row" (click)="$event.stopPropagation()">
+      <input
+        type="checkbox"
+        class="dont-show-input"
+        [checked]="dontShowAgainInstall"
+        (change)="toggleDontShowAgainInstall()"
+      />
+      <span class="custom-checkbox" [class.checked]="dontShowAgainInstall">
+        <svg *ngIf="dontShowAgainInstall" lucideCheck [attr.size]="12"></svg>
+      </span>
+      <span class="dont-show-text">Don't show again</span>
+    </label>
   </div>
 </div>
 

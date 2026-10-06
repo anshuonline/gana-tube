@@ -180,14 +180,69 @@ export class App implements OnInit {
   private lastNonPlaylistPage = 'home';
 
   showInstallModal = false;
+  dontShowAgainInstall = false;
 
   showLoginPrompt = signal<boolean>(false);
 
+  /**
+   * Check if PWA install prompt has been permanently dismissed via cookie or storage
+   */
+  isInstallPermanentlyDismissed(): boolean {
+    if (typeof document === 'undefined') return false;
+    try {
+      const match = document.cookie.match(/(?:^|; )gt_pwa_dont_show=([^;]*)/);
+      if (match && match[1] === 'true') return true;
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('gt_pwa_dont_show') === 'true') {
+        return true;
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  }
+
+  /**
+   * Save or clear PWA install permanent dismissal preference in cookie and localStorage
+   */
+  setInstallPermanentlyDismissed(dismissed: boolean = true): void {
+    if (typeof document !== 'undefined') {
+      if (dismissed) {
+        const maxAge = 60 * 60 * 24 * 365; // 1 year
+        document.cookie = `gt_pwa_dont_show=true; path=/; max-age=${maxAge}; SameSite=Lax`;
+      } else {
+        document.cookie = `gt_pwa_dont_show=; path=/; max-age=0; SameSite=Lax`;
+      }
+    }
+    if (typeof localStorage !== 'undefined') {
+      try {
+        if (dismissed) {
+          localStorage.setItem('gt_pwa_dont_show', 'true');
+        } else {
+          localStorage.removeItem('gt_pwa_dont_show');
+        }
+      } catch {}
+    }
+  }
+
+  toggleDontShowAgainInstall(): void {
+    this.dontShowAgainInstall = !this.dontShowAgainInstall;
+  }
+
   closeInstallModal() {
+    if (this.dontShowAgainInstall) {
+      this.setInstallPermanentlyDismissed(true);
+    } else {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('lastInstallPromptShown', Date.now().toString());
+      }
+    }
     this.showInstallModal = false;
   }
 
   triggerInstall() {
+    if (this.dontShowAgainInstall) {
+      this.setInstallPermanentlyDismissed(true);
+    }
     this.pwaService.installApp();
     this.showInstallModal = false;
   }
@@ -2003,15 +2058,18 @@ export class App implements OnInit {
       }, 1500);
     }
 
-    // Check PWA Install Prompt every 2 hours
-    if (!this.pwaService.isInstalledPWA()) {
+    // Check PWA Install Prompt every 2 hours (if not permanently dismissed)
+    if (!this.pwaService.isInstalledPWA() && !this.isInstallPermanentlyDismissed()) {
       const lastPrompt = localStorage.getItem('lastInstallPromptShown');
       const now = Date.now();
       if (!lastPrompt || (now - parseInt(lastPrompt, 10)) > 2 * 60 * 60 * 1000) {
         // Show the prompt
         setTimeout(() => {
-          this.showInstallModal = true;
-          localStorage.setItem('lastInstallPromptShown', now.toString());
+          if (!this.pwaService.isInstalledPWA() && !this.isInstallPermanentlyDismissed()) {
+            this.dontShowAgainInstall = false;
+            this.showInstallModal = true;
+            localStorage.setItem('lastInstallPromptShown', now.toString());
+          }
         }, 3000); // Wait 3 seconds after reload to show it so it's not jarring
       }
     }

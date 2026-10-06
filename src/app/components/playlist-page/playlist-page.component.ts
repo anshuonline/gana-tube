@@ -71,8 +71,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
         this.loadMoreSongs();
       }
     }, {
-      rootMargin: '0px 0px 600px 0px',
-      threshold: 0
+      rootMargin: '0px 0px 200px 0px',
+      threshold: 0.1
     });
     this.observer.observe(element);
   }
@@ -84,8 +84,8 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
       const nextLimit = this.displayLimit() + 20;
       this.displayLimit.set(nextLimit);
       this.isLoadingMore.set(false);
-      this.fetchMissingDurations(this.displayedSongs());
-    }, 200);
+      this.fetchMissingDurations();
+    }, 400);
   }
 
   get canAddDirectly(): boolean {
@@ -130,7 +130,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     if (sentinel) {
       const rect = sentinel.getBoundingClientRect();
       const windowHeight = window.innerHeight || (document.documentElement ? document.documentElement.clientHeight : 800);
-      if (rect.top <= windowHeight + 600) {
+      if (rect.top <= windowHeight + 200) {
         this.loadMoreSongs();
       }
     } else if (typeof document !== 'undefined') {
@@ -138,7 +138,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
       if (dropList) {
         const rect = dropList.getBoundingClientRect();
         const windowHeight = window.innerHeight || (document.documentElement ? document.documentElement.clientHeight : 800);
-        if (rect.bottom <= windowHeight + 600) {
+        if (rect.bottom <= windowHeight + 200) {
           this.loadMoreSongs();
         }
       }
@@ -183,9 +183,15 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['playlist'] && !changes['playlist'].firstChange) {
-      this.suggestedSongs.set([]);
-      this.suggestionAttempts = 0;
-      this.loadSongs();
+      const prev = changes['playlist'].previousValue as PlaylistMeta | undefined;
+      const curr = changes['playlist'].currentValue as PlaylistMeta | undefined;
+      const isSamePlaylist = !!(prev && curr && prev.id === curr.id);
+
+      if (!isSamePlaylist) {
+        this.suggestedSongs.set([]);
+        this.suggestionAttempts = 0;
+      }
+      this.loadSongs(isSamePlaylist);
     }
   }
 
@@ -224,8 +230,10 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
 
   safePlaylistAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('playlist_in_feed_banner'));
 
-  loadSongs(): void {
-    this.displayLimit.set(20);
+  loadSongs(keepLimit: boolean = false): void {
+    if (!keepLimit) {
+      this.displayLimit.set(20);
+    }
     this.isLoadingMore.set(false);
     if (this.playlist.preloadedSongs && this.playlist.preloadedSongs.length > 0) {
       // Check if they are legacy dummy songs (Unknown Title)
@@ -247,7 +255,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
           
           this.songs.set(updatedSongs);
           this.isLoading.set(false);
-          this.fetchMissingDurations(updatedSongs);
+          this.fetchMissingDurations();
           this.loadSuggestedSongs();
           
           if (this.playlist.id === 'liked-songs') {
@@ -257,7 +265,7 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
       } else {
         this.songs.set(this.playlist.preloadedSongs);
         this.isLoading.set(false);
-        this.fetchMissingDurations(this.playlist.preloadedSongs);
+        this.fetchMissingDurations();
         this.loadSuggestedSongs();
       }
       return;
@@ -267,19 +275,23 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries, this.playlist.id).pipe(takeUntil(this.destroy$)).subscribe((results) => {
       this.songs.set(results);
       this.isLoading.set(false);
-      this.fetchMissingDurations(results);
+      this.fetchMissingDurations();
       this.loadSuggestedSongs();
     });
   }
 
-  fetchMissingDurations(currentList: YouTubeSearchResult[]): void {
-    const missingIds = currentList.filter(s => !s.duration || s.duration === 210).map(s => s.videoId);
+  fetchMissingDurations(currentList?: YouTubeSearchResult[]): void {
+    const list = currentList || this.displayedSongs();
+    const missingIds = list.filter(s => !s.duration || s.duration === 210).map(s => s.videoId);
     if (missingIds.length === 0) return;
 
     this.youtubeApi.getVideoDetails(missingIds).pipe(takeUntil(this.destroy$)).subscribe(details => {
-      const updated = currentList.map(song => {
-        if (!song.duration || song.duration === 210) {
-          const fetched = details.find(d => d.videoId === song.videoId);
+      if (!details || details.length === 0) return;
+      const detailsMap = new Map(details.map(d => [d.videoId, d]));
+      const allSongs = this.songs();
+      const updated = allSongs.map(song => {
+        if ((!song.duration || song.duration === 210) && detailsMap.has(song.videoId)) {
+          const fetched = detailsMap.get(song.videoId);
           if (fetched && fetched.duration) {
             return { ...song, duration: fetched.duration };
           }

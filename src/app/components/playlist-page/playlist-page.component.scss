@@ -923,6 +923,12 @@
     transform: translateY(0);
   }
 
+  &.loading-active {
+    background: rgba(168, 85, 247, 0.08);
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);
+  }
+
   .spinner-small {
     width: 24px;
     height: 24px;

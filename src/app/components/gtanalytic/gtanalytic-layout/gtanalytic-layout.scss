@@ -1,5 +1,8 @@
 .gtanalytic-shell {
   min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   background: #000000;
   color: #ffffff;
   display: flex;
@@ -384,6 +387,24 @@
   justify-content: space-between;
   padding: 16px 12px;
   flex-shrink: 0;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  align-self: flex-start;
+  z-index: 90;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
 
   .sidebar-header-mobile {
     display: none;

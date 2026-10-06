@@ -135,14 +135,15 @@
            id="playlistScrollSentinel" 
            #playlistScrollSentinel 
            *ngIf="hasMoreSongs()" 
+           [class.loading-active]="isLoadingMore()"
            (click)="loadMoreSongs()">
-        <div class="spinner-small"></div>
+        <div class="spinner-small" [class.spinning]="isLoadingMore()"></div>
         <div class="loading-more-text">
           <span class="loading-more-title">
-            {{ isLoadingMore() ? 'Loading next tracks...' : 'Scroll for more tracks' }}
+            {{ isLoadingMore() ? 'Loading more songs...' : 'Loading more songs...' }}
           </span>
           <span class="loading-more-count">
-            Showing {{ displayedSongs().length }} of {{ songs().length }} songs
+            Showing {{ displayedSongs().length }} of {{ songs().length }} songs • Scroll or tap for more
           </span>
         </div>
       </div>
