@@ -50,19 +50,21 @@
     <!-- KPI Cards -->
     <div class="kpi-grid">
 
-      <!-- Total Visitors -->
-      <div class="kpi-card emerald-glow">
+      <!-- Total Play Time (Users + Guests Combined) -->
+      <div class="kpi-card amber-glow" [title]="formatSeconds(dailyData().total_play_seconds || ((dailyData().total_play_hours || 0) * 3600))">
         <div class="kpi-header">
-          <span class="kpi-label">Total Visitors</span>
-          <div class="kpi-icon">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="kpi-label">Total Play Time</span>
+          <div class="kpi-icon amber-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
         </div>
-        <div class="kpi-value">{{ dailyData().total_visitors | number }}</div>
+        <div class="kpi-value amber">
+          {{ formatHours(dailyData().total_play_seconds || ((dailyData().total_play_hours || 0) * 3600)) }}
+        </div>
         <div class="kpi-sub">
-          <span class="sub-item guest">{{ dailyData().guest_visitors | number }} Guests</span>
+          <span class="sub-item user">{{ formatHours(dailyData().user_play_seconds || ((dailyData().user_play_hours || 0) * 3600)) }} Users</span>
           <span class="sub-divider">·</span>
-          <span class="sub-item user">{{ dailyData().logged_in_users | number }} Logged-In</span>
+          <span class="sub-item guest">{{ formatHours(dailyData().guest_play_seconds || ((dailyData().guest_play_hours || 0) * 3600)) }} Guests</span>
         </div>
       </div>
 
@@ -79,6 +81,22 @@
           <span class="sub-item user">{{ dailyData().user_plays | number }} by Users</span>
           <span class="sub-divider">·</span>
           <span class="sub-item guest">{{ dailyData().guest_plays | number }} by Guests</span>
+        </div>
+      </div>
+
+      <!-- Total Visitors -->
+      <div class="kpi-card emerald-glow">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Visitors</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value">{{ dailyData().total_visitors | number }}</div>
+        <div class="kpi-sub">
+          <span class="sub-item guest">{{ dailyData().guest_visitors | number }} Guests</span>
+          <span class="sub-divider">·</span>
+          <span class="sub-item user">{{ dailyData().logged_in_users | number }} Logged-In</span>
         </div>
       </div>
 
@@ -112,6 +130,16 @@
     <div class="charts-row">
       <div class="chart-panel">
         <div class="chart-head">
+          <h2 class="chart-title">7-Day Play Hours Trend</h2>
+          <span class="chart-tag amber-tag">Hours</span>
+        </div>
+        <div class="chart-canvas">
+          <canvas baseChart [datasets]="hoursChartData()" [labels]="trendChartLabels()" [options]="hoursChartOptions" [type]="'line'"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="chart-head">
           <h2 class="chart-title">7-Day Plays Trend</h2>
           <span class="chart-tag">Plays</span>
         </div>
@@ -123,7 +151,7 @@
       <div class="chart-panel">
         <div class="chart-head">
           <h2 class="chart-title">7-Day Visitors Trend</h2>
-          <span class="chart-tag">Visitors</span>
+          <span class="chart-tag green-tag">Visitors</span>
         </div>
         <div class="chart-canvas">
           <canvas baseChart [datasets]="visitorChartData()" [labels]="visitorChartLabels()" [options]="trendChartOptions" [type]="'line'"></canvas>

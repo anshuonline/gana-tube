@@ -98,6 +98,76 @@ export class GtanalyticDailyComponent implements OnInit {
     ];
   });
 
+  hoursChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: { color: '#ffffff', boxWidth: 10, padding: 14, font: { size: 11 } }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => `${context.dataset.label}: ${context.raw} hrs`
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(255, 255, 255, 0.06)' },
+        ticks: { 
+          color: 'rgba(255, 255, 255, 0.5)', 
+          font: { size: 11 },
+          callback: (value: any) => `${value}h`
+        }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 11 } }
+      }
+    }
+  };
+
+  hoursChartData = computed(() => {
+    const days = this.dailyData()?.recent_days || [];
+    return [
+      {
+        data: days.map((d: any) => d.total_play_hours ?? (d.total_play_seconds ? +(d.total_play_seconds / 3600).toFixed(1) : 0)),
+        label: 'Total Hours',
+        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        borderColor: '#f59e0b',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: '#f59e0b'
+      },
+      {
+        data: days.map((d: any) => d.user_play_hours ?? (d.user_play_seconds ? +(d.user_play_seconds / 3600).toFixed(1) : 0)),
+        label: 'User Hours',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: '#3b82f6',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#3b82f6'
+      },
+      {
+        data: days.map((d: any) => d.guest_play_hours ?? (d.guest_play_seconds ? +(d.guest_play_seconds / 3600).toFixed(1) : 0)),
+        label: 'Guest Hours',
+        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+        borderColor: '#ec4899',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#ec4899'
+      }
+    ];
+  });
+
   visitorChartLabels = computed(() => {
     const days = this.dailyData()?.recent_days || [];
     return days.map((d: any) => d.label);
@@ -184,6 +254,15 @@ export class GtanalyticDailyComponent implements OnInit {
     if (d > today) return;
     this.selectedDate.set(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'));
     this.loadData();
+  }
+
+  formatHours(sec: number): string {
+    if (!sec || sec <= 0) return '0 hrs';
+    const hrs = sec / 3600;
+    if (hrs >= 100) return `${Math.round(hrs)} hrs`;
+    if (hrs >= 1) return `${hrs.toFixed(1)} hrs`;
+    const mins = Math.round(sec / 60);
+    return `${mins} mins`;
   }
 
   formatSeconds(sec: number): string {
