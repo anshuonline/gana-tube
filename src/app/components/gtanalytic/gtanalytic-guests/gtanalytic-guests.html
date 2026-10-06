@@ -656,19 +656,34 @@
             <div class="map-panel-header">
               <div class="map-header-left">
                 <span class="map-title">Audience Geographic Map</span>
-                <span class="map-hint">Click country to drill down into cities &bull; Glowing dots indicate live active cities</span>
+                <span class="map-hint">Drag map to pan &bull; Scroll / Buttons to zoom &bull; Click country to view cities</span>
               </div>
               <div class="map-zoom-controls">
-                <button class="zoom-btn" (click)="setMapZoom(0.2)" title="Zoom In">+</button>
-                <button class="zoom-btn" (click)="setMapZoom(-0.2)" title="Zoom Out">&minus;</button>
-                <button class="zoom-btn reset" (click)="resetMapZoom()" title="Reset Zoom">100%</button>
+                <button class="zoom-btn" (click)="setMapZoom(0.3)" title="Zoom In">+</button>
+                <button class="zoom-btn" (click)="setMapZoom(-0.3)" title="Zoom Out">&minus;</button>
+                <button class="zoom-btn reset" (click)="resetMapZoom()" title="Reset Zoom & Pan">
+                  {{ (mapZoom() * 100).toFixed(0) }}% Reset
+                </button>
               </div>
             </div>
 
             <!-- Viewport with SVG Map and Floating Tooltip -->
-            <div class="geo-map-viewport" (mousemove)="onMapMouseMove($event)">
+            <div 
+              class="geo-map-viewport" 
+              [class.is-panning]="isMapPanning()"
+              (mousedown)="onMapMouseDown($event)"
+              (mousemove)="onMapMouseMove($event)"
+              (mouseup)="onMapMouseUp($event)"
+              (mouseleave)="onMapMouseUp($event)"
+              (wheel)="onMapWheel($event)"
+              (touchstart)="onMapTouchStart($event)"
+              (touchmove)="onMapTouchMove($event)"
+              (touchend)="onMapTouchEnd()">
               
-              <div class="svg-map-wrapper" [style.transform]="'scale(' + mapZoom() + ')'">
+              <div 
+                class="svg-map-wrapper" 
+                [class.panning]="isMapPanning()"
+                [style.transform]="'translate(' + mapPanX() + 'px, ' + mapPanY() + 'px) scale(' + mapZoom() + ')'">
                 <svg 
                   viewBox="30.767 241.591 784.077 458.627" 
                   class="geo-svg-map">
@@ -927,6 +942,9 @@
         <span class="geo-footer-hint">Google Analytics 4 Demographic Breakdown &bull; Top 50 Locations</span>
         <button class="modal-action-btn" (click)="closeGeoModal()">Close</button>
       </div>
+
+    </div>
+  </div>
 
   <!-- ── IP EXCLUSION & BOT FILTER SETTINGS MODAL ── -->
   <div class="guest-modal-backdrop" *ngIf="isSettingsModalOpen()" (click)="closeSettingsModal()">

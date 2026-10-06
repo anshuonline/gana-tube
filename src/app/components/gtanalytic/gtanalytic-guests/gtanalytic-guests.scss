@@ -1473,6 +1473,13 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: grab;
+          touch-action: none;
+          user-select: none;
+
+          &.is-panning {
+            cursor: grabbing !important;
+          }
 
           @media (max-width: 640px) {
             height: 280px;
@@ -1484,8 +1491,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s ease-out;
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
             transform-origin: center center;
+            will-change: transform;
+
+            &.panning {
+              transition: none !important;
+            }
 
             .geo-svg-map {
               width: 100%;

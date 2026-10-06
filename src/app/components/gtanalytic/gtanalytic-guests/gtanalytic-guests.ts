@@ -182,6 +182,14 @@ export class GtanalyticGuestsComponent {
   selectedCountryCode = signal<string | null>(null);
   geoViewMode = signal<'map' | 'countries' | 'cities'>('map');
   mapZoom = signal<number>(1);
+  mapPanX = signal<number>(0);
+  mapPanY = signal<number>(0);
+  isMapPanning = signal<boolean>(false);
+  private startClientX = 0;
+  private startClientY = 0;
+  private startPanX = 0;
+  private startPanY = 0;
+  private hasDraggedMap = false;
   hoveredCountry = signal<CountrySummary | null>(null);
   hoveredBeacon = signal<CityBeacon | null>(null);
   tooltipPos = signal<{ x: number, y: number }>({ x: 0, y: 0 });
@@ -373,6 +381,8 @@ export class GtanalyticGuestsComponent {
     this.geoError.set('');
     this.selectedCountryCode.set(null);
     this.mapZoom.set(1);
+    this.mapPanX.set(0);
+    this.mapPanY.set(0);
     this.hoveredCountry.set(null);
     this.hoveredBeacon.set(null);
     this.isGeoModalOpen.set(true);
@@ -393,6 +403,10 @@ export class GtanalyticGuestsComponent {
   }
 
   selectCountry(code: string | null) {
+    if (this.hasDraggedMap) {
+      this.hasDraggedMap = false;
+      return;
+    }
     if (!code) {
       this.selectedCountryCode.set(null);
       return;
@@ -410,12 +424,15 @@ export class GtanalyticGuestsComponent {
   }
 
   setMapZoom(delta: number) {
-    const next = Math.max(0.8, Math.min(2.5, Number((this.mapZoom() + delta).toFixed(1))));
+    const current = this.mapZoom();
+    const next = Math.max(0.7, Math.min(6.0, Number((current + delta).toFixed(1))));
     this.mapZoom.set(next);
   }
 
   resetMapZoom() {
     this.mapZoom.set(1);
+    this.mapPanX.set(0);
+    this.mapPanY.set(0);
   }
 
   getCountryFillColor(code: string): string {
@@ -471,10 +488,81 @@ export class GtanalyticGuestsComponent {
     this.updateTooltipCoords(event);
   }
 
+  onMapMouseDown(event: MouseEvent) {
+    if (event.button !== 0) return; // Only main button
+    this.isMapPanning.set(true);
+    this.hasDraggedMap = false;
+    this.startClientX = event.clientX;
+    this.startClientY = event.clientY;
+    this.startPanX = this.mapPanX();
+    this.startPanY = this.mapPanY();
+  }
+
   onMapMouseMove(event: MouseEvent) {
+    if (this.isMapPanning()) {
+      const dx = event.clientX - this.startClientX;
+      const dy = event.clientY - this.startClientY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        this.hasDraggedMap = true;
+      }
+      this.mapPanX.set(Math.round(this.startPanX + dx));
+      this.mapPanY.set(Math.round(this.startPanY + dy));
+    }
+
     if (this.hoveredCountry() || this.hoveredBeacon()) {
       this.updateTooltipCoords(event);
     }
+  }
+
+  onMapMouseUp(event?: MouseEvent) {
+    this.isMapPanning.set(false);
+  }
+
+  onMapWheel(event: WheelEvent) {
+    event.preventDefault();
+    const zoomFactor = event.deltaY < 0 ? 1.25 : 0.8;
+    const currentZoom = this.mapZoom();
+    const next = Math.max(0.7, Math.min(6.0, Number((currentZoom * zoomFactor).toFixed(2))));
+    
+    // Zoom toward pointer position
+    const target = event.currentTarget as HTMLElement;
+    const container = target.closest('.geo-map-viewport');
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const pointerX = event.clientX - rect.left - rect.width / 2;
+      const pointerY = event.clientY - rect.top - rect.height / 2;
+      const scaleChange = next / currentZoom;
+      this.mapPanX.update(px => Math.round(pointerX - (pointerX - px) * scaleChange));
+      this.mapPanY.update(py => Math.round(pointerY - (pointerY - py) * scaleChange));
+    }
+    this.mapZoom.set(next);
+  }
+
+  onMapTouchStart(event: TouchEvent) {
+    if (event.touches.length === 1) {
+      this.isMapPanning.set(true);
+      this.hasDraggedMap = false;
+      this.startClientX = event.touches[0].clientX;
+      this.startClientY = event.touches[0].clientY;
+      this.startPanX = this.mapPanX();
+      this.startPanY = this.mapPanY();
+    }
+  }
+
+  onMapTouchMove(event: TouchEvent) {
+    if (this.isMapPanning() && event.touches.length === 1) {
+      const dx = event.touches[0].clientX - this.startClientX;
+      const dy = event.touches[0].clientY - this.startClientY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        this.hasDraggedMap = true;
+      }
+      this.mapPanX.set(Math.round(this.startPanX + dx));
+      this.mapPanY.set(Math.round(this.startPanY + dy));
+    }
+  }
+
+  onMapTouchEnd() {
+    this.isMapPanning.set(false);
   }
 
   private updateTooltipCoords(event: MouseEvent) {
