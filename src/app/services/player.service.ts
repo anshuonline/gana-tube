@@ -964,6 +964,8 @@ export class PlayerService {
       const user = this.authService.currentUser();
       if (user && user.email) {
         this.userService.addRecentPlay(user.email, current, this.userService.preferredLanguages());
+      } else {
+        this.userService.recordGuestPlay();
       }
     }
 

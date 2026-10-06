@@ -10,6 +10,8 @@ export interface UserProfileData {
   liked_songs: any[];
   recent_plays: any[];
   listening_preferences: string[];
+  total_plays?: number;
+  increment_play?: boolean;
 }
 
 @Injectable({
@@ -24,14 +26,23 @@ export class UserService {
   preferredLanguages = signal<string[]>(['English', 'Hindi', 'Tamil', 'Punjabi']);
   likedSongs = signal<any[]>([]);
   recentPlays = signal<any[]>([]);
+  totalPlays = signal<number>(0);
   listeningPreferences = signal<string[]>([]);
   customPlaylists = signal<any[]>([]);
   isProfileLoaded = false;
   private _creatingPlaylists = new Set<string>();
   
   constructor(private http: HttpClient) {
-    if (!environment.production) {
-      // In local dev, use the local XAMPP backend if preferred
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('gt_total_plays');
+        if (stored) {
+          const parsed = parseInt(stored, 10);
+          if (!isNaN(parsed) && parsed > 0) {
+            this.totalPlays.set(parsed);
+          }
+        }
+      } catch (e) {}
     }
   }
 
@@ -113,19 +124,51 @@ export class UserService {
         if (response.liked_songs) {
           this.likedSongs.set(response.liked_songs);
         }
+        let recentCount = 0;
         if (response.recent_plays) {
           const plays = Array.isArray(response.recent_plays) ? response.recent_plays.slice(0, 100) : [];
           this.recentPlays.set(plays);
+          recentCount = plays.length;
         }
         if (response.listening_preferences) {
           this.listeningPreferences.set(response.listening_preferences);
         }
+
+        const serverTotal = typeof response.total_plays === 'number' ? response.total_plays : parseInt(response.total_plays || '0', 10) || 0;
+        let localTotal = 0;
+        if (typeof localStorage !== 'undefined') {
+          try {
+            const stored = localStorage.getItem('gt_total_plays');
+            if (stored) localTotal = parseInt(stored, 10) || 0;
+          } catch (e) {}
+        }
+        const effectiveTotal = Math.max(serverTotal, localTotal, recentCount);
+        this.totalPlays.set(effectiveTotal);
+        if (typeof localStorage !== 'undefined') {
+          try {
+            localStorage.setItem('gt_total_plays', effectiveTotal.toString());
+          } catch (e) {}
+        }
+
+        // If local total was ahead of server total, sync it back to DB
+        if (effectiveTotal > serverTotal) {
+          this.syncProfile({
+            email: email,
+            preferred_languages: response.preferred_languages || [],
+            liked_songs: response.liked_songs || [],
+            recent_plays: this.recentPlays(),
+            listening_preferences: response.listening_preferences || [],
+            total_plays: effectiveTotal
+          });
+        }
+
         return {
           email: response.email,
           preferred_languages: response.preferred_languages || [],
           liked_songs: response.liked_songs || [],
           recent_plays: response.recent_plays || [],
-          listening_preferences: response.listening_preferences || []
+          listening_preferences: response.listening_preferences || [],
+          total_plays: effectiveTotal
         };
       }
       return null;
@@ -150,11 +193,25 @@ export class UserService {
 
   async syncProfile(data: UserProfileData): Promise<boolean> {
     try {
+      if (data.total_plays === undefined && this.totalPlays() > 0) {
+        data.total_plays = this.totalPlays();
+      }
       const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}?action=updateProfile`, data));
       return response.status === 'success';
     } catch (error) {
       console.error('Failed to sync user profile to DB', error);
       return false;
+    }
+  }
+
+  // Record guest play when not logged in
+  recordGuestPlay() {
+    const nextTotal = (this.totalPlays() || 0) + 1;
+    this.totalPlays.set(nextTotal);
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('gt_total_plays', nextTotal.toString());
+      } catch (e) {}
     }
   }
 
@@ -222,13 +279,24 @@ export class UserService {
     }
     
     this.recentPlays.set(plays);
+
+    // Increment total plays counter
+    const currentTotal = Math.max(this.totalPlays() + 1, plays.length);
+    this.totalPlays.set(currentTotal);
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('gt_total_plays', currentTotal.toString());
+      } catch (e) {}
+    }
     
     await this.syncProfile({
       email: email,
       preferred_languages: currentLangs,
       liked_songs: this.likedSongs(),
       recent_plays: plays,
-      listening_preferences: this.listeningPreferences()
+      listening_preferences: this.listeningPreferences(),
+      total_plays: currentTotal,
+      increment_play: true
     });
   }
 

@@ -3573,7 +3573,9 @@ export class App implements OnInit {
   }
 
   recentPlaysCount(): number {
-    return this.userService.recentPlays ? this.userService.recentPlays().length : 0;
+    const total = this.userService.totalPlays ? this.userService.totalPlays() : 0;
+    const recent = this.userService.recentPlays ? this.userService.recentPlays().length : 0;
+    return Math.max(total, recent);
   }
 
   openLikedSongs(): void {

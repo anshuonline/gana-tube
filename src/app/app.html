@@ -197,12 +197,12 @@
 
         <!-- Quick Stats -->
         <div class="profile-stats">
-          <div class="stat-chip">
+          <div class="stat-chip" (click)="openLikedSongs()" style="cursor: pointer;" title="View Liked Songs">
             <svg lucideHeart [attr.size]="14"></svg>
             <span class="stat-num">{{ likedSongsCount() }}</span>
             <span class="stat-label">Liked</span>
           </div>
-          <div class="stat-chip">
+          <div class="stat-chip" (click)="openRecentlyPlayed()" style="cursor: pointer;" title="View Recently Played History">
             <svg lucideClock [attr.size]="14"></svg>
             <span class="stat-num">{{ recentPlaysCount() }}</span>
             <span class="stat-label">Played</span>
