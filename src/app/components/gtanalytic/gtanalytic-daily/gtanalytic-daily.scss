@@ -213,6 +213,7 @@
     border-color: rgba(255, 255, 255, 0.16);
   }
 
+  &.amber-glow { border-left: 3px solid #f59e0b; }
   &.emerald-glow { border-left: 3px solid #10b981; }
   &.purple-glow { border-left: 3px solid #a855f7; }
   &.pink-glow { border-left: 3px solid #ec4899; }
@@ -242,6 +243,11 @@
     justify-content: center;
     background: rgba(255, 255, 255, 0.06);
     color: rgba(255, 255, 255, 0.5);
+
+    &.amber-icon {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.12);
+    }
   }
 
   .kpi-value {
@@ -251,6 +257,7 @@
     margin-bottom: 6px;
     letter-spacing: -0.5px;
 
+    &.amber { color: #f59e0b; }
     &.pink { color: #ec4899; }
     &.blue { color: #3b82f6; }
   }
@@ -277,9 +284,13 @@
 // Charts
 .charts-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 24px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 1fr;
+  }
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -315,6 +326,16 @@
     background: rgba(168, 85, 247, 0.12);
     color: #c084fc;
     letter-spacing: 0.5px;
+
+    &.amber-tag {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+    }
+
+    &.green-tag {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
   }
 
   .chart-canvas {
