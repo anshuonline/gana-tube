@@ -655,6 +655,81 @@ export class App implements OnInit {
   safeBottomPlayerAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('bottom_player_banner'));
   safePlayerCoverAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('player_cover_ad'));
 
+  // ── Strict Ad Suppression Guard for GTAnalytic & ManageGT ──
+  isAnalyticsOrManageGt(customUrl?: string): boolean {
+    const page = this.currentPage();
+    if (page === 'managegt' || page === 'gtanalytic') return true;
+    if (typeof window !== 'undefined') {
+      const p = (customUrl || window.location.pathname || '').toLowerCase();
+      if (p.startsWith('/gtanalytic') || p.startsWith('/managegt') || p.includes('gtanalytic') || p.includes('managegt')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  syncAdSuppressionForCurrentRoute(url?: string): void {
+    if (typeof document === 'undefined') return;
+    const isRestricted = this.isAnalyticsOrManageGt(url);
+    if (isRestricted) {
+      document.body.classList.add('no-ads-section');
+      document.documentElement.classList.add('no-ads-section');
+      if (typeof window !== 'undefined' && (window as any).adsbygoogle) {
+        try {
+          (window as any).adsbygoogle.pauseAdRequests = 1;
+        } catch (e) {}
+      }
+      this.purgeAdElements();
+    } else {
+      document.body.classList.remove('no-ads-section');
+      document.documentElement.classList.remove('no-ads-section');
+      if (typeof window !== 'undefined' && (window as any).adsbygoogle) {
+        try {
+          (window as any).adsbygoogle.pauseAdRequests = 0;
+        } catch (e) {}
+      }
+    }
+  }
+
+  purgeAdElements(): void {
+    if (typeof document === 'undefined') return;
+    try {
+      const selectors = [
+        '.google-auto-placed',
+        'ins.adsbygoogle',
+        'iframe[id*="google_ads"]',
+        'iframe[id*="aswift"]',
+        'div[id*="google_ads"]',
+        'div[id^="aswift_"]',
+        'div[class*="google_ads"]',
+        '#google-vignette',
+        '.google-anchor-ad',
+        '.sponsored-ad-banner'
+      ];
+      document.querySelectorAll(selectors.join(',')).forEach(el => {
+        try {
+          el.remove();
+        } catch (e) {}
+      });
+    } catch (e) {}
+  }
+
+  private adBlockObserver: MutationObserver | null = null;
+
+  private setupAdBlockObserver(): void {
+    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') return;
+    if (this.adBlockObserver) return;
+    this.adBlockObserver = new MutationObserver(() => {
+      if (this.isAnalyticsOrManageGt()) {
+        this.purgeAdElements();
+      }
+    });
+    this.adBlockObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
   injectHeaderScript(customHtml: string): void {
     if (typeof window === 'undefined' || !customHtml) return;
     
@@ -1305,6 +1380,8 @@ export class App implements OnInit {
     this.fetchCustomPlaylists();
 
     if (typeof window !== 'undefined') {
+      this.syncAdSuppressionForCurrentRoute(window.location.pathname);
+      this.setupAdBlockObserver();
       window.addEventListener('offline', () => {
         this.toastService.error('You are currently offline. Check your internet connection.');
       });
@@ -1315,6 +1392,9 @@ export class App implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(async (event: any) => {
+      // Strictly suppress all ads on GTAnalytic & ManageGT routes
+      this.syncAdSuppressionForCurrentRoute(event.urlAfterRedirects);
+
       // Mark that user has navigated within the app (useful for back button logic)
       if (this.currentPage() !== 'home' || event.id > 1) {
         (window as any).hasNavigatedInApp = true;

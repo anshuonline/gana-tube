@@ -651,9 +651,13 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   formatTime(seconds: number): string {
-    if (!seconds) return '0:00';
-    const m = Math.floor(seconds / 60);
+    if (!seconds || isNaN(seconds) || seconds <= 0) return '0:00';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
+    if (h > 0) {
+      return m > 0 ? `${h}hour ${m}min` : `${h}hour`;
+    }
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   }
 

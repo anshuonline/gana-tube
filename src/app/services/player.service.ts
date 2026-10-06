@@ -110,6 +110,11 @@ export class PlayerService {
     typeof localStorage !== 'undefined' ? Math.min(10, Math.max(1, parseInt(localStorage.getItem('gt_crossfade_duration') || '5', 10) || 5)) : 5
   );
 
+  // Playback Speed State (1x to 5x)
+  playbackSpeed = signal<number>(
+    typeof localStorage !== 'undefined' ? Math.max(1, Math.min(5, parseFloat(localStorage.getItem('gt_playback_speed') || '1') || 1)) : 1
+  );
+
   /** Tracks how many songs have been initiated/played in the current session */
   songsPlayedCount = signal<number>(0);
 
@@ -296,6 +301,13 @@ export class PlayerService {
       this.ytPlayer.mute();
     }
     
+    // Restore playback speed
+    if (typeof this.ytPlayer.setPlaybackRate === 'function') {
+      try {
+        this.ytPlayer.setPlaybackRate(this.playbackSpeed());
+      } catch (_) {}
+    }
+    
     // If a track was selected before ytPlayer was initialized, load it now
     const current = this.currentTrack();
     if (current) {
@@ -308,6 +320,26 @@ export class PlayerService {
           (this as any)._pendingSeekTime = 0;
         }, 500);
       }
+    }
+  }
+
+  setPlaybackSpeed(speed: number): void {
+    const clamped = Math.max(1, Math.min(5, Math.round(speed * 100) / 100));
+    this.playbackSpeed.set(clamped);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('gt_playback_speed', clamped.toString());
+    }
+    if (this.ytPlayer && typeof this.ytPlayer.setPlaybackRate === 'function') {
+      try {
+        this.ytPlayer.setPlaybackRate(clamped);
+      } catch (e) {
+        console.warn('Failed to set YT playback rate:', e);
+      }
+    }
+    if (this.htmlAudio) {
+      try {
+        this.htmlAudio.playbackRate = clamped;
+      } catch (_) {}
     }
   }
   
@@ -880,6 +912,9 @@ export class PlayerService {
     this.htmlAudio.addEventListener('play', () => {
       this.playerState.set('playing');
       this.duration.set(this.htmlAudio!.duration || 0);
+      try {
+        this.htmlAudio!.playbackRate = this.playbackSpeed();
+      } catch (_) {}
     });
     this.htmlAudio.addEventListener('pause', () => {
       this.playerState.set('paused');

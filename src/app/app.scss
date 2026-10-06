@@ -2646,8 +2646,8 @@
   /* Mobile Adjustments */
   @media (max-width: 768px) {
     bottom: 80px; /* Sit above the 70px mobile nav */
-    max-width: calc(100% - 32px); /* 16px margin on each side */
-    height: 50px; /* Mobile banner size (320x50) */
+    max-width: calc(100% - 20px); /* 10px margin on each side for max screen usage */
+    height: 58px; /* Perfectly fits scaled 728x90 banners (42px-48px) with clean padding */
   }
 }
 
@@ -2674,6 +2674,7 @@
     border-radius: 8px;
     overflow: hidden;
     display: block;
+    border: none;
   }
 
   .sponsored-ad-image {
@@ -2702,8 +2703,8 @@
   }
 
   @media (max-width: 768px) {
-    max-width: calc(100% - 32px);
-    height: 250px; /* Medium rectangle mobile size */
+    max-width: calc(100% - 20px);
+    height: 180px; /* Balanced responsive mobile height */
     margin: 20px auto;
   }
 }
@@ -2715,6 +2716,16 @@
   @media (max-width: 768px) {
     bottom: calc(80px + env(safe-area-inset-bottom)); /* 68px player + 12px gap */
   }
+}
+
+.is-gtanalytic .sponsored-ad-banner,
+.is-managegt .sponsored-ad-banner,
+:host-context(.is-gtanalytic) .sponsored-ad-banner,
+:host-context(.is-managegt) .sponsored-ad-banner {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  pointer-events: none !important;
 }
 
 

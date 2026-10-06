@@ -137,6 +137,12 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
               if (i === this.activePlayerIndex) {
                 this.playerService.onPlayerStateChange(event);
                 if (event.data === YT.PlayerState.PLAYING) {
+                  const spd = this.playerService.playbackSpeed();
+                  if (spd !== 1) {
+                    try {
+                      this.players[i]?.setPlaybackRate?.(spd);
+                    } catch (_) {}
+                  }
                   // The YouTube IFrame API steals keyboard focus when starting playback.
                   // This returns focus to the main window so global shortcuts continue to work.
                   window.focus();
@@ -177,6 +183,29 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       },
       getPlayerState: () => this.players[this.activePlayerIndex]?.getPlayerState(),
+      setPlaybackRate: (rate: number) => {
+        this.players.forEach(player => {
+          if (player && typeof player.setPlaybackRate === 'function') {
+            try {
+              player.setPlaybackRate(rate);
+            } catch (_) {}
+          }
+        });
+        try {
+          const iframes = document.querySelectorAll('.yt-player-container iframe');
+          iframes.forEach((iframe: any) => {
+            try {
+              const doc = iframe.contentDocument || iframe.contentWindow?.document;
+              const v = doc?.querySelector('video');
+              if (v) v.playbackRate = rate;
+            } catch (_) {}
+          });
+        } catch (_) {}
+      },
+      getPlaybackRate: () => {
+        const p = this.players[this.activePlayerIndex];
+        return (p && typeof p.getPlaybackRate === 'function') ? p.getPlaybackRate() : 1;
+      },
       getCurrentTime: () => this.players[this.activePlayerIndex]?.getCurrentTime(),
       getDuration: () => this.players[this.activePlayerIndex]?.getDuration(),
       getVideoLoadedFraction: () => this.players[this.activePlayerIndex]?.getVideoLoadedFraction?.() || 0,

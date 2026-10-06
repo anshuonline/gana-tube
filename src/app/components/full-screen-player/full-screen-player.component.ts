@@ -139,6 +139,9 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   isSidebarVisible = false;
   showMenu = false;
   showMobileOptions = signal(false);
+  showSpeedPopover = signal(false);
+  showMobileSpeedView = signal(false);
+  speedPresets = [1, 1.25, 1.5, 1.75, 2, 3, 4, 5];
   menuTrack: Track | null = null;
   menuX = 0;
   menuY = 0;
@@ -941,9 +944,13 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   hoverProgressTime = '';
 
   formatTime(seconds: number): string {
-    if (!seconds || isNaN(seconds)) return '0:00';
-    const m = Math.floor(seconds / 60);
+    if (!seconds || isNaN(seconds) || seconds <= 0) return '0:00';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
+    if (h > 0) {
+      return m > 0 ? `${h}hour ${m}min` : `${h}hour`;
+    }
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
@@ -1064,5 +1071,50 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
       setTimeout(() => this.showToast = false, 3000);
     });
     this.showMenu = false;
+  }
+
+  toggleSpeedPopover(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showSpeedPopover.update(v => !v);
+  }
+
+  closeSpeedPopover(): void {
+    this.showSpeedPopover.set(false);
+  }
+
+  openMobileOptions(): void {
+    this.showMobileSpeedView.set(false);
+    this.showMobileOptions.set(true);
+  }
+
+  setSpeed(speed: number): void {
+    this.playerService.setPlaybackSpeed(speed);
+  }
+
+  onSpeedSliderChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const val = parseFloat(target.value);
+    if (!isNaN(val)) {
+      this.playerService.setPlaybackSpeed(val);
+    }
+  }
+
+  getSpeedLabel(speed: number): string {
+    return speed === 1 ? '1x (Normal)' : `${speed}x`;
+  }
+
+  getSpeedProgressBackground(speed: number): string {
+    const pct = Math.max(0, Math.min(100, ((speed - 1) / (5 - 1)) * 100));
+    return `linear-gradient(to right, #a855f7 0%, #ec4899 ${pct}%, rgba(255, 255, 255, 0.15) ${pct}%, rgba(255, 255, 255, 0.15) 100%)`;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.showSpeedPopover()) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.fs-speed-anchor')) {
+        this.showSpeedPopover.set(false);
+      }
+    }
   }
 }

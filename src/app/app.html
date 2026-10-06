@@ -1169,8 +1169,8 @@
     </div>
   </main>
 
-  <!-- Global Sponsored Ad Banner (Only shown if active) -->
-  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive && currentPage() !== 'managegt' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms'">
+  <!-- Global Sponsored Ad Banner (Only shown if active and not on admin/managegt/gtanalytic) -->
+  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive && !isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms'">
     
     <!-- Show Image if no custom code -->
     <a *ngIf="!sponsoredAd()?.customCode" [href]="sponsoredAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">

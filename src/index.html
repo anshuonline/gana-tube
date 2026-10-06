@@ -87,6 +87,16 @@
     </script>
 
     <!-- Google AdSense -->
+    <script>
+      (function() {
+        var p = (window.location.pathname || '').toLowerCase();
+        if (p.indexOf('/gtanalytic') === 0 || p.indexOf('/managegt') === 0) {
+          window.adsbygoogle = window.adsbygoogle || [];
+          window.adsbygoogle.pauseAdRequests = 1;
+          document.documentElement.classList.add('no-ads-section');
+        }
+      })();
+    </script>
     <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
     <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
     <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />

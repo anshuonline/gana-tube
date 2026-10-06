@@ -107,3 +107,67 @@ body {
   overscroll-behavior: contain;
 }
 
+/* ── STRICT ZERO-TOLERANCE AD BLOCKING FOR GTANALYTIC & MANAGEGT SECTIONS ── */
+html.no-ads-section,
+body.no-ads-section,
+.is-gtanalytic,
+.is-managegt,
+app-gtanalytic-layout,
+app-managegt-layout,
+app-managegt-header,
+.managegt-wrapper {
+  .sponsored-ad-banner,
+  .in-feed-ad-container,
+  .playlist-ad-row,
+  ins.adsbygoogle,
+  .adsbygoogle,
+  .google-auto-placed,
+  iframe[id*="google_ads"],
+  iframe[id*="aswift"],
+  div[id*="google_ads"],
+  div[id^="aswift_"],
+  div[class*="google_ads"],
+  #google-vignette,
+  .google-anchor-ad,
+  div[aria-label*="advertisement" i],
+  div[aria-label*="Advertisement" i] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    max-height: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    z-index: -9999 !important;
+  }
+}
+
+body.no-ads-section {
+  ins.adsbygoogle,
+  .adsbygoogle,
+  .google-auto-placed,
+  iframe[id*="google_ads"],
+  iframe[id*="aswift"],
+  div[id*="google_ads"],
+  div[id^="aswift_"],
+  div[class*="google_ads"],
+  #google-vignette,
+  .google-anchor-ad,
+  .sponsored-ad-banner,
+  .in-feed-ad-container {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
