@@ -35,6 +35,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
       { path: 'login', loadComponent: () => import('./components/gtanalytic/gtanalytic-login/gtanalytic-login').then(m => m.GtanalyticLoginComponent) },
       { path: 'overview', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-overview/gtanalytic-overview').then(m => m.GtanalyticOverviewComponent) },
+      { path: 'user-activity', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-active-times/gtanalytic-active-times').then(m => m.GtanalyticActiveTimesComponent) },
+      { path: 'active-times', redirectTo: 'user-activity', pathMatch: 'full' },
       { path: 'daily', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-daily/gtanalytic-daily').then(m => m.GtanalyticDailyComponent) },
       { path: 'search', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-search/gtanalytic-search').then(m => m.GtanalyticSearchComponent) },
       { path: 'streamanalytics', canActivate: [gtanalyticAuthGuard], loadComponent: () => import('./components/gtanalytic/gtanalytic-streams/gtanalytic-streams').then(m => m.GtanalyticStreamsComponent) },

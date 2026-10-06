@@ -116,6 +116,14 @@ export class GtanalyticDataService {
     return this.analyticsService.getDailySummary(pwd, date);
   }
 
+  getUserActivity(filter: string = 'last_28_days', compareA: number = 0, compareB: number = 3): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) {
+      return of({ status: 'error', message: 'Unauthorized' });
+    }
+    return this.analyticsService.getUserActivity(pwd, filter, compareA, compareB);
+  }
+
   startAutoRefresh() {
     if (this.autoRefreshTimer) return;
     this.autoRefreshTimer = setInterval(() => {

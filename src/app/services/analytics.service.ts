@@ -293,4 +293,9 @@ export class AnalyticsService {
     if (date) url += `&date=${encodeURIComponent(date)}`;
     return this.http.get<{status: string, data?: any, message?: string}>(url);
   }
+
+  getUserActivity(password: string, filter: string = 'last_28_days', compareA: number = 0, compareB: number = 3) {
+    const url = `${this.apiUrl}?action=getUserActivity&pwd=${encodeURIComponent(password)}&filter=${encodeURIComponent(filter)}&compare_a=${compareA}&compare_b=${compareB}`;
+    return this.http.get<{status: string, data?: any, message?: string}>(url);
+  }
 }

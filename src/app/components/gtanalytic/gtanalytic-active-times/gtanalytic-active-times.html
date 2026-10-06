@@ -1,0 +1,450 @@
+<div class="active-times-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-title-row">
+        <h1 class="page-title">User Most Active</h1>
+        <span class="badge-ytstudio">YT Studio Timing</span>
+      </div>
+      <p class="page-desc">Discover when your listeners are on GanaTube — identify peak active days, prime listening hours, and compare audience behavior.</p>
+    </div>
+
+    <!-- Time Filter Pills -->
+    <div class="filter-pill-group">
+      <button 
+        *ngFor="let tf of timeFilters"
+        class="filter-pill"
+        [class.active]="selectedFilter() === tf.id"
+        (click)="setFilter(tf.id)">
+        {{ tf.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading() && !activityData()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading audience activity metrics...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMsg() && !loading() && !activityData()" class="loading-state error-card">
+    <div class="error-icon">⚠️</div>
+    <p class="error-text">{{ errorMsg() }}</p>
+    <button (click)="loadData()" class="btn-retry">Retry</button>
+  </div>
+
+  <!-- Main Analytics Container -->
+  <div *ngIf="activityData()" class="analytics-content">
+
+    <!-- Top KPI Highlights -->
+    <div class="kpi-grid">
+
+      <!-- Peak Active Day -->
+      <div class="kpi-card pink-glow">
+        <div class="kpi-header">
+          <span class="kpi-label">Busiest Listening Day</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value pink">{{ activityData().insights?.most_active_day }}</div>
+        <div class="kpi-sub">
+          <span class="sub-highlight">{{ activityData().insights?.most_active_day_pct }}%</span> of weekly volume · Peak at {{ activityData().days_ranked[0]?.peak_hour_label }}
+        </div>
+      </div>
+
+      <!-- Prime Time Window -->
+      <div class="kpi-card purple-glow">
+        <div class="kpi-header">
+          <span class="kpi-label">Prime Listening Window</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value purple">{{ activityData().insights?.prime_window }}</div>
+        <div class="kpi-sub">
+          Peak hour: <span class="sub-highlight">{{ activityData().insights?.overall_peak_hour }} IST</span>
+        </div>
+      </div>
+
+      <!-- Weekend vs Weekday Surge -->
+      <div class="kpi-card emerald-glow">
+        <div class="kpi-header">
+          <span class="kpi-label">Weekend Listening Boost</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value emerald">+{{ activityData().insights?.weekend_vs_weekday?.weekend_boost_pct }}%</div>
+        <div class="kpi-sub">
+          Avg <span class="sub-highlight">{{ activityData().insights?.weekend_vs_weekday?.weekend_daily_avg | number }}</span> daily weekend active vs {{ activityData().insights?.weekend_vs_weekday?.weekday_daily_avg | number }} weekday
+        </div>
+      </div>
+
+      <!-- Period Growth / Change -->
+      <div class="kpi-card blue-glow">
+        <div class="kpi-header">
+          <span class="kpi-label">Period Trend</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value" [class.emerald]="activityData().period_comparison?.growth_pct >= 0" [class.pink]="activityData().period_comparison?.growth_pct < 0">
+          {{ activityData().period_comparison?.growth_pct >= 0 ? '+' : '' }}{{ activityData().period_comparison?.growth_pct }}%
+        </div>
+        <div class="kpi-sub">
+          vs previous {{ activityData().filter_label || 'period' }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Sub-Tabs -->
+    <div class="subnav-bar">
+      <button 
+        class="subnav-btn" 
+        [class.active]="activeSubTab() === 'heatmap'"
+        (click)="setSubTab('heatmap')">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Activity Heatmap (7×24)
+      </button>
+
+      <button 
+        class="subnav-btn" 
+        [class.active]="activeSubTab() === 'leaderboard'"
+        (click)="setSubTab('leaderboard')">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Day Ranking Leaderboard
+      </button>
+
+      <button 
+        class="subnav-btn" 
+        [class.active]="activeSubTab() === 'compare'"
+        (click)="setSubTab('compare')">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+        Advance Comparisons
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!-- TAB 1: YOUTUBE STUDIO 7×24 HEATMAP MATRIX                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeSubTab() === 'heatmap'" class="heatmap-section">
+
+      <!-- Heatmap Main Panel -->
+      <div class="panel-card">
+        
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">When your listeners are on GanaTube</h2>
+            <p class="panel-subtitle">Audience activity by day of the week and local hour (IST). Darker purple/pink indicates high listener density.</p>
+          </div>
+
+          <!-- YouTube Studio Style Legend -->
+          <div class="yt-legend">
+            <span class="legend-text">Very few listeners</span>
+            <div class="legend-cells">
+              <span class="legend-cell intensity-0" title="Intensity 0: Very Low"></span>
+              <span class="legend-cell intensity-1" title="Intensity 1: Low"></span>
+              <span class="legend-cell intensity-2" title="Intensity 2: Moderate"></span>
+              <span class="legend-cell intensity-3" title="Intensity 3: High"></span>
+              <span class="legend-cell intensity-4" title="Intensity 4: Peak Activity"></span>
+            </div>
+            <span class="legend-text">Many listeners</span>
+          </div>
+        </div>
+
+        <!-- 7x24 Matrix Grid Container -->
+        <div class="heatmap-scroll-container">
+          <div class="heatmap-matrix">
+
+            <!-- Matrix Header: Hours (00:00 - 23:00) -->
+            <div class="matrix-row header-row">
+              <div class="cell day-label-header">Day</div>
+              <div *ngFor="let hl of hourLabels; let h = index" class="cell hour-header">
+                {{ hl }}
+              </div>
+            </div>
+
+            <!-- Matrix Days: 7 Rows (Sun to Sat) -->
+            <div *ngFor="let day of activityData().heatmap" class="matrix-row">
+              <div class="cell day-label" [class.weekend]="day.day_index === 0 || day.day_index === 6">
+                <span class="day-name-full">{{ day.day_name }}</span>
+                <span class="day-name-short">{{ day.short_name }}</span>
+              </div>
+
+              <!-- 24 Hour Cells -->
+              <div 
+                *ngFor="let cell of day.hours"
+                class="cell heat-cell"
+                [ngClass]="getIntensityClass(cell.intensity)"
+                [class.selected]="selectedCell()?.hour === cell.hour && selectedCell()?.day_name === day.day_name"
+                (mouseenter)="onCellHover(cell, day)"
+                (mouseleave)="onCellLeave()"
+                (click)="onCellClick(cell, day)"
+                [attr.aria-label]="day.day_name + ' ' + cell.label + ': ' + cell.level">
+                <div class="cell-glow"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Matrix Footer Guidance -->
+        <div class="matrix-footer-info">
+          <div class="info-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Click any time block to view specific audience numbers & share of volume.</span>
+          </div>
+          <div class="info-item best-time">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Best time to drop playlists: <strong>{{ activityData().insights?.best_upload_time }}</strong></span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Inspector Card for Clicked / Hovered Cell -->
+      <div *ngIf="hoveredCell() || selectedCell()" class="cell-inspector-panel">
+        <div class="inspector-card">
+          <div class="inspector-badge-row">
+            <span class="inspector-day">
+              {{ (hoveredCell() || selectedCell()).day_name }}, {{ (hoveredCell() || selectedCell()).label }}
+            </span>
+            <span class="tier-pill" [ngClass]="getIntensityClass((hoveredCell() || selectedCell()).intensity)">
+              {{ (hoveredCell() || selectedCell()).level }}
+            </span>
+          </div>
+
+          <div class="inspector-metrics">
+            <div class="metric-item">
+              <span class="metric-num">{{ (hoveredCell() || selectedCell()).active_users | number }}</span>
+              <span class="metric-name">Active Listeners</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-num">{{ (hoveredCell() || selectedCell()).play_count | number }}</span>
+              <span class="metric-name">Songs Streamed</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-num">{{ (hoveredCell() || selectedCell()).pct }}%</span>
+              <span class="metric-name">Peak Capacity</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!-- TAB 2: DAY RANKING LEADERBOARD ("Kaunse Din Sabse Zyada Users Active Hote")-->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeSubTab() === 'leaderboard'" class="leaderboard-section">
+
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Day-of-Week Activity Leaderboard</h2>
+            <p class="panel-subtitle">Ranking days of the week by listener footfall, stream volume, and peak listening windows.</p>
+          </div>
+        </div>
+
+        <div class="ranked-days-list">
+          <div 
+            *ngFor="let item of activityData().days_ranked"
+            class="day-rank-card"
+            [class.rank-one]="item.rank === 1"
+            [class.rank-two]="item.rank === 2"
+            [class.weekend]="item.is_weekend">
+            
+            <div class="rank-badge">#{{ item.rank }}</div>
+
+            <div class="day-info">
+              <div class="day-name-row">
+                <span class="day-title">{{ item.day_name }}</span>
+                <span class="status-tag" [class.peak]="item.rank === 1">{{ item.status }}</span>
+                <span *ngIf="item.is_weekend" class="weekend-tag">Weekend</span>
+              </div>
+              <div class="day-sub-info">
+                <span>Peak Time: <strong>{{ item.peak_hour_label }}</strong></span>
+                <span class="dot-separator">·</span>
+                <span>Avg Hourly: <strong>{{ item.avg_hourly | number }} listeners</strong></span>
+              </div>
+            </div>
+
+            <!-- Volume Progress Bar -->
+            <div class="volume-bar-wrapper">
+              <div class="bar-track">
+                <div 
+                  class="bar-fill" 
+                  [style.width]="item.percentage + '%'"
+                  [class.bar-peak]="item.rank === 1"></div>
+              </div>
+              <span class="pct-label">{{ item.percentage }}% of weekly streams</span>
+            </div>
+
+            <div class="day-totals">
+              <div class="total-plays-val">{{ item.total_activity | number }}</div>
+              <div class="total-plays-lbl">Active Events</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekend vs Weekday Detailed Comparison -->
+      <div class="panel-card split-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Weekend vs Weekday Split</h2>
+            <p class="panel-subtitle">How listening behavior shifts between work days (Mon-Fri) and relaxation days (Sat-Sun).</p>
+          </div>
+        </div>
+
+        <div class="split-cards-row">
+          <!-- Weekends -->
+          <div class="split-card weekend-card">
+            <div class="split-icon">🎉</div>
+            <div class="split-content">
+              <span class="split-label">Weekends (Saturday & Sunday)</span>
+              <div class="split-val">{{ activityData().insights?.weekend_vs_weekday?.weekend_share_pct }}% of all plays</div>
+              <p class="split-desc">Average <strong>{{ activityData().insights?.weekend_vs_weekday?.weekend_daily_avg | number }}</strong> active sessions per day. High daytime listening starting at 12 PM with late-night peak.</p>
+            </div>
+          </div>
+
+          <!-- Weekdays -->
+          <div class="split-card weekday-card">
+            <div class="split-icon">💼</div>
+            <div class="split-content">
+              <span class="split-label">Weekdays (Monday – Friday)</span>
+              <div class="split-val">{{ activityData().insights?.weekend_vs_weekday?.weekday_share_pct }}% of all plays</div>
+              <p class="split-desc">Average <strong>{{ activityData().insights?.weekend_vs_weekday?.weekday_daily_avg | number }}</strong> active sessions per day. Concentrated evening surge between 7 PM and 10 PM.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!-- TAB 3: ADVANCE COMPARISONS ("Compare Wagera Advance Features")              -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeSubTab() === 'compare'" class="compare-section">
+
+      <!-- Head-to-Head Day vs Day Comparison -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Day vs Day Head-to-Head Comparison</h2>
+            <p class="panel-subtitle">Select any two days of the week to analyze their 24-hour listening curves side-by-side.</p>
+          </div>
+
+          <!-- Selectors -->
+          <div class="compare-selectors">
+            <div class="select-group day-a-group">
+              <label>Day A (Pink):</label>
+              <select 
+                [ngModel]="selectedCompareA()" 
+                (ngModelChange)="selectedCompareA.set(+$event); onCompareChange()"
+                class="compare-select select-a">
+                <option *ngFor="let opt of dayOptions" [value]="opt.index">{{ opt.name }}</option>
+              </select>
+            </div>
+
+            <span class="vs-badge">VS</span>
+
+            <div class="select-group day-b-group">
+              <label>Day B (Purple):</label>
+              <select 
+                [ngModel]="selectedCompareB()" 
+                (ngModelChange)="selectedCompareB.set(+$event); onCompareChange()"
+                class="compare-select select-b">
+                <option *ngFor="let opt of dayOptions" [value]="opt.index">{{ opt.name }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Summary Bar -->
+        <div class="compare-summary-bar">
+          <div class="side side-a">
+            <span class="side-title">{{ activityData().day_vs_day?.day_a?.name }}</span>
+            <span class="side-stat">{{ activityData().day_vs_day?.day_a?.total | number }} Total Streams</span>
+            <span class="side-peak">Peak at {{ activityData().day_vs_day?.day_a?.peak_hour }}</span>
+          </div>
+
+          <div class="diff-badge" [class.positive]="activityData().day_vs_day?.diff_pct >= 0" [class.negative]="activityData().day_vs_day?.diff_pct < 0">
+            {{ activityData().day_vs_day?.diff_pct >= 0 ? '+' : '' }}{{ activityData().day_vs_day?.diff_pct }}%
+            <span>difference</span>
+          </div>
+
+          <div class="side side-b">
+            <span class="side-title">{{ activityData().day_vs_day?.day_b?.name }}</span>
+            <span class="side-stat">{{ activityData().day_vs_day?.day_b?.total | number }} Total Streams</span>
+            <span class="side-peak">Peak at {{ activityData().day_vs_day?.day_b?.peak_hour }}</span>
+          </div>
+        </div>
+
+        <!-- 24-Hour Comparative Curve Chart -->
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [datasets]="dayCompareChartData()"
+            [labels]="dayCompareChartLabels()"
+            [options]="dayCompareChartOptions"
+            [type]="'line'">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Period Comparison (This Period vs Previous Period) -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Period-over-Period Activity Growth</h2>
+            <p class="panel-subtitle">Comparing listener volume across all 7 days against the previous period benchmark.</p>
+          </div>
+        </div>
+
+        <div class="chart-canvas-wrapper" style="height: 280px;">
+          <canvas baseChart
+            [datasets]="periodCompareData()"
+            [labels]="periodCompareLabels()"
+            [options]="periodCompareChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+
+        <!-- Table of Day-by-Day Delta -->
+        <div class="delta-table-wrapper">
+          <table class="delta-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Current Volume</th>
+                <th>Previous Volume</th>
+                <th>Change</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of activityData().period_comparison?.days">
+                <td class="day-col"><strong>{{ row.day_name }}</strong></td>
+                <td>{{ row.current | number }}</td>
+                <td>{{ row.previous | number }}</td>
+                <td>
+                  <span class="delta-pill" [class.positive]="row.delta_pct >= 0" [class.negative]="row.delta_pct < 0">
+                    {{ row.delta_pct >= 0 ? '+' : '' }}{{ row.delta_pct }}%
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
