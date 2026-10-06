@@ -43,7 +43,7 @@
         (contextmenu)="onRightClick($event, topResult)">
         <div class="top-thumbnail-wrapper">
           <img
-            [src]="topResult.thumbnailHigh || topResult.thumbnail"
+            [src]="getHDThumb(topResult)"
             [alt]="topResult.title"
             (error)="onImgError($event, topResult)"
             referrerpolicy="no-referrer"
@@ -87,7 +87,7 @@
           </div>
           <div class="item-thumbnail">
             <img
-              [src]="track.thumbnail"
+              [src]="getHDThumb(track)"
               [alt]="track.title"
               loading="lazy"
               decoding="async"
@@ -135,7 +135,7 @@
           (contextmenu)="onRightClick($event, album)">
           <div class="media-thumbnail">
             <img
-              [src]="album.thumbnailHigh || album.thumbnail"
+              [src]="getHDThumb(album)"
               [alt]="album.title"
               loading="lazy"
               decoding="async"
@@ -168,7 +168,7 @@
           (contextmenu)="onRightClick($event, playlist)">
           <div class="media-thumbnail">
             <img
-              [src]="playlist.thumbnailHigh || playlist.thumbnail"
+              [src]="getHDThumb(playlist)"
               [alt]="playlist.title"
               loading="lazy"
               decoding="async"
@@ -227,7 +227,7 @@
           </div>
           <div class="item-thumbnail">
             <img
-              [src]="track.thumbnail"
+              [src]="getHDThumb(track)"
               [alt]="track.title"
               loading="lazy"
               decoding="async"
@@ -273,7 +273,7 @@
           [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
           (click)="onArtistClick(artist)">
           <div class="artist-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
-            <img *ngIf="artist.thumb" [src]="artist.thumb" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
+            <img *ngIf="artist.thumb" [src]="getHDUrl(artist.thumb)" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
             <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
           </div>
           <span class="artist-name">{{ artist.name }}</span>
@@ -295,7 +295,7 @@
         (contextmenu)="onRightClick($event, album)">
         <div class="media-thumbnail">
           <img
-            [src]="album.thumbnailHigh || album.thumbnail"
+            [src]="getHDThumb(album)"
             [alt]="album.title"
             loading="lazy"
             decoding="async"
@@ -331,7 +331,7 @@
         (contextmenu)="onRightClick($event, playlist)">
         <div class="media-thumbnail">
           <img
-            [src]="playlist.thumbnailHigh || playlist.thumbnail"
+            [src]="getHDThumb(playlist)"
             [alt]="playlist.title"
             loading="lazy"
             decoding="async"
@@ -362,7 +362,7 @@
         [style.animation-delay.ms]="i * 25"
         (click)="onArtistClick(artist)">
         <div class="artist-card-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
-          <img *ngIf="artist.thumb" [src]="artist.thumb" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
+          <img *ngIf="artist.thumb" [src]="getHDUrl(artist.thumb)" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
           <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
         </div>
         <p class="media-title">{{ artist.name }}</p>

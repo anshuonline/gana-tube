@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    SEARCH RESULTS — Modern Structured Layout
    AMOLED black · white · ambient · responsive
    ═══════════════════════════════════════════════ */
@@ -110,6 +110,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-contrast;
     transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
@@ -241,6 +243,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-contrast;
     transition: filter 0.2s ease;
   }
 }
@@ -354,6 +358,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-contrast;
     display: block;
     transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
   }

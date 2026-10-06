@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucidePlay, LucideMoreVertical, LucideMusic2, LucideAudioLines, LucideDisc3, LucideLibrary, LucideLoader2, LucideChevronDown, LucideChevronRight, LucideUser } from '@lucide/angular';
-import { YouTubeSearchResult } from '../../services/youtube-api.service';
+import { YouTubeSearchResult, getHighResThumbnail } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 
 @Component({
@@ -86,7 +86,7 @@ export class SearchResultsComponent implements OnChanges {
         } else {
           this.songResults = this.songResults.slice(1);
         }
-        this.ambientBgFound.emit(this.topResult.thumbnailHigh || this.topResult.thumbnail);
+        this.ambientBgFound.emit(this.topResult ? this.getHDThumb(this.topResult) : '');
       }
     } else {
       this.topResult = null;
@@ -96,8 +96,17 @@ export class SearchResultsComponent implements OnChanges {
         : this.currentFilter === 'playlists'
           ? this.playlistResults[0]
           : this.songResults[0];
-      this.ambientBgFound.emit(first ? (first.thumbnailHigh || first.thumbnail) : '');
+      this.ambientBgFound.emit(first ? this.getHDThumb(first) : '');
     }
+  }
+
+  getHDThumb(track?: YouTubeSearchResult | null): string {
+    if (!track) return '';
+    return getHighResThumbnail(track.thumbnailHigh || track.thumbnail);
+  }
+
+  getHDUrl(url?: string): string {
+    return getHighResThumbnail(url);
   }
 
   formatDuration(seconds?: number): string {
@@ -131,8 +140,11 @@ export class SearchResultsComponent implements OnChanges {
 
   onImgError(event: Event, track: YouTubeSearchResult): void {
     const img = event.target as HTMLImageElement;
-    if (track.videoId && track.videoId.length === 11) {
-      img.src = `https://img.youtube.com/vi/${track.videoId}/mqdefault.jpg`;
+    if (!img) return;
+    if (track.videoId && track.videoId.length === 11 && !img.dataset['fallback']) {
+      img.dataset['fallback'] = '1';
+      img.src = `https://i.ytimg.com/vi/${track.videoId}/hqdefault.jpg`;
+      return;
     }
     img.style.visibility = 'hidden';
   }

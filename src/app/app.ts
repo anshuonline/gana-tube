@@ -13,7 +13,7 @@ import { SavePlaylistModalComponent } from './components/save-playlist-modal/sav
 import { ToastComponent } from './components/toast/toast.component';
 import { ToastService } from './services/toast.service';
 import { HttpClient } from '@angular/common/http';
-import { YoutubeApiService, YouTubeSearchResult } from './services/youtube-api.service';
+import { YoutubeApiService, YouTubeSearchResult, getHighResThumbnail } from './services/youtube-api.service';
 import { PlayerService, Track } from './services/player.service';
 import { RoomService } from './services/room.service';
 import { AlgorithmService, ShelfDefinition } from './services/algorithm.service';
@@ -2978,8 +2978,8 @@ export class App implements OnInit {
             return data.data.map((pl: any) => ({
               videoId: pl.playlist_id,
               title: pl.playlist_name,
-              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'ganatubenewlogo.png',
-              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'ganatubenewlogo.png',
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && (pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail)) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
               channelTitle: pl.owner,
               publishedAt: pl.created_at,
               type: 'community-playlist'
@@ -3143,8 +3143,8 @@ export class App implements OnInit {
             return data.data.slice(0, 6).map((pl: any) => ({
               videoId: pl.playlist_id,
               title: pl.playlist_name,
-              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? pl.songs[0].thumbnail : 'ganatubenewlogo.png',
-              thumbnailHigh: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh) ? pl.songs[0].thumbnailHigh : 'ganatubenewlogo.png',
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && (pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail)) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
               channelTitle: pl.owner,
               publishedAt: pl.created_at,
               type: 'community-playlist'

@@ -93,6 +93,36 @@ function parseDurationToSeconds(d) {
   return 0;
 }
 
+// Universal helper to upgrade any YouTube Music / Video / Playlist / Album thumbnail to HD
+function toHDUrl(url) {
+  if (!url) return '';
+  if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
+    let u = url;
+    if (/=w\d+-h\d+/i.test(u)) {
+      u = u.replace(/=w\d+-h\d+[^=]*/i, '=w544-h544-l90-rj');
+    } else if (/-w\d+-h\d+/i.test(u)) {
+      u = u.replace(/-w\d+-h\d+[^=]*/i, '-w544-h544-l90-rj');
+    } else if (/=s\d+/i.test(u)) {
+      u = u.replace(/=s\d+(-[a-zA-Z0-9_-]*)?/i, '=s544-c-k-c0x00ffffff-no-rj');
+    } else if (/-s\d+/i.test(u)) {
+      u = u.replace(/-s\d+(-[a-zA-Z0-9_-]*)?/i, '-s544-c-k-c0x00ffffff-no-rj');
+    } else if (/\/s\d+\//i.test(u)) {
+      u = u.replace(/\/s\d+\//i, '/s544/');
+    } else if (!u.includes('=')) {
+      u = u + '=w544-h544-l90-rj';
+    }
+    return u;
+  }
+  if (url.includes('ytimg.com') || url.includes('youtube.com')) {
+    let cleanUrl = url.split('?')[0];
+    if (cleanUrl.includes('/default.jpg') || cleanUrl.includes('/mqdefault.jpg') || cleanUrl.includes('/sddefault.jpg')) {
+      cleanUrl = cleanUrl.replace(/\/(default|mqdefault|sddefault)\.jpg$/i, '/hqdefault.jpg');
+    }
+    return cleanUrl;
+  }
+  return url;
+}
+
 async function getBotSongs() {
   const yt = await getYTMusic();
   const queries = ['Trending Hindi Songs', 'Trending English Songs'];
@@ -176,8 +206,8 @@ async function getBotSongs() {
         videoId: song.videoId,
         title: song.name || song.title,
         channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : 'Unknown Artist'),
-        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
-        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
+        thumbnail: toHDUrl(song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : ''),
+        thumbnailHigh: toHDUrl(song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : ''),
         duration: parseDurationToSeconds(song.duration),
         publishedAt: new Date().toISOString()
       }));
@@ -249,18 +279,6 @@ app.get('/api/trending', async (req, res) => {
     const yt = await getYTMusic();
     const query = `Trending ${lang} Songs`;
     let results = await yt.searchSongs(query);
-    
-    // Helper to upgrade YouTube Music / Video thumbnails to high resolution (HD)
-    const toHDUrl = (url) => {
-      if (!url) return '';
-      if (url.includes('img.youtube.com')) {
-        return url.replace('/default.jpg', '/hqdefault.jpg');
-      }
-      return url
-        .replace(/=w\d+-h\d+/, '=w600-h600')
-        .replace(/-w\d+-h\d+/, '-w600-h600')
-        .replace(/\/s\d+-/, '/s600-');
-    };
 
     const mappedResults = results.map(item => {
       const artistName = item.artist && typeof item.artist === 'object' 
@@ -331,19 +349,6 @@ app.get('/api/songs', async (req, res) => {
       results = results.slice(0, limit);
     }
 
-    // Helper to upgrade YouTube Music / Video thumbnails to high resolution (HD)
-    const toHDUrl = (url) => {
-      if (!url) return '';
-      if (url.includes('img.youtube.com')) {
-        return url.replace('/default.jpg', '/hqdefault.jpg');
-      }
-      // Replace dynamic sizing parameters in Google UserContent URLs (album art) to 600x600 for sharp HD
-      return url
-        .replace(/=w\d+-h\d+/, '=w600-h600')
-        .replace(/-w\d+-h\d+/, '-w600-h600')
-        .replace(/\/s\d+-/, '/s600-');
-    };
-
     // Map to standard YouTubeSearchResult format expected by Angular frontend
     const mappedResults = results.map(item => {
       const artistName = item.artist && typeof item.artist === 'object' 
@@ -397,10 +402,10 @@ app.get('/api/album', async (req, res) => {
           videoId: song.videoId,
           title: song.name || song.title,
           channelTitle: (song.artist && song.artist.name) || (album.artist && album.artist.name) || 'Unknown Artist',
-          thumbnail: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : 
-                     (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : ''),
-          thumbnailHigh: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : 
-                        (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : ''),
+          thumbnail: toHDUrl(song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : 
+                     (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '')),
+          thumbnailHigh: toHDUrl(song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : 
+                        (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '')),
           duration: song.duration,
           publishedAt: album.year ? `${album.year}-01-01T00:00:00Z` : new Date().toISOString()
         }));
@@ -415,10 +420,10 @@ app.get('/api/album', async (req, res) => {
         videoId: song.videoId,
         title: song.name || song.title,
         channelTitle: (song.artist && song.artist.name) || (album.artist && album.artist.name) || 'Unknown Artist',
-        thumbnail: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : 
-                   (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : ''),
-        thumbnailHigh: song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : 
-                      (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : ''),
+        thumbnail: toHDUrl(song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : 
+                   (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '')),
+        thumbnailHigh: toHDUrl(song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : 
+                      (song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '')),
         publishedAt: album.year ? `${album.year}-01-01T00:00:00Z` : new Date().toISOString()
       }));
     }
@@ -427,7 +432,7 @@ app.get('/api/album', async (req, res) => {
       id: album.albumId || id,
       title: album.name || album.title,
       creator: (album.artist && album.artist.name) || (typeof album.artist === 'string' ? album.artist : 'YouTube Music'),
-      coverImage: album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : '',
+      coverImage: toHDUrl(album.thumbnails && album.thumbnails.length > 0 ? album.thumbnails[album.thumbnails.length - 1].url : ''),
       searchQueries: [],
       preloadedSongs: songs
     });
@@ -458,8 +463,8 @@ app.get('/api/playlist', async (req, res) => {
         videoId: item.videoId,
         title: item.title?.runs?.[0]?.text || 'Unknown',
         channelTitle: item.shortBylineText?.runs?.map(r => r.text).join('') || 'Unknown Artist',
-        thumbnail: item.thumbnail?.thumbnails?.[0]?.url || '',
-        thumbnailHigh: item.thumbnail?.thumbnails?.at(-1)?.url || '',
+        thumbnail: toHDUrl(item.thumbnail?.thumbnails?.[0]?.url || ''),
+        thumbnailHigh: toHDUrl(item.thumbnail?.thumbnails?.at(-1)?.url || ''),
         duration: parseDurationToSeconds(item.lengthText?.runs?.[0]?.text || '0:00'),
         publishedAt: new Date().toISOString()
       }));
@@ -468,7 +473,7 @@ app.get('/api/playlist', async (req, res) => {
         id: playlistId,
         title: subtitle,
         creator: 'YouTube Music',
-        coverImage: songs.length > 0 ? songs[0].thumbnailHigh : '',
+        coverImage: toHDUrl(songs.length > 0 ? songs[0].thumbnailHigh : ''),
         searchQueries: [],
         preloadedSongs: songs
       });
@@ -485,8 +490,8 @@ app.get('/api/playlist', async (req, res) => {
         videoId: song.videoId,
         title: song.name || song.title,
         channelTitle: (song.artist && song.artist.name) || (typeof song.artist === 'string' ? song.artist : 'Unknown Artist'),
-        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
-        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
+        thumbnail: toHDUrl(song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : (song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : '')),
+        thumbnailHigh: toHDUrl(song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : (song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : '')),
         duration: song.duration,
         publishedAt: new Date().toISOString()
       }));
@@ -497,8 +502,8 @@ app.get('/api/playlist', async (req, res) => {
         videoId: song.videoId,
         title: song.name || song.title,
         channelTitle: (song.artist && song.artist.name) || 'Unknown Artist',
-        thumbnail: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : '',
-        thumbnailHigh: song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : '',
+        thumbnail: toHDUrl(song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[0].url : (song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/mqdefault.jpg` : '')),
+        thumbnailHigh: toHDUrl(song.thumbnails && song.thumbnails.length > 0 ? song.thumbnails[song.thumbnails.length - 1].url : (song.videoId ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` : '')),
         publishedAt: new Date().toISOString()
       }));
     }
@@ -507,7 +512,7 @@ app.get('/api/playlist', async (req, res) => {
       id: playlist.playlistId || id,
       title: playlist.name || playlist.title,
       creator: (playlist.author && playlist.author.name) || (playlist.artist && playlist.artist.name) || (typeof playlist.author === 'string' ? playlist.author : 'YouTube Music'),
-      coverImage: playlist.thumbnails && playlist.thumbnails.length > 0 ? playlist.thumbnails[playlist.thumbnails.length - 1].url : '',
+      coverImage: toHDUrl(playlist.thumbnails && playlist.thumbnails.length > 0 ? playlist.thumbnails[playlist.thumbnails.length - 1].url : (songs.length > 0 ? songs[0].thumbnailHigh : '')),
       searchQueries: [],
       preloadedSongs: songs
     });
@@ -527,17 +532,6 @@ app.get('/api/radio', async (req, res) => {
     const data = await yt.constructRequest('next', { playlistId: 'RDAMVM' + videoId, isAudioOnly: true });
     const queueRenderer = data.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer;
     const contents = queueRenderer?.content?.playlistPanelRenderer?.contents || [];
-
-    const toHDUrl = (url) => {
-      if (!url) return '';
-      if (url.includes('img.youtube.com')) {
-        return url.replace('/default.jpg', '/hqdefault.jpg');
-      }
-      return url
-        .replace(/=w\d+-h\d+/, '=w500-h500')
-        .replace(/-w\d+-h\d+/, '-w500-h500')
-        .replace(/\/s\d+-/, '/s500-');
-    };
 
     let songs = contents
       .map(item => item.playlistPanelVideoRenderer)

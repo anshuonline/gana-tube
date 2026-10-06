@@ -15,6 +15,44 @@ export interface YouTubeSearchResult {
   type?: string;
 }
 
+/**
+ * Universal helper to convert any low/medium resolution YouTube or Google image
+ * URL to crystal-clear high-definition (HD) resolution.
+ */
+export function getHighResThumbnail(url?: string): string {
+  if (!url) return '';
+
+  // 1. Google UserContent / ggpht (YouTube Music Album art, artist images)
+  if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
+    let u = url;
+    if (/=w\d+-h\d+/i.test(u)) {
+      u = u.replace(/=w\d+-h\d+[^=]*/i, '=w544-h544-l90-rj');
+    } else if (/-w\d+-h\d+/i.test(u)) {
+      u = u.replace(/-w\d+-h\d+[^=]*/i, '-w544-h544-l90-rj');
+    } else if (/=s\d+/i.test(u)) {
+      u = u.replace(/=s\d+(-[a-zA-Z0-9_-]*)?/i, '=s544-c-k-c0x00ffffff-no-rj');
+    } else if (/-s\d+/i.test(u)) {
+      u = u.replace(/-s\d+(-[a-zA-Z0-9_-]*)?/i, '-s544-c-k-c0x00ffffff-no-rj');
+    } else if (/\/s\d+\//i.test(u)) {
+      u = u.replace(/\/s\d+\//i, '/s544/');
+    } else if (!u.includes('=')) {
+      u = u + '=w544-h544-l90-rj';
+    }
+    return u;
+  }
+
+  // 2. YouTube Video Thumbnails (i.ytimg.com / img.youtube.com)
+  if (url.includes('ytimg.com') || url.includes('youtube.com')) {
+    let cleanUrl = url.split('?')[0];
+    if (cleanUrl.includes('/default.jpg') || cleanUrl.includes('/mqdefault.jpg') || cleanUrl.includes('/sddefault.jpg')) {
+      cleanUrl = cleanUrl.replace(/\/(default|mqdefault|sddefault)\.jpg$/i, '/hqdefault.jpg');
+    }
+    return cleanUrl;
+  }
+
+  return url;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -132,7 +170,12 @@ export class YoutubeApiService {
       try {
         const parsed = JSON.parse(cached);
         if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) { // 24 hours expiry
-          const shuffled = [...parsed.data].sort(() => 0.5 - Math.random());
+          const upgraded = (parsed.data || []).map((t: YouTubeSearchResult) => ({
+            ...t,
+            thumbnail: getHighResThumbnail(t.thumbnailHigh || t.thumbnail),
+            thumbnailHigh: getHighResThumbnail(t.thumbnailHigh || t.thumbnail)
+          }));
+          const shuffled = [...upgraded].sort(() => 0.5 - Math.random());
           return of(shuffled);
         }
       } catch (e) {
@@ -164,8 +207,8 @@ export class YoutubeApiService {
               videoId: item.id.videoId,
               title: this.decodeHtml(item.snippet.title),
               channelTitle: item.snippet.channelTitle,
-              thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
-              thumbnailHigh: item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.standard?.url || item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+              thumbnail: getHighResThumbnail(item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url),
+              thumbnailHigh: getHighResThumbnail(item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.standard?.url || item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url),
               publishedAt: item.snippet.publishedAt,
             }))
           ),
@@ -174,6 +217,11 @@ export class YoutubeApiService {
       }),
       map(results => results.filter((track: YouTubeSearchResult) => !this.isBanned(track))),
       map(results => this.injectCuratedSongs(query, results)),
+      map(results => (results || []).map((track: YouTubeSearchResult) => ({
+        ...track,
+        thumbnail: getHighResThumbnail(track.thumbnailHigh || track.thumbnail),
+        thumbnailHigh: getHighResThumbnail(track.thumbnailHigh || track.thumbnail)
+      }))),
       map(results => {
         if (results && results.length > 0) {
           try {
@@ -194,6 +242,18 @@ export class YoutubeApiService {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams().set('id', playlistId);
     return this.http.get<any>(`${backendUrl}/playlist`, { params }).pipe(
+      map((res) => {
+        if (!res) return null;
+        if (res.coverImage) res.coverImage = getHighResThumbnail(res.coverImage);
+        if (res.preloadedSongs && Array.isArray(res.preloadedSongs)) {
+          res.preloadedSongs = res.preloadedSongs.map((s: any) => ({
+            ...s,
+            thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
+            thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
+          }));
+        }
+        return res;
+      }),
       catchError((err) => {
         console.error('Failed to fetch YT playlist', err);
         return of(null);
@@ -205,6 +265,18 @@ export class YoutubeApiService {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     const params = new HttpParams().set('id', albumId);
     return this.http.get<any>(`${backendUrl}/album`, { params }).pipe(
+      map((res) => {
+        if (!res) return null;
+        if (res.coverImage) res.coverImage = getHighResThumbnail(res.coverImage);
+        if (res.preloadedSongs && Array.isArray(res.preloadedSongs)) {
+          res.preloadedSongs = res.preloadedSongs.map((s: any) => ({
+            ...s,
+            thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
+            thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
+          }));
+        }
+        return res;
+      }),
       catchError((err) => {
         console.error('Failed to fetch YT album', err);
         return of(null);
