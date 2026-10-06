@@ -56,7 +56,20 @@ export class AnalyticsService {
     this.lastSearchQuery = query;
   }
 
+  isBotEnvironment(): boolean {
+    if (typeof window === 'undefined') return false;
+    const search = window.location.search || '';
+    if (search.includes('LSCWP_CTRL') || search.includes('before_optm')) {
+      return true;
+    }
+    if ((navigator as any).webdriver) {
+      return true;
+    }
+    return false;
+  }
+
   startGuestTracking() {
+    if (this.isBotEnvironment()) return;
     if (this.timeTrackingInterval) {
       clearInterval(this.timeTrackingInterval);
     }
@@ -71,6 +84,7 @@ export class AnalyticsService {
   }
 
   async recordGuestPing(guestId: string, seconds: number = 60) {
+    if (this.isBotEnvironment()) return;
     try {
       const page = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : this.currentPage;
       await fetch(`${this.apiUrl}?action=recordGuestPing`, {
@@ -108,6 +122,7 @@ export class AnalyticsService {
 
   async recordPlay(track: any) {
     if (!track || !track.videoId) return;
+    if (this.isBotEnvironment()) return;
     const isGuest = !this.currentUserEmail;
     const guestId = isGuest ? this.getGuestId() : null;
     const page = '/play?v=' + track.videoId;
@@ -176,6 +191,33 @@ export class AnalyticsService {
   getRoomAnalytics(password: string) {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     return this.http.get<{status: string, data?: any, message?: string}>(`${backendUrl}/room-analytics?pwd=${encodeURIComponent(password)}`);
+  }
+
+  getExcludedIps(password: string) {
+    return this.http.get<{status: string, data?: any[], client_ip?: string, message?: string}>(
+      `${this.apiUrl}?action=getExcludedIps&pwd=${encodeURIComponent(password)}`
+    );
+  }
+
+  addExcludedIp(password: string, ip: string, note?: string) {
+    return this.http.post<{status: string, message?: string, purged_count?: number, data?: any[]}>(
+      `${this.apiUrl}?action=addExcludedIp`,
+      { pwd: password, ip, note }
+    );
+  }
+
+  removeExcludedIp(password: string, ip: string) {
+    return this.http.post<{status: string, message?: string, data?: any[]}>(
+      `${this.apiUrl}?action=removeExcludedIp`,
+      { pwd: password, ip }
+    );
+  }
+
+  purgeHostingerBots(password: string) {
+    return this.http.post<{status: string, message?: string, purged_count?: number}>(
+      `${this.apiUrl}?action=purgeHostingerBots`,
+      { pwd: password }
+    );
   }
 
   // ── Search Analytics Tracking & API ───────────────────────────────────────

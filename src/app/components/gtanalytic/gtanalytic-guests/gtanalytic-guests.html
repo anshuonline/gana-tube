@@ -23,6 +23,16 @@
         <span class="geo-top-pill">Top 50</span>
       </button>
 
+      <!-- IP & Bot Filter Settings Button -->
+      <button class="settings-action-btn" (click)="openSettingsModal()" title="Manage Excluded IPs & Hostinger Bot Filter">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>IP & Bot Filter</span>
+        <span class="settings-count-pill" *ngIf="excludedIps().length">{{ excludedIps().length }}</span>
+      </button>
+
       <!-- Time Filter Pills -->
       <div class="filter-pill-group">
         <button class="filter-pill" [class.active]="dataService.currentFilter() === 'today'" (click)="setFilter('today')">Today</button>
@@ -201,9 +211,17 @@
               <td style="color: #10b981; font-weight: 500; font-size: 12px;">
                 {{ formatRelativeTime(g.last_active) }}
               </td>
-              <td style="text-align: right;">
+              <td style="text-align: right; white-space: nowrap;">
                 <button class="inspect-btn" (click)="$event.stopPropagation(); openGuestModal(g)">
                   Inspect
+                </button>
+                <button 
+                  *ngIf="g.ip_address && g.ip_address !== '—'" 
+                  class="quick-exclude-btn" 
+                  (click)="$event.stopPropagation(); quickExcludeIp(g.ip_address)"
+                  [disabled]="quickExcludingIp() === g.ip_address"
+                  [title]="'Exclude & block IP ' + g.ip_address">
+                  {{ quickExcludingIp() === g.ip_address ? '...' : '🚫' }}
                 </button>
               </td>
             </tr>
@@ -329,9 +347,17 @@
               <td style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
                 {{ formatRelativeTime(g.last_active) }}
               </td>
-              <td style="text-align: right;">
+              <td style="text-align: right; white-space: nowrap;">
                 <button class="inspect-btn" (click)="$event.stopPropagation(); openGuestModal(g)">
                   Inspect
+                </button>
+                <button 
+                  *ngIf="g.ip_address && g.ip_address !== '—'" 
+                  class="quick-exclude-btn" 
+                  (click)="$event.stopPropagation(); quickExcludeIp(g.ip_address)"
+                  [disabled]="quickExcludingIp() === g.ip_address"
+                  [title]="'Exclude & block IP ' + g.ip_address">
+                  {{ quickExcludingIp() === g.ip_address ? '...' : '🚫' }}
                 </button>
               </td>
             </tr>
@@ -377,6 +403,15 @@
             <div class="detail-sub-row">
               <span class="flag-large">{{ getCountryFlag(selectedGuest().country_code) }}</span>
               <span class="geo-text">{{ selectedGuest().location || 'Location Not Available' }}</span>
+            </div>
+            <div *ngIf="selectedGuest().ip_address && selectedGuest().ip_address !== '—'" style="margin-top: 10px;">
+              <button 
+                class="modal-exclude-ip-btn"
+                (click)="quickExcludeIp(selectedGuest().ip_address, 'Blocked via Guest Inspector')"
+                [disabled]="quickExcludingIp() === selectedGuest().ip_address">
+                <span *ngIf="quickExcludingIp() === selectedGuest().ip_address">Excluding IP...</span>
+                <span *ngIf="quickExcludingIp() !== selectedGuest().ip_address">🚫 Exclude This IP From Tracking</span>
+              </button>
             </div>
           </div>
 
@@ -490,7 +525,7 @@
         <button class="modal-close-btn" (click)="closeGeoModal()" aria-label="Close modal">&times;</button>
       </div>
 
-      <!-- Filter Bar: DAU / WAU / MAU / YAU / All Time + Search -->
+      <!-- Filter Bar: DAU / WAU / MAU / YAU / All Time + View Mode + Search -->
       <div class="geo-controls-bar">
         <!-- Range Filter Pills -->
         <div class="geo-range-pills">
@@ -530,17 +565,37 @@
           </button>
         </div>
 
-        <!-- Filter / Search by City / Country -->
-        <div class="geo-search-box">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input 
-            type="text" 
-            [ngModel]="geoSearchQuery()" 
-            (ngModelChange)="geoSearchQuery.set($event)"
-            placeholder="Filter city, state, country..." 
-            class="geo-search-input"
-          />
-          <button *ngIf="geoSearchQuery()" (click)="geoSearchQuery.set('')" class="btn-clear">&times;</button>
+        <div class="geo-controls-right">
+          <!-- View Dimension Mode -->
+          <div class="geo-view-pills">
+            <button 
+              class="geo-view-pill" 
+              [class.active]="geoViewMode() === 'map'" 
+              (click)="geoViewMode.set('map')">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Map & Countries</span>
+            </button>
+            <button 
+              class="geo-view-pill" 
+              [class.active]="geoViewMode() === 'cities'" 
+              (click)="geoViewMode.set('cities')">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>Cities Table</span>
+            </button>
+          </div>
+
+          <!-- Filter / Search by City / Country -->
+          <div class="geo-search-box">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input 
+              type="text" 
+              [ngModel]="geoSearchQuery()" 
+              (ngModelChange)="geoSearchQuery.set($event)"
+              placeholder="Filter city, state, country..." 
+              class="geo-search-input"
+            />
+            <button *ngIf="geoSearchQuery()" (click)="geoSearchQuery.set('')" class="btn-clear">&times;</button>
+          </div>
         </div>
       </div>
 
@@ -562,113 +617,489 @@
             <span class="geo-kpi-val">{{ formatSeconds(geoData().summary.total_time_seconds) }}</span>
           </div>
           <div class="geo-kpi-card emerald-kpi">
-            <span class="geo-kpi-lbl">Cities / Locations Tracked</span>
-            <span class="geo-kpi-val">{{ geoData().summary.total_cities_count | number }}</span>
+            <span class="geo-kpi-lbl">Countries / Cities Tracked</span>
+            <span class="geo-kpi-val">{{ countryStats().length }} Countries &bull; {{ geoData().summary.total_cities_count | number }} Cities</span>
+          </div>
+        </div>
+
+        <!-- Active Country Filter Chip Banner (GA4 Drilldown) -->
+        <div class="country-filter-chip-row" *ngIf="selectedCountryCode()">
+          <div class="active-filter-badge">
+            <span class="filter-flag">{{ getCountryFlag(selectedCountryCode()!) }}</span>
+            <span class="filter-txt">
+              Showing cities in <strong>{{ getCountryNameByCode(selectedCountryCode()!) }}</strong> 
+              ({{ countryStatsMap()[selectedCountryCode()!]?.active_guests || 0 }} active listeners &bull; {{ countryStatsMap()[selectedCountryCode()!]?.percentage }}% traffic)
+            </span>
+            <button class="btn-clear-filter" (click)="clearCountryFilter()" title="Clear country filter">
+              &times; Reset All Countries
+            </button>
           </div>
         </div>
 
         <!-- Loading State -->
         <div class="geo-loading-state" *ngIf="geoLoading()">
           <div class="geo-spinner"></div>
-          <p>Analyzing audience location demographics ({{ geoRange().toUpperCase() }})...</p>
+          <p>Analyzing Google Analytics audience location demographics ({{ geoRange().toUpperCase() }})...</p>
         </div>
 
         <!-- Error State -->
-        <div class="geo-error-state" *ngIf="geoError() && !geoLoading()" style="padding: 30px; text-align: center; color: #f87171; background: rgba(239, 68, 68, 0.08); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2); margin-bottom: 20px;">
-          <p style="font-size: 14px; margin-bottom: 12px;">{{ geoError() }}</p>
-          <button type="button" class="geo-range-pill active" (click)="loadGeoData()" style="margin: 0 auto; display: inline-flex; cursor: pointer;">Retry</button>
+        <div class="geo-error-state" *ngIf="geoError() && !geoLoading()">
+          <p>{{ geoError() }}</p>
+          <button type="button" class="geo-range-pill active" (click)="loadGeoData()">Retry</button>
         </div>
 
-        <!-- Top 50 Locations Table -->
-        <div class="table-responsive geo-table-responsive" *ngIf="!geoLoading() && !geoError()">
-          <table class="guest-table geo-table">
-            <thead>
-              <tr>
-                <th style="width: 55px; text-align: center;">Rank</th>
-                <th>Location / City</th>
-                <th>Active Guests</th>
-                <th style="width: 170px;">Traffic Share</th>
-                <th>Total Streams</th>
-                <th>Listen Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngIf="!filteredGeoLocations().length">
-                <td colspan="6" class="empty-state">
-                  <p>No active location data found for {{ geoRange().toUpperCase() }}.</p>
-                </td>
-              </tr>
-              <tr *ngFor="let loc of filteredGeoLocations()">
-                <!-- Rank -->
-                <td style="text-align: center;">
-                  <span class="rank-badge" [class.rank-1]="loc.rank === 1" [class.rank-2]="loc.rank === 2" [class.rank-3]="loc.rank === 3">
-                    <ng-container *ngIf="loc.rank === 1">🥇</ng-container>
-                    <ng-container *ngIf="loc.rank === 2">🥈</ng-container>
-                    <ng-container *ngIf="loc.rank === 3">🥉</ng-container>
-                    <ng-container *ngIf="loc.rank > 3">#{{ loc.rank }}</ng-container>
-                  </span>
-                </td>
+        <!-- ── GOOGLE ANALYTICS 4 SPLIT SECTION: INTERACTIVE WORLD MAP + TOP COUNTRIES ── -->
+        <div class="geo-ga4-layout" *ngIf="!geoLoading() && !geoError() && geoViewMode() === 'map'">
+          
+          <!-- Left: SVG Interactive Vector World Map -->
+          <div class="geo-map-panel">
+            <div class="map-panel-header">
+              <div class="map-header-left">
+                <span class="map-title">Audience Geographic Map</span>
+                <span class="map-hint">Click country to drill down into cities &bull; Glowing dots indicate live active cities</span>
+              </div>
+              <div class="map-zoom-controls">
+                <button class="zoom-btn" (click)="setMapZoom(0.2)" title="Zoom In">+</button>
+                <button class="zoom-btn" (click)="setMapZoom(-0.2)" title="Zoom Out">&minus;</button>
+                <button class="zoom-btn reset" (click)="resetMapZoom()" title="Reset Zoom">100%</button>
+              </div>
+            </div>
 
-                <!-- Location / City -->
-                <td>
-                  <div class="geo-city-cell">
-                    <span class="geo-flag">{{ getCountryFlag(loc.country_code) }}</span>
-                    <div class="geo-city-meta">
-                      <span class="geo-city-name">{{ loc.city || 'Unknown' }}</span>
-                      <span class="geo-region-country">
-                        <ng-container *ngIf="loc.region">{{ loc.region }}, </ng-container>{{ loc.country }}
-                      </span>
+            <!-- Viewport with SVG Map and Floating Tooltip -->
+            <div class="geo-map-viewport" (mousemove)="onMapMouseMove($event)">
+              
+              <div class="svg-map-wrapper" [style.transform]="'scale(' + mapZoom() + ')'">
+                <svg 
+                  viewBox="30.767 241.591 784.077 458.627" 
+                  class="geo-svg-map">
+                  
+                  <!-- All 180 Countries -->
+                  <g class="world-countries-group">
+                    <path 
+                      *ngFor="let country of worldMapPaths; trackBy: trackByCountryId"
+                      [attr.id]="country.id"
+                      [attr.d]="country.d"
+                      class="country-path"
+                      [class.has-traffic]="(countryStatsMap()[country.id.toUpperCase()]?.active_guests || 0) > 0"
+                      [class.selected]="selectedCountryCode() === country.id.toUpperCase()"
+                      [style.fill]="getCountryFillColor(country.id)"
+                      (mouseenter)="onCountryHover(country.id, $event)"
+                      (mouseleave)="onCountryLeave()"
+                      (click)="selectCountry(country.id)"
+                    />
+                  </g>
+
+                  <!-- Live City Radar Pulsing Beacons -->
+                  <g class="city-beacons-group">
+                    <g 
+                      *ngFor="let beacon of activeCityBeacons()" 
+                      class="city-beacon-node"
+                      (mouseenter)="onBeaconHover(beacon, $event)"
+                      (mouseleave)="onCountryLeave()"
+                      (click)="selectCountry(beacon.country_code)">
+                      <circle [attr.cx]="beacon.cx" [attr.cy]="beacon.cy" r="8" class="beacon-ripple"></circle>
+                      <circle [attr.cx]="beacon.cx" [attr.cy]="beacon.cy" r="3.5" class="beacon-core"></circle>
+                    </g>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Floating Tooltip (GA4 Style) -->
+              <div 
+                class="geo-map-tooltip" 
+                *ngIf="hoveredCountry() || hoveredBeacon()"
+                [style.left.px]="tooltipPos().x + 12"
+                [style.top.px]="tooltipPos().y + 12">
+                
+                <!-- Country Tooltip Content -->
+                <ng-container *ngIf="hoveredCountry() && !hoveredBeacon()">
+                  <div class="tooltip-header">
+                    <span class="tooltip-flag">{{ hoveredCountry()?.flag }}</span>
+                    <span class="tooltip-name">{{ hoveredCountry()?.name }}</span>
+                    <span class="tooltip-pct" *ngIf="hoveredCountry()?.active_guests">{{ hoveredCountry()?.percentage }}%</span>
+                  </div>
+                  <div class="tooltip-body">
+                    <div class="tooltip-row">
+                      <span class="tl-lbl">Active Guests:</span>
+                      <strong class="tl-val highlight">{{ hoveredCountry()?.active_guests || 0 }} listeners</strong>
+                    </div>
+                    <div class="tooltip-row" *ngIf="hoveredCountry()?.active_guests">
+                      <span class="tl-lbl">Total Streams:</span>
+                      <strong class="tl-val">{{ hoveredCountry()?.total_plays | number }} plays</strong>
+                    </div>
+                    <div class="tooltip-row" *ngIf="hoveredCountry()?.active_guests">
+                      <span class="tl-lbl">Listen Time:</span>
+                      <strong class="tl-val">{{ formatSeconds(hoveredCountry()?.total_time_seconds || 0) }}</strong>
+                    </div>
+                    <div class="tooltip-hint" *ngIf="hoveredCountry()?.active_guests">
+                      👉 Click to view {{ hoveredCountry()?.city_count }} cities in table
                     </div>
                   </div>
-                </td>
+                </ng-container>
 
-                <!-- Active Guests -->
-                <td>
-                  <span class="geo-guest-count">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <strong>{{ loc.active_guests | number }}</strong>
-                    <span class="unit-txt">guests</span>
-                  </span>
-                </td>
-
-                <!-- Traffic Share % & Bar -->
-                <td>
-                  <div class="geo-share-cell">
-                    <div class="geo-share-header">
-                      <span class="geo-share-pct">{{ loc.percentage }}%</span>
+                <!-- City Beacon Tooltip Content -->
+                <ng-container *ngIf="hoveredBeacon()">
+                  <div class="tooltip-header">
+                    <span class="tooltip-flag">{{ hoveredBeacon()?.flag }}</span>
+                    <span class="tooltip-name">{{ hoveredBeacon()?.city }}</span>
+                    <span class="tooltip-sub">({{ hoveredBeacon()?.country }})</span>
+                  </div>
+                  <div class="tooltip-body">
+                    <div class="tooltip-row">
+                      <span class="tl-lbl">Live Guests:</span>
+                      <strong class="tl-val highlight">{{ hoveredBeacon()?.active_guests }} listeners</strong>
                     </div>
-                    <div class="geo-progress-track">
-                      <div class="geo-progress-bar" [style.width.%]="loc.percentage"></div>
+                    <div class="tooltip-row">
+                      <span class="tl-lbl">Total Streams:</span>
+                      <strong class="tl-val">{{ hoveredBeacon()?.total_plays | number }} plays</strong>
                     </div>
                   </div>
-                </td>
+                </ng-container>
+              </div>
 
-                <!-- Total Streams -->
-                <td>
-                  <span class="geo-plays-badge">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    {{ loc.total_plays | number }}
-                  </span>
-                </td>
+              <!-- Map Intensity Scale Legend -->
+              <div class="map-legend-bar">
+                <span class="legend-lbl">Listener Density:</span>
+                <div class="legend-scale">
+                  <span class="legend-box scale-0" title="0 Listeners"></span>
+                  <span class="legend-box scale-low" title="Low Volume (Indigo)"></span>
+                  <span class="legend-box scale-mid" title="Medium Volume (Purple)"></span>
+                  <span class="legend-box scale-high" title="High Volume (Fuchsia)"></span>
+                  <span class="legend-box scale-peak" title="Peak Volume (Hot Pink)"></span>
+                </div>
+                <span class="legend-min">0</span>
+                <span class="legend-max">Peak ({{ maxCountryGuests() }})</span>
+              </div>
 
-                <!-- Listen Time -->
-                <td>
-                  <span class="geo-time-txt">{{ formatSeconds(loc.total_time_seconds) }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            </div>
+          </div>
+
+          <!-- Right: Top Countries Leaderboard (GA4 Style) -->
+          <div class="geo-countries-panel">
+            <div class="countries-panel-head">
+              <span class="cp-title">Top Countries</span>
+              <span class="cp-count">{{ countryStats().length }} regions</span>
+            </div>
+
+            <div class="countries-list-scroll">
+              <div 
+                *ngFor="let c of countryStats(); let idx = index" 
+                class="country-item-row"
+                [class.active]="selectedCountryCode() === c.code"
+                (click)="selectCountry(c.code)">
+                
+                <div class="country-item-top">
+                  <div class="country-left">
+                    <span class="c-rank">{{ idx + 1 }}.</span>
+                    <span class="c-flag">{{ c.flag }}</span>
+                    <span class="c-name" [title]="c.name">{{ c.name }}</span>
+                  </div>
+                  <div class="country-right">
+                    <span class="c-guests">{{ c.active_guests }} <span class="unit">guests</span></span>
+                    <span class="c-pct">({{ c.percentage }}%)</span>
+                  </div>
+                </div>
+
+                <!-- Traffic Share Gradient Progress Bar -->
+                <div class="c-progress-track">
+                  <div class="c-progress-fill" [style.width.%]="c.percentage"></div>
+                </div>
+              </div>
+
+              <div *ngIf="!countryStats().length" class="empty-countries">
+                <p>No active country data found</p>
+              </div>
+            </div>
+
+            <div class="countries-panel-foot" *ngIf="selectedCountryCode()">
+              <button class="btn-reset-countries" (click)="clearCountryFilter()">
+                &times; View All Countries
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── DETAILED CITIES BREAKDOWN TABLE ── -->
+        <div class="geo-table-section" *ngIf="!geoLoading() && !geoError()">
+          <div class="geo-table-header-row">
+            <div class="table-header-title">
+              <h3>
+                <span *ngIf="!selectedCountryCode()">All Cities & Locations Leaderboard</span>
+                <span *ngIf="selectedCountryCode()">Cities in {{ getCountryNameByCode(selectedCountryCode()!) }}</span>
+              </h3>
+              <span class="table-count-tag">{{ filteredGeoLocations().length }} locations</span>
+            </div>
+            <div class="table-header-actions" *ngIf="selectedCountryCode()">
+              <button class="filter-tag-btn" (click)="clearCountryFilter()">
+                <span>{{ getCountryFlag(selectedCountryCode()!) }} {{ getCountryNameByCode(selectedCountryCode()!) }}</span>
+                <span class="remove-x">&times;</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive geo-table-responsive">
+            <table class="guest-table geo-table">
+              <thead>
+                <tr>
+                  <th style="width: 55px; text-align: center;">Rank</th>
+                  <th>Location / City</th>
+                  <th>Active Guests</th>
+                  <th style="width: 170px;">Traffic Share</th>
+                  <th>Total Streams</th>
+                  <th>Listen Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="!filteredGeoLocations().length">
+                  <td colspan="6" class="empty-state">
+                    <p>No active location data found for {{ geoRange().toUpperCase() }}<ng-container *ngIf="selectedCountryCode()"> in {{ getCountryNameByCode(selectedCountryCode()!) }}</ng-container>.</p>
+                    <button *ngIf="selectedCountryCode()" class="geo-range-pill active" (click)="clearCountryFilter()" style="margin: 8px auto 0; display: inline-flex;">View All Countries</button>
+                  </td>
+                </tr>
+                <tr *ngFor="let loc of filteredGeoLocations()">
+                  <!-- Rank -->
+                  <td style="text-align: center;">
+                    <span class="rank-badge" [class.rank-1]="loc.rank === 1" [class.rank-2]="loc.rank === 2" [class.rank-3]="loc.rank === 3">
+                      <ng-container *ngIf="loc.rank === 1">🥇</ng-container>
+                      <ng-container *ngIf="loc.rank === 2">🥈</ng-container>
+                      <ng-container *ngIf="loc.rank === 3">🥉</ng-container>
+                      <ng-container *ngIf="loc.rank > 3">#{{ loc.rank }}</ng-container>
+                    </span>
+                  </td>
+
+                  <!-- Location / City -->
+                  <td>
+                    <div class="geo-city-cell">
+                      <span class="geo-flag">{{ getCountryFlag(loc.country_code) }}</span>
+                      <div class="geo-city-meta">
+                        <span class="geo-city-name">{{ loc.city || 'Unknown' }}</span>
+                        <span class="geo-region-country">
+                          <ng-container *ngIf="loc.region">{{ loc.region }}, </ng-container>{{ loc.country }}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Active Guests -->
+                  <td>
+                    <span class="geo-guest-count">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <strong>{{ loc.active_guests | number }}</strong>
+                      <span class="unit-txt">guests</span>
+                    </span>
+                  </td>
+
+                  <!-- Traffic Share % & Bar -->
+                  <td>
+                    <div class="geo-share-cell">
+                      <div class="geo-share-header">
+                        <span class="geo-share-pct">{{ loc.percentage }}%</span>
+                      </div>
+                      <div class="geo-progress-track">
+                        <div class="geo-progress-bar" [style.width.%]="loc.percentage"></div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Total Streams -->
+                  <td>
+                    <span class="geo-plays-badge">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      {{ loc.total_plays | number }}
+                    </span>
+                  </td>
+
+                  <!-- Listen Time -->
+                  <td>
+                    <span class="geo-time-txt">{{ formatSeconds(loc.total_time_seconds) }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>
 
       <!-- Modal Footer -->
       <div class="modal-foot">
-        <span class="geo-footer-hint">Top 50 highest traffic locations</span>
+        <span class="geo-footer-hint">Google Analytics 4 Demographic Breakdown &bull; Top 50 Locations</span>
         <button class="modal-action-btn" (click)="closeGeoModal()">Close</button>
+      </div>
+
+  <!-- ── IP EXCLUSION & BOT FILTER SETTINGS MODAL ── -->
+  <div class="guest-modal-backdrop" *ngIf="isSettingsModalOpen()" (click)="closeSettingsModal()">
+    <div class="guest-modal-card ip-settings-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-head">
+        <div class="modal-head-left">
+          <div class="settings-modal-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="geo-modal-title-row">
+              <h2 class="modal-title">IP Exclusions & Bot Shield</h2>
+              <span class="shield-badge-active">Active Shield</span>
+            </div>
+            <p class="modal-sub">Filter out automated server crawlers and prevent specific IP addresses from skewing analytics</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeSettingsModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Alerts / Feedback Banner -->
+      <div *ngIf="settingsSuccessMsg()" class="settings-alert-banner success-banner">
+        <span>✅ {{ settingsSuccessMsg() }}</span>
+      </div>
+      <div *ngIf="settingsErrorMsg()" class="settings-alert-banner error-banner">
+        <span>⚠️ {{ settingsErrorMsg() }}</span>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body ip-settings-body">
+
+        <!-- SECTION 1: Automated Hostinger Crawler Bot Shield -->
+        <div class="settings-section-card hostinger-shield-card">
+          <div class="section-card-head">
+            <div class="section-card-title-group">
+              <span class="bot-icon">🛡️</span>
+              <div>
+                <h3 class="section-card-title">Hostinger LiteSpeed Bot Shield</h3>
+                <p class="section-card-desc">Automatic filtering for LiteSpeed Cache crawlers (<code>?LSCWP_CTRL=before_optm</code>) and Hostinger IP subnet (<code>2a02:4780::/32</code>).</p>
+              </div>
+            </div>
+            <button 
+              class="purge-bots-btn" 
+              (click)="purgeHostingerBots()" 
+              [disabled]="isPurgingBots()">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>{{ isPurgingBots() ? 'Cleaning...' : 'Purge Past Hostinger Bots' }}</span>
+            </button>
+          </div>
+          <div class="shield-status-tags">
+            <span class="shield-tag"><span class="dot-green"></span> LiteSpeed Crawler Block: Active</span>
+            <span class="shield-tag"><span class="dot-green"></span> Headless Browser Detection: Active</span>
+            <span class="shield-tag"><span class="dot-green"></span> Hostinger AS47583 Subnet: Filtered</span>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Add Custom Excluded IP -->
+        <div class="settings-section-card">
+          <div class="section-card-head">
+            <div>
+              <h3 class="section-card-title">Exclude Custom IP Address</h3>
+              <p class="section-card-desc">Exclude your own device, office network, or any suspicious IP address from being tracked.</p>
+            </div>
+            <!-- Quick Fill My Detected IP Button -->
+            <button 
+              *ngIf="myDetectedIp()" 
+              class="fill-my-ip-btn" 
+              (click)="fillMyIp()" 
+              title="Click to pre-fill your current IP">
+              <span>Exclude My Detected IP: <code>{{ myDetectedIp() }}</code></span>
+            </button>
+          </div>
+
+          <div class="add-ip-form-row">
+            <div class="input-field-group ip-input-wrap">
+              <label class="input-label">IP Address (IPv4 or IPv6)</label>
+              <input 
+                type="text" 
+                class="settings-text-input" 
+                placeholder="e.g. 103.21.244.2 or 2a02:4780:..." 
+                [ngModel]="newIpInput()" 
+                (ngModelChange)="newIpInput.set($event)"
+              />
+            </div>
+            <div class="input-field-group note-input-wrap">
+              <label class="input-label">Note / Label (Optional)</label>
+              <input 
+                type="text" 
+                class="settings-text-input" 
+                placeholder="e.g. My Phone, Office Wifi" 
+                [ngModel]="newIpNote()" 
+                (ngModelChange)="newIpNote.set($event)"
+              />
+            </div>
+            <div class="input-btn-wrap">
+              <label class="input-label" style="opacity: 0;">Add</label>
+              <button 
+                class="add-ip-btn" 
+                (click)="addExcludedIp()" 
+                [disabled]="isSavingIp() || !newIpInput()">
+                <span>{{ isSavingIp() ? 'Saving...' : '+ Add to Excluded List' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Currently Excluded IPs List -->
+        <div class="settings-section-card">
+          <div class="section-card-head">
+            <div>
+              <h3 class="section-card-title">Currently Excluded IPs ({{ excludedIps().length }})</h3>
+              <p class="section-card-desc">Requests from these IPs are completely ignored and will not appear in guests, streams, or geography.</p>
+            </div>
+          </div>
+
+          <div class="excluded-table-wrap">
+            <table class="excluded-table">
+              <thead>
+                <tr>
+                  <th>IP Address</th>
+                  <th>Label / Note</th>
+                  <th>Added At</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="!excludedIps().length">
+                  <td colspan="4" class="empty-state-small">
+                    No custom IPs excluded yet. You can add your own IP above to exclude yourself from analytics.
+                  </td>
+                </tr>
+                <tr *ngFor="let item of excludedIps()">
+                  <td>
+                    <code class="excluded-ip-code">{{ item.ip }}</code>
+                  </td>
+                  <td>
+                    <span class="excluded-note-txt">{{ item.note || 'Manual Exclusion' }}</span>
+                  </td>
+                  <td style="color: rgba(255, 255, 255, 0.5); font-size: 12px;">
+                    {{ item.added_at ? formatIST(item.added_at) : 'Active' }}
+                  </td>
+                  <td style="text-align: right;">
+                    <button 
+                      class="remove-excluded-btn" 
+                      (click)="removeExcludedIp(item.ip)"
+                      title="Remove from exclusion list">
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-foot">
+        <span class="geo-footer-hint">GanaTube Analytics Privacy &amp; Bot Guard</span>
+        <button class="modal-action-btn" (click)="closeSettingsModal()">Done</button>
       </div>
 
     </div>
   </div>
 
 </div>
+

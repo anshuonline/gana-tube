@@ -124,6 +124,30 @@ export class GtanalyticDataService {
     return this.analyticsService.getUserActivity(pwd, filter, compareA, compareB);
   }
 
+  getExcludedIps(): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.getExcludedIps(pwd);
+  }
+
+  addExcludedIp(ip: string, note?: string): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.addExcludedIp(pwd, ip, note);
+  }
+
+  removeExcludedIp(ip: string): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.removeExcludedIp(pwd, ip);
+  }
+
+  purgeHostingerBots(): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.purgeHostingerBots(pwd);
+  }
+
   startAutoRefresh() {
     if (this.autoRefreshTimer) return;
     this.autoRefreshTimer = setInterval(() => {
