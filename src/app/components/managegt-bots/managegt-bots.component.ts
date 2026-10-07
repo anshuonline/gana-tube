@@ -251,7 +251,7 @@ export class ManagegtBotsComponent implements OnInit {
 
     try {
       const res: any = await firstValueFrom(
-        this.http.get(`${this.apiUrl}?action=trigger_bot_run&t=${Date.now()}`)
+        this.http.get(`${this.apiUrl}?action=trigger_bot_run&token=gt_cron_bot&t=${Date.now()}`)
       );
       if (res && res.status === 'success') {
         const logs = [
