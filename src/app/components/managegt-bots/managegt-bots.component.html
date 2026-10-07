@@ -109,47 +109,52 @@
   <div class="tab-pane" *ngIf="activeTab() === 'pending'">
     <div class="queue-grid" *ngIf="pendingList.length > 0">
       <div class="queue-card" *ngFor="let pl of pendingList">
-        <div class="card-thumb-side">
-          <img [src]="pl.cover_image || 'ganatubenewlogo.png'" [alt]="pl.title" class="pl-thumb" />
-          <span class="type-tag" [class.album]="pl.type === 'album'">{{ pl.type }}</span>
-          <span class="song-count-tag">{{ pl.total_songs }} songs</span>
+        <!-- Top Half: Thumb + Info -->
+        <div class="card-main-content">
+          <div class="card-thumb-side">
+            <img [src]="pl.cover_image || 'ganatubenewlogo.png'" [alt]="pl.title" class="pl-thumb" />
+            <span class="type-tag" [class.album]="pl.type === 'album'">{{ pl.type }}</span>
+            <span class="song-count-tag">{{ pl.total_songs }} songs</span>
+          </div>
+
+          <div class="card-details-side">
+            <!-- Editable Title -->
+            <div class="field-group">
+              <label class="field-label">Playlist Title:</label>
+              <input type="text" [(ngModel)]="pl.title" class="title-input" />
+            </div>
+
+            <!-- Language Selection -->
+            <div class="field-group">
+              <label class="field-label">Assign Language:</label>
+              <select [(ngModel)]="pl.language" class="lang-assign-select">
+                <option *ngFor="let l of languages" [value]="l">{{ l }}</option>
+              </select>
+            </div>
+
+            <!-- Add to Home Section Checkbox -->
+            <div class="field-group checkbox-field">
+              <label class="bot-checkbox-label">
+                <input type="checkbox" [(ngModel)]="pl.addToHomeSection" />
+                <span>Also add to Home Feed Shelf ({{ pl.language }})</span>
+              </label>
+            </div>
+          </div>
         </div>
 
-        <div class="card-details-side">
-          <!-- Editable Title -->
-          <div class="field-group">
-            <label class="field-label">Playlist Title:</label>
-            <input type="text" [(ngModel)]="pl.title" class="title-input" />
-          </div>
-
-          <!-- Language Selection -->
-          <div class="field-group">
-            <label class="field-label">Assign Language:</label>
-            <select [(ngModel)]="pl.language" class="lang-assign-select">
-              <option *ngFor="let l of languages" [value]="l">{{ l }}</option>
-            </select>
-          </div>
-
-          <!-- Add to Home Section Checkbox -->
-          <div class="field-group checkbox-field">
-            <label class="bot-checkbox-label">
-              <input type="checkbox" [(ngModel)]="pl.addToHomeSection" />
-              <span>Also add to Home Feed Shelf ({{ pl.language }})</span>
-            </label>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="card-actions-row">
-            <button class="btn-approve" (click)="approvePlaylist(pl)" title="Approve and Publish to GanaTube">
-              <svg lucideCheck [attr.size]="16"></svg>
-              <span>Approve</span>
-            </button>
+        <!-- Bottom Half: Full-Width Action Bar -->
+        <div class="card-actions-row">
+          <button class="btn-approve" (click)="approvePlaylist(pl)" title="Approve and Publish to GanaTube">
+            <svg lucideCheck [attr.size]="16"></svg>
+            <span>Approve & Publish</span>
+          </button>
+          <div class="aux-actions-group">
             <button class="btn-shuffle" (click)="shufflePlaylist(pl)" title="Shuffle matched songs">
-              <svg lucideShuffle [attr.size]="15"></svg>
+              <svg lucideShuffle [attr.size]="14"></svg>
               <span>Shuffle</span>
             </button>
             <button class="btn-preview" (click)="openPreview(pl)" title="View tracks">
-              <svg lucideLayers [attr.size]="15"></svg>
+              <svg lucideLayers [attr.size]="14"></svg>
               <span>Tracks</span>
             </button>
             <button class="btn-delete" (click)="rejectPlaylist(pl, 'delete')" title="Delete collection">
