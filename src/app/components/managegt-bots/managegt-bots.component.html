@@ -130,6 +130,14 @@
             </select>
           </div>
 
+          <!-- Add to Home Section Checkbox -->
+          <div class="field-group checkbox-field">
+            <label class="bot-checkbox-label">
+              <input type="checkbox" [(ngModel)]="pl.addToHomeSection" />
+              <span>Also add to Home Feed Shelf ({{ pl.language }})</span>
+            </label>
+          </div>
+
           <!-- Action Buttons -->
           <div class="card-actions-row">
             <button class="btn-approve" (click)="approvePlaylist(pl)" title="Approve and Publish to GanaTube">
@@ -169,6 +177,7 @@
             <th>Cover</th>
             <th>Title & Type</th>
             <th>Language</th>
+            <th>Home Shelf</th>
             <th>Songs</th>
             <th>Updated</th>
             <th>Actions</th>
@@ -185,6 +194,16 @@
             </td>
             <td>
               <span class="lang-badge">{{ pl.language }}</span>
+            </td>
+            <td>
+              <button 
+                class="home-shelf-toggle-btn" 
+                [class.active]="pl.inHomeSection"
+                (click)="toggleHomeSection(pl)"
+                [title]="pl.inHomeSection ? 'Active on Home Feed. Click to remove.' : 'Inactive on Home Feed. Click to add as shelf.'">
+                <span class="toggle-dot"></span>
+                <span>{{ pl.inHomeSection ? 'Active' : 'Off' }}</span>
+              </button>
             </td>
             <td>{{ pl.total_songs }} tracks</td>
             <td class="col-date">{{ pl.updated_at | date:'short' }}</td>

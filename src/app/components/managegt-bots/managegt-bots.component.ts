@@ -28,6 +28,8 @@ export interface BotPlaylist {
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   updated_at: string;
+  inHomeSection?: boolean;
+  addToHomeSection?: boolean;
 }
 
 export interface SpotifySource {
@@ -119,8 +121,12 @@ export class ManagegtBotsComponent implements OnInit {
       const res: any = await firstValueFrom(
         this.http.get(`${this.apiUrl}?action=get_bot_playlists&status=all&t=${Date.now()}`)
       );
-      if (res && res.status === 'success') {
-        this.playlists.set(res.data || []);
+      if (res && res.status === 'success' && Array.isArray(res.data)) {
+        const list = res.data.map((p: BotPlaylist) => ({
+          ...p,
+          addToHomeSection: p.addToHomeSection !== false
+        }));
+        this.playlists.set(list);
       }
     } catch (err) {
       console.error('Failed to load bot playlists:', err);
@@ -202,16 +208,39 @@ export class ManagegtBotsComponent implements OnInit {
         this.http.post(`${this.apiUrl}?action=approve_bot_playlist`, {
           id: pl.id,
           language: pl.language,
-          title: pl.title
+          title: pl.title,
+          addToHomeSection: pl.addToHomeSection !== false
         })
       );
       if (res && res.status === 'success') {
         pl.status = 'approved';
-        this.showToast(`'${pl.title}' approved for ${pl.language}!`);
+        pl.inHomeSection = !!res.addedToSection;
+        this.showToast(res.message || `'${pl.title}' approved!`);
       }
     } catch (err) {
       console.error('Approve failed:', err);
       this.showToast('Failed to approve playlist');
+    }
+  }
+
+  async toggleHomeSection(pl: BotPlaylist) {
+    const targetState = !pl.inHomeSection;
+    try {
+      const res: any = await firstValueFrom(
+        this.http.post(`${this.apiUrl}?action=toggle_home_section`, {
+          id: pl.id,
+          enable: targetState
+        })
+      );
+      if (res && res.status === 'success') {
+        pl.inHomeSection = targetState;
+        this.showToast(targetState 
+          ? `'${pl.title}' added to Home Feed (${pl.language})!` 
+          : `'${pl.title}' removed from Home Feed`);
+      }
+    } catch (err) {
+      console.error('Toggle home section failed:', err);
+      this.showToast('Failed to update Home Feed status');
     }
   }
 

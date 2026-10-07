@@ -449,6 +449,29 @@
     font-weight: 600;
     outline: none;
   }
+
+  &.checkbox-field {
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .bot-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.76rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+      accent-color: #a855f7;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+  }
 }
 
 .card-actions-row {
@@ -594,6 +617,45 @@
   font-size: 0.75rem;
   font-weight: 600;
   color: #c084fc;
+}
+
+.home-shelf-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease;
+
+  .toggle-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  &.active {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #34d399;
+
+    .toggle-dot {
+      background: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+    }
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(168, 85, 247, 0.4);
+  }
 }
 
 .col-date {
