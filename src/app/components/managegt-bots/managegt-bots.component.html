@@ -1,0 +1,336 @@
+<div class="gt-bots-container">
+  
+  <!-- Toast Notification -->
+  <div class="gt-toast" *ngIf="toastMessage()">
+    {{ toastMessage() }}
+  </div>
+
+  <!-- Top Hero & Automation Stats -->
+  <div class="gt-bots-header">
+    <div class="header-titles">
+      <div class="badge-pill">
+        <svg lucideSparkles [attr.size]="14"></svg>
+        <span>24/7 BACKGROUND AUTOMATION</span>
+      </div>
+      <h1 class="header-main-title">Spotify & Section Manager Bots</h1>
+      <p class="header-desc">
+        Automated ingestion from Spotify into GanaTube, track matching via YouTube Music API, and automatic section curation (Max 15 sections/language).
+      </p>
+    </div>
+
+    <!-- Quick Bot Triggers & State -->
+    <div class="header-action-cards">
+      <div class="mode-card" [class.auto-active]="config().isFullyAuto">
+        <div class="mode-info">
+          <span class="mode-label">Automation Mode</span>
+          <span class="mode-status">
+            {{ config().isFullyAuto ? '⚡ Fully Auto (Direct Publish)' : '🛡️ Manual Admin Review' }}
+          </span>
+        </div>
+        <button class="toggle-mode-btn" (click)="toggleFullyAuto()">
+          {{ config().isFullyAuto ? 'Switch to Manual' : 'Enable Fully Auto' }}
+        </button>
+      </div>
+
+      <button class="run-bot-btn" (click)="triggerManualRun()" [disabled]="isRunningBot()">
+        <svg lucidePlay [attr.size]="18" *ngIf="!isRunningBot()" fill="currentColor"></svg>
+        <svg lucideRefreshCw [attr.size]="18" class="spin" *ngIf="isRunningBot()"></svg>
+        <span>{{ isRunningBot() ? 'Bot Ingesting...' : 'Run Bot Now' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Automation Info Bar -->
+  <div class="bot-meta-bar">
+    <div class="meta-item">
+      <span class="meta-title">Hostinger Cron:</span>
+      <span class="meta-val">Every 10 Minutes</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-title">Last Run:</span>
+      <span class="meta-val">{{ config().lastRunTime || 'Never run' }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-title">Section Rule:</span>
+      <span class="meta-val">Max 15 Sections / Lang</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-title">Status:</span>
+      <span class="meta-val status-text">{{ config().lastRunStatus || 'Ready' }}</span>
+    </div>
+  </div>
+
+  <!-- Main Navigation Tabs -->
+  <div class="gt-bots-tabs">
+    <button class="tab-btn" [class.active]="activeTab() === 'pending'" (click)="activeTab.set('pending')">
+      <span>Pending Approvals</span>
+      <span class="tab-count-badge" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'approved'" (click)="activeTab.set('approved')">
+      <span>Approved & Live</span>
+      <span class="tab-count-badge approved">{{ approvedCount }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'config'" (click)="activeTab.set('config')">
+      <span>Spotify Sources & Rules</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'logs'" (click)="activeTab.set('logs')">
+      <span>Execution Logs</span>
+    </button>
+  </div>
+
+  <!-- Filter Controls (for Pending & Approved) -->
+  <div class="filter-controls-row" *ngIf="activeTab() === 'pending' || activeTab() === 'approved'">
+    <div class="lang-filter-wrap">
+      <label class="filter-label">Language:</label>
+      <select [ngModel]="selectedLangFilter()" (ngModelChange)="selectedLangFilter.set($event)" class="lang-select">
+        <option value="all">All Languages</option>
+        <option *ngFor="let l of languages" [value]="l">{{ l }}</option>
+      </select>
+    </div>
+
+    <div class="search-filter-wrap">
+      <svg lucideSearch [attr.size]="16" class="search-icon"></svg>
+      <input 
+        type="text" 
+        [ngModel]="searchFilter()" 
+        (ngModelChange)="searchFilter.set($event)" 
+        placeholder="Filter by title..." 
+        class="filter-input"
+      />
+    </div>
+
+    <button class="refresh-list-btn" (click)="fetchPlaylists()" [disabled]="isLoading()">
+      <svg lucideRefreshCw [attr.size]="15" [class.spin]="isLoading()"></svg>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <!-- TAB 1: PENDING APPROVALS QUEUE -->
+  <div class="tab-pane" *ngIf="activeTab() === 'pending'">
+    <div class="queue-grid" *ngIf="pendingList.length > 0">
+      <div class="queue-card" *ngFor="let pl of pendingList">
+        <div class="card-thumb-side">
+          <img [src]="pl.cover_image || 'ganatubenewlogo.png'" [alt]="pl.title" class="pl-thumb" />
+          <span class="type-tag" [class.album]="pl.type === 'album'">{{ pl.type }}</span>
+          <span class="song-count-tag">{{ pl.total_songs }} songs</span>
+        </div>
+
+        <div class="card-details-side">
+          <!-- Editable Title -->
+          <div class="field-group">
+            <label class="field-label">Playlist Title:</label>
+            <input type="text" [(ngModel)]="pl.title" class="title-input" />
+          </div>
+
+          <!-- Language Selection -->
+          <div class="field-group">
+            <label class="field-label">Assign Language:</label>
+            <select [(ngModel)]="pl.language" class="lang-assign-select">
+              <option *ngFor="let l of languages" [value]="l">{{ l }}</option>
+            </select>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card-actions-row">
+            <button class="btn-approve" (click)="approvePlaylist(pl)" title="Approve and Publish to GanaTube">
+              <svg lucideCheck [attr.size]="16"></svg>
+              <span>Approve</span>
+            </button>
+            <button class="btn-shuffle" (click)="shufflePlaylist(pl)" title="Shuffle matched songs">
+              <svg lucideShuffle [attr.size]="15"></svg>
+              <span>Shuffle</span>
+            </button>
+            <button class="btn-preview" (click)="openPreview(pl)" title="View tracks">
+              <svg lucideLayers [attr.size]="15"></svg>
+              <span>Tracks</span>
+            </button>
+            <button class="btn-delete" (click)="rejectPlaylist(pl, 'delete')" title="Delete collection">
+              <svg lucideTrash2 [attr.size]="15"></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-tab-state" *ngIf="pendingList.length === 0">
+      <svg lucideCheck [attr.size]="44" class="empty-icon"></svg>
+      <h3>Queue is Clear</h3>
+      <p>No playlists waiting for approval. New collections fetched by the 10-minute cron will show up here.</p>
+      <button class="run-bot-small-btn" (click)="triggerManualRun()">Fetch from Spotify Now</button>
+    </div>
+  </div>
+
+  <!-- TAB 2: APPROVED & LIVE PLAYLISTS -->
+  <div class="tab-pane" *ngIf="activeTab() === 'approved'">
+    <div class="approved-table-wrap" *ngIf="approvedList.length > 0">
+      <table class="approved-table">
+        <thead>
+          <tr>
+            <th>Cover</th>
+            <th>Title & Type</th>
+            <th>Language</th>
+            <th>Songs</th>
+            <th>Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pl of approvedList">
+            <td class="col-thumb">
+              <img [src]="pl.cover_image || 'ganatubenewlogo.png'" class="table-thumb" />
+            </td>
+            <td class="col-title">
+              <div class="title-text">{{ pl.title }}</div>
+              <span class="table-badge" [class.album]="pl.type === 'album'">{{ pl.type }}</span>
+            </td>
+            <td>
+              <span class="lang-badge">{{ pl.language }}</span>
+            </td>
+            <td>{{ pl.total_songs }} tracks</td>
+            <td class="col-date">{{ pl.updated_at | date:'short' }}</td>
+            <td class="col-actions">
+              <button class="tbl-action-btn shuffle" (click)="shufflePlaylist(pl)" title="Shuffle Songs">
+                <svg lucideShuffle [attr.size]="14"></svg>
+              </button>
+              <button class="tbl-action-btn preview" (click)="openPreview(pl)" title="Preview Tracks">
+                <svg lucideLayers [attr.size]="14"></svg>
+              </button>
+              <button class="tbl-action-btn delete" (click)="rejectPlaylist(pl, 'delete')" title="Delete">
+                <svg lucideTrash2 [attr.size]="14"></svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-tab-state" *ngIf="approvedList.length === 0">
+      <h3>No Live Bot Collections</h3>
+      <p>Approve playlists from the Pending queue or enable Fully Auto mode.</p>
+    </div>
+  </div>
+
+  <!-- TAB 3: SPOTIFY SOURCES & RULES -->
+  <div class="tab-pane" *ngIf="activeTab() === 'config'">
+    <div class="config-section">
+      <h3 class="config-sec-title">Automation & Section Rules</h3>
+      <div class="config-grid">
+        <div class="config-card">
+          <label class="cfg-label">Max Sections Per Language (Homepage):</label>
+          <input type="number" [(ngModel)]="config().maxSectionsPerLanguage" min="1" max="30" class="cfg-input" />
+          <span class="cfg-hint">Enforced by Bot 2 to keep homepage clean and fast (Default: 15).</span>
+        </div>
+
+        <div class="config-card">
+          <label class="cfg-label">Sync Interval (Minutes):</label>
+          <input type="number" [(ngModel)]="config().syncIntervalMinutes" min="5" max="1440" class="cfg-input" />
+          <span class="cfg-hint">Hostinger cron run interval target.</span>
+        </div>
+      </div>
+      <button class="btn-save-cfg" (click)="saveConfig()">Save Rules</button>
+    </div>
+
+    <div class="config-section">
+      <h3 class="config-sec-title">Monitored Spotify Sources</h3>
+      
+      <!-- Add New Source Row -->
+      <div class="add-source-bar">
+        <input 
+          type="text" 
+          [(ngModel)]="newSourceUrl" 
+          placeholder="Spotify playlist or album URL (e.g. https://open.spotify.com/playlist/...)" 
+          class="src-input-url"
+        />
+        <input 
+          type="text" 
+          [(ngModel)]="newSourceName" 
+          placeholder="Collection Name" 
+          class="src-input-name"
+        />
+        <select [(ngModel)]="newSourceLang" class="src-select">
+          <option *ngFor="let l of languages" [value]="l">{{ l }}</option>
+        </select>
+        <select [(ngModel)]="newSourceType" class="src-select">
+          <option value="playlist">Playlist</option>
+          <option value="album">Album</option>
+        </select>
+        <button class="btn-add-src" (click)="addSource()">
+          <svg lucidePlus [attr.size]="16"></svg>
+          <span>Add Source</span>
+        </button>
+      </div>
+
+      <!-- Sources List -->
+      <div class="sources-list">
+        <div class="source-row" *ngFor="let src of config().targetSpotifySources; let i = index">
+          <div class="src-toggle">
+            <input type="checkbox" [checked]="src.enabled" (change)="toggleSource(src)" />
+          </div>
+          <div class="src-details">
+            <span class="src-name">{{ src.name }}</span>
+            <span class="src-url">{{ src.url }}</span>
+          </div>
+          <div class="src-tags">
+            <span class="src-badge lang">{{ src.defaultLang }}</span>
+            <span class="src-badge type" [class.album]="src.type === 'album'">{{ src.type }}</span>
+          </div>
+          <button class="src-del-btn" (click)="removeSource(i)" title="Remove source">
+            <svg lucideTrash2 [attr.size]="16"></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: EXECUTION LOGS -->
+  <div class="tab-pane" *ngIf="activeTab() === 'logs'">
+    <div class="logs-console">
+      <div class="logs-header">
+        <span>Live Execution Output</span>
+        <button class="clear-logs-btn" (click)="botRunLogs.set([])">Clear</button>
+      </div>
+      <div class="logs-body">
+        <div *ngIf="botRunLogs().length === 0" class="no-logs">
+          No logs available. Click "Run Bot Now" to execute an ingestion run and view output.
+        </div>
+        <div *ngFor="let line of botRunLogs()" class="log-line">
+          {{ line }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKS PREVIEW MODAL -->
+  <div class="modal-overlay" *ngIf="previewPlaylist" (click)="closePreview()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <div class="modal-head-title">
+          <h3>{{ previewPlaylist.title }}</h3>
+          <span>{{ previewPlaylist.language }} • {{ previewPlaylist.total_songs }} tracks matched</span>
+        </div>
+        <button class="modal-close-btn" (click)="closePreview()">✕</button>
+      </div>
+
+      <div class="modal-scroll-tracks">
+        <div class="track-row" *ngFor="let track of previewPlaylist.songs; let idx = index">
+          <span class="track-num">{{ idx + 1 }}</span>
+          <img [src]="track.thumbnail || 'ganatubenewlogo.png'" class="track-thumb" />
+          <div class="track-info">
+            <span class="track-title">{{ track.title }}</span>
+            <span class="track-artist">{{ track.channelTitle }}</span>
+          </div>
+          <span class="track-dur">{{ track.duration }}</span>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-modal-shuffle" (click)="shufflePlaylist(previewPlaylist)">
+          <svg lucideShuffle [attr.size]="14"></svg>
+          Shuffle List
+        </button>
+        <button class="btn-modal-close" (click)="closePreview()">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div>

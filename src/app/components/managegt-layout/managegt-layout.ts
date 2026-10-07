@@ -41,7 +41,8 @@ export class ManagegtLayoutComponent implements OnInit {
       links: [
         { path: '/managegt/sections', label: 'Custom Sections', icon: 'grid' },
         { path: '/managegt/sections/discovery', label: 'Discovery', icon: 'compass' },
-        { path: '/managegt/playlists', label: 'Custom Playlists', icon: 'music' }
+        { path: '/managegt/playlists', label: 'Custom Playlists', icon: 'music' },
+        { path: '/managegt/spotify-bots', label: 'Spotify & Section Bots', icon: 'bot' }
       ]
     },
     {
