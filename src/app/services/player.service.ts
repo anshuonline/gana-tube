@@ -30,6 +30,9 @@ export class PlayerService {
   private spinService = inject(SpinService);
   public offlineService = inject(OfflineService);
   private trackStartTime: number = 0;
+  // Qualified play tracking (prevents instant skips from artificially inflating plays and play time)
+  private currentPlayTrackedId: string | null = null;
+  private currentPlayDurationListened: number = 0;
   public isFetchingMore = false;
   private lastNonZeroVolume: number = 80;
   private isRemoteUpdate = false;
@@ -901,10 +904,22 @@ export class PlayerService {
   private initHtmlAudio(): void {
     if (this.htmlAudio) return;
     this.htmlAudio = new Audio();
+    let lastAudioTime = 0;
     this.htmlAudio.addEventListener('timeupdate', () => {
-      this.currentTime.set(this.htmlAudio!.currentTime);
+      const cur = this.htmlAudio!.currentTime;
+      const delta = Math.max(0, Math.min(2, cur - lastAudioTime));
+      lastAudioTime = cur;
+      this.currentTime.set(cur);
+      if (this.playerState() === 'playing') {
+        this.checkAndRecordQualifiedPlay(delta);
+      }
     });
     this.htmlAudio.addEventListener('ended', () => {
+      const current = this.currentTrack();
+      if (current && this.currentPlayTrackedId !== current.videoId) {
+        this.currentPlayTrackedId = current.videoId;
+        this.recordQualifiedPlay(current);
+      }
       this.playerState.set('ended');
       this.currentTime.set(0);
       this.handleTrackEnd();
@@ -948,6 +963,10 @@ export class PlayerService {
     this.initHtmlAudio();
     this.startLoadTimeout();
     
+    // Reset qualified play session for incoming track
+    this.currentPlayTrackedId = null;
+    this.currentPlayDurationListened = 0;
+
     if (current) {
       if (typeof localStorage !== 'undefined' && current.videoId) {
         try {
@@ -956,7 +975,6 @@ export class PlayerService {
           }
         } catch (e) {}
       }
-      this.analyticsService.recordPlay(current);
       // Proactively fetch more tracks if we are near the end of the queue
       const q = this.queue();
       if (this.isAutoplayEnabled() && !this.isPlaylistContext() && this.repeatMode() !== 'all' && this.currentIndex() >= q.length - 2) {
@@ -993,15 +1011,6 @@ export class PlayerService {
       this.htmlAudio!.pause();
       this.htmlAudio!.src = '';
       this.loadInYtPlayer(videoId);
-    }
-
-    if (current) {
-      const user = this.authService.currentUser();
-      if (user && user.email) {
-        this.userService.addRecentPlay(user.email, current, this.userService.preferredLanguages());
-      } else {
-        this.userService.recordGuestPlay();
-      }
     }
 
     if (!isRemote && current && this.roomService.currentRoomInfo()) {
@@ -1054,6 +1063,11 @@ export class PlayerService {
   }
 
   private handleTrackEnd(): void {
+    const current = this.currentTrack();
+    if (current && this.currentPlayTrackedId !== current.videoId) {
+      this.currentPlayTrackedId = current.videoId;
+      this.recordQualifiedPlay(current);
+    }
     this.triggerEngagement();
 
     if (this.sleepAtEndOfTrack()) {
@@ -1097,6 +1111,37 @@ export class PlayerService {
       const listenDuration = (Date.now() - this.trackStartTime) / 1000;
       this.algorithmService.trackEngagement(current, listenDuration, this.duration() || 240);
       this.trackStartTime = 0; // reset
+    }
+  }
+
+  /**
+   * Evaluates active playback time to ensure a play is only recorded if
+   * the user actually listens to the song for at least 20 seconds (or 50% if short).
+   * Prevents rapid track skipping (Next-Next) from inflating play counts or daily listening hours.
+   */
+  private checkAndRecordQualifiedPlay(deltaSeconds: number = 0): void {
+    const current = this.currentTrack();
+    if (!current || !current.videoId) return;
+    if (this.currentPlayTrackedId === current.videoId) return;
+
+    this.currentPlayDurationListened += deltaSeconds;
+
+    const dur = this.duration();
+    const threshold = (dur > 0 && dur < 20) ? Math.max(5, dur * 0.5) : 20;
+
+    if (this.currentPlayDurationListened >= threshold) {
+      this.currentPlayTrackedId = current.videoId;
+      this.recordQualifiedPlay(current);
+    }
+  }
+
+  private recordQualifiedPlay(current: Track): void {
+    this.analyticsService.recordPlay(current);
+    const user = this.authService.currentUser();
+    if (user && user.email) {
+      this.userService.addRecentPlay(user.email, current, this.userService.preferredLanguages());
+    } else {
+      this.userService.recordGuestPlay();
     }
   }
 
@@ -1171,6 +1216,11 @@ export class PlayerService {
             }
           }
           
+          // Track qualified song play (at least 20 seconds of actual playback, or track end)
+          if (this.playerState() === 'playing') {
+            this.checkAndRecordQualifiedPlay(deltaSeconds);
+          }
+
           // Track listening time for spin wheel (120 seconds = 1 chance)
           // ONLY if user has exhausted all daily spins (spinsLeft <= 0)
           if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
