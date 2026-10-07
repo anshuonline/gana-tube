@@ -228,20 +228,29 @@
         </div>
       </div>
 
-      <!-- Mobile bottom tab bar -->
+      <!-- Mobile bottom tab bar (Sleek floating segmented dock) -->
       <div class="cm-tab-bar">
         <button class="cm-tab-btn" [class.active]="activePanel() === 'player'" (click)="openPanel('player')">
-          <svg lucidePlay [attr.size]="22" fill="currentColor" *ngIf="playerService.isPlaying()"></svg>
-          <svg lucidePause [attr.size]="22" fill="currentColor" *ngIf="!playerService.isPlaying()"></svg>
-          <span>Now Playing</span>
+          <div class="cm-tab-icon-wrap">
+            <div class="cm-tab-live-bars" *ngIf="playerService.isPlaying()">
+              <span></span><span></span><span></span>
+            </div>
+            <svg lucideMusic [attr.size]="18" *ngIf="!playerService.isPlaying()"></svg>
+          </div>
+          <span class="cm-tab-label">Player</span>
         </button>
         <button class="cm-tab-btn" [class.active]="activePanel() === 'queue'" (click)="openPanel('queue')">
-          <svg lucideRepeat [attr.size]="22"></svg>
-          <span>Queue</span>
+          <div class="cm-tab-icon-wrap">
+            <svg lucideRepeat [attr.size]="18"></svg>
+          </div>
+          <span class="cm-tab-label">Queue</span>
+          <span class="cm-tab-badge" *ngIf="playerService.queue().length > 0">{{ playerService.queue().length }}</span>
         </button>
         <button class="cm-tab-btn" [class.active]="activePanel() === 'search'" (click)="openPanel('search')">
-          <svg lucideMic [attr.size]="22" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
-          <span>Search</span>
+          <div class="cm-tab-icon-wrap">
+            <svg lucideMic [attr.size]="18" [attr.fill]="isListening ? 'currentColor' : 'none'"></svg>
+          </div>
+          <span class="cm-tab-label">Voice Search</span>
         </button>
       </div>
     </div>

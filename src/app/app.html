@@ -567,6 +567,129 @@
           <span class="social-cta muted">Stay tuned</span>
         </div>
       </div>
+
+      <!-- Rate & Review Banner -->
+      <div class="socials-feedback-banner">
+        <div class="feedback-banner-glow"></div>
+        <div class="feedback-banner-content">
+          <div class="feedback-banner-icon">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <div class="feedback-banner-text">
+            <div class="feedback-banner-badge">User Reviews</div>
+            <h3 class="feedback-banner-title">Love listening on GanaTube?</h3>
+            <p class="feedback-banner-sub">Rate your experience or drop a quick suggestion. Your feedback helps us keep GanaTube 100% ad-free & high quality!</p>
+          </div>
+          <button type="button" class="feedback-banner-btn" (click)="openFeedbackPopup()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Rate Us</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Feature Request Section -->
+      <div class="feature-request-section">
+        <div class="feature-section-header">
+          <span class="feature-badge">Community Wishlist</span>
+          <h2 class="feature-section-title">Request a <span class="socials-gradient-text">Feature</span></h2>
+          <p class="feature-section-subtitle">Have an idea to make GanaTube even better? Tell us what you want to see next and our dev team will review it!</p>
+        </div>
+
+        <!-- Success Message Card -->
+        <div class="feature-success-card" *ngIf="featureSubmittedSuccess()">
+          <div class="success-icon-wrap">
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3>Feature Request Submitted!</h3>
+          <p>Thank you! Your suggestion has been saved. We review all community requests regularly on our roadmap.</p>
+          <button type="button" class="btn-submit-another" (click)="resetFeatureForm()">
+            <span>Submit Another Idea</span>
+          </button>
+        </div>
+
+        <!-- Submission Form Card -->
+        <form class="feature-form-card" *ngIf="!featureSubmittedSuccess()" (submit)="submitFeatureRequest(); $event.preventDefault()">
+          
+          <!-- Category selector pills -->
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <div class="category-pills">
+              <button type="button" 
+                      *ngFor="let cat of featureCategories" 
+                      class="category-pill" 
+                      [class.active]="featureCategory() === cat"
+                      (click)="featureCategory.set(cat)">
+                {{ cat }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Feature Title -->
+          <div class="form-group">
+            <label class="form-label">Feature Title <span class="required">*</span></label>
+            <input type="text" 
+                   class="feature-input" 
+                   placeholder="e.g., Sleep timer with volume fade out, Equalizer presets, etc." 
+                   [value]="featureTitle()" 
+                   (input)="featureTitle.set($any($event.target).value)" 
+                   maxlength="120"
+                   required />
+          </div>
+
+          <!-- Feature Description -->
+          <div class="form-group">
+            <label class="form-label">Detailed Description <span class="required">*</span></label>
+            <textarea class="feature-textarea" 
+                      rows="4" 
+                      placeholder="Describe what this feature would do and why it would improve your experience..." 
+                      [value]="featureDescription()" 
+                      (input)="featureDescription.set($any($event.target).value)" 
+                      maxlength="2000"
+                      required></textarea>
+            <div class="char-count">{{ featureDescription().length }}/2000</div>
+          </div>
+
+          <!-- Name & Email (Optional) -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Your Name <span class="optional">(Optional)</span></label>
+              <input type="text" 
+                     class="feature-input" 
+                     placeholder="e.g. Alex" 
+                     [value]="featureUserName() || (authService.currentUser()?.displayName || '')" 
+                     (input)="featureUserName.set($any($event.target).value)" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Email <span class="optional">(Optional - to get notified when shipped)</span></label>
+              <input type="email" 
+                     class="feature-input" 
+                     placeholder="e.g. alex@example.com" 
+                     [value]="featureUserEmail() || (authService.currentUser()?.email || '')" 
+                     (input)="featureUserEmail.set($any($event.target).value)" />
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button type="submit" class="feature-submit-btn" [disabled]="isSubmittingFeature()">
+              <svg *ngIf="!isSubmittingFeature()" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <span *ngIf="!isSubmittingFeature()">Submit Feature Request</span>
+              <span *ngIf="isSubmittingFeature()">Submitting...</span>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
     </div>
 
     <app-advertise-page *ngIf="currentPage() === 'advertise'"></app-advertise-page>
@@ -649,13 +772,13 @@
               <!-- Action CTAs -->
               <div class="hero-action-row">
                 <button class="hero-btn-primary" (click)="explorePlaylist(currentHeroSlide().lang)" type="button">
-                  <svg lucidePlay [attr.size]="16" fill="currentColor"></svg>
+                  <svg lucidePlay width="15" height="15" [attr.size]="15" fill="currentColor"></svg>
                   <span>{{ currentHeroSlide().buttonText || 'Listen Now' }}</span>
                 </button>
 
                 <button class="hero-btn-secondary" (click)="browseLanguage(currentHeroSlide().lang)" type="button">
                   <span>Explore {{ currentHeroSlide().lang }}</span>
-                  <svg lucideChevronRight [attr.size]="14"></svg>
+                  <svg lucideChevronRight width="14" height="14" [attr.size]="14"></svg>
                 </button>
               </div>
             </div>

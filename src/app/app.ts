@@ -272,9 +272,9 @@ export class App implements OnInit {
       subtitle: 'The hottest Hindi anthems, soulful romantic melodies and club chartbusters',
       artists: 'Arijit Singh • Shreya Ghoshal • Badshah • Pritam • Sachin-Jigar',
       image: 'images/hindi-singers.png',
-      gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.35) 0%, rgba(168, 85, 247, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(236, 72, 153, 0.28) 0%, rgba(168, 85, 247, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#ec4899',
-      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(236, 72, 153, 0.35) 0%, rgba(168, 85, 247, 0.2) 45%, transparent 70%)'
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(236, 72, 153, 0.45) 0%, rgba(168, 85, 247, 0.22) 45%, transparent 70%)'
     },
     {
       lang: 'Punjabi',
@@ -283,9 +283,9 @@ export class App implements OnInit {
       subtitle: 'Chart-topping dhol rhythms, trap anthems and unstoppable Punjabi energy',
       artists: 'Diljit Dosanjh • Sidhu Moose Wala • Karan Aujla • AP Dhillon',
       image: 'images/punjabi-singers.png',
-      gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(239, 68, 68, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(245, 158, 11, 0.26) 0%, rgba(239, 68, 68, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#f59e0b',
-      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(245, 158, 11, 0.35) 0%, rgba(239, 68, 68, 0.2) 45%, transparent 70%)'
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(245, 158, 11, 0.42) 0%, rgba(239, 68, 68, 0.2) 45%, transparent 70%)'
     },
     {
       lang: 'English',
@@ -294,9 +294,9 @@ export class App implements OnInit {
       subtitle: 'The biggest international chartbusters dominating Spotify and Billboard charts',
       artists: 'The Weeknd • Taylor Swift • Drake • Dua Lipa • Bruno Mars',
       image: 'images/english-singers.png',
-      gradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.35) 0%, rgba(6, 182, 212, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(99, 102, 241, 0.28) 0%, rgba(6, 182, 212, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#6366f1',
-      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(99, 102, 241, 0.35) 0%, rgba(6, 182, 212, 0.2) 45%, transparent 70%)'
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(99, 102, 241, 0.45) 0%, rgba(6, 182, 212, 0.2) 45%, transparent 70%)'
     },
     {
       lang: 'Bhojpuri',
@@ -305,9 +305,9 @@ export class App implements OnInit {
       subtitle: 'Electrifying festive beats, trending reels music and viral dance numbers',
       artists: 'Pawan Singh • Khesari Lal Yadav • Shilpi Raj • Arvind Akela Kallu',
       image: 'images/bhojpuri-singers.png',
-      gradient: 'linear-gradient(135deg, rgba(239, 68, 68, 0.35) 0%, rgba(234, 179, 8, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(239, 68, 68, 0.26) 0%, rgba(234, 179, 8, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#ef4444',
-      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(239, 68, 68, 0.35) 0%, rgba(234, 179, 8, 0.2) 45%, transparent 70%)'
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(239, 68, 68, 0.42) 0%, rgba(234, 179, 8, 0.2) 45%, transparent 70%)'
     },
     {
       lang: 'Haryanvi',
@@ -316,9 +316,9 @@ export class App implements OnInit {
       subtitle: 'Heavy basslines, desi swag and trending regional club tracks ruling north India',
       artists: 'Gulzaar Chhaniwala • Renuka Panwar • Masoom Sharma • Diler Kharkiya',
       image: 'images/haryanvi-singers.png',
-      gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(132, 204, 22, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(16, 185, 129, 0.26) 0%, rgba(132, 204, 22, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#10b981',
-      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(16, 185, 129, 0.35) 0%, rgba(132, 204, 22, 0.2) 45%, transparent 70%)'
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(16, 185, 129, 0.42) 0%, rgba(132, 204, 22, 0.2) 45%, transparent 70%)'
     },
     {
       lang: 'Bengali',
@@ -327,9 +327,9 @@ export class App implements OnInit {
       subtitle: 'Timeless poetic melodies, rich lyrical legacy and contemporary Bengali pop',
       artists: 'Arijit Singh • Shreya Ghoshal • Anupam Roy • Jeet Gannguli',
       image: 'images/bengali-singers.png',
-      gradient: 'linear-gradient(135deg, rgba(20, 184, 166, 0.35) 0%, rgba(244, 114, 182, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(20, 184, 166, 0.28) 0%, rgba(244, 114, 182, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#14b8a6',
-      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(20, 184, 166, 0.35) 0%, rgba(244, 114, 182, 0.2) 45%, transparent 70%)'
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(20, 184, 166, 0.42) 0%, rgba(244, 114, 182, 0.2) 45%, transparent 70%)'
     },
     {
       lang: 'Tamil',
@@ -338,9 +338,9 @@ export class App implements OnInit {
       subtitle: 'Legendary cinematic compositions, mass hero intros and electrifying hooks',
       artists: 'Anirudh Ravichander • A.R. Rahman • Sid Sriram • Yuvan Shankar Raja',
       image: 'images/tamil-singers.png',
-      gradient: 'linear-gradient(135deg, rgba(234, 179, 8, 0.35) 0%, rgba(147, 51, 234, 0.22) 45%, rgba(10, 10, 16, 0.95) 100%)',
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(234, 179, 8, 0.26) 0%, rgba(147, 51, 234, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#eab308',
-      ambientGlow: 'radial-gradient(circle at 75% 40%, rgba(234, 179, 8, 0.35) 0%, rgba(147, 51, 234, 0.2) 45%, transparent 70%)'
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(234, 179, 8, 0.42) 0%, rgba(147, 51, 234, 0.22) 45%, transparent 70%)'
     }
   ];
 
@@ -591,6 +591,25 @@ export class App implements OnInit {
   showFeedbackPopup = signal<boolean>(false);
   feedbackPopupConfig = signal<FeedbackPopupConfig>(DEFAULT_FEEDBACK_POPUP_CONFIG);
   private feedbackPopupTimer: any = null;
+
+  // Feature Request Form Signals (for /socials page)
+  featureTitle = signal<string>('');
+  featureCategory = signal<string>('Audio & Playback');
+  featureDescription = signal<string>('');
+  featureUserName = signal<string>('');
+  featureUserEmail = signal<string>('');
+  isSubmittingFeature = signal<boolean>(false);
+  featureSubmittedSuccess = signal<boolean>(false);
+  featureCategories: string[] = [
+    'Audio & Playback',
+    'UI / UX Design',
+    'Listen Together Rooms',
+    'Playlists & Library',
+    'Search & Discovery',
+    'Mobile & PWA Experience',
+    'Performance & Speed',
+    'Other'
+  ];
 
   carouselIndex = 0;
   private carouselInterval: any;
@@ -2344,6 +2363,81 @@ export class App implements OnInit {
 
   openFeedbackPopup(): void {
     this.showFeedbackPopup.set(true);
+  }
+
+  submitFeatureRequest(): void {
+    const title = this.featureTitle().trim();
+    const desc = this.featureDescription().trim();
+    
+    if (!title) {
+      this.toastService.show('Please enter a feature title!', 'error');
+      return;
+    }
+    if (title.length < 3) {
+      this.toastService.show('Feature title must be at least 3 characters.', 'error');
+      return;
+    }
+    if (!desc) {
+      this.toastService.show('Please describe your feature idea!', 'error');
+      return;
+    }
+    if (desc.length < 10) {
+      this.toastService.show('Please provide a slightly more detailed description (min 10 characters).', 'error');
+      return;
+    }
+    
+    this.isSubmittingFeature.set(true);
+    
+    const user = this.authService.currentUser();
+    let userName = this.featureUserName().trim();
+    if (!userName) {
+      if (user?.displayName) {
+        userName = user.displayName;
+      } else if (user?.email) {
+        userName = user.email.split('@')[0];
+      } else {
+        userName = 'Guest';
+      }
+    }
+    
+    let userEmail = this.featureUserEmail().trim();
+    if (!userEmail && user?.email) {
+      userEmail = user.email;
+    }
+    
+    const payload = {
+      title: title,
+      description: desc,
+      category: this.featureCategory(),
+      user_name: userName,
+      user_email: userEmail
+    };
+    
+    const url = `${this.manageApiUrl}?action=submit_feature_request`;
+    this.http.post<any>(url, payload).subscribe({
+      next: (res) => {
+        this.isSubmittingFeature.set(false);
+        if (res && res.status === 'success') {
+          this.featureSubmittedSuccess.set(true);
+          this.featureTitle.set('');
+          this.featureDescription.set('');
+          this.toastService.show('Feature request submitted successfully! Thank you.', 'success');
+        } else {
+          this.toastService.show(res?.message || 'Could not submit request. Please try again.', 'error');
+        }
+      },
+      error: (err) => {
+        this.isSubmittingFeature.set(false);
+        console.error('Feature request submission error:', err);
+        this.toastService.show('Failed to connect to server. Please try again.', 'error');
+      }
+    });
+  }
+
+  resetFeatureForm(): void {
+    this.featureSubmittedSuccess.set(false);
+    this.featureTitle.set('');
+    this.featureDescription.set('');
   }
 
   private fetchFallbackOEmbedAndPlay(videoId: string) {
