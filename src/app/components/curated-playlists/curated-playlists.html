@@ -1,131 +1,42 @@
-<div class="curated-playlists-page">
-  <!-- Page Header -->
-  <div class="curated-header">
-    <div class="header-badge">
-      <svg lucideSparkles [attr.size]="14"></svg>
-      <span>24/7 SPOTIFY CURATED HUBS</span>
-    </div>
-    <div class="header-main-row">
-      <div>
-        <h1 class="curated-title">Curated Albums & Playlists</h1>
-        <p class="curated-subtitle">Browse trending albums and shuffled playlists updated daily by GanaTube Bot</p>
-      </div>
-      <button class="refresh-btn" (click)="fetchCuratedContent()" [disabled]="isLoading()" title="Refresh Playlists">
-        <svg lucideRefreshCw [attr.size]="16" [class.spin]="isLoading()"></svg>
-        <span>Refresh</span>
-      </button>
-    </div>
-
-    <!-- Filter & Search Bar Controls -->
-    <div class="curated-controls-bar">
-      <!-- Type Filter Pills (YTMusic Style) -->
-      <div class="type-filter-group">
-        <button class="type-pill" [class.active]="selectedType() === 'all'" (click)="selectType('all')">
-          All
-        </button>
-        <button class="type-pill" [class.active]="selectedType() === 'playlist'" (click)="selectType('playlist')">
-          <svg lucideListMusic [attr.size]="14"></svg>
-          Playlists
-        </button>
-        <button class="type-pill" [class.active]="selectedType() === 'album'" (click)="selectType('album')">
-          <svg lucideDisc3 [attr.size]="14"></svg>
-          Albums
-        </button>
-      </div>
-
-      <!-- Quick Search Input -->
-      <div class="curated-search-box">
-        <svg lucideSearch [attr.size]="15" class="search-icon"></svg>
-        <input 
-          type="text" 
-          [(ngModel)]="searchQuery" 
-          placeholder="Filter by title or language..." 
-          class="curated-search-input"
-        />
-        <button class="search-clear-btn" *ngIf="searchQuery()" (click)="searchQuery.set('')">✕</button>
-      </div>
-    </div>
-
-    <!-- Language Filter Chips (Horizontal Scrollable) -->
-    <div class="languages-scroll-row">
-      <button 
-        *ngFor="let lang of availableLanguages()" 
-        class="lang-chip"
-        [class.active]="selectedLang() === lang"
-        (click)="selectLanguage(lang)"
-      >
-        {{ lang }}
-      </button>
-    </div>
+<div class="curated-playlists-container">
+  <div class="page-header">
+    <h1 class="page-title">Curated Playlists</h1>
+    <p class="page-subtitle">Swipe through our exclusive GenZ collections</p>
   </div>
 
-  <!-- Loading Skeletons -->
-  <div class="curated-grid-loading" *ngIf="isLoading()">
-    <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]">
-      <div class="skeleton-thumb"></div>
-      <div class="skeleton-line title"></div>
-      <div class="skeleton-line sub"></div>
+  <!-- Hindi Playlists Section -->
+  <section class="playlist-section" *ngIf="hindiPlaylists.length > 0">
+    <h2 class="section-title">Hindi Hits & Indie</h2>
+    <div class="swiper-wrapper-container">
+      <swiper-container class="curated-swiper" slides-per-view="auto" space-between="20" grab-cursor="true" autoplay-delay="2500" autoplay-disable-on-interaction="false" navigation="true" loop="true">
+        <swiper-slide *ngFor="let playlist of hindiPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
+          <div class="playlist-card-modern">
+            <img class="card-bg" [src]="playlist.coverImage" alt="Playlist Background" loading="lazy">
+            <div class="card-overlay"></div>
+            <div class="card-content">
+              <h3 class="modern-title">{{ playlist.title }}</h3>
+            </div>
+          </div>
+        </swiper-slide>
+      </swiper-container>
     </div>
-  </div>
+  </section>
 
-  <!-- Content Grid -->
-  <div class="curated-grid" *ngIf="!isLoading() && filteredItems.length > 0">
-    <div 
-      class="curated-card" 
-      *ngFor="let item of filteredItems" 
-      (click)="openPlaylist(item)"
-    >
-      <!-- Thumbnail & Overlays -->
-      <div class="card-thumb-wrap">
-        <img 
-          [src]="item.cover_image || 'ganatubenewlogo.png'" 
-          [alt]="item.title" 
-          class="card-thumb" 
-          loading="lazy"
-        />
-        
-        <!-- Type Badge -->
-        <span class="card-badge type" [class.album]="item.type === 'album'">
-          {{ item.type === 'album' ? 'ALBUM' : 'PLAYLIST' }}
-        </span>
-
-        <!-- Song Count Badge -->
-        <span class="card-badge count" *ngIf="item.total_songs > 0">
-          {{ item.total_songs }} songs
-        </span>
-
-        <!-- Hover Play Button Overlay -->
-        <button class="hover-play-btn" (click)="playDirect(item, $event)" title="Play Now">
-          <svg lucidePlay [attr.size]="24" fill="currentColor"></svg>
-        </button>
-      </div>
-
-      <!-- Card Metadata -->
-      <div class="card-info">
-        <h3 class="card-title" [title]="item.title">{{ item.title }}</h3>
-        <p class="card-meta">
-          <span class="card-lang">{{ item.language }}</span>
-          <span class="card-dot">•</span>
-          <span class="card-source">Curated by GanaTube Bot</span>
-        </p>
-      </div>
+  <!-- English Playlists Section -->
+  <section class="playlist-section" *ngIf="englishPlaylists.length > 0">
+    <h2 class="section-title">Global Top & GenZ Pop</h2>
+    <div class="swiper-wrapper-container">
+      <swiper-container class="curated-swiper" slides-per-view="auto" space-between="20" grab-cursor="true" autoplay-delay="3000" autoplay-disable-on-interaction="false" autoplay-reverse-direction="true" navigation="true" loop="true">
+        <swiper-slide *ngFor="let playlist of englishPlaylists" class="playlist-slide" (click)="openPlaylist(playlist)">
+          <div class="playlist-card-modern">
+            <img class="card-bg" [src]="playlist.coverImage" alt="Playlist Background" loading="lazy">
+            <div class="card-overlay"></div>
+            <div class="card-content">
+              <h3 class="modern-title">{{ playlist.title }}</h3>
+            </div>
+          </div>
+        </swiper-slide>
+      </swiper-container>
     </div>
-  </div>
-
-  <!-- Empty State -->
-  <div class="curated-empty-state" *ngIf="!isLoading() && filteredItems.length === 0">
-    <div class="empty-icon-wrap">
-      <svg lucideListMusic [attr.size]="44"></svg>
-    </div>
-    <h3 class="empty-title">No Curated Collections Found</h3>
-    <p class="empty-desc" *ngIf="searchQuery()">
-      No results match "{{ searchQuery() }}". Try clearing your search or changing filters.
-    </p>
-    <p class="empty-desc" *ngIf="!searchQuery()">
-      No bot playlists have been approved yet. Run the bot or approve collections in ManageGT.
-    </p>
-    <button class="empty-action-btn" (click)="searchQuery.set(''); selectedLang.set('All Languages'); selectedType.set('all'); fetchCuratedContent()">
-      Reset Filters & Refresh
-    </button>
-  </div>
+  </section>
 </div>
