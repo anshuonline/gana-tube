@@ -1255,7 +1255,7 @@ export class App implements OnInit {
       if (track && track.title) {
         this.title.setTitle(`${track.title} - GanaTube`);
       } else {
-        this.title.setTitle('GanaTube - Free Music Streaming');
+        this.title.setTitle('Free Music Streaming - GanaTube');
       }
     });
 
