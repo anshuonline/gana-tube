@@ -897,53 +897,104 @@
             </div>
           </div>
 
-          <!-- Product Updates Section (Above Suggested for You) -->
-          <section class="product-updates-section" *ngIf="!shelvesLoading() && loadedShelves().length > 0">
+          <!-- Featured Spotlight Section (Above Suggested for You) -->
+          <section class="product-updates-section spotlight-theme" *ngIf="!shelvesLoading() && loadedShelves().length > 0">
             <div class="product-updates-header">
-              <span class="product-updates-tag">PRODUCT UPDATES</span>
-              <span class="product-updates-sub">New releases this week</span>
+              <div class="spotlight-title-row">
+                <span class="spotlight-dot"></span>
+                <span class="product-updates-tag">FEATURED SPOTLIGHT</span>
+              </div>
+              <span class="product-updates-sub">Discover Next-Gen Streaming</span>
             </div>
 
             <div class="product-updates-grid">
               <div class="product-update-card freesong-card">
-                <div class="product-card-glow"></div>
+                <div class="product-card-ambient"></div>
 
-                <div class="product-badges">
-                  <span class="badge-pill pill-red">NEW MUSIC PLATFORM</span>
-                  <span class="badge-pill pill-subtle">BETA PHASE</span>
-                </div>
-
-                <div class="product-brand-row">
-                  <div class="product-icon-box">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
-                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                    </svg>
-                  </div>
-                  <h3 class="product-name">FreeSong.in</h3>
-                </div>
-
-                <p class="product-desc">
-                  Better and more collection of songs with dynamic playlists, lightning fast loading and ultra-smooth experience.<br />
-                  Currently in beta phase — try it out and give feedback to improve!
-                </p>
-
-                <div class="product-actions">
-                  <a href="https://freesong.in" target="_blank" rel="noopener noreferrer" class="btn-product-open">
-                    <span>Open FreeSong.in</span>
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="7" y1="17" x2="17" y2="7"></line>
-                      <polyline points="7 7 17 7 17 17"></polyline>
-                    </svg>
-                  </a>
-                  <button type="button" class="btn-product-copy" (click)="copyFreeSongLink()">
-                    <span *ngIf="!freeSongLinkCopied">Copy link</span>
-                    <span *ngIf="freeSongLinkCopied" class="copied-indicator">
-                      Copied!
-                      <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
+                <div class="card-inner-content">
+                  <!-- Badges Bar -->
+                  <div class="product-badges">
+                    <span class="badge-pill pill-emerald">
+                      <span class="live-dot"></span>
+                      BETA PHASE
                     </span>
-                  </button>
+                    <span class="badge-pill pill-subtle">NEXT-GEN PLATFORM</span>
+                    <span class="badge-pill pill-highlight">ULTRA SMOOTH</span>
+                  </div>
+
+                  <!-- Brand Header Row: Logo + Brand Name + Verified -->
+                  <div class="product-brand-row">
+                    <div class="product-logo-box">
+                      <img src="https://freesong.in/images/freesonglogowebp.webp"
+                           alt="FreeSong.in Logo"
+                           class="product-brand-img"
+                           loading="lazy"
+                           (error)="$any($event.target).src = '/assets/images/freesonglogo.webp'" />
+                    </div>
+                    <div class="brand-text-col">
+                      <div class="brand-name-wrap">
+                        <h3 class="product-name">FreeSong.in</h3>
+                        <span class="verified-badge" title="Official Partner Platform">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="#10b981">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                          </svg>
+                        </span>
+                      </div>
+                      <span class="product-tagline">Massive song collection • Instant playback</span>
+                    </div>
+                  </div>
+
+                  <!-- Description -->
+                  <p class="product-desc">
+                    Better and larger collection of songs with dynamic playlists, lightning fast streaming and ultra-smooth experience.
+                    Currently in beta phase — try it out and give feedback to improve!
+                  </p>
+
+                  <!-- Feature Highlights Chips (YouTube style) -->
+                  <div class="product-feature-chips">
+                    <span class="feature-chip">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                      </svg>
+                      Lightning Fast
+                    </span>
+                    <span class="feature-chip">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
+                      </svg>
+                      Dynamic Playlists
+                    </span>
+                    <span class="feature-chip">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path>
+                      </svg>
+                      Smooth UI
+                    </span>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="product-actions">
+                    <a href="https://freesong.in" target="_blank" rel="noopener noreferrer" class="btn-product-open">
+                      <span>Try FreeSong.in</span>
+                      <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                      </svg>
+                    </a>
+                    <button type="button" class="btn-product-copy" (click)="copyFreeSongLink()">
+                      <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" *ngIf="!freeSongLinkCopied">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <span *ngIf="!freeSongLinkCopied">Copy link</span>
+                      <span *ngIf="freeSongLinkCopied" class="copied-indicator">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Copied!
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
