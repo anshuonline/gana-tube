@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const config = require('../config');
+const { getGuildSettings } = require('../utils/settings');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,10 +16,20 @@ module.exports = {
     const idea = interaction.options.getString('idea');
     const user = interaction.user;
 
-    // Try to find a suggestions or feedback channel in the server
-    const feedbackChannel = interaction.guild?.channels.cache.find(
-      c => c.name.includes('suggest') || c.name.includes('feedback') || c.name.includes('ideas')
-    );
+    // Check configured suggestions channel
+    const settings = getGuildSettings(interaction.guildId);
+    let feedbackChannel = null;
+
+    if (settings.suggestionChannelId) {
+      feedbackChannel = interaction.guild?.channels.cache.get(settings.suggestionChannelId);
+    }
+
+    // Fallback search
+    if (!feedbackChannel) {
+      feedbackChannel = interaction.guild?.channels.cache.find(
+        c => c.isTextBased() && (c.name.includes('suggest') || c.name.includes('feedback') || c.name.includes('ideas'))
+      );
+    }
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.accent)
@@ -37,7 +48,7 @@ module.exports = {
         await msg.react('👍');
         await msg.react('👎');
       } catch (e) {
-        console.error('Failed to post to feedback channel:', e);
+        console.error('[GanaTube Bot] Failed to post to feedback channel:', e.message);
       }
     }
 

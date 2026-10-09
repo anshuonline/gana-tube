@@ -3,9 +3,11 @@ const {
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle
+  ButtonStyle,
+  PermissionFlagsBits
 } = require('discord.js');
 const config = require('../config');
+const { getGuildSettings } = require('../utils/settings');
 
 // Helper to create the real GanaTube room
 async function createBackendRoom(name, username) {
@@ -75,12 +77,24 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    // Check bot permissions in current channel
+    if (interaction.guild && interaction.channel) {
+      const botMember = interaction.guild.members.me;
+      const perms = interaction.channel.permissionsFor(botMember);
+      if (perms && (!perms.has(PermissionFlagsBits.SendMessages) || !perms.has(PermissionFlagsBits.EmbedLinks))) {
+        return interaction.reply({
+          content: '❌ **Bot Missing Permissions**: I cannot send messages or embed links in this channel. An admin can run `/fixperms` to resolve this.',
+          ephemeral: true
+        });
+      }
+    }
+
     await interaction.deferReply();
 
     const customName = interaction.options.getString('name');
     const roomName = customName || `${interaction.user.username}'s Music Vibe`;
 
-    // 1. Create Private GanaTube Room (isPublic: false -> never shown on website public lobby)
+    // 1. Create Private GanaTube Room
     const { roomId, roomUrl } = await createBackendRoom(roomName, interaction.user.username);
 
     // 2. Build AMOLED Embed
@@ -116,6 +130,35 @@ module.exports = {
         .setURL(config.ganatubeUrl)
     );
 
+    // Reply directly in current channel
     await interaction.editReply({ embeds: [embed], components: [row] });
+
+    // 3. Optional Broadcast to Configured Room Channel
+    try {
+      const settings = getGuildSettings(interaction.guildId);
+      if (settings.roomChannelId && settings.roomChannelId !== interaction.channelId) {
+        const broadcastChannel = interaction.guild.channels.cache.get(settings.roomChannelId);
+        if (broadcastChannel && broadcastChannel.isTextBased()) {
+          const broadcastEmbed = new EmbedBuilder()
+            .setColor(config.colors.primary)
+            .setTitle(`🎶 Live Music Room Created: ${roomName}`)
+            .setDescription(`**${interaction.user.username}** just started a room in ${interaction.channel}!\nRoom Code: \`${roomId}\``)
+            .setFooter({ text: 'Click below to tune in live' })
+            .setTimestamp();
+
+          const broadcastRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setLabel('🎧 Join Party')
+              .setStyle(ButtonStyle.Link)
+              .setURL(roomUrl)
+              .setEmoji('▶️')
+          );
+
+          await broadcastChannel.send({ embeds: [broadcastEmbed], components: [broadcastRow] });
+        }
+      }
+    } catch (broadcastErr) {
+      console.warn('[GanaTube Bot] Room broadcast skipped:', broadcastErr.message);
+    }
   }
 };

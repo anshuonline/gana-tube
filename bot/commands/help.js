@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require('discord.js');
 const config = require('../config');
 
 module.exports = {
@@ -7,12 +7,14 @@ module.exports = {
     .setDescription('📖 View all GanaTube bot commands and features'),
 
   async execute(interaction) {
+    const isAdmin = interaction.memberPermissions?.has(PermissionFlagsBits.Administrator);
+
     const embed = new EmbedBuilder()
       .setColor(config.colors.primary)
       .setTitle('🎧 GanaTube Discord Bot — Command Guide')
       .setDescription(
         `Welcome to **GanaTube**! Stream unlimited music ad-free, create real-time listening rooms, and share your favorite tracks.\n\n` +
-        `Here is the list of available commands:`
+        `**Music & Community Commands:**`
       )
       .addFields(
         {
@@ -39,8 +41,28 @@ module.exports = {
           name: '💡 `/suggest <idea>`',
           value: 'Submit your feature suggestions or report bugs directly to developers.',
           inline: false
+        },
+        {
+          name: '📖 `/guide [topic]`',
+          value: 'Open interactive in-depth guide covering Listen Together rooms, streaming features, and manuals.',
+          inline: false
         }
-      )
+      );
+
+    if (isAdmin) {
+      embed.addFields(
+        {
+          name: '👑 Admin Commands:',
+          value:
+            '• ⚙️ `/setchannel <welcome|room|suggestions|logs|view|reset>` — Bind specific channels for welcome cards, room broadcasts, etc.\n' +
+            '• 🛠️ `/fixperms` — Automatically unlock slash commands & bot access across all text channels.\n' +
+            '• 🚀 `/setup` — Auto-create organized categories and channels with role permissions.',
+          inline: false
+        }
+      );
+    }
+
+    embed
       .setFooter({ text: 'GanaTube Music • Powered by ganatube.in', iconURL: interaction.client.user.displayAvatarURL() })
       .setTimestamp();
 
