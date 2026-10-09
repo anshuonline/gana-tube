@@ -4049,4 +4049,17 @@ export class App implements OnInit {
       }, 2000);
     });
   }
+
+  freeSongLinkCopied = false;
+
+  copyFreeSongLink() {
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText('https://freesong.in').then(() => {
+        this.freeSongLinkCopied = true;
+        setTimeout(() => {
+          this.freeSongLinkCopied = false;
+        }, 2500);
+      });
+    }
+  }
 }

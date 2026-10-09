@@ -897,6 +897,58 @@
             </div>
           </div>
 
+          <!-- Product Updates Section (Above Suggested for You) -->
+          <section class="product-updates-section" *ngIf="!shelvesLoading() && loadedShelves().length > 0">
+            <div class="product-updates-header">
+              <span class="product-updates-tag">PRODUCT UPDATES</span>
+              <span class="product-updates-sub">New releases this week</span>
+            </div>
+
+            <div class="product-updates-grid">
+              <div class="product-update-card freesong-card">
+                <div class="product-card-glow"></div>
+
+                <div class="product-badges">
+                  <span class="badge-pill pill-red">NEW MUSIC PLATFORM</span>
+                  <span class="badge-pill pill-subtle">BETA PHASE</span>
+                </div>
+
+                <div class="product-brand-row">
+                  <div class="product-icon-box">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
+                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                    </svg>
+                  </div>
+                  <h3 class="product-name">FreeSong.in</h3>
+                </div>
+
+                <p class="product-desc">
+                  Better and more collection of songs with dynamic playlists, lightning fast loading and ultra-smooth experience.<br />
+                  Currently in beta phase — try it out and give feedback to improve!
+                </p>
+
+                <div class="product-actions">
+                  <a href="https://freesong.in" target="_blank" rel="noopener noreferrer" class="btn-product-open">
+                    <span>Open FreeSong.in</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  </a>
+                  <button type="button" class="btn-product-copy" (click)="copyFreeSongLink()">
+                    <span *ngIf="!freeSongLinkCopied">Copy link</span>
+                    <span *ngIf="freeSongLinkCopied" class="copied-indicator">
+                      Copied!
+                      <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <!-- Dynamic Shelves Loop -->
           <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index; trackBy: shelfTrackBy">
             

@@ -1700,6 +1700,199 @@
   border-radius: 50px;
 }
 
+// ---- Product Updates Section (Above Suggested for You) ----
+.product-updates-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 10px 0 16px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    margin: 6px 0 12px;
+  }
+}
+
+.product-updates-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+
+  .product-updates-tag {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .product-updates-sub {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.product-updates-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+}
+
+.product-update-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: 22px 24px;
+  background: #0d0a0d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  width: 100%;
+  max-width: 480px;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 18px 20px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 0 12px 36px rgba(239, 68, 68, 0.12), 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  &.freesong-card {
+    background: radial-gradient(circle at 100% 0%, rgba(225, 29, 72, 0.18) 0%, transparent 65%),
+                linear-gradient(135deg, rgba(26, 10, 15, 0.9) 0%, #0c080b 100%);
+  }
+
+  .product-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+
+    .badge-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      line-height: 1.2;
+
+      &.pill-red {
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        color: #fca5a5;
+      }
+
+      &.pill-subtle {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+  }
+
+  .product-brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .product-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+      flex-shrink: 0;
+    }
+
+    .product-name {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+  }
+
+  .product-desc {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.55;
+    margin: 0 0 20px 0;
+  }
+
+  .product-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    .btn-product-open {
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.28);
+        border-color: rgba(239, 68, 68, 0.65);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+      }
+
+      &:active {
+        transform: scale(0.97);
+      }
+    }
+
+    .btn-product-copy {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.8);
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+      }
+
+      &:active {
+        transform: scale(0.97);
+      }
+    }
+  }
+}
+
 // ---- Recommendation Shelves (Home Screen) ----
 .recommendations-wrap {
   display: flex;
