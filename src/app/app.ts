@@ -49,6 +49,7 @@ import { CuratedPlaylistsComponent } from './components/curated-playlists/curate
   import { LanguageSelectModalComponent } from './components/language-select-modal/language-select-modal.component';
   import { LoginPromptModalComponent } from './components/login-prompt-modal/login-prompt-modal.component';
   import { PromoPopupModalComponent } from './components/promo-popup-modal/promo-popup-modal.component';
+  import { BackgroundPlayPopupComponent } from './components/background-play-popup/background-play-popup.component';
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { RoomFeaturesPopupComponent } from './components/room-features-popup/room-features-popup.component';
@@ -140,6 +141,7 @@ export interface HeroSlide {
     LanguageSelectModalComponent,
     LoginPromptModalComponent,
     PromoPopupModalComponent,
+    BackgroundPlayPopupComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
     RoomFeaturesPopupComponent,

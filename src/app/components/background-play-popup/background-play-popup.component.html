@@ -1,0 +1,22 @@
+<div class="bpp-backdrop" *ngIf="visible()"></div>
+
+<div class="bpp-modal" *ngIf="visible()" role="dialog" aria-modal="true" aria-label="Background Play announcement">
+  <div class="bpp-icon-wrap">
+    <svg lucideMoonStar [attr.size]="30"></svg>
+  </div>
+
+  <h2 class="bpp-title">Background Play is Here!</h2>
+
+  <p class="bpp-text">
+    Now keep your music playing even when you switch apps or lock your screen —
+    with full <strong>lock-screen controls</strong> for play, pause & next.
+  </p>
+
+  <ul class="bpp-points">
+    <li>Music keeps streaming in background</li>
+    <li>Lock-screen play / pause / next controls</li>
+    <li>Crisp HD audio streaming</li>
+  </ul>
+
+  <button type="button" class="bpp-ok-btn" (click)="onGotIt()">Got it!</button>
+</div>
