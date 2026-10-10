@@ -83,7 +83,7 @@
       transition: border-color 0.2s;
       
       &:focus {
-        border-color: #1ED760;
+        border-color: #EC4899;
       }
     }
   }
@@ -131,8 +131,8 @@
     
     &.active {
       .option-content {
-        border-color: #1ED760;
-        background: rgba(30, 215, 96, 0.05);
+        border-color: #EC4899;
+        background: rgba(236, 72, 153, 0.05);
         
         .icon-globe { color: #10B981; }
         .icon-lock { color: #F59E0B; }
@@ -184,7 +184,7 @@
   }
   
   .btn-primary {
-    background: linear-gradient(135deg, #169C46, #1ED760);
+    background: linear-gradient(135deg, #9333EA, #EC4899);
     border: none;
     color: #FFF;
     
@@ -195,7 +195,7 @@
     
     &:not(:disabled):hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(30, 215, 96, 0.3);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
     }
   }
 }

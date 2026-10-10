@@ -45,7 +45,7 @@
       transition: border-color 0.2s;
 
       &:focus {
-        border-color: #1db954;
+        border-color: #a855f7;
       }
     }
   }
@@ -64,7 +64,7 @@
   .login-btn {
     width: 100%;
     padding: 14px;
-    background-color: #1db954;
+    background-color: #a855f7;
     color: black;
     border: none;
     border-radius: 8px;
@@ -74,7 +74,7 @@
     transition: background-color 0.2s, transform 0.1s;
 
     &:hover:not([disabled]) {
-      background-color: #1ed760;
+      background-color: #ec4899;
       transform: scale(1.02);
     }
 

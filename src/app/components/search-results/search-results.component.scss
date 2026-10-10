@@ -481,13 +481,13 @@
   }
 
   &:hover:not(:disabled) {
-    background: rgba(29, 185, 84, 0.14);
-    border-color: rgba(29, 185, 84, 0.5);
-    box-shadow: 0 8px 24px rgba(29, 185, 84, 0.18);
+    background: rgba(168, 85, 247, 0.14);
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.18);
     transform: translateY(-2px);
 
     svg {
-      color: #1ed760;
+      color: #ec4899;
     }
   }
 
@@ -626,11 +626,11 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(29, 185, 84, 0.4);
+    border-color: rgba(168, 85, 247, 0.4);
     transform: translateY(-2px);
 
     .artist-card-avatar {
-      box-shadow: 0 8px 24px rgba(29, 185, 84, 0.35);
+      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35);
     }
   }
 

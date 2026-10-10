@@ -84,7 +84,7 @@
     .brand-tag {
       font-size: 11px;
       font-weight: 600;
-      color: #1db954;
+      color: #a855f7;
       text-transform: uppercase;
       letter-spacing: 0.8px;
     }
@@ -100,7 +100,7 @@
   .dropdown-icon {
     position: absolute;
     left: 12px;
-    color: #1db954;
+    color: #a855f7;
     pointer-events: none;
   }
 
@@ -121,7 +121,7 @@
 
     &:hover, &:focus {
       outline: none;
-      border-color: #1db954;
+      border-color: #a855f7;
       background-color: #171722;
     }
 
@@ -176,7 +176,7 @@
 
     &:hover, &:focus {
       outline: none;
-      border-color: rgba(29, 185, 84, 0.6);
+      border-color: rgba(168, 85, 247, 0.6);
       background-color: #171722;
     }
 
@@ -207,12 +207,12 @@
   &:hover {
     background: #181824;
     color: #ffffff;
-    border-color: rgba(29, 185, 84, 0.5);
+    border-color: rgba(168, 85, 247, 0.5);
   }
 
   &.loading svg {
     animation: spin 0.8s linear infinite;
-    color: #1db954;
+    color: #a855f7;
   }
 }
 
@@ -295,8 +295,8 @@
   top: calc(100% + 10px);
   right: 0;
   background: #0d0d14;
-  border: 1px solid rgba(30, 215, 96, 0.5);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.95), 0 0 20px rgba(30, 215, 96, 0.25);
+  border: 1px solid rgba(236, 72, 153, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.95), 0 0 20px rgba(236, 72, 153, 0.25);
   padding: 8px 14px;
   border-radius: 12px;
   display: flex;
@@ -312,7 +312,7 @@
     font-weight: 700;
     color: #ffffff;
     letter-spacing: 0.3px;
-    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -330,8 +330,8 @@
     width: 10px;
     height: 10px;
     background: #0d0d14;
-    border-left: 1px solid rgba(30, 215, 96, 0.5);
-    border-top: 1px solid rgba(30, 215, 96, 0.5);
+    border-left: 1px solid rgba(236, 72, 153, 0.5);
+    border-top: 1px solid rgba(236, 72, 153, 0.5);
     transform: rotate(45deg);
   }
 
@@ -445,7 +445,7 @@
       font-weight: 700;
       padding: 2px 7px;
       border-radius: 100px;
-      background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
       color: #ffffff;
       text-transform: uppercase;
       letter-spacing: 0.4px;
@@ -456,18 +456,18 @@
       color: #ffffff;
 
       .nav-icon {
-        color: #1db954;
+        color: #a855f7;
       }
     }
 
     &.active {
-      background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(30, 215, 96, 0.1) 100%);
-      border: 1px solid rgba(29, 185, 84, 0.3);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.3);
       color: #ffffff;
       font-weight: 600;
 
       .nav-icon {
-        color: #1ed760;
+        color: #ec4899;
       }
     }
   }

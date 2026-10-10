@@ -51,10 +51,10 @@
     }
 
     &.active {
-      background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
       color: #ffffff;
       font-weight: 600;
-      box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
     }
   }
 
@@ -76,7 +76,7 @@
   .loading-progress {
     height: 100%;
     width: 40%;
-    background: linear-gradient(90deg, #1db954, #1ed760);
+    background: linear-gradient(90deg, #a855f7, #ec4899);
     animation: progressIndeterminate 1.2s infinite ease-in-out;
   }
 }
@@ -116,8 +116,8 @@
         font-size: 10px;
         font-weight: 700;
         padding: 2px 8px;
-        background: rgba(29, 185, 84, 0.15);
-        color: #1db954;
+        background: rgba(168, 85, 247, 0.15);
+        color: #a855f7;
         border-radius: 100px;
       }
     }
@@ -197,7 +197,7 @@
 
         &:focus {
           outline: none;
-          border-color: #1db954;
+          border-color: #a855f7;
           background: #14141c;
         }
 
@@ -271,7 +271,7 @@
     color: rgba(255, 255, 255, 0.7);
 
     &.top3 {
-      background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
       color: #ffffff;
     }
   }
@@ -336,15 +336,15 @@
       border-radius: 6px;
 
       &.user {
-        background: rgba(29, 185, 84, 0.15);
-        color: #1ed760;
-        border: 1px solid rgba(29, 185, 84, 0.3);
+        background: rgba(168, 85, 247, 0.15);
+        color: #ec4899;
+        border: 1px solid rgba(168, 85, 247, 0.3);
       }
 
       &.guest {
-        background: rgba(30, 215, 96, 0.15);
+        background: rgba(236, 72, 153, 0.15);
         color: #f472b6;
-        border: 1px solid rgba(30, 215, 96, 0.3);
+        border: 1px solid rgba(236, 72, 153, 0.3);
       }
     }
   }

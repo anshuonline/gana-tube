@@ -110,7 +110,7 @@
         }
 
         &:focus {
-          border-color: #169C46;
+          border-color: #9333EA;
           background: rgba(255, 255, 255, 0.08);
         }
       }
@@ -144,7 +144,7 @@
 
   .btn-primary {
     width: 100%;
-    background: linear-gradient(135deg, #169C46, #1ED760);
+    background: linear-gradient(135deg, #9333EA, #EC4899);
     color: #FFF;
     border: none;
     border-radius: 12px;
@@ -161,7 +161,7 @@
 
     &:not(:disabled):hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(30, 215, 96, 0.3);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
     }
   }
 }

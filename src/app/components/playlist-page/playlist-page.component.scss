@@ -31,7 +31,7 @@
     right: -120px;
     width: 480px;
     height: 480px;
-    background: radial-gradient(circle, rgba(29, 185, 84, 0.16) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.16) 0%, transparent 65%);
     filter: blur(90px);
     z-index: -1;
     pointer-events: none;
@@ -90,7 +90,7 @@
   height: 250px;
   flex-shrink: 0;
   border-radius: 16px;
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 25px rgba(29, 185, 84, 0.15);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 25px rgba(168, 85, 247, 0.15);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
 
@@ -156,8 +156,8 @@
   .badge {
     align-self: flex-start;
     padding: 4px 12px;
-    background: rgba(29, 185, 84, 0.15);
-    border: 1px solid rgba(29, 185, 84, 0.3);
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.3);
     border-radius: 100px;
     font-size: 0.75rem;
     font-weight: 700;
@@ -295,7 +295,7 @@
 
     &:hover:not(:disabled) {
       transform: translateY(-1px);
-      background: linear-gradient(135deg, #7c22d6 0%, #15a34a 100%);
+      background: linear-gradient(135deg, #7c22d6 0%, #db2777 100%);
       box-shadow: 0 8px 26px rgba(190, 24, 93, 0.45);
       filter: brightness(1.1);
     }
@@ -324,16 +324,16 @@
     }
 
     &.active {
-      background: rgba(29, 185, 84, 0.18);
+      background: rgba(168, 85, 247, 0.18);
       color: #e9d5ff;
-      border-color: rgba(29, 185, 84, 0.5);
+      border-color: rgba(168, 85, 247, 0.5);
     }
   }
 
   .pl-save.active {
-    background: rgba(29, 185, 84, 0.2);
+    background: rgba(168, 85, 247, 0.2);
     color: #e9d5ff;
-    border-color: rgba(29, 185, 84, 0.5);
+    border-color: rgba(168, 85, 247, 0.5);
   }
 
   .pl-share.active {
@@ -361,7 +361,7 @@
     width: 40px;
     height: 40px;
     border: 3px solid rgba(255, 255, 255, 0.1);
-    border-top-color: #1db954;
+    border-top-color: #a855f7;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
@@ -378,7 +378,7 @@
 }
 
 .songs-list-container {
-  background: linear-gradient(180deg, rgba(29, 185, 84, 0.08) 0%, rgba(30, 215, 96, 0.04) 45%, rgba(255, 255, 255, 0.015) 100%);
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.08) 0%, rgba(236, 72, 153, 0.04) 45%, rgba(255, 255, 255, 0.015) 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 10px 12px;
@@ -427,7 +427,7 @@
   }
 
   &.active {
-    background: rgba(29, 185, 84, 0.12);
+    background: rgba(168, 85, 247, 0.12);
 
     .col-title .song-title {
       color: #ffffff;
@@ -698,10 +698,10 @@
     font-weight: 700;
     letter-spacing: 1.2px;
     text-transform: uppercase;
-    color: #1ed760;
+    color: #ec4899;
 
     .sparkles-icon {
-      color: #1ed760;
+      color: #ec4899;
       animation: pulse-glow 2s infinite alternate;
     }
   }
@@ -779,7 +779,7 @@
       width: 26px;
       height: 26px;
       border: 2.5px solid rgba(255, 255, 255, 0.1);
-      border-top-color: #1db954;
+      border-top-color: #a855f7;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -837,8 +837,8 @@
     }
 
     &.active {
-      background: rgba(29, 185, 84, 0.12);
-      border-color: rgba(29, 185, 84, 0.3);
+      background: rgba(168, 85, 247, 0.12);
+      border-color: rgba(168, 85, 247, 0.3);
 
       .song-title {
         color: #ffffff;
@@ -863,8 +863,8 @@
     gap: 4px;
     padding: 6px 14px;
     border-radius: 100px;
-    background: rgba(29, 185, 84, 0.14);
-    border: 1px solid rgba(29, 185, 84, 0.35);
+    background: rgba(168, 85, 247, 0.14);
+    border: 1px solid rgba(168, 85, 247, 0.35);
     color: #e9d5ff;
     font-size: 0.82rem;
     font-weight: 600;
@@ -876,10 +876,10 @@
     }
 
     &:hover {
-      background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
       border-color: transparent;
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(29, 185, 84, 0.4);
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
       transform: scale(1.05);
     }
 
@@ -906,17 +906,17 @@
   padding: 16px 20px;
   margin: 14px 4px 6px;
   background: rgba(255, 255, 255, 0.025);
-  border: 1px dashed rgba(29, 185, 84, 0.3);
+  border: 1px dashed rgba(168, 85, 247, 0.3);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
 
   &:hover {
-    background: rgba(29, 185, 84, 0.08);
-    border-color: rgba(29, 185, 84, 0.5);
+    background: rgba(168, 85, 247, 0.08);
+    border-color: rgba(168, 85, 247, 0.5);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(29, 185, 84, 0.15);
+    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.15);
   }
 
   &:active {
@@ -924,17 +924,17 @@
   }
 
   &.loading-active {
-    background: rgba(29, 185, 84, 0.08);
-    border: 1px solid rgba(29, 185, 84, 0.5);
-    box-shadow: 0 4px 20px rgba(29, 185, 84, 0.15);
+    background: rgba(168, 85, 247, 0.08);
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);
   }
 
   .spinner-small {
     width: 24px;
     height: 24px;
     border: 2.5px solid rgba(255, 255, 255, 0.12);
-    border-top-color: #1db954;
-    border-right-color: #1ed760;
+    border-top-color: #a855f7;
+    border-right-color: #ec4899;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     flex-shrink: 0;

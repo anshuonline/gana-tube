@@ -66,8 +66,8 @@
     width: 32px;
     height: 32px;
     margin: 0 auto 16px;
-    border: 3px solid rgba(29, 185, 84, 0.2);
-    border-top-color: #1db954;
+    border: 3px solid rgba(168, 85, 247, 0.2);
+    border-top-color: #a855f7;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -147,13 +147,13 @@
   }
 
   &.purple-gradient {
-    border-color: rgba(29, 185, 84, 0.25);
-    .kpi-icon-pill { background: rgba(29, 185, 84, 0.15); color: #1db954; }
+    border-color: rgba(168, 85, 247, 0.25);
+    .kpi-icon-pill { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
   }
 
   &.pink-gradient {
-    border-color: rgba(30, 215, 96, 0.25);
-    .kpi-icon-pill { background: rgba(30, 215, 96, 0.15); color: #1ed760; }
+    border-color: rgba(236, 72, 153, 0.25);
+    .kpi-icon-pill { background: rgba(236, 72, 153, 0.15); color: #ec4899; }
   }
 
   &.blue-gradient {
@@ -199,8 +199,8 @@
   flex-direction: column;
 
   &.highlight-guest-panel {
-    border-color: rgba(30, 215, 96, 0.25);
-    background: radial-gradient(circle at top right, rgba(30, 215, 96, 0.04) 0%, #181818 60%);
+    border-color: rgba(236, 72, 153, 0.25);
+    background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.04) 0%, #181818 60%);
   }
 
   .panel-header {
@@ -228,9 +228,9 @@
         font-weight: 700;
         padding: 2px 7px;
         border-radius: 100px;
-        background: rgba(30, 215, 96, 0.15);
-        border: 1px solid rgba(30, 215, 96, 0.35);
-        color: #1ed760;
+        background: rgba(236, 72, 153, 0.15);
+        border: 1px solid rgba(236, 72, 153, 0.35);
+        color: #ec4899;
         text-transform: uppercase;
       }
     }
@@ -244,13 +244,13 @@
     .panel-action-link {
       font-size: 12px;
       font-weight: 500;
-      color: #1db954;
+      color: #a855f7;
       text-decoration: none;
       white-space: nowrap;
       transition: color 0.2s ease;
 
       &:hover {
-        color: #1ed760;
+        color: #ec4899;
         text-decoration: underline;
       }
     }
@@ -377,7 +377,7 @@
     text-align: center;
 
     &.rank-pink {
-      color: #1ed760;
+      color: #ec4899;
     }
   }
 
@@ -426,7 +426,7 @@
       color: #ffffff;
 
       &.pink-text {
-        color: #1ed760;
+        color: #ec4899;
       }
     }
 
