@@ -51,9 +51,9 @@
   border: none;
 
   &.primary {
-    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
     color: #fff;
-    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.25);
+    box-shadow: 0 4px 16px rgba(30, 215, 96, 0.25);
 
     &:hover { opacity: 0.9; transform: translateY(-1px); }
   }
@@ -78,7 +78,7 @@
 
   &:hover {
     background: #101013;
-    border-color: rgba(236, 72, 153, 0.25);
+    border-color: rgba(30, 215, 96, 0.25);
   }
 
   .popup-thumb {
@@ -98,8 +98,8 @@
       font-size: 0.7rem;
       font-weight: 800;
       letter-spacing: 0.08em;
-      color: #8B5CF6;
-      background: rgba(139, 92, 246, 0.12);
+      color: #1DB954;
+      background: rgba(29, 185, 84, 0.12);
       padding: 4px 10px;
       border-radius: 8px;
     }
@@ -155,7 +155,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
 
-      svg { color: #EC4899; flex-shrink: 0; }
+      svg { color: #1ED760; flex-shrink: 0; }
     }
 
     .popup-meta {
@@ -186,8 +186,8 @@
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(236, 72, 153, 0.15);
-    border-color: rgba(236, 72, 153, 0.4);
+    background: rgba(30, 215, 96, 0.15);
+    border-color: rgba(30, 215, 96, 0.4);
     color: #fff;
   }
 
@@ -304,7 +304,7 @@
 
       &:focus {
         background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(236, 72, 153, 0.5);
+        border-color: rgba(30, 215, 96, 0.5);
       }
 
       &::placeholder { color: rgba(255, 255, 255, 0.25); }
@@ -341,7 +341,7 @@
       white-space: nowrap;
       transition: all 0.2s;
 
-      &:hover { background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.5); }
+      &:hover { background: rgba(29, 185, 84, 0.2); border-color: rgba(29, 185, 84, 0.5); }
       &.uploading { opacity: 0.6; pointer-events: none; }
     }
 
@@ -404,7 +404,7 @@
     }
 
     &.on {
-      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+      background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
       border-color: transparent;
 
       .toggle-knob { transform: translateX(20px); }
@@ -437,7 +437,7 @@
   .submit-btn {
     width: 100%;
     margin-top: 20px;
-    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
     color: #fff;
     border: none;
     padding: 16px;
@@ -446,7 +446,7 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 4px 18px rgba(236, 72, 153, 0.25);
+    box-shadow: 0 4px 18px rgba(30, 215, 96, 0.25);
 
     &:hover:not(:disabled) { opacity: 0.9; }
     &:disabled { opacity: 0.5; cursor: default; }
@@ -555,10 +555,10 @@
   }
 
   &.active {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.18) 0%, rgba(236, 72, 153, 0.18) 100%);
-    border-color: rgba(236, 72, 153, 0.45);
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.18) 0%, rgba(30, 215, 96, 0.18) 100%);
+    border-color: rgba(30, 215, 96, 0.45);
     color: #fff;
-    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.15);
+    box-shadow: 0 4px 16px rgba(30, 215, 96, 0.15);
   }
 }
 
@@ -836,8 +836,8 @@
     }
 
     &.active {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
-      border-color: rgba(236, 72, 153, 0.5);
+      background: linear-gradient(135deg, rgba(29, 185, 84, 0.2) 0%, rgba(30, 215, 96, 0.2) 100%);
+      border-color: rgba(30, 215, 96, 0.5);
       color: #fff;
     }
   }
@@ -864,7 +864,7 @@
     transition: all 0.2s;
 
     input[type="checkbox"] {
-      accent-color: #ec4899;
+      accent-color: #1ed760;
       width: 16px;
       height: 16px;
       cursor: pointer;
@@ -903,7 +903,7 @@
     align-items: center;
     justify-content: center;
     padding: 30px 16px;
-    background: radial-gradient(circle at center, rgba(139, 92, 246, 0.08) 0%, #000 70%);
+    background: radial-gradient(circle at center, rgba(29, 185, 84, 0.08) 0%, #000 70%);
     border: 1px dashed rgba(255, 255, 255, 0.12);
     border-radius: 16px;
   }

@@ -1,4 +1,4 @@
-﻿.library-page-wrapper {
+.library-page-wrapper {
   justify-content: flex-start;
   padding-left: 40px;
   padding-right: 40px;
@@ -39,8 +39,8 @@
     margin-bottom: 20px !important;
   }
   .lib-icon {
-    color: #a855f7; /* Vibrant purple */
-    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4));
+    color: #1db954; /* Vibrant purple */
+    filter: drop-shadow(0 0 10px rgba(29, 185, 84, 0.4));
     @media (max-width: 480px) {
       width: 32px;
       height: 32px;

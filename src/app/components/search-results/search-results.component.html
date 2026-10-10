@@ -198,7 +198,7 @@
           *ngFor="let artist of artistsSource; let i = index"
           [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
           (click)="onArtistClick(artist)">
-          <div class="artist-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
+          <div class="artist-avatar" [style.background]="artist.thumb ? '#181818' : getArtistGradient(artist.name)">
             <img *ngIf="artist.thumb" [src]="artist.thumb" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
             <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
           </div>
@@ -272,7 +272,7 @@
           *ngFor="let artist of artistsSource; let i = index"
           [style.animation-delay.ms]="i < 20 ? i * 25 : 0"
           (click)="onArtistClick(artist)">
-          <div class="artist-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
+          <div class="artist-avatar" [style.background]="artist.thumb ? '#181818' : getArtistGradient(artist.name)">
             <img *ngIf="artist.thumb" [src]="getHDUrl(artist.thumb)" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
             <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
           </div>
@@ -361,7 +361,7 @@
         *ngFor="let artist of artistsSource; let i = index"
         [style.animation-delay.ms]="i * 25"
         (click)="onArtistClick(artist)">
-        <div class="artist-card-avatar" [style.background]="artist.thumb ? '#0a0a0f' : getArtistGradient(artist.name)">
+        <div class="artist-card-avatar" [style.background]="artist.thumb ? '#181818' : getArtistGradient(artist.name)">
           <img *ngIf="artist.thumb" [src]="getHDUrl(artist.thumb)" [alt]="artist.name" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onArtistImgError(artist)" />
           <span *ngIf="!artist.thumb">{{ getArtistInitials(artist.name) }}</span>
         </div>

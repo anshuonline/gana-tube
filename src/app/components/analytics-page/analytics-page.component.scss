@@ -30,7 +30,7 @@
   font-size: 1.875rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  background: linear-gradient(to right, #60a5fa, #a855f7);
+  background: linear-gradient(to right, #60a5fa, #1db954);
   -webkit-background-clip: text;
   color: transparent;
 }
@@ -149,7 +149,7 @@
   background: linear-gradient(to bottom right, rgba(88, 28, 135, 0.4), rgba(88, 28, 135, 0.1));
   border: 1px solid rgba(88, 28, 135, 0.5);
 }
-.stat-card.purple h3 { color: #c084fc; }
+.stat-card.purple h3 { color: #1ed760; }
 
 .stat-title {
   font-size: 0.875rem;
@@ -193,7 +193,7 @@
   border-radius: 50%;
 }
 .dot.blue { background-color: #3b82f6; }
-.dot.pink { background-color: #ec4899; }
+.dot.pink { background-color: #1ed760; }
 
 .list-item {
   display: flex;
@@ -234,7 +234,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(to bottom right, #a855f7, #6366f1);
+  background: linear-gradient(to bottom right, #1db954, #1db954);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,7 +275,7 @@
   font-weight: bold;
 }
 .list-score.green span { color: #4ade80; }
-.list-score.purple span { color: #c084fc; }
+.list-score.purple span { color: #1ed760; }
 
 .list-score p {
   font-size: 0.75rem;

@@ -17,7 +17,7 @@
   width: 100%;
   max-width: 320px;
   height: 100vh;
-  background: #000000;
+  background: #121212;
   border-left: 1px solid rgba(255, 255, 255, 0.05);
   z-index: 10001;
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
@@ -140,7 +140,7 @@
           margin-top: 4px;
           
           &.admin {
-            color: #EC4899;
+            color: #1ED760;
           }
         }
       }
@@ -185,7 +185,7 @@
           position: absolute;
           right: 0;
           top: 100%;
-          background: #000000;
+          background: #121212;
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
@@ -278,7 +278,7 @@
 
         button {
           background: #ffffff;
-          color: #000000;
+          color: #121212;
           border: none;
           border-radius: 6px;
           padding: 8px 16px;

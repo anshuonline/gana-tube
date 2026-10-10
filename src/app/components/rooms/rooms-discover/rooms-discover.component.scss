@@ -12,8 +12,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     radial-gradient(120% 160% at 0% 0%, rgba(124, 58, 237, 0.14) 0%, rgba(0, 0, 0, 0) 55%),
-    radial-gradient(90% 120% at 100% 0%, rgba(236, 72, 153, 0.08) 0%, rgba(0, 0, 0, 0) 50%),
-    #000000;
+    radial-gradient(90% 120% at 100% 0%, rgba(30, 215, 96, 0.08) 0%, rgba(0, 0, 0, 0) 50%),
+    #121212;
   overflow: hidden;
   padding: 32px;
   margin-bottom: 36px;
@@ -138,7 +138,7 @@
   }
 
   .btn-create {
-    background: linear-gradient(135deg, #7C3AED, #9333EA);
+    background: linear-gradient(135deg, #169C46, #169C46);
     color: #FFF;
 
     &:hover {
@@ -173,7 +173,7 @@
   transition: border-color 0.2s ease, background 0.2s ease;
 
   &:focus-within {
-    border-color: rgba(236, 72, 153, 0.5);
+    border-color: rgba(30, 215, 96, 0.5);
     background: rgba(255, 255, 255, 0.06);
   }
 
@@ -205,7 +205,7 @@
     flex-shrink: 0;
     transition: all 0.2s;
 
-    &:hover { background: rgba(236, 72, 153, 0.2); color: #fff; }
+    &:hover { background: rgba(30, 215, 96, 0.2); color: #fff; }
   }
 }
 
@@ -233,15 +233,15 @@
   .more-count {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #EC4899;
-    background: rgba(236, 72, 153, 0.12);
+    color: #1ED760;
+    background: rgba(30, 215, 96, 0.12);
     padding: 2px 10px;
     border-radius: 12px;
   }
 
   &:hover {
-    background: rgba(139, 92, 246, 0.12);
-    border-color: rgba(139, 92, 246, 0.5);
+    background: rgba(29, 185, 84, 0.12);
+    border-color: rgba(29, 185, 84, 0.5);
   }
 
   &:disabled { opacity: 0.4; cursor: default; }
@@ -270,7 +270,7 @@
     transform: translateY(-2px);
 
     .btn-join {
-      background: linear-gradient(135deg, #7C3AED, #9333EA);
+      background: linear-gradient(135deg, #169C46, #169C46);
       color: #FFF;
       border-color: transparent;
     }
@@ -468,7 +468,7 @@
   text-align: center;
   background:
     radial-gradient(100% 120% at 50% 0%, rgba(124, 58, 237, 0.1) 0%, rgba(0, 0, 0, 0) 60%),
-    #000000;
+    #121212;
   border-radius: 24px;
   border: 1px dashed rgba(255, 255, 255, 0.12);
   margin-top: 8px;
@@ -557,7 +557,7 @@
   gap: 8px;
   padding: 13px 28px;
   border-radius: 26px;
-  background: linear-gradient(135deg, #7C3AED, #9333EA);
+  background: linear-gradient(135deg, #169C46, #169C46);
   color: #FFF;
   border: none;
   font-size: 15px;

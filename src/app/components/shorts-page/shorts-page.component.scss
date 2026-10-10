@@ -1,4 +1,4 @@
-﻿.shorts-container {
+.shorts-container {
   height: 100dvh;
   width: 100vw;
   background-color: #000;
@@ -72,7 +72,7 @@
   }
 }
  
-// ---- Expanding ring â€” a soft "pulse of love" behind the heart --
+// ---- Expanding ring — a soft "pulse of love" behind the heart --
 ::ng-deep .heart-ring {
   position: fixed;
   pointer-events: none;
@@ -98,7 +98,7 @@
   }
 }
  
-// ---- Mini hearts flying outward â€” this sells the "cute" factor -
+// ---- Mini hearts flying outward — this sells the "cute" factor -
 ::ng-deep .mini-heart {
   position: fixed;
   pointer-events: none;
@@ -138,7 +138,7 @@
   }
 }
  
-// ---- Tiny sparkle dots â€” extra shimmer, optional but very cute -
+// ---- Tiny sparkle dots — extra shimmer, optional but very cute -
 ::ng-deep .mini-spark {
   position: fixed;
   pointer-events: none;
@@ -208,7 +208,7 @@
     height: 40px;
     border: 3px solid rgba(255,255,255,0.15);
     border-radius: 50%;
-    border-top-color: #a855f7;
+    border-top-color: #1db954;
     animation: spin 0.8s ease-in-out infinite;
     margin-bottom: 16px;
   }
@@ -233,10 +233,10 @@
     height: 48px;
     border: 3px solid rgba(255,255,255,0.1);
     border-radius: 50%;
-    border-top-color: #a855f7;
-    border-right-color: rgba(168, 85, 247, 0.4);
+    border-top-color: #1db954;
+    border-right-color: rgba(29, 185, 84, 0.4);
     animation: spin 0.6s linear infinite;
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 20px rgba(29, 185, 84, 0.2);
   }
 }
 
@@ -338,9 +338,9 @@
     }
     
     &.active {
-      background: rgba(168, 85, 247, 0.8);
-      border-color: #a855f7;
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+      background: rgba(29, 185, 84, 0.8);
+      border-color: #1db954;
+      box-shadow: 0 0 15px rgba(29, 185, 84, 0.5);
     }
   }
 }
@@ -507,7 +507,7 @@
   
   .bar {
     width: 4px;
-    background: #a855f7;
+    background: #1db954;
     animation: eq 1s ease-in-out infinite alternate;
     
     &:nth-child(1) { animation-delay: 0.1s; height: 10px; }
@@ -543,12 +543,12 @@
   
   .modal-content {
     background: #111;
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    border: 1px solid rgba(29, 185, 84, 0.3);
     border-radius: 16px;
     width: 100%;
     max-width: 400px;
     padding: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(29, 185, 84, 0.2);
     animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
   
@@ -606,9 +606,9 @@
       box-sizing: border-box;
       
       &:focus {
-        border-color: #a855f7;
+        border-color: #1db954;
         background: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+        box-shadow: 0 0 10px rgba(29, 185, 84, 0.2);
       }
       
       &::placeholder {
@@ -623,7 +623,7 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
-    background: #a855f7;
+    background: #1db954;
     color: #fff;
     border: none;
     padding: 14px;
@@ -639,7 +639,7 @@
     }
     
     &:disabled {
-      background: rgba(168, 85, 247, 0.3);
+      background: rgba(29, 185, 84, 0.3);
       color: rgba(255, 255, 255, 0.5);
       cursor: not-allowed;
     }

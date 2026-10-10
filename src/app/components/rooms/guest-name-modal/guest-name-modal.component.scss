@@ -12,7 +12,7 @@
 }
 
 .modal-content {
-  background: #000000;
+  background: #121212;
   width: 90%;
   max-width: 400px;
   border-radius: 20px;
@@ -110,7 +110,7 @@
         }
 
         &:focus {
-          border-color: #7C3AED;
+          border-color: #169C46;
           background: rgba(255, 255, 255, 0.08);
         }
       }
@@ -144,7 +144,7 @@
 
   .btn-primary {
     width: 100%;
-    background: linear-gradient(135deg, #7C3AED, #EC4899);
+    background: linear-gradient(135deg, #169C46, #1ED760);
     color: #FFF;
     border: none;
     border-radius: 12px;
@@ -161,7 +161,7 @@
 
     &:not(:disabled):hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+      box-shadow: 0 4px 12px rgba(30, 215, 96, 0.3);
     }
   }
 }

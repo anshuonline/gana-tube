@@ -14,7 +14,7 @@
 
 .modal-content {
   position: relative;
-  background: #000000;
+  background: #121212;
   width: 100%;
   max-width: 580px;
   max-height: min(88vh, 720px);
@@ -49,12 +49,12 @@
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    background: rgba(168, 85, 247, 0.12);
-    border: 1px solid rgba(168, 85, 247, 0.25);
+    background: rgba(29, 185, 84, 0.12);
+    border: 1px solid rgba(29, 185, 84, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #c084fc;
+    color: #1ed760;
     flex-shrink: 0;
   }
 
@@ -115,8 +115,8 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: rgba(168, 85, 247, 0.1);
-    border: 1px solid rgba(168, 85, 247, 0.25);
+    background: rgba(29, 185, 84, 0.1);
+    border: 1px solid rgba(29, 185, 84, 0.25);
     padding: 4px 10px;
     border-radius: 100px;
     font-size: 12px;
@@ -126,7 +126,7 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #a855f7;
+      background: #1db954;
     }
 
     b {
@@ -152,7 +152,7 @@
       transition: all 0.16s;
 
       &:hover {
-        color: #ec4899;
+        color: #1ed760;
       }
     }
 
@@ -199,7 +199,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: #0a0a0f;
+  background: #181818;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 13px 13px;
@@ -215,11 +215,11 @@
   }
 
   &.active {
-    background: rgba(168, 85, 247, 0.12);
-    border-color: #a855f7;
+    background: rgba(29, 185, 84, 0.12);
+    border-color: #1db954;
 
     .checkbox-indicator {
-      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
       border-color: transparent;
       color: #ffffff;
     }
@@ -302,7 +302,7 @@
     height: 48px;
     border: none;
     border-radius: 14px;
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
     color: #ffffff;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -356,7 +356,7 @@
     line-height: 1.35;
 
     svg {
-      color: #a855f7;
+      color: #1db954;
       flex-shrink: 0;
     }
 

@@ -61,7 +61,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+      background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -137,13 +137,13 @@
   }
 
   &.active {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.14) 0%, rgba(236, 72, 153, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.14) 0%, rgba(30, 215, 96, 0.1) 100%);
     color: #fff;
 
     .group-icon {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%);
-      border-color: rgba(236, 72, 153, 0.4);
-      color: #EC4899;
+      background: linear-gradient(135deg, rgba(29, 185, 84, 0.3) 0%, rgba(30, 215, 96, 0.3) 100%);
+      border-color: rgba(30, 215, 96, 0.4);
+      color: #1ED760;
     }
   }
 }
@@ -185,13 +185,13 @@
   }
 
   &.active {
-    background: rgba(236, 72, 153, 0.1);
+    background: rgba(30, 215, 96, 0.1);
     color: #fff;
     font-weight: 700;
 
     .link-dot {
-      background: #EC4899;
-      box-shadow: 0 0 8px rgba(236, 72, 153, 0.6);
+      background: #1ED760;
+      box-shadow: 0 0 8px rgba(30, 215, 96, 0.6);
     }
   }
 }

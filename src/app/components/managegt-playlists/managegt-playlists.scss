@@ -1,4 +1,4 @@
-﻿/* --- Manage Custom Playlists (New Design System) --- */
+/* --- Manage Custom Playlists (New Design System) --- */
 .pl-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -18,7 +18,7 @@
 
 .pl-spinning { animation: plSpin 1s linear infinite; }
 
-/* ─── Page Header ─── */
+/* --- Page Header --- */
 .pl-header {
   display: flex;
   align-items: flex-end;
@@ -65,9 +65,9 @@
   border: none;
 
   &.primary {
-    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
     color: #fff;
-    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.25);
+    box-shadow: 0 4px 16px rgba(30, 215, 96, 0.25);
 
     &:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
   }
@@ -99,7 +99,7 @@
   &:disabled { opacity: 0.5; cursor: default; }
 }
 
-/* ─── Controls Bar (Language selector) ─── */
+/* --- Controls Bar (Language selector) --- */
 .pl-controls {
   display: flex;
   align-items: center;
@@ -137,15 +137,15 @@
       }
 
       &.active {
-        background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+        background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
         color: #fff;
-        box-shadow: 0 2px 12px rgba(236, 72, 153, 0.35);
+        box-shadow: 0 2px 12px rgba(30, 215, 96, 0.35);
       }
     }
   }
 }
 
-/* ─── Playlist List ─── */
+/* --- Playlist List --- */
 .pl-list-container {
   background: #0c0c0e;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -165,7 +165,7 @@
       gap: 10px;
 
       .count-badge {
-        background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+        background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
         color: #fff;
         font-weight: 800;
         padding: 4px 12px;
@@ -201,7 +201,7 @@
   }
 }
 
-/* ─── Playlist Card ─── */
+/* --- Playlist Card --- */
 .playlist-card {
   display: flex;
   align-items: center;
@@ -214,18 +214,18 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(236, 72, 153, 0.3);
+    border-color: rgba(30, 215, 96, 0.3);
   }
 
   &.editing {
     cursor: default;
-    background: rgba(139, 92, 246, 0.06);
-    border-color: rgba(139, 92, 246, 0.35);
+    background: rgba(29, 185, 84, 0.06);
+    border-color: rgba(29, 185, 84, 0.35);
   }
 
   &.cdk-drag-preview {
     background: #141418;
-    border-color: rgba(236, 72, 153, 0.4);
+    border-color: rgba(30, 215, 96, 0.4);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
   }
   &.cdk-drag-placeholder { opacity: 0.3; }
@@ -310,7 +310,7 @@
 
       &.status-tag {
         color: #f472b6;
-        background: rgba(236, 72, 153, 0.1);
+        background: rgba(30, 215, 96, 0.1);
 
         &.publish { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
         &.private { color: rgba(255, 255, 255, 0.45); background: rgba(255, 255, 255, 0.06); }
@@ -322,7 +322,7 @@
         cursor: pointer;
         transition: all 0.2s;
 
-        &:hover { color: #EC4899; background: rgba(236, 72, 153, 0.12); }
+        &:hover { color: #1ED760; background: rgba(30, 215, 96, 0.12); }
       }
     }
   }
@@ -342,8 +342,8 @@
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(236, 72, 153, 0.15);
-    border-color: rgba(236, 72, 153, 0.4);
+    background: rgba(30, 215, 96, 0.15);
+    border-color: rgba(30, 215, 96, 0.4);
     color: #fff;
   }
 
@@ -356,7 +356,7 @@
   }
 }
 
-/* ─── Inline Edit Form ─── */
+/* --- Inline Edit Form --- */
 .edit-form {
   width: 100%;
   padding: 8px 4px;
@@ -379,7 +379,7 @@
   }
 }
 
-/* ─── Empty State ─── */
+/* --- Empty State --- */
 .pl-empty {
   display: flex;
   flex-direction: column;
@@ -394,7 +394,7 @@
   p { margin: 0; font-size: 0.9rem; }
 }
 
-/* ─── Create Playlist Container ─── */
+/* --- Create Playlist Container --- */
 .pl-create-container {
   background: #0c0c0e;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -411,12 +411,12 @@
       width: 34px;
       height: 34px;
       border-radius: 10px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
-      border: 1px solid rgba(236, 72, 153, 0.3);
+      background: linear-gradient(135deg, rgba(29, 185, 84, 0.2) 0%, rgba(30, 215, 96, 0.2) 100%);
+      border: 1px solid rgba(30, 215, 96, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #EC4899;
+      color: #1ED760;
     }
 
     h3 {
@@ -478,7 +478,7 @@
 
       &:focus {
         background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(236, 72, 153, 0.5);
+        border-color: rgba(30, 215, 96, 0.5);
       }
       &::placeholder { color: rgba(255, 255, 255, 0.25); }
     }
@@ -505,8 +505,8 @@
       &:hover { color: #fff; }
 
       &.active {
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(236, 72, 153, 0.25) 100%);
-        border-color: rgba(236, 72, 153, 0.4);
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.25) 0%, rgba(30, 215, 96, 0.25) 100%);
+        border-color: rgba(30, 215, 96, 0.4);
         color: #fff;
       }
     }
@@ -572,7 +572,7 @@
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 100%);
+      background: linear-gradient(90deg, #1DB954 0%, #1ED760 100%);
       border-radius: 3px;
       transition: width 0.3s ease;
     }
@@ -588,7 +588,7 @@
   .submit-btn {
     width: 100%;
     margin-top: 20px;
-    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
     color: #fff;
     border: none;
     padding: 16px;
@@ -597,7 +597,7 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 4px 18px rgba(236, 72, 153, 0.25);
+    box-shadow: 0 4px 18px rgba(30, 215, 96, 0.25);
 
     &:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.92; }
     &:disabled { opacity: 0.5; cursor: default; }
@@ -613,7 +613,7 @@
   }
 }
 
-/* ─── Detail View (Split Screen) ─── */
+/* --- Detail View (Split Screen) --- */
 .detail-view {
   display: grid;
   grid-template-columns: 1fr 400px;
@@ -656,7 +656,7 @@
     transition: all 0.2s;
     flex-shrink: 0;
 
-    &:hover { background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); color: #fff; }
+    &:hover { background: rgba(30, 215, 96, 0.15); border-color: rgba(30, 215, 96, 0.4); color: #fff; }
   }
 
   .title-group-detail {
@@ -693,7 +693,7 @@
         font-size: 0.72rem;
         font-weight: 700;
         color: #f472b6;
-        background: rgba(236, 72, 153, 0.1);
+        background: rgba(30, 215, 96, 0.1);
         padding: 3px 10px;
         border-radius: 10px;
       }
@@ -728,7 +728,7 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(236, 72, 153, 0.25);
+    border-color: rgba(30, 215, 96, 0.25);
   }
 
   .song-index {
@@ -782,7 +782,7 @@
   }
 }
 
-/* ─── Right Panel (Search & Add) ─── */
+/* --- Right Panel (Search & Add) --- */
 .detail-right {
   background: #0c0c0e;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -822,7 +822,7 @@
       padding: 0 14px;
       transition: border-color 0.2s;
 
-      &:focus-within { border-color: rgba(236, 72, 153, 0.5); }
+      &:focus-within { border-color: rgba(30, 215, 96, 0.5); }
 
       .search-icon { color: rgba(255, 255, 255, 0.35); flex-shrink: 0; }
 
@@ -852,7 +852,7 @@
         cursor: pointer;
         flex-shrink: 0;
 
-        &:hover { background: rgba(236, 72, 153, 0.2); color: #fff; }
+        &:hover { background: rgba(30, 215, 96, 0.2); color: #fff; }
       }
     }
 
@@ -861,7 +861,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+      background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
       border: none;
       color: #fff;
       padding: 0 20px;
@@ -929,7 +929,7 @@
 
     &:hover {
       background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(236, 72, 153, 0.25);
+      border-color: rgba(30, 215, 96, 0.25);
     }
 
     .result-thumb {
@@ -965,9 +965,9 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(236, 72, 153, 0.12);
-      border: 1px solid rgba(236, 72, 153, 0.35);
-      color: #EC4899;
+      background: rgba(30, 215, 96, 0.12);
+      border: 1px solid rgba(30, 215, 96, 0.35);
+      color: #1ED760;
       padding: 7px 14px;
       border-radius: 10px;
       font-size: 0.78rem;
@@ -977,7 +977,7 @@
       flex-shrink: 0;
 
       &:hover {
-        background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+        background: linear-gradient(135deg, #1DB954 0%, #1ED760 100%);
         color: #fff;
         border-color: transparent;
       }

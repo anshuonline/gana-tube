@@ -1,6 +1,6 @@
 .analytic-login-page {
   min-height: 100vh;
-  background: #000000;
+  background: #121212;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,7 +16,7 @@
     transform: translate(-50%, -50%);
     width: 380px;
     height: 380px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(236, 72, 153, 0.05) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(29, 185, 84, 0.15) 0%, rgba(30, 215, 96, 0.05) 50%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }
@@ -27,7 +27,7 @@
   z-index: 1;
   width: 100%;
   max-width: 420px;
-  background: #0a0a0f;
+  background: #181818;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 36px 32px;
@@ -103,8 +103,8 @@
 
     &:focus {
       outline: none;
-      border-color: #a855f7;
-      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+      border-color: #1db954;
+      box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.15);
       background: #14141c;
     }
 
@@ -117,7 +117,7 @@
 .btn-login-submit {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
   border: none;
   border-radius: 12px;
   color: #ffffff;
@@ -125,11 +125,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.25);
+  box-shadow: 0 8px 24px rgba(29, 185, 84, 0.25);
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 12px 28px rgba(168, 85, 247, 0.35);
+    box-shadow: 0 12px 28px rgba(29, 185, 84, 0.35);
   }
 
   &:active:not(:disabled) {
@@ -231,8 +231,8 @@
   top: calc(100% + 10px);
   right: 0;
   background: #0d0d14;
-  border: 1px solid rgba(236, 72, 153, 0.5);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.95), 0 0 20px rgba(236, 72, 153, 0.25);
+  border: 1px solid rgba(30, 215, 96, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.95), 0 0 20px rgba(30, 215, 96, 0.25);
   padding: 8px 14px;
   border-radius: 12px;
   display: flex;
@@ -248,7 +248,7 @@
     font-weight: 700;
     color: #ffffff;
     letter-spacing: 0.3px;
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -266,8 +266,8 @@
     width: 10px;
     height: 10px;
     background: #0d0d14;
-    border-left: 1px solid rgba(236, 72, 153, 0.5);
-    border-top: 1px solid rgba(236, 72, 153, 0.5);
+    border-left: 1px solid rgba(30, 215, 96, 0.5);
+    border-top: 1px solid rgba(30, 215, 96, 0.5);
     transform: rotate(45deg);
   }
 
