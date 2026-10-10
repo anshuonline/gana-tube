@@ -1,6 +1,7 @@
-import { Injectable, signal, computed, inject, NgZone } from '@angular/core';
+import { Injectable, signal, computed, inject, NgZone, effect } from '@angular/core';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom, timeout } from 'rxjs';
 import { YouTubeSearchResult } from './youtube-api.service';
 import { AlgorithmService } from './algorithm.service';
 import { YoutubeApiService } from './youtube-api.service';
@@ -49,6 +50,7 @@ export class PlayerService {
   constructor() {
     this.setupSocketListeners();
     this.setupNetworkWatcher();
+    this.setupMediaSession();
 
     // Listen Together Sync Worker
     setInterval(() => {
@@ -59,7 +61,7 @@ export class PlayerService {
           const isPlaying = pState === 'playing';
           let t = 0;
           try {
-            if (this.isPlayingOffline()) {
+            if (this.isPlayingOffline() || this.isPlayingSaavn()) {
               t = this.htmlAudio?.currentTime || 0;
             } else if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
               t = this.ytPlayer.getCurrentTime() || 0;
@@ -77,6 +79,73 @@ export class PlayerService {
     }, 2000);
 
     this.setupInactivityTracker();
+  }
+
+  // ── MediaSession: lock-screen & notification controls ────────────
+  // Works for every engine (Saavn audio / offline audio / YouTube IFrame).
+  // With the Saavn HTML5 audio engine this gives real lock-screen
+  // play/pause/next/previous on Android & iOS.
+  private setupMediaSession(): void {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+    const ms = (navigator as any).mediaSession;
+
+    // Track metadata
+    effect(() => {
+      const track = this.currentTrack();
+      if (!track || typeof (window as any).MediaMetadata === 'undefined') return;
+      try {
+        const art = track.thumbnailHigh || track.thumbnail || '';
+        ms.metadata = new (window as any).MediaMetadata({
+          title: track.title || 'GanaTube',
+          artist: track.channelTitle || '',
+          album: 'GanaTube',
+          artwork: art ? [
+            { src: art, sizes: '96x96', type: 'image/jpeg' },
+            { src: art, sizes: '256x256', type: 'image/jpeg' },
+            { src: art, sizes: '512x512', type: 'image/jpeg' }
+          ] : []
+        });
+      } catch (e) {}
+    });
+
+    // Playback state
+    effect(() => {
+      try {
+        ms.playbackState = this.isPlaying() ? 'playing' : 'paused';
+      } catch (e) {}
+    });
+
+    // Action handlers (wired once)
+    try {
+      ms.setActionHandler('play', () => {
+        if (!this.isPlaying()) this.ngZone.run(() => this.togglePlayPause());
+      });
+      ms.setActionHandler('pause', () => {
+        if (this.isPlaying()) this.ngZone.run(() => this.togglePlayPause());
+      });
+      ms.setActionHandler('previoustrack', () => this.ngZone.run(() => this.previous()));
+      ms.setActionHandler('nexttrack', () => this.ngZone.run(() => this.next()));
+      ms.setActionHandler('seekto', (details: any) => {
+        if (details && typeof details.seekTime === 'number') {
+          this.ngZone.run(() => this.seekTo(details.seekTime));
+        }
+      });
+      ms.setActionHandler('stop', () => this.ngZone.run(() => this.pause()));
+    } catch (e) {}
+  }
+
+  private updateMediaSessionPosition(): void {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+    const d = this.duration();
+    const t = this.currentTime();
+    if (d <= 0) return;
+    try {
+      (navigator as any).mediaSession.setPositionState({
+        duration: d,
+        playbackRate: (this.isPlayingOffline() || this.isPlayingSaavn()) ? (this.htmlAudio?.playbackRate || 1) : 1,
+        position: Math.min(t, d)
+      });
+    } catch (e) {}
   }
 
   private setupNetworkWatcher(): void {
@@ -153,6 +222,14 @@ export class PlayerService {
   private htmlAudio: HTMLAudioElement | null = null;
   private isPlayingOffline = signal<boolean>(false);
   private currentOfflineBlobUrl: string | null = null;
+
+  // ── JioSaavn streaming engine ────────────────────────────────────
+  // Primary playback path: a direct Saavn CDN stream played through the shared
+  // HTML5 <audio> element (true background playback + lock-screen controls).
+  // YouTube IFrame stays as the fallback when no confident match is found.
+  isPlayingSaavn = signal<boolean>(false);
+  private saavnCache = new Map<string, { streamUrl: string; duration: number }>();
+  private saavnToken = 0; // races: async stream resolution vs user skip
 
   // Sleep Timer State
   showSleepModal = signal<boolean>(false);
@@ -430,8 +507,25 @@ export class PlayerService {
       socket.on('room:playback_sync', ({ isPlaying, currentTime }) => {
         // Ignore room events if we are no longer in a room
         if (!this.roomService.currentRoomInfo()) return;
-        if (!this.ytPlayer) return;
         this.isRemoteUpdate = true;
+
+        if (this.isPlayingOffline() || this.isPlayingSaavn()) {
+          const audio = this.htmlAudio;
+          if (audio) {
+            if (currentTime !== undefined && Math.abs(audio.currentTime - currentTime) > 2) {
+              audio.currentTime = currentTime;
+            }
+            if (isPlaying) {
+              audio.play().catch(() => {});
+            } else {
+              audio.pause();
+            }
+          }
+          this.isRemoteUpdate = false;
+          return;
+        }
+
+        if (!this.ytPlayer) return;
         
         const current = this.ytPlayer.getCurrentTime();
         if (currentTime !== undefined && Math.abs(current - currentTime) > 2) {
@@ -559,7 +653,7 @@ export class PlayerService {
   }
 
   togglePlayPause(): void {
-    if (this.isPlayingOffline()) {
+    if (this.isPlayingOffline() || this.isPlayingSaavn()) {
       if (this.playerState() === 'playing') {
         this.pause();
       } else {
@@ -579,7 +673,7 @@ export class PlayerService {
   }
 
   pause(): void {
-    if (this.isPlayingOffline()) {
+    if (this.isPlayingOffline() || this.isPlayingSaavn()) {
       this.htmlAudio?.pause();
       this.broadcastPlaybackSync(false);
       return;
@@ -591,10 +685,13 @@ export class PlayerService {
   
   private broadcastPlaybackSync(isPlaying: boolean) {
     if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
+      const pos = (this.isPlayingOffline() || this.isPlayingSaavn())
+        ? (this.htmlAudio?.currentTime || 0)
+        : (this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0);
       if (isPlaying) {
-        this.roomService.adminResume(this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0);
+        this.roomService.adminResume(pos);
       } else {
-        this.roomService.adminPause(this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0);
+        this.roomService.adminPause(pos);
       }
     }
   }
@@ -676,17 +773,17 @@ export class PlayerService {
     this.queue.set(newQueue);
 
     if (currIdx === index) {
-      this.triggerEngagement();
-      if (newQueue.length === 0) {
-        this.currentIndex.set(-1);
-        this.playerState.set('unstarted');
-        if (this.isPlayingOffline() && this.htmlAudio) {
-          this.htmlAudio.pause();
-          this.htmlAudio.src = '';
-        } else if (this.ytPlayer) {
-          this.ytPlayer.stopVideo();
-        }
-      } else {
+        this.triggerEngagement();
+        if (newQueue.length === 0) {
+          this.currentIndex.set(-1);
+          this.playerState.set('unstarted');
+          if ((this.isPlayingOffline() || this.isPlayingSaavn()) && this.htmlAudio) {
+            this.htmlAudio.pause();
+            this.htmlAudio.src = '';
+          } else if (this.ytPlayer) {
+            this.ytPlayer.stopVideo();
+          }
+        } else {
         const nextIdx = index >= newQueue.length ? newQueue.length - 1 : index;
         this.currentIndex.set(nextIdx);
         this.loadInPlayer(newQueue[nextIdx].videoId);
@@ -704,7 +801,7 @@ export class PlayerService {
     this.seekTargetSetAt = Date.now();
     this.currentTime.set(seconds);
     
-    if (this.isPlayingOffline() && this.htmlAudio) {
+    if ((this.isPlayingOffline() || this.isPlayingSaavn()) && this.htmlAudio) {
       this.htmlAudio.currentTime = seconds;
       if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
         this.roomService.adminSeek(seconds);
@@ -730,7 +827,7 @@ export class PlayerService {
     }
     this.volume.set(value);
     
-    if (this.isPlayingOffline() && this.htmlAudio) {
+    if ((this.isPlayingOffline() || this.isPlayingSaavn()) && this.htmlAudio) {
       this.htmlAudio.volume = value / 100;
       if (value > 0) {
         this.htmlAudio.muted = false;
@@ -750,6 +847,8 @@ export class PlayerService {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('gt_music_quality', quality);
     }
+    // Next Saavn resolutions pick up the new bitrate
+    this.saavnCache.clear();
     // Change quality of currently playing video
     if (this.ytPlayer && this.ytPlayer.setPlaybackQuality) {
       const qMap = {
@@ -779,7 +878,7 @@ export class PlayerService {
         this.lastNonZeroVolume = this.volume();
       }
       this.isMuted.set(true);
-      if (this.isPlayingOffline() && this.htmlAudio) {
+      if ((this.isPlayingOffline() || this.isPlayingSaavn()) && this.htmlAudio) {
         this.htmlAudio.muted = true;
       }
       if (this.ytPlayer && typeof this.ytPlayer.mute === 'function') {
@@ -823,6 +922,8 @@ export class PlayerService {
   }
 
   onPlayerStateChange(event: any): void {
+    // Saavn engine drives state via htmlAudio events — ignore stale YT events
+    if (this.isPlayingSaavn()) return;
     // YT.PlayerState: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
     switch (event.data) {
       case 1: // playing
@@ -930,12 +1031,24 @@ export class PlayerService {
       try {
         this.htmlAudio!.playbackRate = this.playbackSpeed();
       } catch (_) {}
+      this.startProgressTracking();
     });
     this.htmlAudio.addEventListener('pause', () => {
       this.playerState.set('paused');
+      this.stopProgressTracking();
     });
     this.htmlAudio.addEventListener('loadedmetadata', () => {
       this.duration.set(this.htmlAudio!.duration || 0);
+    });
+    this.htmlAudio.addEventListener('error', () => {
+      // Saavn stream failed mid-playback — fall back to the YouTube engine
+      if (this.isPlayingSaavn()) {
+        console.warn('Saavn stream error — falling back to YouTube');
+        this.isPlayingSaavn.set(false);
+        const current = this.currentTrack();
+        this.playerState.set('loading');
+        if (current) this.loadInYtPlayer(current.videoId);
+      }
     });
   }
 
@@ -962,6 +1075,7 @@ export class PlayerService {
     const current = this.currentTrack();
     this.initHtmlAudio();
     this.startLoadTimeout();
+    const saavnToken = ++this.saavnToken;
     
     // Reset qualified play session for incoming track
     this.currentPlayTrackedId = null;
@@ -982,7 +1096,9 @@ export class PlayerService {
       }
     }
 
+    // 1. Offline downloads always win (user explicitly saved them)
     if (this.offlineService.isDownloaded(videoId)) {
+      this.isPlayingSaavn.set(false);
       this.isPlayingOffline.set(true);
       if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
         this.ytPlayer.stopVideo(); // Stop youtube player
@@ -1007,10 +1123,34 @@ export class PlayerService {
         this.loadInYtPlayer(videoId);
       }
     } else {
+      // 2. JioSaavn stream (background-play engine), 3. YouTube IFrame fallback
       this.isPlayingOffline.set(false);
       this.htmlAudio!.pause();
       this.htmlAudio!.src = '';
-      this.loadInYtPlayer(videoId);
+
+      const match = await this.resolveSaavnStream(current);
+      // A newer load request superseded this one while resolving
+      if (saavnToken !== this.saavnToken) return;
+
+      if (match?.streamUrl) {
+        this.isPlayingSaavn.set(true);
+        if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
+          this.ytPlayer.stopVideo();
+        }
+        this.htmlAudio!.volume = this.volume() / 100;
+        this.htmlAudio!.muted = this.isMuted();
+        this.htmlAudio!.src = match.streamUrl;
+        try {
+          await this.htmlAudio!.play();
+        } catch (e) {
+          console.warn('Saavn audio play failed, falling back to YouTube:', e);
+          this.isPlayingSaavn.set(false);
+          this.loadInYtPlayer(videoId);
+        }
+      } else {
+        this.isPlayingSaavn.set(false);
+        this.loadInYtPlayer(videoId);
+      }
     }
 
     if (!isRemote && current && this.roomService.currentRoomInfo()) {
@@ -1018,6 +1158,43 @@ export class PlayerService {
       // also sync queue when song auto-changes
       this.roomService.adminQueueUpdate(this.queue(), this.currentIndex());
     }
+  }
+
+  // Resolve a JioSaavn stream URL for the track (session cache + timeout)
+  private async resolveSaavnStream(track: Track | null): Promise<{ streamUrl: string; duration: number } | null> {
+    if (!track?.videoId || !track?.title) return null;
+    const cached = this.saavnCache.get(track.videoId);
+    if (cached) return cached;
+
+    const bitrateMap = { 'Low': 96, 'Standard': 160, 'Best': 320 } as const;
+    const bitrate = bitrateMap[this.resolvedQuality()] || 320;
+
+    try {
+      const params = new URLSearchParams({
+        title: String(track.title || '').slice(0, 120),
+        artist: String(track.channelTitle || '').slice(0, 120),
+        album: '',
+        duration: String(Math.round(track.duration || 0)),
+        bitrate: String(bitrate)
+      });
+      const res: any = await firstValueFrom(
+        this.http.get(`/api/saavn/match?${params.toString()}`, { responseType: 'json' })
+          .pipe(timeout(4500))
+      );
+      const match = res?.match;
+      if (match?.streamUrl) {
+        const entry = { streamUrl: match.streamUrl, duration: match.duration || 0 };
+        this.saavnCache.set(track.videoId, entry);
+        if (this.saavnCache.size > 120) {
+          const oldest = this.saavnCache.keys().next().value;
+          if (oldest) this.saavnCache.delete(oldest);
+        }
+        return entry;
+      }
+    } catch (e) {
+      // no match / timeout — caller falls back to YouTube
+    }
+    return null;
   }
 
   private loadInYtPlayer(videoId: string): void {
@@ -1078,7 +1255,11 @@ export class PlayerService {
 
     if (this.repeatMode() === 'one') {
       this.seekTo(0);
-      this.ytPlayer?.playVideo();
+      if (!this.isPlayingSaavn() && !this.isPlayingOffline()) {
+        this.ytPlayer?.playVideo();
+      } else {
+        this.htmlAudio?.play().catch(() => {});
+      }
     } else {
       const q = this.queue();
       // Auto-generate queue if we reach the end and not in playlist context
@@ -1162,6 +1343,22 @@ export class PlayerService {
         const now = Date.now();
         const deltaSeconds = (now - this.lastTickTime) / 1000;
         this.lastTickTime = now;
+
+        // Saavn/Offline audio engines: currentTime comes from audio timeupdate
+        // events — only listening-time accumulation runs here
+        if (this.isPlayingSaavn() || this.isPlayingOffline()) {
+          this.ngZone.run(() => {
+            this.updateMediaSessionPosition();
+            if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
+              this.listeningSeconds.update(v => v + deltaSeconds);
+              if (this.listeningSeconds() >= 120) {
+                this.listeningSeconds.set(0);
+                this.awardSpinChance();
+              }
+            }
+          });
+          return;
+        }
 
         if (this.ytPlayer) {
           this.ngZone.run(() => {

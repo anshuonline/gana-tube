@@ -942,6 +942,83 @@ app.get('/api/yt-videos', async (req, res) => {
   }
 });
 
+// ─── JioSaavn Playback Streams (unofficial) ─────────────────────────────────
+// ytmusic-api handles ALL discovery (search/albums/artists/radio). These
+// endpoints only resolve a direct stream URL for a chosen song so the client
+// can play via HTML5 <audio> (background playback + MediaSession).
+const { searchSaavnSongs, matchSaavnSong } = require('./saavnEngine.js');
+const saavnCache = new Map();
+const SAAVN_CACHE_TTL = 30 * 60 * 1000;
+
+function getSaavnCached(key) {
+  const item = saavnCache.get(key);
+  if (!item) return null;
+  if (Date.now() - item.time > SAAVN_CACHE_TTL) {
+    saavnCache.delete(key);
+    return null;
+  }
+  return item.data;
+}
+
+function setSaavnCached(key, data) {
+  // Keep the cache bounded
+  if (saavnCache.size > 500) {
+    const oldest = saavnCache.keys().next().value;
+    saavnCache.delete(oldest);
+  }
+  saavnCache.set(key, { time: Date.now(), data });
+}
+
+// Search JioSaavn directly (debug / manual fallback)
+app.get('/api/saavn/search', async (req, res) => {
+  const q = String(req.query.q || '').trim().slice(0, 120);
+  if (!q) return res.status(400).json({ error: 'q is required', songs: [] });
+
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 30);
+  const bitrateRaw = parseInt(req.query.bitrate, 10) || 320;
+  const bitrate = [320, 160, 96].includes(bitrateRaw) ? bitrateRaw : 320;
+
+  const cacheKey = `search_${q.toLowerCase()}_${limit}_${bitrate}`;
+  const cached = getSaavnCached(cacheKey);
+  if (cached) return res.json(cached);
+
+  try {
+    const songs = await searchSaavnSongs(q, limit);
+    const result = { songs, source: 'jiosaavn' };
+    setSaavnCached(cacheKey, result);
+    res.json(result);
+  } catch (err) {
+    console.warn('Saavn search error:', err.message);
+    res.status(500).json({ error: 'Saavn search failed', songs: [] });
+  }
+});
+
+// Resolve a playable stream for a YouTube Music song (title/artist/duration match)
+app.get('/api/saavn/match', async (req, res) => {
+  const title = String(req.query.title || '').trim().slice(0, 120);
+  const artist = String(req.query.artist || '').trim().slice(0, 120);
+  const album = String(req.query.album || '').trim().slice(0, 120);
+  const duration = parseInt(req.query.duration, 10) || 0;
+  const bitrateRaw = parseInt(req.query.bitrate, 10) || 320;
+  const bitrate = [320, 160, 96].includes(bitrateRaw) ? bitrateRaw : 320;
+
+  if (!title) return res.status(400).json({ error: 'title is required' });
+
+  const key = `${title.toLowerCase().replace(/[^a-z0-9]/g, '')}_${artist.toLowerCase().replace(/[^a-z0-9]/g, '')}_${duration}_${bitrate}`;
+  const cached = getSaavnCached(`match_${key}`);
+  if (cached) return res.json(cached);
+
+  try {
+    const match = await matchSaavnSong({ title, artist, album, duration, bitrate });
+    const result = match ? { match } : { match: null, reason: 'no_confident_match' };
+    setSaavnCached(`match_${key}`, result);
+    res.json(result);
+  } catch (err) {
+    console.warn('Saavn match error:', err.message);
+    res.status(500).json({ error: 'Saavn match failed', match: null });
+  }
+});
+
 // Redirect share.php requests to the PHP backend so the script executes correctly
 app.get('/share.php', (req, res) => {
   res.redirect(301, 'https://manageads.ganatube.in' + req.originalUrl);
