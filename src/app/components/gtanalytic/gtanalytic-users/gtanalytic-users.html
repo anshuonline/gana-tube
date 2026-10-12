@@ -150,16 +150,16 @@
                 <div class="user-cell">
                   <div
                     class="avatar-circle"
-                    [class.has-img]="!!user.photo_url"
-                    [class.clickable]="!!user.photo_url"
-                    (click)="user.photo_url ? openPhotoModal(user, $event) : null"
-                    [title]="user.photo_url ? 'Click to view full profile picture' : ''"
+                    [class.has-img]="!!getUserPhoto(user)"
+                    [class.clickable]="!!getUserPhoto(user)"
+                    (click)="getUserPhoto(user) ? openPhotoModal(user, $event) : null"
+                    [title]="getUserPhoto(user) ? 'Click to view full profile picture' : ''"
                   >
-                    <img *ngIf="user.photo_url" [src]="user.photo_url" class="avatar-circle-img" alt="Avatar" />
-                    <div class="avatar-zoom-overlay" *ngIf="user.photo_url">
+                    <img *ngIf="getUserPhoto(user)" [src]="getUserPhoto(user)" class="avatar-circle-img" alt="Avatar" />
+                    <div class="avatar-zoom-overlay" *ngIf="getUserPhoto(user)">
                       <svg lucideZoomIn [attr.size]="14"></svg>
                     </div>
-                    <span *ngIf="!user.photo_url">{{ user.display_name ? user.display_name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U') }}</span>
+                    <span *ngIf="!getUserPhoto(user)">{{ user.display_name ? user.display_name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U') }}</span>
                   </div>
                   <span class="user-display-name">{{ user.display_name || 'Anonymous User' }}</span>
                 </div>
@@ -262,16 +262,16 @@
                 <div class="user-cell">
                   <div
                     class="avatar-circle"
-                    [class.has-img]="!!u.photo_url"
-                    [class.clickable]="!!u.photo_url"
-                    (click)="u.photo_url ? openPhotoModal(u, $event) : null"
-                    [title]="u.photo_url ? 'Click to view full profile picture' : ''"
+                    [class.has-img]="!!getUserPhoto(u)"
+                    [class.clickable]="!!getUserPhoto(u)"
+                    (click)="getUserPhoto(u) ? openPhotoModal(u, $event) : null"
+                    [title]="getUserPhoto(u) ? 'Click to view full profile picture' : ''"
                   >
-                    <img *ngIf="u.photo_url" [src]="u.photo_url" class="avatar-circle-img" alt="Avatar" />
-                    <div class="avatar-zoom-overlay" *ngIf="u.photo_url">
+                    <img *ngIf="getUserPhoto(u)" [src]="getUserPhoto(u)" class="avatar-circle-img" alt="Avatar" />
+                    <div class="avatar-zoom-overlay" *ngIf="getUserPhoto(u)">
                       <svg lucideZoomIn [attr.size]="14"></svg>
                     </div>
-                    <span *ngIf="!u.photo_url">{{ u.display_name ? u.display_name.charAt(0).toUpperCase() : (u.email ? u.email.charAt(0).toUpperCase() : 'U') }}</span>
+                    <span *ngIf="!getUserPhoto(u)">{{ u.display_name ? u.display_name.charAt(0).toUpperCase() : (u.email ? u.email.charAt(0).toUpperCase() : 'U') }}</span>
                   </div>
                   <div class="user-info">
                     <span class="user-display-name">{{ u.display_name || 'GanaTube Listener' }}</span>

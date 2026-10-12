@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GtanalyticDataService } from '../gtanalytic-data.service';
+import { AuthService } from '../../../services/auth.service';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import {
   LucideX,
@@ -30,6 +31,7 @@ import {
 })
 export class GtanalyticUsersComponent {
   dataService = inject(GtanalyticDataService);
+  authService = inject(AuthService);
 
   searchQuery = signal<string>('');
   activeTab = signal<'directory' | 'top_active'>('directory');
@@ -174,13 +176,26 @@ export class GtanalyticUsersComponent {
     return [1, '...', current - 1, current, current + 1, '...', total];
   }
 
+  getUserPhoto(user: any): string | null {
+    if (user?.photo_url) return user.photo_url;
+    const current = this.authService.currentUser();
+    if (current && current.email && user?.email && current.email.toLowerCase() === user.email.toLowerCase()) {
+      return current.photoURL || null;
+    }
+    return null;
+  }
+
   // Full Picture Lightbox Modal
   openPhotoModal(user: any, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
-    if (user.photo_url) {
-      this.previewUser.set(user);
+    const photo = this.getUserPhoto(user);
+    if (photo) {
+      this.previewUser.set({
+        ...user,
+        photo_url: photo
+      });
     }
   }
 
