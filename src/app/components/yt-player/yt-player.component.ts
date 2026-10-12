@@ -150,6 +150,20 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
                     document.activeElement.blur();
                   }
                 }
+              } else if (event.data === YT.PlayerState.PLAYING) {
+                // Background leak guard: a NON-active pool player must never
+                // sound. Muted (inaudible) cue-preload on mobile browsers is
+                // allowed to keep preloading; anything audible is killed.
+                const p = this.players[i];
+                let muted = true;
+                try {
+                  muted = typeof p?.isMuted === 'function' ? p.isMuted() : true;
+                } catch (_) {}
+                if (!muted) {
+                  console.warn('YT background player leak — stopping non-active player', i);
+                  try { p.stopVideo(); } catch (_) {}
+                  this.cuedVideoIds[i] = '';
+                }
               }
             },
             onError: (event: any) => {
@@ -209,6 +223,7 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       getCurrentTime: () => this.players[this.activePlayerIndex]?.getCurrentTime(),
       getDuration: () => this.players[this.activePlayerIndex]?.getDuration(),
       getVideoLoadedFraction: () => this.players[this.activePlayerIndex]?.getVideoLoadedFraction?.() || 0,
+      stopAll: () => this.stopAllPlayers(),
       loadVideoById: (args: any) => {
         if (typeof args === 'string') {
           this.handleLoadVideo(args, 0);
@@ -264,6 +279,18 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (q === 'Standard') return 'medium';
     if (q === 'Best') return 'hd720';
     return 'medium';
+  }
+
+  // Kill every player in the pool + clear all cues — called by the service
+  // on every track switch so the previous song can never keep sounding
+  private stopAllPlayers(): void {
+    for (let i = 0; i < this.totalPlayers; i++) {
+      const p = this.players[i];
+      if (p && typeof p.stopVideo === 'function') {
+        try { p.stopVideo(); } catch (_) {}
+      }
+      this.cuedVideoIds[i] = '';
+    }
   }
 
   private applyVideoMode(on: boolean): void {
@@ -350,31 +377,36 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    const oldActiveIndex = this.activePlayerIndex;
     const quality = this.getSuggestedQuality();
 
     if (foundIndex !== -1 && foundIndex !== this.activePlayerIndex) {
       // It's preloaded! Swap active player
       this.activePlayerIndex = foundIndex;
       this.applyVideoMode(this.playerService.isVideoMode());
-      
-      // Stop the old active player to save bandwidth
-      if (typeof this.players[oldActiveIndex].stopVideo === 'function') {
-        this.players[oldActiveIndex].stopVideo();
+
+      // Stop EVERY other pool player — not just the old active. Stale cued
+      // players (older preload paths) must never be left playing/cued,
+      // otherwise the previous song keeps sounding under the new one.
+      for (let i = 0; i < this.totalPlayers; i++) {
+        if (i !== this.activePlayerIndex) {
+          if (typeof this.players[i].stopVideo === 'function') {
+            try { this.players[i].stopVideo(); } catch (_) {}
+          }
+          this.cuedVideoIds[i] = '';
+        }
       }
-      this.cuedVideoIds[oldActiveIndex] = '';
-      
+
       // Unmute the new active player and play
       if (!this.playerService.isMuted()) {
         this.players[this.activePlayerIndex].unMute();
       }
       this.players[this.activePlayerIndex].setVolume(this.playerService.volume());
       this.players[this.activePlayerIndex].setPlaybackQuality(quality);
-      
+
       if (startSeconds > 0) {
         this.players[this.activePlayerIndex].seekTo(startSeconds, true);
       }
-      
+
       this.players[this.activePlayerIndex].playVideo();
     } else {
       // Not preloaded (or it was already active), just load it in the current active player

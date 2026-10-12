@@ -1258,9 +1258,7 @@ export class PlayerService {
       this.isPlayingSaavn.set(false);
       this.isPlayingOffline.set(true);
       this.htmlAudioLoadToken = saavnToken;
-      if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
-        this.ytPlayer.stopVideo(); // Stop youtube player
-      }
+      try { this.ytPlayer?.stopAll?.(); } catch (e) {} // Stop the whole YT pool
       
       const blobUrl = await this.offlineService.getTrackBlobUrl(videoId);
       if (blobUrl) {
@@ -1285,6 +1283,9 @@ export class PlayerService {
       this.isPlayingOffline.set(false);
       this.htmlAudio!.pause();
       this.htmlAudio!.src = '';
+      // Kill the WHOLE YT pool immediately — the previous song must never
+      // keep sounding during the Saavn resolution window (0.5-4.5s)
+      try { this.ytPlayer?.stopAll?.(); } catch (e) {}
 
       const match = await this.resolveSaavnStream(current);
       // A newer load request superseded this one while resolving
@@ -1293,9 +1294,7 @@ export class PlayerService {
       if (match?.streamUrl) {
         this.isPlayingSaavn.set(true);
         this.htmlAudioLoadToken = saavnToken;
-        if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
-          this.ytPlayer.stopVideo();
-        }
+        try { this.ytPlayer?.stopAll?.(); } catch (e) {}
         this.htmlAudio!.volume = this.volume() / 100;
         this.htmlAudio!.muted = this.isMuted();
         this.htmlAudio!.src = match.streamUrl;
@@ -1372,6 +1371,8 @@ export class PlayerService {
     this.isPlayingSaavn.set(false);
     this.isPlayingOffline.set(false);
     try { this.htmlAudio?.pause(); } catch (e) {}
+    // Full pool reset before claiming YT — no stale cued player may sound
+    try { this.ytPlayer?.stopAll?.(); } catch (e) {}
     if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
       this.ytPlayer.loadVideoById(videoId);
     }
