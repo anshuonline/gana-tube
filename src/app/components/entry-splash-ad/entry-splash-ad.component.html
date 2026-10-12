@@ -1,0 +1,59 @@
+<div
+  class="gt-entry-splash-backdrop"
+  *ngIf="isVisible()"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Advertisement"
+>
+  <div class="gt-entry-splash-modal" (click)="$event.stopPropagation()">
+    <!-- Ambient glow behind modal -->
+    <div class="gt-entry-splash-ambient" aria-hidden="true"></div>
+
+    <!-- Corner badge: countdown while active, switch to close (X) when unlocked -->
+    <button
+      type="button"
+      class="gt-entry-splash-corner"
+      [class.closable]="canClose()"
+      (click)="canClose() ? closeModal() : null"
+      [attr.aria-label]="canClose() ? 'Close ad' : 'Ad closes in ' + countdown() + ' seconds'"
+      [disabled]="!canClose()"
+    >
+      <ng-container *ngIf="!canClose()">{{ countdown() }}</ng-container>
+      <svg *ngIf="canClose()" lucideX [attr.size]="16"></svg>
+    </button>
+
+    <!-- Top micro label -->
+    <span class="gt-entry-splash-label">Advertisement</span>
+
+    <!-- 300x250 Ad Container Host -->
+    <div class="gt-entry-splash-ad-host" #adHost aria-hidden="true">
+      <!-- Placeholder card shown when adScript is empty -->
+      <div class="gt-entry-splash-placeholder" *ngIf="!hasAdScript()">
+        <div class="placeholder-icon-wrap">
+          <span class="placeholder-dot"></span>
+          <span class="placeholder-tag">SPONSORED</span>
+        </div>
+        <p class="placeholder-title">GanaTube Ad Slot</p>
+        <span class="placeholder-dim">300 × 250</span>
+        <span class="placeholder-hint">Ad script will render here</span>
+      </div>
+    </div>
+
+    <!-- Bottom Action Button -->
+    <button
+      type="button"
+      class="gt-entry-splash-action"
+      [class.active]="canClose()"
+      (click)="canClose() ? closeModal() : null"
+      [disabled]="!canClose()"
+    >
+      <ng-container *ngIf="canClose()">
+        <span>Skip Ad</span>
+      </ng-container>
+      <ng-container *ngIf="!canClose()">
+        <span *ngIf="countdown() > 0">Please wait {{ countdown() }}s</span>
+        <span *ngIf="countdown() === 0">Loading ad…</span>
+      </ng-container>
+    </button>
+  </div>
+</div>
