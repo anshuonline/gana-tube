@@ -3,11 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GtanalyticDataService } from '../gtanalytic-data.service';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import {
+  LucideX,
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucideZoomIn,
+  LucideCalendar
+} from '@lucide/angular';
 
 @Component({
   selector: 'app-gtanalytic-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, BaseChartDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    BaseChartDirective,
+    LucideX,
+    LucideChevronLeft,
+    LucideChevronRight,
+    LucideZoomIn,
+    LucideCalendar
+  ],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './gtanalytic-users.html',
   styleUrls: ['./gtanalytic-users.scss']
@@ -17,6 +33,13 @@ export class GtanalyticUsersComponent {
 
   searchQuery = signal<string>('');
   activeTab = signal<'directory' | 'top_active'>('directory');
+
+  // Pagination for User Directory
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(10);
+
+  // Lightbox Modal for Full Picture
+  previewUser = signal<any | null>(null);
 
   summary = computed(() => this.dataService.analyticsData()?.summary || {
     total_users: 0,
@@ -80,6 +103,98 @@ export class GtanalyticUsersComponent {
       (u.email || '').toLowerCase().includes(q)
     );
   });
+
+  // Total pages
+  totalPages = computed(() => {
+    const count = this.filteredDetailedUsers().length;
+    return Math.max(1, Math.ceil(count / this.pageSize()));
+  });
+
+  // Paginated Users Slice
+  paginatedDetailedUsers = computed(() => {
+    const list = this.filteredDetailedUsers();
+    const start = (this.currentPage() - 1) * this.pageSize();
+    return list.slice(start, start + this.pageSize());
+  });
+
+  // Pagination info text
+  paginationInfo = computed(() => {
+    const total = this.filteredDetailedUsers().length;
+    if (total === 0) return { start: 0, end: 0, total: 0 };
+    const start = (this.currentPage() - 1) * this.pageSize() + 1;
+    const end = Math.min(this.currentPage() * this.pageSize(), total);
+    return { start, end, total };
+  });
+
+  onSearchChange(value: string): void {
+    this.searchQuery.set(value);
+    this.currentPage.set(1);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+    this.currentPage.set(1);
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.update((p) => p - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((p) => p + 1);
+    }
+  }
+
+  setPageSize(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+  }
+
+  getPageNumbers(): (number | string)[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, '...', total];
+    }
+    if (current >= total - 3) {
+      return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+    }
+    return [1, '...', current - 1, current, current + 1, '...', total];
+  }
+
+  // Full Picture Lightbox Modal
+  openPhotoModal(user: any, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (user.photo_url) {
+      this.previewUser.set(user);
+    }
+  }
+
+  closePhotoModal(): void {
+    this.previewUser.set(null);
+  }
+
+  getHighResPhotoUrl(url?: string): string {
+    if (!url) return '';
+    if (url.includes('googleusercontent.com')) {
+      return url.replace(/=s\d+(-c)?/i, '=s500-c');
+    }
+    return url;
+  }
 
   setFilter(filterId: string) {
     this.dataService.setFilter(filterId);

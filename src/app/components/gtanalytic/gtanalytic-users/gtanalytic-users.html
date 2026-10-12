@@ -118,11 +118,11 @@
         <input 
           type="text" 
           [ngModel]="searchQuery()" 
-          (ngModelChange)="searchQuery.set($event)"
+          (ngModelChange)="onSearchChange($event)"
           placeholder="Search by name or email..." 
           class="search-input"
         />
-        <button *ngIf="searchQuery()" (click)="searchQuery.set('')" class="btn-clear">&times;</button>
+        <button *ngIf="searchQuery()" (click)="clearSearch()" class="btn-clear">&times;</button>
       </div>
     </div>
 
@@ -145,11 +145,20 @@
               </td>
             </tr>
 
-            <tr *ngFor="let user of filteredDetailedUsers()">
+            <tr *ngFor="let user of paginatedDetailedUsers()">
               <td>
                 <div class="user-cell">
-                  <div class="avatar-circle" [class.has-img]="!!user.photo_url">
+                  <div
+                    class="avatar-circle"
+                    [class.has-img]="!!user.photo_url"
+                    [class.clickable]="!!user.photo_url"
+                    (click)="user.photo_url ? openPhotoModal(user, $event) : null"
+                    [title]="user.photo_url ? 'Click to view full profile picture' : ''"
+                  >
                     <img *ngIf="user.photo_url" [src]="user.photo_url" class="avatar-circle-img" alt="Avatar" />
+                    <div class="avatar-zoom-overlay" *ngIf="user.photo_url">
+                      <svg lucideZoomIn [attr.size]="14"></svg>
+                    </div>
                     <span *ngIf="!user.photo_url">{{ user.display_name ? user.display_name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U') }}</span>
                   </div>
                   <span class="user-display-name">{{ user.display_name || 'Anonymous User' }}</span>
@@ -167,6 +176,61 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination Footer for User Directory -->
+      <div class="pagination-footer" *ngIf="filteredDetailedUsers().length > 0">
+        <div class="pagination-meta">
+          Showing <span>{{ paginationInfo().start }}–{{ paginationInfo().end }}</span> of <span>{{ paginationInfo().total }}</span> members
+          <div class="page-size-selector">
+            <label>Per page:</label>
+            <select [ngModel]="pageSize()" (ngModelChange)="setPageSize(+$event)">
+              <option [value]="10">10</option>
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
+              <option [value]="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pagination-controls" *ngIf="totalPages() > 1">
+          <button
+            type="button"
+            class="page-btn prev-btn"
+            [disabled]="currentPage() === 1"
+            (click)="prevPage()"
+            aria-label="Previous Page"
+          >
+            <svg lucideChevronLeft [attr.size]="15"></svg>
+            <span>Prev</span>
+          </button>
+
+          <div class="page-numbers">
+            <ng-container *ngFor="let p of getPageNumbers()">
+              <span *ngIf="p === '...'" class="page-ellipsis">…</span>
+              <button
+                *ngIf="p !== '...'"
+                type="button"
+                class="page-num-btn"
+                [class.active]="currentPage() === p"
+                (click)="setPage(+p)"
+              >
+                {{ p }}
+              </button>
+            </ng-container>
+          </div>
+
+          <button
+            type="button"
+            class="page-btn next-btn"
+            [disabled]="currentPage() === totalPages()"
+            (click)="nextPage()"
+            aria-label="Next Page"
+          >
+            <span>Next</span>
+            <svg lucideChevronRight [attr.size]="15"></svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -196,8 +260,18 @@
               </td>
               <td>
                 <div class="user-cell">
-                  <div class="avatar-circle">
-                    {{ u.display_name ? u.display_name.charAt(0).toUpperCase() : (u.email ? u.email.charAt(0).toUpperCase() : 'U') }}
+                  <div
+                    class="avatar-circle"
+                    [class.has-img]="!!u.photo_url"
+                    [class.clickable]="!!u.photo_url"
+                    (click)="u.photo_url ? openPhotoModal(u, $event) : null"
+                    [title]="u.photo_url ? 'Click to view full profile picture' : ''"
+                  >
+                    <img *ngIf="u.photo_url" [src]="u.photo_url" class="avatar-circle-img" alt="Avatar" />
+                    <div class="avatar-zoom-overlay" *ngIf="u.photo_url">
+                      <svg lucideZoomIn [attr.size]="14"></svg>
+                    </div>
+                    <span *ngIf="!u.photo_url">{{ u.display_name ? u.display_name.charAt(0).toUpperCase() : (u.email ? u.email.charAt(0).toUpperCase() : 'U') }}</span>
                   </div>
                   <div class="user-info">
                     <span class="user-display-name">{{ u.display_name || 'GanaTube Listener' }}</span>
@@ -222,6 +296,41 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Full Picture Lightbox Modal -->
+  <div
+    class="photo-lightbox-backdrop"
+    *ngIf="previewUser()"
+    (click)="closePhotoModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-label="User Profile Picture Preview"
+  >
+    <div class="photo-lightbox-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="photo-lightbox-close" (click)="closePhotoModal()" aria-label="Close Preview">
+        <svg lucideX [attr.size]="18"></svg>
+      </button>
+
+      <div class="photo-lightbox-image-wrap">
+        <img
+          [src]="getHighResPhotoUrl(previewUser()?.photo_url)"
+          [alt]="previewUser()?.display_name || previewUser()?.email"
+          class="photo-lightbox-img"
+        />
+      </div>
+
+      <div class="photo-lightbox-info">
+        <h3 class="photo-lightbox-name">
+          {{ previewUser()?.display_name || 'GanaTube User' }}
+        </h3>
+        <code class="photo-lightbox-email">{{ previewUser()?.email }}</code>
+        <span class="photo-lightbox-joined" *ngIf="previewUser()?.created_at">
+          <svg lucideCalendar [attr.size]="12"></svg>
+          Member since {{ formatISTDate(previewUser()?.created_at) }}
+        </span>
+      </div>
+    </div>
   </div>
 
 </div>
