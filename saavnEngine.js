@@ -96,6 +96,26 @@ function artistOverlapScore(targetArtists, candidateArtists) {
   return denom > 0 ? Math.min(1, matched / denom) : 0;
 }
 
+// Full artist-name match: multiple artists me se EK bhi artist poora match
+// ho jaye to confirm — "Arijit Singh, Pritam" vs "Pritam, Badshah" passes,
+// "Anuv Jain" vs "Rahul Sharma" fails (wrong recording, YouTube fallback)
+function artistNamesMatchAny(targetArtists, candidateArtists) {
+  const splitNames = (s) => String(s || '')
+    .split(/,|&|\bfeat\.?\b|\bft\.?\b/i)
+    .map(part => normalizeText(part))
+    .filter(Boolean);
+  const tNames = splitNames(targetArtists);
+  const cNames = splitNames(candidateArtists);
+  for (const t of tNames) {
+    for (const c of cNames) {
+      if (t === c) return true;
+      // "Sanam Puri" vs "Sanam" — chhota naam bade ke andar poora aa jaye
+      if (t.length >= 4 && c.length >= 4 && (t.includes(c) || c.includes(t))) return true;
+    }
+  }
+  return false;
+}
+
 function durationClosenessScore(targetDuration, candidateDuration) {
   const t = parseInt(targetDuration, 10) || 0;
   const c = parseInt(candidateDuration, 10) || 0;
@@ -174,9 +194,14 @@ async function resolveStreamUrl(encryptedUrl, requestedBitrate) {
 
   if (/_\d+\.mp4$/i.test(base)) {
     const order = bitrate === 320 ? [320, 160, 96] : bitrate === 160 ? [160, 320, 96] : [96, 160, 320];
-    for (const b of order) {
-      const candidate = bitrateUrl(base, b);
-      if (await isReachable(candidate)) return candidate;
+    // Sab bitrate probes PARALLEL — sequential me 3 x 4s timeout worst case
+    // ~12s lagta tha; ab max ~4s, typical ~300ms. Preference order me
+    // pehla reachable chunta hai.
+    const probes = await Promise.all(
+      order.map(async (b) => ({ b, ok: await isReachable(bitrateUrl(base, b)) }))
+    );
+    for (const { b, ok } of probes) {
+      if (ok) return bitrateUrl(base, b);
     }
     return base; // last resort: original decrypted URL
   }
@@ -269,17 +294,24 @@ async function matchSaavnSong({ title, artist, album, duration, bitrate }) {
   const artistStr = String(artist || '').trim().slice(0, 120);
   const albumStr = String(album || '').trim().slice(0, 120);
 
-  // Two-stage search: "title artist" first, then plain title for broad coverage
+  // Search variants: normalised title (strips "(From ...)", "(Lyrical)",
+  // "(Official Video)" etc. — JioSaavn's search chokes on raw YouTube
+  // suffixes) + artist / album, then the bare title for broad coverage.
+  const baseQuery = normalizeText(cleanTitle) || cleanTitle.toLowerCase();
   const queries = [];
-  if (artistStr) queries.push(`${cleanTitle} ${artistStr.split(',')[0].trim()}`);
-  if (albumStr && albumStr.toLowerCase() !== 'single') queries.push(`${cleanTitle} ${albumStr}`);
-  queries.push(cleanTitle);
+  if (artistStr) queries.push(`${baseQuery} ${artistStr.split(',')[0].trim()}`);
+  if (albumStr && albumStr.toLowerCase() !== 'single') queries.push(`${baseQuery} ${albumStr}`);
+  queries.push(baseQuery);
 
+  // Fire all query variants in parallel — Saavn must answer fast enough to
+  // win the client's resolution race so the background-playable Saavn
+  // stream is preferred over the YouTube IFrame engine.
   const seenIds = new Set();
   const candidates = [];
-  for (const q of queries) {
-    if (candidates.length >= 25) break;
-    const found = await searchSaavnSongs(q, 20).catch(() => []);
+  const foundLists = await Promise.all(
+    queries.map(q => searchSaavnSongs(q, 20).catch(() => []))
+  );
+  for (const found of foundLists) {
     for (const song of found) {
       if (song.id && !seenIds.has(song.id)) {
         seenIds.add(song.id);
@@ -291,17 +323,31 @@ async function matchSaavnSong({ title, artist, album, duration, bitrate }) {
 
   let best = null;
   let bestScore = 0;
+  const artistRequested = artistStr.length > 0;
   for (const cand of candidates) {
+    // Anti-spam: reject jukeboxes/non-stop mixes and tiny snippets — a
+    // matching title on a 15-minute mix is still the wrong recording
+    if (cand.duration > 720 || (cand.duration > 0 && cand.duration < 45)) continue;
     const titleScore = diceCoefficient(cleanTitle, cand.title);
     const artistScore = artistOverlapScore(artistStr, cand.artist);
     const durScore = durationClosenessScore(duration, cand.duration);
     const score = titleScore * 0.55 + artistScore * 0.25 + durScore * 0.20;
 
+    // Artist verification: gana + artist dono match hone chahiye. Multiple
+    // artists me se EK bhi poora artist match => confirmed; koi nahi =>
+    // reject (wrong recording — client exact YouTube videoId play karega).
+    // Title+duration alone is NOT enough — same-title songs by other artists
+    // with near-identical durations exist (Atif Aslam vs Bengali same-name).
+    const candArtist = String(cand.artist || '').trim();
+    const candArtistKnown = candArtist.length > 0 && candArtist.toLowerCase() !== 'unknown artist';
+    const artistConfirmed = !artistRequested || !candArtistKnown ||
+      artistNamesMatchAny(artistStr, cand.artist) || artistScore >= 0.5;
+
     // Confidence gates: title must always be close; duration seals the deal
     const durKnown = (parseInt(duration, 10) || 0) > 0 && cand.duration > 0;
     const passes =
-      (titleScore >= 0.9 && score >= 0.55) ||
-      (titleScore >= 0.6 && durKnown && durScore >= 0.75 && score >= 0.68) ||
+      (titleScore >= 0.92 && artistConfirmed && score >= 0.6) ||
+      (titleScore >= 0.6 && durKnown && durScore >= 0.75 && score >= 0.68 && artistConfirmed) ||
       (titleScore >= 0.6 && !durKnown && artistScore >= 0.6 && score >= 0.65);
 
     if (passes && score > bestScore) {

@@ -18,6 +18,131 @@ export interface Track extends YouTubeSearchResult {}
 
 export type PlayerState = 'unstarted' | 'loading' | 'playing' | 'paused' | 'ended';
 
+// ── JioSaavn match verification ──────────────────────────────────────────────
+// A JioSaavn stream is resolved by TEXT search (title/artist), so the returned
+// recording must be re-verified against the requested track BEFORE it plays.
+// Rule: title AND artist dono match hone chahiye — multiple artists me se EK
+// bhi artist poora match ho gaya to confirmed. Fail => wrong recording =>
+// the exact YouTube videoId plays instead (tackles wrong playbacks).
+
+function normalizeVerifyText(str: unknown): string {
+  return String(str || '')
+    .toLowerCase()
+    .replace(/\((?:from|feat|ft\.?|with|lyrical|video|audio|official|slowed|reverb|sped|nightcore|lofi|lo-fi|remix)[^)]*\)/g, ' ')
+    .replace(/\[(?:from|feat|ft\.?|lyrical|video|audio|official|slowed|reverb|sped|nightcore|lofi|lo-fi|remix)[^\]]*\]/g, ' ')
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function verifyDice(a: unknown, b: unknown): number {
+  const s1 = normalizeVerifyText(a);
+  const s2 = normalizeVerifyText(b);
+  if (!s1 || !s2) return 0;
+  if (s1 === s2) return 1;
+  if (s1.length < 2 || s2.length < 2) return s1 === s2 ? 1 : 0;
+  const grams = new Map<string, number>();
+  for (let i = 0; i < s1.length - 1; i++) {
+    const bg = s1.slice(i, i + 2);
+    grams.set(bg, (grams.get(bg) || 0) + 1);
+  }
+  let hits = 0;
+  for (let i = 0; i < s2.length - 1; i++) {
+    const bg = s2.slice(i, i + 2);
+    const count = grams.get(bg) || 0;
+    if (count > 0) {
+      grams.set(bg, count - 1);
+      hits += 1;
+    }
+  }
+  return (2 * hits) / (s1.length - 1 + s2.length - 1);
+}
+
+function verifyArtistOverlap(target: unknown, candidate: unknown): number {
+  const splitArtists = (s: unknown) => String(s || '').split(/,|&|\bfeat\.?\b|\bft\.?\b/i);
+  const tTokens = new Set(splitArtists(target).flatMap(p => normalizeVerifyText(p).split(' ')).filter(Boolean));
+  const cTokens = new Set(splitArtists(candidate).flatMap(p => normalizeVerifyText(p).split(' ')).filter(Boolean));
+  if (tTokens.size === 0 || cTokens.size === 0) return 0.5;
+  let matched = 0;
+  cTokens.forEach(tok => { if (tTokens.has(tok)) matched += 1; });
+  const denom = Math.min(tTokens.size, cTokens.size, 4);
+  return denom > 0 ? Math.min(1, matched / denom) : 0;
+}
+
+function isKnownArtist(name: unknown): boolean {
+  const s = String(name || '').trim();
+  return Boolean(s) && s.toLowerCase() !== 'unknown artist';
+}
+
+// Artist rule: multiple artists me se EK bhi poora artist match => confirmed.
+// "Arijit Singh, Pritam" vs "Pritam, Badshah" passes; "Anuv Jain" vs
+// "Rahul Sharma" fails (wrong recording => exact YouTube video plays).
+function verifyArtistNames(target: unknown, candidate: unknown): boolean {
+  const splitNames = (s: unknown) => String(s || '')
+    .split(/,|&|\bfeat\.?\b|\bft\.?\b/i)
+    .map(part => normalizeVerifyText(part))
+    .filter(Boolean);
+  const tNames = splitNames(target);
+  const cNames = splitNames(candidate);
+  for (const t of tNames) {
+    for (const c of cNames) {
+      if (t === c) return true;
+      // "Sanam Puri" vs "Sanam" — chhota naam bade ke andar poora aa jaye
+      if (t.length >= 4 && c.length >= 4 && (t.includes(c) || c.includes(t))) return true;
+    }
+  }
+  // Stylised duo credits: "Sachet Tandon" vs "Sachet-Parampara"
+  return verifyArtistOverlap(target, candidate) >= 0.5;
+}
+
+// Final gate before a JioSaavn stream is allowed to play.
+interface SaavnMatchCandidate { title?: string; artist?: string; duration?: number; streamUrl?: string }
+
+function verifySaavnMatch(track: { title?: string; channelTitle?: string; duration?: number } | null, match: SaavnMatchCandidate | null): boolean {
+  if (!track?.title || !match?.title) return false;
+  let titleScore = verifyDice(track.title, match.title);
+
+  // Repeated/hook titles: "O Maahi" vs "O Maahi O Maahi" score low on Dice
+  // but are the same song — token containment rescues them
+  const st = new Set(normalizeVerifyText(track.title).split(' ').filter(Boolean));
+  const mt = new Set(normalizeVerifyText(match.title).split(' ').filter(Boolean));
+  if (st.size && mt.size && titleScore < 0.85) {
+    const smaller = st.size <= mt.size ? st : mt;
+    const larger = st.size <= mt.size ? mt : st;
+    let hits = 0;
+    smaller.forEach(tok => { if (larger.has(tok)) hits += 1; });
+    if (hits === smaller.size) titleScore = 0.85;
+  }
+  if (titleScore < 0.75) return false;
+
+  // Artist validation — koi bhi artist match nahi => wrong recording.
+  // NOTE: title+duration fingerprint alone is NOT enough — same-title
+  // songs by other artists with near-identical durations exist.
+  if (isKnownArtist(track.channelTitle) && isKnownArtist(match.artist)) {
+    if (!verifyArtistNames(track.channelTitle, match.artist)) return false;
+  }
+
+  // Duration sanity — same title/artist but wildly different length is
+  // likely a jukebox/extended/cover version. Also reject jukebox-length
+  // recordings and tiny snippets outright (anti-spam: >12min / <45s).
+  const trackDur = Math.round(track.duration || 0);
+  const matchDur = Math.round(match.duration || 0);
+  if (matchDur > 0) {
+    if (matchDur > 720 || matchDur < 45) return false;
+    if (trackDur > 0 && matchDur > 0 && Math.abs(trackDur - matchDur) > 15 && titleScore < 0.9) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Deep-link placeholder titles — Saavn se inka search karna hi bekaar hai
+function isPlaceholderTrack(title: string | undefined): boolean {
+  if (!title) return true;
+  return title.includes('Loading Track') || title.includes('Playing Track') || title.includes('Playing from link');
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -230,6 +355,7 @@ export class PlayerService {
   isPlayingSaavn = signal<boolean>(false);
   private saavnCache = new Map<string, { streamUrl: string; duration: number }>();
   private saavnToken = 0; // races: async stream resolution vs user skip
+  private htmlAudioLoadToken = -1; // which generation the audio src belongs to
 
   // Sleep Timer State
   showSleepModal = signal<boolean>(false);
@@ -922,8 +1048,14 @@ export class PlayerService {
   }
 
   onPlayerStateChange(event: any): void {
-    // Saavn engine drives state via htmlAudio events — ignore stale YT events
-    if (this.isPlayingSaavn()) return;
+    // Engine supervisor: if the IFrame sounds while Saavn/Offline owns
+    // playback, silence it instantly — never let both engines play together
+    if (this.isPlayingSaavn() || this.isPlayingOffline()) {
+      if (event.data === 1) {
+        try { this.ytPlayer?.stopVideo(); } catch (e) {}
+      }
+      return;
+    }
     // YT.PlayerState: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
     switch (event.data) {
       case 1: // playing
@@ -1026,6 +1158,12 @@ export class PlayerService {
       this.handleTrackEnd();
     });
     this.htmlAudio.addEventListener('play', () => {
+      // Engine supervisor: audio started without an owning engine — kill it
+      // (prevents a stale Saavn stream sounding under the YT IFrame)
+      if (!this.isPlayingSaavn() && !this.isPlayingOffline()) {
+        try { this.htmlAudio?.pause(); } catch (e) {}
+        return;
+      }
       this.playerState.set('playing');
       this.duration.set(this.htmlAudio!.duration || 0);
       try {
@@ -1039,10 +1177,29 @@ export class PlayerService {
     });
     this.htmlAudio.addEventListener('loadedmetadata', () => {
       this.duration.set(this.htmlAudio!.duration || 0);
+      // Wrong-recording guard: verify the stream that ACTUALLY started. If
+      // its real duration is wildly different from the requested track's
+      // duration, JioSaavn resolved the wrong audio — reject it and play
+      // the exact YouTube videoId instead.
+      if (this.isPlayingSaavn() && this.htmlAudioLoadToken === this.saavnToken) {
+        const track = this.currentTrack();
+        const trackDur = Math.round(track?.duration || 0);
+        const streamDur = this.htmlAudio!.duration;
+        if (trackDur > 0 && streamDur && isFinite(streamDur)) {
+          if (Math.abs(streamDur - trackDur) > Math.max(15, trackDur * 0.2)) {
+            console.warn('Saavn stream duration mismatch — rejecting wrong recording, falling back to YouTube');
+            this.isPlayingSaavn.set(false);
+            this.playerState.set('loading');
+            try { this.htmlAudio!.pause(); this.htmlAudio!.removeAttribute('src'); } catch (e) {}
+            if (track) this.loadInYtPlayer(track.videoId, this.saavnToken);
+          }
+        }
+      }
     });
     this.htmlAudio.addEventListener('error', () => {
-      // Saavn stream failed mid-playback — fall back to the YouTube engine
-      if (this.isPlayingSaavn()) {
+      // Saavn stream failed mid-playback — fall back to the YouTube engine.
+      // Stale guard: an error from an OLD stream must never clobber newer playback
+      if (this.isPlayingSaavn() && this.htmlAudioLoadToken === this.saavnToken) {
         console.warn('Saavn stream error — falling back to YouTube');
         this.isPlayingSaavn.set(false);
         const current = this.currentTrack();
@@ -1100,6 +1257,7 @@ export class PlayerService {
     if (this.offlineService.isDownloaded(videoId)) {
       this.isPlayingSaavn.set(false);
       this.isPlayingOffline.set(true);
+      this.htmlAudioLoadToken = saavnToken;
       if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
         this.ytPlayer.stopVideo(); // Stop youtube player
       }
@@ -1134,6 +1292,7 @@ export class PlayerService {
 
       if (match?.streamUrl) {
         this.isPlayingSaavn.set(true);
+        this.htmlAudioLoadToken = saavnToken;
         if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
           this.ytPlayer.stopVideo();
         }
@@ -1145,11 +1304,11 @@ export class PlayerService {
         } catch (e) {
           console.warn('Saavn audio play failed, falling back to YouTube:', e);
           this.isPlayingSaavn.set(false);
-          this.loadInYtPlayer(videoId);
+          this.loadInYtPlayer(videoId, saavnToken);
         }
       } else {
         this.isPlayingSaavn.set(false);
-        this.loadInYtPlayer(videoId);
+        this.loadInYtPlayer(videoId, saavnToken);
       }
     }
 
@@ -1160,9 +1319,14 @@ export class PlayerService {
     }
   }
 
-  // Resolve a JioSaavn stream URL for the track (session cache + timeout)
+  // Resolve a JioSaavn stream URL for the track (session cache + timeout).
+  // Saavn-first validation: title + artist verify — pass => Saavn play
+  // (background playback), fail => IMMEDIATELY exact YouTube videoId.
   private async resolveSaavnStream(track: Track | null): Promise<{ streamUrl: string; duration: number } | null> {
     if (!track?.videoId || !track?.title) return null;
+    // Placeholder deep-link tracks ("Loading Track...") — searching Saavn
+    // for these always returns garbage; skip straight to YouTube
+    if (isPlaceholderTrack(track.title)) return null;
     const cached = this.saavnCache.get(track.videoId);
     if (cached) return cached;
 
@@ -1183,6 +1347,10 @@ export class PlayerService {
       );
       const match = res?.match;
       if (match?.streamUrl) {
+        if (!verifySaavnMatch(track, match)) {
+          console.info('[Player] Saavn validation failed (title/artist mismatch) — playing exact YouTube video instead');
+          return null;
+        }
         const entry = { streamUrl: match.streamUrl, duration: match.duration || 0 };
         this.saavnCache.set(track.videoId, entry);
         if (this.saavnCache.size > 120) {
@@ -1197,7 +1365,13 @@ export class PlayerService {
     return null;
   }
 
-  private loadInYtPlayer(videoId: string): void {
+  private loadInYtPlayer(videoId: string, genToken?: number): void {
+    // Engine supervisor: stale loads (superseded by a newer track) stand down,
+    // and claiming YT always silences the Saavn/offline audio engines
+    if (genToken !== undefined && genToken !== this.saavnToken) return;
+    this.isPlayingSaavn.set(false);
+    this.isPlayingOffline.set(false);
+    try { this.htmlAudio?.pause(); } catch (e) {}
     if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
       this.ytPlayer.loadVideoById(videoId);
     }
