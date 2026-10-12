@@ -108,11 +108,14 @@ export class UserService {
     }
   }
 
-  async loadProfile(email: string, displayName?: string): Promise<UserProfileData | null> {
+  async loadProfile(email: string, displayName?: string, photoUrl?: string): Promise<UserProfileData | null> {
     try {
       let url = `${this.apiUrl}?action=getProfile&email=${encodeURIComponent(email)}`;
       if (displayName) {
         url += `&name=${encodeURIComponent(displayName)}`;
+      }
+      if (photoUrl) {
+        url += `&photo=${encodeURIComponent(photoUrl)}`;
       }
       const response: any = await firstValueFrom(this.http.get(url));
       

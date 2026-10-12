@@ -169,6 +169,8 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
       }) as HTMLElement | undefined;
 
       if (stray) {
+        const w = (stray as HTMLElement).offsetWidth || stray.getBoundingClientRect().width || 300;
+        const h = (stray as HTMLElement).offsetHeight || stray.getBoundingClientRect().height || 250;
         stray.style.position = 'relative';
         stray.style.top = 'auto';
         stray.style.right = 'auto';
@@ -177,6 +179,11 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
         stray.style.margin = '0';
         stray.style.zIndex = 'auto';
         container.appendChild(stray);
+        const scale = Math.min(1, 300 / w, 250 / h);
+        if (scale < 1) {
+          stray.style.transformOrigin = 'center center';
+          stray.style.transform = `scale(${scale})`;
+        }
         this.adLoaded.set(true);
         clearInterval(this.pullerInterval);
         this.cdr.detectChanges();

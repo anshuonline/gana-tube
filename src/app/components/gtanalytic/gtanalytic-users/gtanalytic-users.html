@@ -148,8 +148,9 @@
             <tr *ngFor="let user of filteredDetailedUsers()">
               <td>
                 <div class="user-cell">
-                  <div class="avatar-circle">
-                    {{ user.display_name ? user.display_name.charAt(0).toUpperCase() : 'U' }}
+                  <div class="avatar-circle" [class.has-img]="!!user.photo_url">
+                    <img *ngIf="user.photo_url" [src]="user.photo_url" class="avatar-circle-img" alt="Avatar" />
+                    <span *ngIf="!user.photo_url">{{ user.display_name ? user.display_name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U') }}</span>
                   </div>
                   <span class="user-display-name">{{ user.display_name || 'Anonymous User' }}</span>
                 </div>

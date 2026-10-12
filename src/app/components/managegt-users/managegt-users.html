@@ -1,9 +1,10 @@
 <div class="users-page">
 
+  <!-- Header -->
   <header class="users-header">
     <div class="header-content">
       <h2>Registered Users</h2>
-      <p>Manage and view all registered users and their preferences.</p>
+      <p>Manage and view all registered users, profile photos, and preferences.</p>
     </div>
     <div class="total-box">
       <span class="total-label">Total Users</span>
@@ -11,13 +12,56 @@
     </div>
   </header>
 
-  <!-- Loading -->
-  <div class="users-loading" *ngIf="isLoading()">
-    <svg lucideRefreshCw class="spin" [attr.size]="28"></svg>
-    <p>Loading users...</p>
+  <!-- Search & Filter Controls Bar -->
+  <div class="users-toolbar" *ngIf="!isLoading() && users().length > 0">
+    <div class="search-box">
+      <svg lucideSearch class="search-icon" [attr.size]="18"></svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by name or email..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+      <button
+        type="button"
+        class="search-clear-btn"
+        *ngIf="searchQuery()"
+        (click)="clearSearch()"
+        aria-label="Clear search"
+      >
+        <svg lucideX [attr.size]="14"></svg>
+      </button>
+    </div>
+
+    <!-- Page Size & Results Summary -->
+    <div class="toolbar-actions">
+      <span class="results-count">
+        Showing <strong>{{ paginationInfo().start }}–{{ paginationInfo().end }}</strong> of {{ paginationInfo().total }}
+      </span>
+
+      <div class="page-size-selector">
+        <label for="pageSizeSelect">Show:</label>
+        <select
+          id="pageSizeSelect"
+          [ngModel]="pageSize()"
+          (ngModelChange)="setPageSize(+$event)"
+        >
+          <option [value]="10">10 / page</option>
+          <option [value]="25">25 / page</option>
+          <option [value]="50">50 / page</option>
+        </select>
+      </div>
+    </div>
   </div>
 
-  <!-- Error -->
+  <!-- Loading State -->
+  <div class="users-loading" *ngIf="isLoading()">
+    <svg lucideRefreshCw class="spin" [attr.size]="28"></svg>
+    <p>Loading registered users...</p>
+  </div>
+
+  <!-- Error State -->
   <div class="users-error" *ngIf="error()">
     <svg lucideMail [attr.size]="18"></svg>
     <div>
@@ -26,27 +70,69 @@
     </div>
   </div>
 
-  <!-- Empty -->
+  <!-- Empty Initial State -->
   <div class="users-empty" *ngIf="!isLoading() && !error() && users().length === 0">
     <div class="empty-icon">
       <svg lucideUsers [attr.size]="30"></svg>
     </div>
     <h3>No Users Yet</h3>
-    <p>It looks like no one has logged in yet. Once users log in, their profiles will appear here.</p>
+    <p>Once users log in to GanaTube, their profiles will appear here.</p>
   </div>
 
-  <!-- User Cards -->
-  <div class="users-list" *ngIf="!isLoading() && users().length > 0">
-    <div class="user-card" *ngFor="let user of users()">
+  <!-- Empty Search Results State -->
+  <div class="users-empty" *ngIf="!isLoading() && !error() && users().length > 0 && filteredUsers().length === 0">
+    <div class="empty-icon">
+      <svg lucideSearch [attr.size]="30"></svg>
+    </div>
+    <h3>No Matching Users</h3>
+    <p>No user records matched "<strong>{{ searchQuery() }}</strong>". Try searching with a different name or email.</p>
+    <button type="button" class="reset-search-btn" (click)="clearSearch()">Clear Search</button>
+  </div>
 
-      <!-- Card Header (Clickable) -->
+  <!-- User Cards (Paginated) -->
+  <div class="users-list" *ngIf="!isLoading() && paginatedUsers().length > 0">
+    <div class="user-card" *ngFor="let user of paginatedUsers()">
+
+      <!-- Card Header (Clickable to expand) -->
       <div class="user-card-head" (click)="toggleExpand(user.email)">
         <div class="user-identity">
-          <div class="user-avatar">
-            <span>{{ user.email.charAt(0) | uppercase }}</span>
+          
+          <!-- Avatar: Photo or Initial Badge -->
+          <div
+            class="user-avatar"
+            [class.has-photo]="!!user.photo_url"
+            [class.clickable]="!!user.photo_url"
+            (click)="user.photo_url ? openPhotoModal(user, $event) : null"
+            [title]="user.photo_url ? 'Click to view full profile picture' : ''"
+          >
+            <!-- Real User Profile Photo -->
+            <img
+              *ngIf="user.photo_url"
+              [src]="user.photo_url"
+              [alt]="user.display_name || user.email"
+              class="user-avatar-img"
+              loading="lazy"
+            />
+
+            <!-- Hover Zoom Icon overlay -->
+            <div class="avatar-zoom-overlay" *ngIf="user.photo_url">
+              <svg lucideZoomIn [attr.size]="14"></svg>
+            </div>
+
+            <!-- Fallback Letter Badge -->
+            <span *ngIf="!user.photo_url">
+              {{ (user.display_name || user.email).charAt(0) | uppercase }}
+            </span>
           </div>
+
+          <!-- User Name & Email Details -->
           <div class="user-name-wrap">
-            <h3>{{ user.email }}</h3>
+            <div class="user-title-row">
+              <h3 *ngIf="user.display_name">{{ user.display_name }}</h3>
+              <h3 *ngIf="!user.display_name" class="email-primary">{{ user.email }}</h3>
+              <span class="email-sub" *ngIf="user.display_name">{{ user.email }}</span>
+            </div>
+
             <span class="user-joined">
               <svg lucideCalendar [attr.size]="11"></svg>
               Joined: {{ formatDate(user.created_at) }}
@@ -54,23 +140,24 @@
           </div>
         </div>
 
+        <!-- Card Meta / Expand -->
         <div class="user-meta">
           <span class="liked-count" title="Liked Songs">
             <svg lucideHeart [attr.size]="13"></svg>
             {{ user.liked_songs?.length || 0 }}
           </span>
-          <button class="expand-btn" (click)="toggleExpand(user.email); $event.stopPropagation()">
+          <button class="expand-btn" (click)="toggleExpand(user.email); $event.stopPropagation()" aria-label="Toggle details">
             <svg *ngIf="expandedUser() !== user.email" lucideChevronDown [attr.size]="16"></svg>
             <svg *ngIf="expandedUser() === user.email" lucideChevronUp [attr.size]="16"></svg>
           </button>
         </div>
       </div>
 
-      <!-- Expanded Details -->
+      <!-- Expanded Details Section -->
       <div class="user-details" *ngIf="expandedUser() === user.email">
         <div class="details-grid">
 
-          <!-- Languages -->
+          <!-- Preferred Languages -->
           <div class="detail-card">
             <h4>
               <svg lucideLanguages [attr.size]="13"></svg>
@@ -111,10 +198,91 @@
         </ng-template>
 
         <div class="details-footer">
-          Last Updated: {{ formatDate(user.updated_at) }}
+          Last Activity: {{ formatDate(user.updated_at) }}
         </div>
       </div>
 
     </div>
+  </div>
+
+  <!-- Pagination Bar -->
+  <div class="users-pagination-bar" *ngIf="!isLoading() && totalPages() > 1">
+    <button
+      type="button"
+      class="page-btn prev-btn"
+      [disabled]="currentPage() === 1"
+      (click)="prevPage()"
+      aria-label="Previous Page"
+    >
+      <svg lucideChevronLeft [attr.size]="16"></svg>
+      <span>Prev</span>
+    </button>
+
+    <div class="page-numbers">
+      <ng-container *ngFor="let p of getPageNumbers()">
+        <span *ngIf="p === '...'" class="page-ellipsis">…</span>
+        <button
+          *ngIf="p !== '...'"
+          type="button"
+          class="page-num-btn"
+          [class.active]="currentPage() === p"
+          (click)="goToPage(+p)"
+        >
+          {{ p }}
+        </button>
+      </ng-container>
+    </div>
+
+    <button
+      type="button"
+      class="page-btn next-btn"
+      [disabled]="currentPage() === totalPages()"
+      (click)="nextPage()"
+      aria-label="Next Page"
+    >
+      <span>Next</span>
+      <svg lucideChevronRight [attr.size]="16"></svg>
+    </button>
+  </div>
+
+</div>
+
+<!-- Full Picture Lightbox Modal -->
+<div
+  class="photo-lightbox-backdrop"
+  *ngIf="previewUser()"
+  (click)="closePhotoModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-label="User Profile Picture Preview"
+>
+  <div class="photo-lightbox-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Close Button -->
+    <button type="button" class="photo-lightbox-close" (click)="closePhotoModal()" aria-label="Close Preview">
+      <svg lucideX [attr.size]="18"></svg>
+    </button>
+
+    <!-- Large High-Res Picture Container -->
+    <div class="photo-lightbox-image-wrap">
+      <img
+        [src]="getHighResPhotoUrl(previewUser()?.photo_url)"
+        [alt]="previewUser()?.display_name || previewUser()?.email"
+        class="photo-lightbox-img"
+      />
+    </div>
+
+    <!-- User Information Header -->
+    <div class="photo-lightbox-info">
+      <h3 class="photo-lightbox-name">
+        {{ previewUser()?.display_name || 'GanaTube User' }}
+      </h3>
+      <code class="photo-lightbox-email">{{ previewUser()?.email }}</code>
+      <span class="photo-lightbox-joined">
+        <svg lucideCalendar [attr.size]="12"></svg>
+        Member since {{ formatDate(previewUser()?.created_at || '') }}
+      </span>
+    </div>
+
   </div>
 </div>

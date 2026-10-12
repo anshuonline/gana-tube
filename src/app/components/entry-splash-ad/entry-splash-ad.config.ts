@@ -7,7 +7,7 @@
 
 export const ENTRY_SPLASH_CONFIG = {
   // Master toggle: set to true when ad script is ready to go live
-  enabled: false,
+  enabled: true,
 
   // Forced countdown time in seconds before skip unlocks
   countdownSeconds: 6,
@@ -23,7 +23,17 @@ export const ENTRY_SPLASH_CONFIG = {
   safetyTimeoutMs: 12000,
 
   // AD NETWORK SCRIPT CODE
-  // Paste your script tag / ad unit HTML here when ready.
-  // Example: `<script src="https://..."></script>`
-  adScript: ``
+  // HilltopAds video slider ad unit
+  adScript: `<script>
+(function(iplkv){
+var d = document,
+    s = d.createElement('script'),
+    l = d.currentScript || d.scripts[d.scripts.length - 1];
+s.settings = iplkv || {};
+s.src = "\\/\\/massivesalad.com\\/b.XdVWsVd\\/GHla0fYsWVcF\\/ze\\/mm9Cu_Z\\/Url\\/kiPST\\/cu1cMnTfIT4gNmjMUytvNazTUWx\\/MJjCgA2\\/OiQX";
+s.async = true;
+s.referrerPolicy = 'no-referrer-when-downgrade';
+l.parentNode.insertBefore(s, l);
+})({})
+</script>`
 };
