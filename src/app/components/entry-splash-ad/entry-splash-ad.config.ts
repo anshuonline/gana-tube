@@ -6,6 +6,9 @@
 // ═══════════════════════════════════════════════════════════════════════
 
 export const ENTRY_SPLASH_CONFIG = {
+  // Master toggle: set to true when ad script is ready to go live
+  enabled: false,
+
   // Forced countdown time in seconds before skip unlocks
   countdownSeconds: 6,
 

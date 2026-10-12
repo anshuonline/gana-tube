@@ -49,6 +49,11 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
       return;
     }
 
+    // Do not show if disabled or if ad script is not configured
+    if (!this.config.enabled || !this.hasAdScript()) {
+      return;
+    }
+
     if (this.seenRecently()) {
       return;
     }
