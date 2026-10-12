@@ -39,6 +39,7 @@ import { UserService } from '../../services/user.service';
 import { AnalyticsService } from '../../services/analytics.service';
 import { FormsModule } from '@angular/forms';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
+import { AffiliateStickerComponent } from '../affiliate-sticker/affiliate-sticker.component';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CastService } from '../../services/cast.service';
 import { RoomService } from '../../services/room.service';
@@ -78,7 +79,8 @@ import { Subscription } from 'rxjs';
     LucideVolume2,
     LucideVolume1,
     LucideVolumeX,
-    TrackMenuComponent
+    TrackMenuComponent,
+    AffiliateStickerComponent
   ],
   templateUrl: './full-screen-player.component.html',
   styleUrls: ['./full-screen-player.component.scss']

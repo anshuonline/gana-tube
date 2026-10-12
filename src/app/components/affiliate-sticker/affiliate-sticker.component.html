@@ -1,0 +1,20 @@
+<a
+  *ngIf="product as p"
+  [href]="p.amazonUrl"
+  target="_blank"
+  rel="sponsored nofollow noopener noreferrer"
+  class="gt-affiliate-sticker gt-affiliate-sticker--{{ position }}"
+  [class.fading]="fading"
+  [attr.aria-label]="'View ' + p.name + ' on Amazon (sponsored)'"
+  (click)="stopPropagation($event)"
+>
+  <span class="gt-affiliate-thumb">
+    <img [src]="p.imageUrl" alt="" loading="lazy" decoding="async" (error)="hideThumb($event)" />
+  </span>
+  <span class="gt-affiliate-info">
+    <span class="gt-affiliate-tag">Sponsored</span>
+    <span class="gt-affiliate-name">{{ p.name }}</span>
+    <span class="gt-affiliate-price" *ngIf="p.priceLabel">{{ p.priceLabel }}</span>
+  </span>
+  <svg lucideExternalLink [attr.size]="14" class="gt-affiliate-arrow"></svg>
+</a>
