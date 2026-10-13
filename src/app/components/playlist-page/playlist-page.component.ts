@@ -195,11 +195,14 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  formatTime(seconds?: number): string {
-    if (!seconds || isNaN(seconds) || seconds <= 0) return '';
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
+  formatTime(seconds?: any): string {
+    if (!seconds) return '';
+    if (typeof seconds === 'string' && seconds.includes(':')) return seconds;
+    const num = typeof seconds === 'string' ? parseFloat(seconds) : seconds;
+    if (isNaN(num) || num <= 0) return '';
+    const h = Math.floor(num / 3600);
+    const m = Math.floor((num % 3600) / 60);
+    const s = Math.floor(num % 60);
     if (h > 0) {
       return m > 0 ? `${h}hour ${m}min` : `${h}hour`;
     }

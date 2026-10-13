@@ -3812,8 +3812,10 @@ export class App implements OnInit {
       }
       // Always upgrade thumbnailHigh to maxresdefault for best quality
       const s = {...song};
+      s.channelTitle = s.channelTitle || s.artist || (s as any).author || 'GanaTube';
+      s.artist = s.artist || s.channelTitle;
       if (s.videoId) {
-        s.thumbnailHigh = `https://i.ytimg.com/vi/${s.videoId}/maxresdefault.jpg`;
+        s.thumbnailHigh = s.thumbnailHigh || `https://i.ytimg.com/vi/${s.videoId}/maxresdefault.jpg`;
       }
       return s;
     });
@@ -3874,8 +3876,10 @@ export class App implements OnInit {
         };
       }
       const s = {...song};
+      s.channelTitle = s.channelTitle || s.artist || (s as any).author || 'GanaTube';
+      s.artist = s.artist || s.channelTitle;
       if (s.videoId) {
-        s.thumbnailHigh = `https://i.ytimg.com/vi/${s.videoId}/maxresdefault.jpg`;
+        s.thumbnailHigh = s.thumbnailHigh || `https://i.ytimg.com/vi/${s.videoId}/maxresdefault.jpg`;
       }
       return s;
     });

@@ -1,3 +1,12 @@
+// ── Global Process Crash Guards ──
+// Prevents unhandled errors from terminating Node and causing LiteSpeed 403 Forbidden
+process.on('uncaughtException', (err) => {
+  console.error('[CRITICAL] Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[CRITICAL] Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -11,6 +20,9 @@ const { nanoid } = require('nanoid');
 const app = express();
 app.use(compression()); // Enable gzip compression for all responses
 const server = http.createServer(app);
+server.on('error', (err) => {
+  console.error('[CRITICAL] HTTP Server Error:', err);
+});
 const io = new Server(server, {
   cors: {
     origin: "*",

@@ -98,11 +98,11 @@
             <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb">
             <div class="title-meta-box">
               <span class="song-title" [title]="song.title">{{ song.title }}</span>
-              <span class="song-artist-mobile" [title]="song.channelTitle">{{ song.channelTitle }}</span>
+              <span class="song-artist-mobile" [title]="song.channelTitle || song.artist">{{ song.channelTitle || song.artist || 'Unknown Artist' }}</span>
             </div>
           </div>
-          <div class="col-artist song-artist-col" [title]="song.channelTitle">
-            {{ song.channelTitle }}
+          <div class="col-artist song-artist-col" [title]="song.channelTitle || song.artist">
+            {{ song.channelTitle || song.artist || 'Unknown Artist' }}
           </div>
           <div class="col-duration song-duration-col" style="font-variant-numeric: tabular-nums; text-align: right; padding-right: 16px; font-size: 0.9em;">
             {{ song.duration ? formatTime(song.duration) : '' }}
@@ -210,12 +210,12 @@
             <img [src]="song.thumbnail" [alt]="song.title" class="song-thumb" loading="lazy">
             <div class="title-meta-box">
               <span class="song-title" [title]="song.title">{{ song.title }}</span>
-              <span class="song-artist-mobile" [title]="song.channelTitle">{{ song.channelTitle }}</span>
+              <span class="song-artist-mobile" [title]="song.channelTitle || song.artist">{{ song.channelTitle || song.artist || 'Unknown Artist' }}</span>
             </div>
           </div>
 
-          <div class="col-artist song-artist-col" [title]="song.channelTitle">
-            {{ song.channelTitle }}
+          <div class="col-artist song-artist-col" [title]="song.channelTitle || song.artist">
+            {{ song.channelTitle || song.artist || 'Unknown Artist' }}
           </div>
 
           <div class="col-duration song-duration-col" style="font-variant-numeric: tabular-nums; text-align: right; padding-right: 16px; font-size: 0.9em;">

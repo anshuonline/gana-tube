@@ -47,6 +47,14 @@ function createBotClient(usePrivileged = true) {
     }
   }
 
+  // Add Discord client error listeners to prevent uncaught EventEmitter crash
+  client.on('error', (err) => {
+    console.error('[GanaTube Bot] Client error:', err.message);
+  });
+  client.on('shardError', (err) => {
+    console.error('[GanaTube Bot] Discord shard error:', err.message);
+  });
+
   return client;
 }
 
@@ -78,6 +86,9 @@ function startBot() {
     try {
       serverInstance = botApp.listen(BOT_PORT, () => {
         console.log(`[GanaTube Bot] Health monitor active at http://localhost:${BOT_PORT}`);
+      });
+      serverInstance.on('error', (e) => {
+        console.warn(`[GanaTube Bot] Health monitor server error (port ${BOT_PORT}):`, e.message);
       });
     } catch (e) {
       console.warn(`[GanaTube Bot] Port ${BOT_PORT} warning:`, e.message);

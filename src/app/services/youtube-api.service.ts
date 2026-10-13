@@ -13,6 +13,9 @@ export interface YouTubeSearchResult {
   publishedAt: string;
   duration?: number;
   type?: string;
+  artist?: string;
+  author?: string;
+  album?: string;
 }
 
 /**

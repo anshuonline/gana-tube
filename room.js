@@ -711,105 +711,114 @@ function startBotTicker(io) {
 
   // ── Playback progression (every second) ──
   setInterval(() => {
-    for (const roomId of botRooms) {
-      const room = rooms.get(roomId);
-      if (!room || !room.isPlaying || !room.currentTrack) continue;
-      const dur = parseDurationToSeconds(room.currentTrack.duration);
-      room.currentTime += 1;
-      if (room.currentTime >= dur) {
-        // Track ended — play next (queue first, then random from pool)
-        const pool = pickBotTracks(room._botRoomIndex);
-        const taken = new Set();
-        for (const otherId of botRooms) {
-          if (otherId === roomId) continue;
-          const other = rooms.get(otherId);
-          if (other) {
-            if (other.currentTrack) taken.add(other.currentTrack.videoId);
-            other.queue.forEach(t => taken.add(t.videoId));
+    try {
+      for (const roomId of botRooms) {
+        const room = rooms.get(roomId);
+        if (!room || !room.isPlaying || !room.currentTrack) continue;
+        const dur = parseDurationToSeconds(room.currentTrack.duration);
+        room.currentTime += 1;
+        if (room.currentTime >= dur) {
+          // Track ended — play next (queue first, then random from pool)
+          const pool = pickBotTracks(room._botRoomIndex);
+          const taken = new Set();
+          for (const otherId of botRooms) {
+            if (otherId === roomId) continue;
+            const other = rooms.get(otherId);
+            if (other) {
+              if (other.currentTrack) taken.add(other.currentTrack.videoId);
+              other.queue.forEach(t => taken.add(t.videoId));
+            }
           }
-        }
 
-        if (room.queue.length > 0) {
-          room.currentTrack = room.queue.shift();
-        } else {
-          const free = pool.filter(t => !taken.has(t.videoId) && t.videoId !== room.currentTrack?.videoId);
-          const candidates = free.length > 0 ? free : pool;
-          room.currentTrack = candidates[Math.floor(Math.random() * candidates.length)];
+          if (room.queue.length > 0) {
+            room.currentTrack = room.queue.shift();
+          } else {
+            const free = pool.filter(t => !taken.has(t.videoId) && t.videoId !== room.currentTrack?.videoId);
+            const candidates = free.length > 0 ? free : pool;
+            room.currentTrack = candidates[Math.floor(Math.random() * candidates.length)];
+          }
+          
+          const freeForQueue = pool.filter(t => !taken.has(t.videoId) && t.videoId !== room.currentTrack?.videoId && !room.queue.some(q => q.videoId === t.videoId));
+          const qCandidates = freeForQueue.length > 0 ? freeForQueue : pool;
+          const nextUp = qCandidates[Math.floor(Math.random() * qCandidates.length)];
+          room.queue.push(nextUp);
+          room.currentTime = 0;
+          // Keep real listeners in sync with the new track
+          io.to(roomId).emit('room:track_changed', { track: room.currentTrack });
         }
-        
-        const freeForQueue = pool.filter(t => !taken.has(t.videoId) && t.videoId !== room.currentTrack?.videoId && !room.queue.some(q => q.videoId === t.videoId));
-        const qCandidates = freeForQueue.length > 0 ? freeForQueue : pool;
-        const nextUp = qCandidates[Math.floor(Math.random() * qCandidates.length)];
-        room.queue.push(nextUp);
-        room.currentTime = 0;
-        // Keep real listeners in sync with the new track
-        io.to(roomId).emit('room:track_changed', { track: room.currentTrack });
       }
+    } catch (tickerErr) {
+      console.warn('[Bot Ticker Error]:', tickerErr.message);
     }
   }, 1000);
 
   // ── Light activity cron (every 3 minutes) ──
   setInterval(async () => {
-    const roomIds = [...botRooms];
-    if (roomIds.length === 0) return;
+    try {
+      const roomIds = [...botRooms];
+      if (roomIds.length === 0) return;
 
-    // 1) Shuffle 1-2 listeners between random rooms
-    const moveCount = 1 + Math.floor(Math.random() * 2);
-    for (let i = 0; i < moveCount; i++) {
-      const fromId = roomIds[Math.floor(Math.random() * roomIds.length)];
-      const toId = roomIds[Math.floor(Math.random() * roomIds.length)];
-      if (fromId === toId) continue;
+      // 1) Shuffle 1-2 listeners between random rooms
+      const moveCount = 1 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < moveCount; i++) {
+        const fromId = roomIds[Math.floor(Math.random() * roomIds.length)];
+        const toId = roomIds[Math.floor(Math.random() * roomIds.length)];
+        if (fromId === toId) continue;
 
-      const from = rooms.get(fromId);
-      const to = rooms.get(toId);
-      if (!from || !to) continue;
+        const from = rooms.get(fromId);
+        const to = rooms.get(toId);
+        if (!from || !to) continue;
 
-      const botMembers = from.members.filter(m => m.uid.startsWith('bot_') && !m.isAdmin);
-      if (botMembers.length <= 4) continue; // keep a minimum crowd in every room
+        const botMembers = from.members.filter(m => m.uid.startsWith('bot_') && !m.isAdmin);
+        if (botMembers.length <= 4) continue; // keep a minimum crowd in every room
 
-      const mover = botMembers[Math.floor(Math.random() * botMembers.length)];
-      from.members = from.members.filter(m => m.uid !== mover.uid);
-      from.listenerCount = from.members.length;
-      io.to(fromId).emit('room:member_left', { members: from.members, listenerCount: from.listenerCount });
+        const mover = botMembers[Math.floor(Math.random() * botMembers.length)];
+        if (!mover) continue;
+        from.members = from.members.filter(m => m.uid !== mover.uid);
+        from.listenerCount = from.members.length;
+        io.to(fromId).emit('room:member_left', { members: from.members, listenerCount: from.listenerCount });
 
-      to.members.push(mover);
-      to.listenerCount = to.members.length;
-      io.to(toId).emit('room:member_joined', { members: to.members, listenerCount: to.listenerCount });
-    }
+        to.members.push(mover);
+        to.listenerCount = to.members.length;
+        io.to(toId).emit('room:member_joined', { members: to.members, listenerCount: to.listenerCount });
+      }
 
-    // 2) Random bot drops a chat message
-    if (Math.random() < 0.6) {
-      const chatRoomId = roomIds[Math.floor(Math.random() * roomIds.length)];
-      const chatRoom = rooms.get(chatRoomId);
-      if (chatRoom) {
-        const botsInRoom = chatRoom.members.filter(m => m.uid.startsWith('bot_'));
-        const speaker = botsInRoom[Math.floor(Math.random() * botsInRoom.length)];
-        if (speaker) {
-          const msg = {
-            id: nanoid(10),
-            senderUid: speaker.uid,
-            senderName: speaker.displayName,
-            type: 'text',
-            content: BOT_CHAT_LINES[Math.floor(Math.random() * BOT_CHAT_LINES.length)],
-            timestamp: Date.now()
-          };
-          chatRoom.chat.push(msg);
-          if (chatRoom.chat.length > 100) chatRoom.chat.shift();
-          io.to(chatRoomId).emit('room:chat_new', msg);
+      // 2) Random bot drops a chat message
+      if (Math.random() < 0.6) {
+        const chatRoomId = roomIds[Math.floor(Math.random() * roomIds.length)];
+        const chatRoom = rooms.get(chatRoomId);
+        if (chatRoom) {
+          const botsInRoom = chatRoom.members.filter(m => m.uid.startsWith('bot_'));
+          const speaker = botsInRoom[Math.floor(Math.random() * botsInRoom.length)];
+          if (speaker) {
+            const msg = {
+              id: nanoid(10),
+              senderUid: speaker.uid,
+              senderName: speaker.displayName,
+              type: 'text',
+              content: BOT_CHAT_LINES[Math.floor(Math.random() * BOT_CHAT_LINES.length)],
+              timestamp: Date.now()
+            };
+            chatRoom.chat.push(msg);
+            if (chatRoom.chat.length > 100) chatRoom.chat.shift();
+            io.to(chatRoomId).emit('room:chat_new', msg);
+          }
         }
       }
-    }
 
-    // 3) Refresh the song pool periodically (cached)
-    await refreshBotPool();
+      // 3) Refresh the song pool periodically (cached)
+      await refreshBotPool();
 
-    // 4) Push a playback sync to rooms with real listeners so they stay glued to the bot clock
-    for (const roomId of botRooms) {
-      const room = rooms.get(roomId);
-      if (!room || !room.currentTrack) continue;
-      if (hasRealListeners(room)) {
-        io.to(roomId).emit('room:playback_sync', { isPlaying: room.isPlaying, currentTime: room.currentTime });
+      // 4) Push a playback sync to rooms with real listeners so they stay glued to the bot clock
+      for (const roomId of botRooms) {
+        const room = rooms.get(roomId);
+        if (!room || !room.currentTrack) continue;
+        if (hasRealListeners(room)) {
+          io.to(roomId).emit('room:playback_sync', { isPlaying: room.isPlaying, currentTime: room.currentTime });
+        }
       }
+    } catch (cronErr) {
+      console.warn('[Bot Activity Cron Error]:', cronErr.message);
     }
   }, 3 * 60 * 1000);
 }
