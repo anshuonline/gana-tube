@@ -864,37 +864,48 @@ app.get('/api/synced-lyrics', async (req, res) => {
 
 
 
-// Proxy for YouTube Data API Search Fallback
+// Search endpoint: strictly powered by npm ytmusic-api (0 quota, unlimited)
 app.get('/api/yt-search', async (req, res) => {
-  const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'YOUTUBE_API_KEY missing in backend' });
+  const query = req.query.q || '';
+  if (!query) return res.json({ items: [] });
 
   try {
-    const params = new URLSearchParams({
-      part: req.query.part || 'snippet',
-      q: req.query.q || '',
-      type: req.query.type || 'video',
-      videoCategoryId: req.query.videoCategoryId || '10',
-      maxResults: req.query.maxResults || '20',
-      key: apiKey
+    const yt = await getYTMusic();
+    const songs = await yt.searchSongs(query);
+    const items = (songs || []).map(song => {
+      const artistName = (song.artist && typeof song.artist === 'object')
+        ? song.artist.name
+        : (typeof song.artist === 'string' ? song.artist : 'Unknown Artist');
+      const thumbs = song.thumbnails || [];
+      const thumbUrl = song.videoId 
+        ? `https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg` 
+        : (thumbs[0]?.url || '');
+      return {
+        id: { videoId: song.videoId },
+        snippet: {
+          title: song.name || song.title,
+          channelTitle: artistName,
+          thumbnails: {
+            default: { url: thumbUrl },
+            medium: { url: thumbUrl },
+            high: { url: thumbUrl }
+          },
+          publishedAt: new Date().toISOString()
+        }
+      };
     });
-
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`);
-    if (!response.ok) throw new Error(`YouTube API returned ${response.status}`);
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching yt-search:', error);
-    res.status(500).json({ error: 'Failed to fetch from YouTube Search API' });
+    res.json({ items });
+  } catch (ytmErr) {
+    console.warn('[yt-search] YTMusic search error:', ytmErr.message);
+    res.json({ items: [] });
   }
 });
 
-// Proxy for YouTube Data API Videos details: Primary = Free YTMusic Scraper (0 Quota), Fallback = YouTube Data API
+// Video details endpoint: strictly powered by npm ytmusic-api (0 quota)
 app.get('/api/yt-videos', async (req, res) => {
   const ids = (req.query.id || '').split(',').filter(Boolean);
   if (ids.length === 0) return res.json({ items: [] });
 
-  // 1. PRIMARY: Free YTMusic scraper (Zero API quota used)
   try {
     const yt = await getYTMusic();
     const results = await Promise.all(ids.map(async (id) => {
@@ -924,33 +935,10 @@ app.get('/api/yt-videos', async (req, res) => {
     }));
 
     const validItems = results.filter(Boolean);
-    if (validItems.length > 0) {
-      return res.json({ items: validItems });
-    }
+    res.json({ items: validItems });
   } catch (ytError) {
-    console.warn('[yt-videos] Primary scraper failed, checking fallback API key:', ytError.message);
-  }
-
-  // 2. FALLBACK: Only if free scraper fails and YOUTUBE_API_KEY is configured
-  const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Failed to fetch video details and no fallback API key configured' });
-  }
-
-  try {
-    const params = new URLSearchParams({
-      part: req.query.part || 'snippet,contentDetails',
-      id: req.query.id || '',
-      key: apiKey
-    });
-
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params.toString()}`);
-    if (!response.ok) throw new Error(`YouTube API returned ${response.status}`);
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching yt-videos fallback:', error);
-    res.status(500).json({ error: 'Failed to fetch from YouTube Videos API' });
+    console.warn('[yt-videos] YTMusic scraper error:', ytError.message);
+    res.json({ items: [] });
   }
 });
 
