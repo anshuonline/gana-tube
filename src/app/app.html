@@ -925,11 +925,11 @@
                   <!-- Brand Header Row: Logo + Brand Name + Verified -->
                   <div class="product-brand-row">
                     <div class="product-logo-box">
-                      <img src="https://freesong.in/images/freesonglogowebp.webp"
+                      <img src="/images/freesonglogo.webp"
                            alt="FreeSong.in Logo"
                            class="product-brand-img"
                            loading="lazy"
-                           (error)="$any($event.target).src = '/assets/images/freesonglogo.webp'" />
+                           (error)="$any($event.target).onerror = null; $any($event.target).src = 'ganatubenewlogo.png'" />
                     </div>
                     <div class="brand-text-col">
                       <div class="brand-name-wrap">

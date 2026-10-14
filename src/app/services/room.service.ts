@@ -77,7 +77,12 @@ export class RoomService {
       ? (environment as any).backendUrl.replace('/api', '') 
       : 'http://localhost:3000';
       
-    this.socket = io(backendUrl);
+    this.socket = io(backendUrl, {
+      transports: ['websocket', 'polling'],
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
+      reconnectionAttempts: 10
+    });
 
     this.socket.on('connect', () => {
       console.log('Connected to Listen Together server, id:', this.socket.id);

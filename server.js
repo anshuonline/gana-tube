@@ -76,6 +76,51 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
+// ── Global IP Rate Limiter (Protects server from rogue client loops & bots) ──
+const ipRequestWindow = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const MAX_REQUESTS_PER_MINUTE = 150;     // Max 150 requests per minute per IP (~2.5 req/sec sustained)
+
+// Auto-cleanup stale IP records every 60 seconds
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of ipRequestWindow.entries()) {
+    if (now - data.windowStart > RATE_LIMIT_WINDOW_MS) {
+      ipRequestWindow.delete(ip);
+    }
+  }
+}, RATE_LIMIT_WINDOW_MS);
+
+app.use((req, res, next) => {
+  // Extract real client IP behind Cloudflare / LiteSpeed proxies
+  const clientIp = req.headers['cf-connecting-ip'] || 
+                   req.headers['x-real-ip'] || 
+                   (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : '') || 
+                   req.socket.remoteAddress || 
+                   'unknown';
+
+  const now = Date.now();
+  let record = ipRequestWindow.get(clientIp);
+
+  if (!record || (now - record.windowStart) > RATE_LIMIT_WINDOW_MS) {
+    record = { windowStart: now, count: 1 };
+    ipRequestWindow.set(clientIp, record);
+    return next();
+  }
+
+  record.count++;
+
+  if (record.count > MAX_REQUESTS_PER_MINUTE) {
+    res.setHeader('Retry-After', '60');
+    return res.status(429).json({ 
+      error: 'Too Many Requests', 
+      message: 'Rate limit exceeded. Please wait a moment.' 
+    });
+  }
+
+  next();
+});
+
 let ytmusicInstance = null;
 
 // Artist data cache (24h TTL) — artist images/data rarely change
@@ -1032,6 +1077,17 @@ app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
+
+  // CRITICAL: Never return index.html for missing static assets (images, fonts, scripts, stylesheets)
+  // Returning HTML for missing assets corrupts browser caches and creates infinite image error loops
+  if (
+    /\.(webp|png|jpe?g|gif|svg|ico|css|js|map|woff2?|ttf|eot|webmanifest|mp3|mp4|webm)$/i.test(req.path) ||
+    req.path.startsWith('/assets/') ||
+    req.path.startsWith('/images/')
+  ) {
+    return res.status(404).type('text/plain').send('File not found');
+  }
+
   res.sendFile(path.join(__dirname, 'dist', 'ganatube', 'browser', 'index.html'));
 });
 

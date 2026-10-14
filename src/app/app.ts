@@ -2926,6 +2926,8 @@ export class App implements OnInit {
 
   onImgError(event: Event, track: YouTubeSearchResult): void {
     const img = event.target as HTMLImageElement;
+    if (!img) return;
+    img.onerror = null;
     img.src = `https://img.youtube.com/vi/${track.videoId}/hqdefault.jpg`;
   }
 
