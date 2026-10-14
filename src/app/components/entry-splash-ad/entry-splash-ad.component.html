@@ -9,16 +9,17 @@
     <!-- Ambient glow behind modal -->
     <div class="gt-entry-splash-ambient" aria-hidden="true"></div>
 
-    <!-- Corner badge: countdown while active, switch to close (X) when unlocked -->
+    <!-- Corner badge: spinner while loading, countdown while active, switch to close (X) when unlocked -->
     <button
       type="button"
       class="gt-entry-splash-corner"
       [class.closable]="canClose()"
       (click)="canClose() ? closeModal() : null"
-      [attr.aria-label]="canClose() ? 'Close ad' : 'Ad closes in ' + countdown() + ' seconds'"
+      [attr.aria-label]="canClose() ? 'Close ad' : (!adLoaded() ? 'Loading advertisement' : 'Ad closes in ' + countdown() + ' seconds')"
       [disabled]="!canClose()"
     >
-      <ng-container *ngIf="!canClose()">{{ countdown() }}</ng-container>
+      <div class="corner-spinner" *ngIf="!adLoaded()"></div>
+      <ng-container *ngIf="adLoaded() && !canClose()">{{ countdown() }}</ng-container>
       <svg *ngIf="canClose()" lucideX [attr.size]="16"></svg>
     </button>
 
@@ -35,6 +36,16 @@
 
     <!-- 300x250 Ad Container Host -->
     <div class="gt-entry-splash-ad-host" #adHost aria-hidden="true">
+      <!-- Loading shimmer skeleton while waiting for ad to render -->
+      <div class="gt-entry-splash-shimmer" *ngIf="!adLoaded() && hasAdScript()">
+        <div class="shimmer-pulse"></div>
+        <div class="shimmer-badge">
+          <span class="shimmer-dot"></span>
+          <span>SPONSORED PASS</span>
+        </div>
+        <span class="shimmer-text">Loading 300 × 250 Ad…</span>
+      </div>
+
       <!-- Placeholder card shown when adScript is empty -->
       <div class="gt-entry-splash-placeholder" *ngIf="!hasAdScript()">
         <div class="placeholder-icon-wrap">
@@ -71,8 +82,11 @@
         </svg>
       </ng-container>
       <ng-container *ngIf="!canClose()">
-        <span *ngIf="countdown() > 0">Please wait {{ countdown() }}s</span>
-        <span *ngIf="countdown() === 0">Loading ad…</span>
+        <span *ngIf="!adLoaded()" class="loading-state">
+          <span class="btn-spinner"></span>
+          Loading ad…
+        </span>
+        <span *ngIf="adLoaded() && countdown() > 0">Please wait {{ countdown() }}s</span>
       </ng-container>
     </button>
 

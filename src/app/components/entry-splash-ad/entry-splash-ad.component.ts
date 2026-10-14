@@ -62,16 +62,14 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
     this.markSeen();
     this.isVisible.set(true);
     this.lockScroll();
-
-    this.startCountdown();
   }
 
   ngAfterViewInit(): void {
     if (!this.isVisible()) return;
 
     if (!this.hasAdScript()) {
-      // No ad script configured yet — ready immediately so placeholder behaves smoothly
-      this.adLoaded.set(true);
+      // No ad script configured yet — ready immediately
+      this.onAdReady();
       return;
     }
 
@@ -115,7 +113,25 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
     } catch {}
   }
 
+  public onAdReady(): void {
+    if (this.adLoaded()) return;
+    this.adLoaded.set(true);
+
+    if (this.pullerInterval) {
+      clearInterval(this.pullerInterval);
+      this.pullerInterval = null;
+    }
+    if (this.safetyTimer) {
+      clearTimeout(this.safetyTimer);
+      this.safetyTimer = null;
+    }
+
+    this.startCountdown();
+    this.cdr.detectChanges();
+  }
+
   private startCountdown(): void {
+    if (this.countdownTimer) return;
     this.countdown.set(this.config.countdownSeconds);
 
     this.countdownTimer = setInterval(() => {
@@ -134,7 +150,10 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private injectAd(): void {
     const host = this.adHostRef?.nativeElement;
-    if (!host || !this.config.adScript) return;
+    if (!host || !this.config.adScript) {
+      this.onAdReady();
+      return;
+    }
 
     const baseline = new Set(Array.from(document.body.children));
     this.cleanupScriptFn = this.executeAdHtml(host, this.config.adScript);
@@ -150,9 +169,7 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
 
       const container = this.adHostRef.nativeElement;
       if (container.querySelector('iframe, ins, embed, video, img')) {
-        this.adLoaded.set(true);
-        clearInterval(this.pullerInterval);
-        this.cdr.detectChanges();
+        this.onAdReady();
         return;
       }
 
@@ -184,18 +201,15 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
           stray.style.transformOrigin = 'center center';
           stray.style.transform = `scale(${scale})`;
         }
-        this.adLoaded.set(true);
-        clearInterval(this.pullerInterval);
-        this.cdr.detectChanges();
-      } else if (tries >= 25) {
-        clearInterval(this.pullerInterval);
+        this.onAdReady();
+      } else if (tries >= 20) {
+        this.onAdReady();
       }
-    }, 400);
+    }, 300);
 
     // Safety timeout: user is never stuck if ad blocker is active or no-fill occurs
     this.safetyTimer = setTimeout(() => {
-      this.adLoaded.set(true);
-      this.cdr.detectChanges();
+      this.onAdReady();
     }, this.config.safetyTimeoutMs);
   }
 
@@ -215,6 +229,12 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
           });
           if (origScript.src) {
             script.src = origScript.src;
+            script.onload = () => {
+              setTimeout(() => this.onAdReady(), 400);
+            };
+            script.onerror = () => {
+              this.onAdReady();
+            };
           } else {
             script.textContent = origScript.textContent;
           }
@@ -228,6 +248,7 @@ export class EntrySplashAdComponent implements OnInit, AfterViewInit, OnDestroy 
       });
     } catch (e) {
       console.warn('[EntrySplashAd] Script injection issue:', e);
+      this.onAdReady();
     }
 
     return () => {

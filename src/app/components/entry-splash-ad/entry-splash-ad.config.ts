@@ -19,21 +19,19 @@ export const ENTRY_SPLASH_CONFIG = {
   storageKey: 'gt_entry_splash_seen',
 
   // Safety timeout in milliseconds: agar ad load na ho ya ad-blocker ho,
-  // to itni der baad skip button auto-unlock ho jayega taaki user phanse nahi.
-  safetyTimeoutMs: 12000,
+  // to itni der baad countdown auto-start ho jayega taaki user phanse nahi.
+  safetyTimeoutMs: 6000,
 
   // AD NETWORK SCRIPT CODE
-  // HilltopAds video slider ad unit
+  // Adsterra 300x250 Banner Ad Unit
   adScript: `<script>
-(function(iplkv){
-var d = document,
-    s = d.createElement('script'),
-    l = d.currentScript || d.scripts[d.scripts.length - 1];
-s.settings = iplkv || {};
-s.src = "\\/\\/massivesalad.com\\/b.XdVWsVd\\/GHla0fYsWVcF\\/ze\\/mm9Cu_Z\\/Url\\/kiPST\\/cu1cMnTfIT4gNmjMUytvNazTUWx\\/MJjCgA2\\/OiQX";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({})
-</script>`
+  atOptions = {
+    'key' : 'ea39d6f7f9636d606fda87856f77c46e',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highrevenueformat.com/ea39d6f7f9636d606fda87856f77c46e/invoke.js"></script>`
 };

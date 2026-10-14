@@ -85,6 +85,15 @@
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 2;
 
+  .corner-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ec4899;
+    border-radius: 50%;
+    animation: gtSpin 0.7s linear infinite;
+  }
+
   &.closable {
     cursor: pointer;
     color: #ffffff;
@@ -170,6 +179,72 @@
   iframe,
   ins {
     max-width: 100%;
+  }
+}
+
+// Shimmer skeleton loader in ad container
+.gt-entry-splash-shimmer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #07070b 0%, #12121a 100%);
+  z-index: 0;
+  pointer-events: none;
+
+  .shimmer-pulse {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: gtShimmer 1.8s infinite ease-in-out;
+  }
+
+  .shimmer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #f472b6;
+    letter-spacing: 0.08em;
+  }
+
+  .shimmer-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ec4899;
+    box-shadow: 0 0 6px #ec4899;
+    animation: gtPulse 1.5s infinite ease-in-out;
+  }
+
+  .shimmer-text {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.02em;
+  }
+}
+
+@keyframes gtShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
@@ -295,6 +370,23 @@
     transition: transform 0.2s ease;
   }
 
+  .loading-state {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #ec4899;
+    border-radius: 50%;
+    animation: gtSpin 0.7s linear infinite;
+  }
+
   &.active {
     cursor: pointer;
     background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
@@ -315,6 +407,15 @@
     &:active {
       transform: translateY(0);
     }
+  }
+}
+
+@keyframes gtSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
