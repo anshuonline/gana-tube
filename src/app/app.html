@@ -64,7 +64,7 @@
         </button>
 
         <div class="logo" routerLink="/">
-          <img src="ganatubenewlogo.png" alt="GanaTube Logo" class="logo-img" />
+          <img src="ganatube-logo.webp" alt="GanaTube Logo" class="logo-img" />
           <span class="logo-text">GanaTube.in</span>
         </div>
         <button class="header-share-btn" (click)="copyWebsiteLink()" title="Share Website">
@@ -413,21 +413,48 @@
         <div class="settings-group group-whatsnew">
           <h2 class="group-title">What's New</h2>
           <div class="setting-item whatsnew-item">
-            <div class="setting-info">
-              <h3>New UI Optimization <span class="new-badge">NEW</span></h3>
-              <p>Fresh modern look across search, home header and account settings.</p>
+            <div class="whatsnew-left">
+              <div class="whatsnew-icon-box ui-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+              </div>
+              <div class="setting-info">
+                <h3>New UI <span class="new-badge">NEW</span></h3>
+                <p>Complete Spotify-style playlist design, modern AMOLED Black aesthetic, and polished player interface.</p>
+              </div>
             </div>
           </div>
           <div class="setting-item whatsnew-item">
-            <div class="setting-info">
-              <h3>Performance Optimized <span class="new-badge">NEW</span></h3>
-              <p>Faster parallel fetching, smarter caching and smoother playback.</p>
+            <div class="whatsnew-left">
+              <div class="whatsnew-icon-box perf-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+              </div>
+              <div class="setting-info">
+                <h3>Performance Optimize <span class="new-badge">NEW</span></h3>
+                <p>Ultra-fast parallel song fetching, lag-free transitions, instant playback, and optimized memory usage.</p>
+              </div>
             </div>
           </div>
           <div class="setting-item whatsnew-item">
-            <div class="setting-info">
-              <h3>New Room Features <span class="new-badge">NEW</span></h3>
-              <p>Always-live listening rooms with hosts, synced music and live chat.</p>
+            <div class="whatsnew-left">
+              <div class="whatsnew-icon-box room-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path>
+                  <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path>
+                  <circle cx="12" cy="12" r="2"></circle>
+                  <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path>
+                  <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"></path>
+                </svg>
+              </div>
+              <div class="setting-info">
+                <h3>New Room Features <span class="new-badge">NEW</span></h3>
+                <p>Always-live listening rooms with hosts, synced music and live chat.</p>
+              </div>
             </div>
             <button class="q-btn" (click)="openRoomsPage()">Explore</button>
           </div>
@@ -699,86 +726,117 @@
     <app-shorts-page *ngIf="currentPage() === 'shorts'"></app-shorts-page>
 
     <div *ngIf="currentPage() === 'home' || currentPage() === 'search'" class="home-content">
-      <!-- Netflix / Amazon Prime Inspired Cinematic Hero Carousel -->
-      <section class="hero-carousel-section" *ngIf="!hasSearched() && !isSearchMode()"
+      <!-- Top Quick-Chips & Mood Pills Bar (YouTube Music / Spotify Style with PC Slide Controls) -->
+      <div class="quick-pills-wrapper" *ngIf="!isSearchMode()">
+        <button type="button" class="pills-nav-btn prev-btn" (click)="scrollPills('left')" aria-label="Previous" title="Scroll Left">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+
+        <div class="quick-pills-bar" #quickPillsRail>
+          <button type="button"
+                  class="quick-pill"
+                  [class.active]="activeChip() === chip"
+                  *ngFor="let chip of dynamicChips()"
+                  (click)="selectChip(chip)">
+            {{ chip }}
+          </button>
+          <button type="button"
+                  class="quick-pill lang-pill"
+                  (click)="openLanguageModal()"
+                  title="Customize Preferred Languages">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+            </svg>
+            <span>Languages</span>
+          </button>
+        </div>
+
+        <button type="button" class="pills-nav-btn next-btn" (click)="scrollPills('right')" aria-label="Next" title="Scroll Right">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <!-- Apple Music Editorial Spotlight Hero Carousel -->
+      <section class="editorial-hero-section" *ngIf="!hasSearched() && !isSearchMode()"
                (mouseenter)="onHeroMouseEnter()"
                (mouseleave)="onHeroMouseLeave()"
                (touchstart)="onHeroTouchStart($event)"
                (touchend)="onHeroTouchEnd($event)">
         
-        <div class="hero-carousel-card">
-          <!-- Slide Dynamic Backdrop Gradient -->
-          <div class="hero-card-backdrop" [style.background]="currentHeroSlide().gradient"></div>
-
-          <!-- Right Artwork / Singers Visual (Spans full height & edge-to-edge right side) -->
-          <div class="hero-visual-panel">
-            <div class="hero-visual-glow" [style.background]="currentHeroSlide().ambientGlow"></div>
-            <div class="hero-visual-images">
-              <img *ngFor="let slide of computedHeroSlides(); let i = index"
-                   [src]="slide.image"
-                   [alt]="slide.lang + ' Top Artists'"
-                   class="hero-singer-cutout"
-                   [class.active]="currentHeroSlideIndex() === i"
-                   (error)="onHeroImageError(slide, i, $event)"
-                   [attr.loading]="i === 0 ? 'eager' : 'lazy'"
-                   decoding="async">
-            </div>
-            <div class="hero-visual-overlay"></div>
-          </div>
-
-          <!-- Top Language Bar / Quick Carousel Switcher -->
-          <div class="hero-lang-bar">
-            <div class="hero-lang-scroll">
-              <button *ngFor="let slide of computedHeroSlides(); let i = index"
-                      class="hero-lang-chip"
-                      [class.active]="currentHeroSlideIndex() === i"
-                      (click)="selectHeroSlide(i)"
-                      type="button">
-                <span class="lang-dot" [style.background]="slide.accentColor"></span>
-                <span>{{ slide.lang }}</span>
-              </button>
-            </div>
-            
-            <button class="hero-manage-lang-btn" (click)="openLanguageModal()" title="Customize Preferred Languages" type="button">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/>
-              </svg>
-              <span class="manage-text">Languages</span>
-            </button>
-          </div>
-
-          <!-- Main Carousel Content Grid -->
-          <div class="hero-card-content">
-            <!-- Left Info Panel -->
-            <div class="hero-info-panel">
-              <div class="hero-badge-row">
-                <span class="hero-spotlight-badge" [style.border-color]="currentHeroSlide().accentColor + '55'" [style.color]="currentHeroSlide().accentColor">
-                  <span class="badge-pulse" [style.background]="currentHeroSlide().accentColor"></span>
-                  {{ currentHeroSlide().badge }}
-                </span>
-                <span class="hero-lang-tag">{{ currentHeroSlide().lang }} Spotlight</span>
+        <div class="editorial-hero-card">
+          <!-- Right Visual Panel (Red Geometric Shapes & 3-4 Playlist Tracks Mix Stack) -->
+          <div class="editorial-visual-panel">
+            <!-- Decorative Red Geometric Shapes Behind Stack -->
+            <div class="hero-red-shapes-backdrop" aria-hidden="true">
+              <div class="shape-glow-core"></div>
+              <div class="shape-glow-secondary"></div>
+              <div class="shape-ring shape-ring-outer"></div>
+              <div class="shape-ring shape-ring-inner"></div>
+              <div class="shape-angled-plate"></div>
+              <div class="shape-dot-grid"></div>
+              <div class="shape-red-diamond"></div>
+              <div class="shape-speed-lines"></div>
+              <div class="shape-equalizer-bars">
+                <span></span><span></span><span></span><span></span><span></span>
               </div>
+              <div class="shape-vinyl-disc">
+                <div class="vinyl-groove"></div>
+                <div class="vinyl-center-red"></div>
+              </div>
+            </div>
 
-              <h1 class="hero-carousel-title">{{ currentHeroSlide().title }}</h1>
-              
-              <p class="hero-carousel-artists" [title]="currentHeroSlide().artists">
-                {{ currentHeroSlide().artists }}
-              </p>
-              
-              <p class="hero-carousel-desc">
-                {{ currentHeroSlide().subtitle }}
-              </p>
+            <!-- 3-4 Playlist Music Artwork Stack -->
+            <div class="hero-playlist-art-stack" (click)="explorePlaylist(currentHeroSlide().lang)" [attr.aria-label]="'Listen to ' + currentHeroSlide().title">
+              <div *ngFor="let track of getHeroSlideTracks(currentHeroSlide()); let tIdx = index"
+                   class="stack-card stack-card-{{ tIdx }}"
+                   [attr.title]="(track.title || '') + (track.artist ? ' - ' + track.artist : '')">
+                <img [src]="track.image" [alt]="track.title || 'Track Cover'" loading="lazy" decoding="async">
+                <div class="stack-card-overlay">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
 
-              <!-- Action CTAs -->
-              <div class="hero-action-row">
-                <button class="hero-btn-primary" (click)="explorePlaylist(currentHeroSlide().lang)" type="button">
-                  <svg lucidePlay width="15" height="15" [attr.size]="15" fill="currentColor"></svg>
+          <!-- Editorial Card Content (Left Panel) -->
+          <div class="editorial-card-content">
+            <!-- Left Red Geometric Shapes Blended With Red Background -->
+            <div class="hero-left-red-shapes" aria-hidden="true">
+              <div class="left-red-ambient-mesh"></div>
+              <div class="left-shape-glow"></div>
+              <div class="left-shape-triangle">
+                <svg viewBox="0 0 100 100" width="100" height="100">
+                  <polygon points="50,12 90,88 10,88" fill="url(#leftRedTriGrad)" stroke="#ef4444" stroke-width="2" stroke-linejoin="round"/>
+                  <polygon points="50,28 78,80 22,80" fill="none" stroke="rgba(239, 68, 68, 0.4)" stroke-width="1.2" stroke-dasharray="3,3"/>
+                  <defs>
+                    <linearGradient id="leftRedTriGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.32" />
+                      <stop offset="100%" stop-color="#991b1b" stop-opacity="0.04" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="left-shape-prism"></div>
+              <div class="left-shape-dots"></div>
+            </div>
+
+            <div class="editorial-info-panel">
+              <span class="editorial-badge">FEATURED PLAYLIST • {{ currentHeroSlide().lang | uppercase }}</span>
+              <h1 class="editorial-title">{{ currentHeroSlide().title }}</h1>
+              <p class="editorial-artists" [title]="currentHeroSlide().artists">{{ currentHeroSlide().artists }}</p>
+              <p class="editorial-desc">{{ currentHeroSlide().subtitle }}</p>
+
+              <!-- Action CTA Row -->
+              <div class="editorial-action-row">
+                <button type="button" class="btn-listen-now" (click)="explorePlaylist(currentHeroSlide().lang)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                   <span>{{ currentHeroSlide().buttonText || 'Listen Now' }}</span>
                 </button>
-
-                <button class="hero-btn-secondary" (click)="browseLanguage(currentHeroSlide().lang)" type="button">
+                <button type="button" class="btn-explore-lang" (click)="browseLanguage(currentHeroSlide().lang)">
                   <span>Explore {{ currentHeroSlide().lang }}</span>
-                  <svg lucideChevronRight width="14" height="14" [attr.size]="14"></svg>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
               </div>
             </div>
@@ -786,13 +844,13 @@
 
           <!-- Left / Right Carousel Controls -->
           <button class="hero-nav-arrow prev" (click)="prevHeroSlide()" aria-label="Previous Slide" title="Previous Slide" type="button">
-            <svg lucideChevronLeft [attr.size]="22"></svg>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <button class="hero-nav-arrow next" (click)="nextHeroSlide()" aria-label="Next Slide" title="Next Slide" type="button">
-            <svg lucideChevronRight [attr.size]="22"></svg>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
-          <!-- Bottom Indicator Dots / Progress Bars -->
+          <!-- Bottom Slide Indicators -->
           <div class="hero-indicators" [class.paused]="isHeroPaused()">
             <button *ngFor="let slide of computedHeroSlides(); let i = index"
                     class="hero-indicator-dot"
@@ -803,7 +861,7 @@
               <span class="indicator-track">
                 <span class="indicator-fill" 
                       *ngIf="currentHeroSlideIndex() === i"
-                      [style.background]="slide.accentColor || 'linear-gradient(90deg, #a855f7, #ec4899)'"></span>
+                      [style.background]="'var(--gradient-primary)'"></span>
               </span>
             </button>
           </div>
@@ -897,116 +955,131 @@
             </div>
           </div>
 
-          <!-- Featured Spotlight Section (Above Suggested for You) -->
-          <section class="product-updates-section spotlight-theme" *ngIf="!shelvesLoading() && loadedShelves().length > 0">
-            <div class="product-updates-header">
-              <div class="spotlight-title-row">
-                <span class="spotlight-dot"></span>
-                <span class="product-updates-tag">FEATURED SPOTLIGHT</span>
-              </div>
-              <span class="product-updates-sub">Discover Next-Gen Streaming</span>
-            </div>
-
-            <div class="product-updates-grid">
-              <div class="product-update-card freesong-card">
-                <div class="product-card-ambient"></div>
-
-                <div class="card-inner-content">
-                  <!-- Badges Bar -->
-                  <div class="product-badges">
-                    <span class="badge-pill pill-emerald">
-                      <span class="live-dot"></span>
-                      BETA PHASE
-                    </span>
-                    <span class="badge-pill pill-subtle">NEXT-GEN PLATFORM</span>
-                    <span class="badge-pill pill-highlight">ULTRA SMOOTH</span>
-                  </div>
-
-                  <!-- Brand Header Row: Logo + Brand Name + Verified -->
-                  <div class="product-brand-row">
-                    <div class="product-logo-box">
-                      <img src="/images/freesonglogo.webp"
-                           alt="FreeSong.in Logo"
-                           class="product-brand-img"
-                           loading="lazy"
-                           (error)="$any($event.target).onerror = null; $any($event.target).src = 'ganatubenewlogo.png'" />
-                    </div>
-                    <div class="brand-text-col">
-                      <div class="brand-name-wrap">
-                        <h3 class="product-name">FreeSong.in</h3>
-                        <span class="verified-badge" title="Official Partner Platform">
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="#10b981">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                          </svg>
-                        </span>
-                      </div>
-                      <span class="product-tagline">Massive song collection • Instant playback</span>
-                    </div>
-                  </div>
-
-                  <!-- Description -->
-                  <p class="product-desc">
-                    Better and larger collection of songs with dynamic playlists, lightning fast streaming and ultra-smooth experience.
-                    Currently in beta phase — try it out and give feedback to improve!
-                  </p>
-
-                  <!-- Feature Highlights Chips (YouTube style) -->
-                  <div class="product-feature-chips">
-                    <span class="feature-chip">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                      </svg>
-                      Lightning Fast
-                    </span>
-                    <span class="feature-chip">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
-                      </svg>
-                      Dynamic Playlists
-                    </span>
-                    <span class="feature-chip">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path>
-                      </svg>
-                      Smooth UI
-                    </span>
-                    <span class="feature-chip">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line>
-                      </svg>
-                      Background Play Available in FreeSong
-                    </span>
-                    <span class="feature-chip">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
-                      </svg>
-                      No More Stops on Lock Screen
-                    </span>
-                  </div>
-
-                  <!-- Action Buttons -->
-                  <div class="product-actions">
-                    <a href="https://freesong.in" target="_blank" rel="noopener noreferrer" class="btn-product-open">
-                      <span>Try FreeSong.in</span>
-                      <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="7" y1="17" x2="17" y2="7"></line>
-                        <polyline points="7 7 17 7 17 17"></polyline>
-                      </svg>
-                    </a>
-                    <button type="button" class="btn-product-copy" (click)="copyFreeSongLink()">
-                      <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" *ngIf="!freeSongLinkCopied">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                      <span *ngIf="!freeSongLinkCopied">Copy link</span>
-                      <span *ngIf="freeSongLinkCopied" class="copied-indicator">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Copied!
-                      </span>
+          <!-- Spotify-Style Quick Access 6-Grid ("Good morning / afternoon / evening") -->
+          <section class="spotify-quick-section" *ngIf="!shelvesLoading() && getQuickPicksTracks().length > 0">
+            <h2 class="quick-greeting">{{ getGreeting() }}</h2>
+            <div class="spotify-quick-grid">
+              <div class="spotify-quick-card" *ngFor="let track of getQuickPicksTracks()" (click)="onPlayTrack(track, getQuickPicksTracks())" (contextmenu)="onRightClick($event, track)" [class.active]="playerService.currentTrack()?.videoId === track.videoId">
+                <div class="quick-card-thumb-wrap">
+                  <img [src]="track.thumbnail" [alt]="track.title" class="quick-card-thumb" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
+                  <div class="quick-play-overlay">
+                    <button type="button" class="quick-play-btn" (click)="playerService.currentTrack()?.videoId === track.videoId ? playerService.togglePlayPause() : onPlayTrack(track, getQuickPicksTracks()); $event.stopPropagation()" [class.playing]="playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying()" aria-label="Play Track">
+                      <svg *ngIf="!(playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying())" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      <svg *ngIf="playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying()" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                     </button>
                   </div>
+                </div>
+                <div class="quick-card-info">
+                  <span class="quick-card-title" [title]="track.title">{{ track.title }}</span>
+                  <span class="quick-card-channel" [title]="track.channelTitle">{{ track.channelTitle }}</span>
+                </div>
+                <button type="button" class="quick-card-menu-btn" (click)="toggleMenu(track, $event); $event.stopPropagation()" title="Options">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- FreeSong.in Featured Spotlight Card -->
+          <section class="spotlight-theme" *ngIf="!shelvesLoading() && loadedShelves().length > 0">
+            <div class="modern-spotlight-card freesong-card">
+              <div class="product-card-ambient"></div>
+
+              <div class="card-inner-content">
+                <!-- Badges Bar -->
+                <div class="product-badges">
+                  <span class="badge-pill pill-emerald">
+                    <span class="live-dot"></span>
+                    BETA PHASE
+                  </span>
+                  <span class="badge-pill pill-subtle">NEXT-GEN PLATFORM</span>
+                  <span class="badge-pill pill-highlight">ULTRA SMOOTH</span>
+                </div>
+
+                <!-- Brand Header Row: Logo + Brand Name + Verified -->
+                <div class="product-brand-row">
+                  <div class="product-logo-box">
+                    <img src="/images/freesonglogo.webp"
+                         alt="FreeSong.in Logo"
+                         class="product-brand-img"
+                         loading="lazy"
+                         (error)="$any($event.target).onerror = null; $any($event.target).src = 'ganatube-logo.webp'" />
+                  </div>
+                  <div class="brand-text-col">
+                    <div class="brand-name-wrap">
+                      <h3 class="product-name">FreeSong.in</h3>
+                      <span class="verified-badge" title="Official Partner Platform">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="#10b981">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                      </span>
+                    </div>
+                    <span class="product-tagline">Massive song collection • Instant playback</span>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <p class="product-desc">
+                  Better and larger collection of songs with dynamic playlists, lightning fast streaming and ultra-smooth experience.
+                  Currently in beta phase — try it out and give feedback to improve!
+                </p>
+
+                <!-- Feature Highlights Chips (YouTube style) -->
+                <div class="product-feature-chips">
+                  <span class="feature-chip">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    Lightning Fast
+                  </span>
+                  <span class="feature-chip">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                    Dynamic Playlists
+                  </span>
+                  <span class="feature-chip">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path>
+                    </svg>
+                    Smooth UI
+                  </span>
+                  <span class="feature-chip">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                    Background Play Available in FreeSong
+                  </span>
+                  <span class="feature-chip">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                    </svg>
+                    No More Stops on Lock Screen
+                  </span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="product-actions">
+                  <a href="https://freesong.in" target="_blank" rel="noopener noreferrer" class="btn-product-open">
+                    <span>Try FreeSong.in</span>
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  </a>
+                  <button type="button" class="btn-product-copy" (click)="copyFreeSongLink()">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" *ngIf="!freeSongLinkCopied">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span *ngIf="!freeSongLinkCopied">Copy link</span>
+                    <span *ngIf="freeSongLinkCopied" class="copied-indicator">
+                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      Copied!
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -1015,65 +1088,101 @@
           <!-- Dynamic Shelves Loop -->
           <div class="shelf-section" *ngFor="let shelf of loadedShelves(); let shelfIdx = index; trackBy: shelfTrackBy">
             
-            <!-- Standard Shelf Layout -->
+            <!-- Standard Shelf Layout (Spotify & Apple Music Standard Album/Song Cards) -->
             <ng-container *ngIf="!isSuggestedListLayout(shelf, shelfIdx)">
               <div class="shelf-header">
                 <h2 class="shelf-title">{{ getShelfDisplayTitle(shelf) }}</h2>
                 <div class="shelf-controls">
-                  <button class="shelf-more-btn" *ngIf="shelf.songs.length > 0" (click)="openShelfModal(shelf)" [title]="'View all songs in ' + getShelfDisplayTitle(shelf)">
+                  <button type="button" class="shelf-more-btn" *ngIf="shelf.songs.length > 0" (click)="openShelfModal(shelf)" [title]="'View all songs in ' + getShelfDisplayTitle(shelf)">
                     <span>More</span>
                   </button>
                   <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
-                    <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
+                    <button type="button" class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, -600)" title="Scroll Left">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
-                    <button class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
+                    <button type="button" class="shelf-nav-btn" (click)="scrollShelf(shelfGrid, 600)" title="Scroll Right">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                   </div>
                 </div>
               </div>
               <div class="shelf-grid" #shelfGrid>
-                <div class="song-card" *ngFor="let track of shelf.songs.slice(0, 15); trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)" (mouseenter)="onCardHover(track, true)" (mouseleave)="onCardHover(track, false)" (touchstart)="onCardHover(track, true)" (touchend)="onCardHover(track, false)">
-                  <div class="card-thumbnail">
+                <div class="modern-song-card" *ngFor="let track of shelf.songs.slice(0, 15); trackBy: trackByVideoId"
+                     [class.active]="playerService.currentTrack()?.videoId === track.videoId"
+                     [class.menu-open]="activeMenuTrack()?.videoId === track.videoId"
+                     (click)="onPlayTrack(track, shelf.songs)"
+                     (contextmenu)="onRightClick($event, track)"
+                     (mouseenter)="onCardHover(track, true)"
+                     (mouseleave)="onCardHover(track, false)"
+                     (touchstart)="onCardHover(track, true)"
+                     (touchend)="onCardHover(track, false)">
+                  <div class="modern-card-thumb">
                     <img [src]="track.thumbnailHigh || track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
-                    <div class="thumbnail-overlay">
-                      <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId">
-                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                      </div>
-                      <button class="play-btn-overlay" *ngIf="playerService.currentTrack()?.videoId !== track.videoId">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
-                      </button>
+                    
+                    <!-- Equalizer Wave Animation (Active Song) -->
+                    <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying()">
+                      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                     </div>
-                    <button class="track-options-btn" (click)="toggleMenu(track, $event)">
-                      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+
+                    <!-- Floating Circular Play Button (Bottom Right) -->
+                    <button type="button" class="play-fab" [class.playing]="playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying()" aria-label="Play">
+                      <svg *ngIf="!(playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying())" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      <svg *ngIf="playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying()" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                    </button>
+
+                    <!-- 3-Dots Menu Button (Top Right) -->
+                    <button type="button" class="track-options-btn" (click)="toggleMenu(track, $event); $event.stopPropagation()" title="Options">
+                      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                     </button>
                   </div>
-                  <div class="card-info">
-                    <p class="track-channel">{{ track.channelTitle | uppercase }}</p>
-                    <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
+                  <div class="modern-card-info">
+                    <h4 class="modern-track-title" [title]="track.title">{{ track.title }}</h4>
+                    <p class="modern-track-channel" [title]="track.channelTitle">{{ track.channelTitle }}</p>
                   </div>
                 </div>
               </div>
             </ng-container>
             
-            <!-- Suggested for You List Layout (Hidden on Mobile) -->
+            <!-- YouTube Music 4-row Quick Picks layout (When isSuggestedListLayout(shelf, shelfIdx)) -->
             <ng-container *ngIf="isSuggestedListLayout(shelf, shelfIdx)">
               <div class="shelf-header">
                 <h2 class="shelf-title">{{ getShelfDisplayTitle(shelf) }}</h2>
-              </div>
-              <div class="suggested-list-grid">
-                <div class="suggested-list-item" *ngFor="let track of shelf.songs.slice(0, 8); trackBy: trackByVideoId" [class.active]="playerService.currentTrack()?.videoId === track.videoId" [class.menu-open]="activeMenuTrack()?.videoId === track.videoId" (click)="onPlayTrack(track, shelf.songs)">
-                  <img class="suggested-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
-                  <div class="suggested-info">
-                    <div class="suggested-artist">{{ track.channelTitle | uppercase }}</div>
-                    <div class="suggested-title" [title]="track.title">{{ track.title }}</div>
-                  </div>
-                  <div class="suggested-actions">
-                    <button class="track-options-btn suggested-menu-btn" (click)="toggleMenu(track, $event)">
-                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                <div class="shelf-controls">
+                  <button type="button" class="shelf-more-btn" *ngIf="shelf.songs.length > 0" (click)="openShelfModal(shelf)" [title]="'View all songs in ' + getShelfDisplayTitle(shelf)">
+                    <span>More</span>
+                  </button>
+                  <div class="shelf-nav-buttons" *ngIf="shelf.songs.length > 4">
+                    <button type="button" class="shelf-nav-btn" (click)="scrollShelf(ytmRail, -600)" title="Scroll Left">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button type="button" class="shelf-nav-btn" (click)="scrollShelf(ytmRail, 600)" title="Scroll Right">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                   </div>
+                </div>
+              </div>
+              <div class="ytm-quick-picks-rail" #ytmRail>
+                <div class="ytm-quick-pick-item" *ngFor="let track of (shelf.songs || []).slice(0, 48); trackBy: trackByVideoId"
+                     [class.active]="playerService.currentTrack()?.videoId === track.videoId"
+                     [class.menu-open]="activeMenuTrack()?.videoId === track.videoId"
+                     (click)="onPlayTrack(track, shelf.songs)"
+                     (contextmenu)="onRightClick($event, track)">
+                  <div class="ytm-pick-thumb-wrap">
+                    <img class="ytm-pick-thumb" [src]="track.thumbnail" [alt]="track.title" loading="lazy" referrerpolicy="no-referrer" (error)="onImgError($event, track)" />
+                    <div class="ytm-pick-play-overlay">
+                      <div class="play-ripple" *ngIf="playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying()">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                      </div>
+                      <svg *ngIf="!(playerService.currentTrack()?.videoId === track.videoId && playerService.isPlaying())" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="ytm-pick-info">
+                    <h4 class="ytm-pick-title" [title]="track.title">{{ track.title }}</h4>
+                    <p class="ytm-pick-artist" [title]="track.channelTitle">{{ track.channelTitle }}</p>
+                  </div>
+                  <button type="button" class="ytm-pick-menu-btn track-options-btn" (click)="toggleMenu(track, $event); $event.stopPropagation()" title="Options">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                  </button>
                 </div>
               </div>
             </ng-container>
@@ -1100,10 +1209,10 @@
                   <h2 class="shelf-title">Top Artists</h2>
                   <div class="shelf-controls">
                     <div class="shelf-nav-buttons" *ngIf="currentTopArtists().length > 4">
-                      <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, -600)" title="Scroll Left">
+                      <button type="button" class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, -600)" title="Scroll Left">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                       </button>
-                      <button class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, 600)" title="Scroll Right">
+                      <button type="button" class="shelf-nav-btn" (click)="scrollShelf(artistsGrid, 600)" title="Scroll Right">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                       </button>
                     </div>
@@ -1136,10 +1245,10 @@
                 <div class="artists-header" style="text-align: center; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; gap: 16px;">
                   <h2 style="font-size: 1.35rem; letter-spacing: 0.15em; font-weight: 800; text-transform: uppercase;">PLAYLISTS</h2>
                   <div class="shelf-nav-buttons" style="display: flex; gap: 8px;">
-                    <button class="shelf-nav-btn" (click)="scrollShelf(playlistsGrid, -600)" title="Scroll Left">
+                    <button type="button" class="shelf-nav-btn" (click)="scrollShelf(playlistsGrid, -600)" title="Scroll Left">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
-                    <button class="shelf-nav-btn" (click)="scrollShelf(playlistsGrid, 600)" title="Scroll Right">
+                    <button type="button" class="shelf-nav-btn" (click)="scrollShelf(playlistsGrid, 600)" title="Scroll Right">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                   </div>
@@ -1153,7 +1262,7 @@
                         <span style="font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;">{{ getInitials(playlist.title) }}</span>
                       </div>
                       <div class="thumbnail-overlay">
-                        <button class="play-btn-overlay">
+                        <button type="button" class="play-btn-overlay">
                           <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style="display: block; margin: 0 auto;"><path d="M8 5v14l11-7z"/></svg>
                         </button>
                       </div>
@@ -1218,7 +1327,7 @@
 
         <!-- Lazy Loading Spinner Placeholder (home shelves only; search uses the Load More button) -->
         <div class="lazy-loading-placeholder" *ngIf="isLazyLoading() && !hasSearched()" style="padding: 30px 0; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-          <div class="spinner" style="width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #a855f7; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
+          <div class="spinner" style="width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--color-primary); border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
           <span>Searching more songs...</span>
         </div>
       </div>
@@ -1785,6 +1894,7 @@
   [isOpen]="!!activeMenuTrack()"
   [xPos]="activeMenuPosition()?.x || 0"
   [yPos]="activeMenuPosition()?.y || 0"
+  [isContextMenu]="activeMenuPosition()?.isContextMenu || false"
   (closeMenu)="closeMenu()"
   (openPlaylist)="openSaveToPlaylist($event)">
 </app-track-menu>
@@ -1880,9 +1990,6 @@
 
 <!-- Promo Popup (ManageGT controlled, frequency-based) -->
 <app-promo-popup-modal *ngIf="!isAdminPage()"></app-promo-popup-modal>
-
-<!-- Background Play announcement (one-time per device) -->
-<app-background-play-popup *ngIf="!isAdminPage()"></app-background-play-popup>
 
 <!-- Entry Splash Ad Gate (24-hour reward interstitial) -->
 <app-entry-splash-ad *ngIf="!isAdminPage()"></app-entry-splash-ad>

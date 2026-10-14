@@ -19,9 +19,7 @@ export class SpinService {
   public spinsLeft = signal<number>(-1); // -1 means uninitialized
   public gCoins = signal<number>(0);
   
-  private apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-    ? 'http://localhost/manageads/wheel-api.php' 
-    : 'https://manageads.ganatube.in/wheel-api.php';
+  private apiUrl = 'https://manageads.ganatube.in/wheel-api.php';
   
   constructor() {
     effect(() => {

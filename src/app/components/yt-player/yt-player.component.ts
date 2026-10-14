@@ -333,7 +333,7 @@ export class YtPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
           p.setSize(w, h);
         }
 
-        el.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;z-index:30;opacity:1;pointer-events:none;border-radius:16px;border:1px solid rgba(236,72,153,0.35);box-shadow:0 16px 48px rgba(0,0,0,0.8),0 0 32px rgba(139,92,246,0.25);overflow:hidden;`;
+        el.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;z-index:30;opacity:1;pointer-events:none;border-radius:16px;border:1px solid rgba(var(--color-primary-rgb),0.35);box-shadow:0 16px 48px rgba(0,0,0,0.8),0 0 32px rgba(var(--color-primary-rgb),0.25);overflow:hidden;`;
       } else {
         el.classList.remove('video-active');
         el.style.cssText = on ? 'display:none;' : '';

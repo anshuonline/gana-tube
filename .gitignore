@@ -90,3 +90,5 @@ src/environments/environment.development.ts
 .env
 bot/.env
 .env.*
+nul
+nul.map

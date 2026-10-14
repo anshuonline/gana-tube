@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, HostListener, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerService, Track } from '../../services/player.service';
 import { AuthService } from '../../services/auth.service';
@@ -48,12 +48,13 @@ import { YoutubeApiService } from '../../services/youtube-api.service';
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
 })
-export class TrackMenuComponent implements OnChanges {
+export class TrackMenuComponent implements OnInit, OnChanges {
   @Input() track: any;
   @Input() isOpen = false;
   
   @Input() xPos = 0;
   @Input() yPos = 0;
+  @Input() isContextMenu = false;
   
   calculatedX = 0;
   calculatedY = 0;
@@ -86,6 +87,12 @@ export class TrackMenuComponent implements OnChanges {
     this.checkScreenSize();
   }
 
+  ngOnInit() {
+    this.checkScreenSize();
+    this.calculatePosition();
+    this.loadArtistImage();
+  }
+
   @HostListener('window:resize')
   checkScreenSize() {
     this.isMobile = window.innerWidth <= 768;
@@ -96,7 +103,48 @@ export class TrackMenuComponent implements OnChanges {
   onDocumentClick(event: Event) {
     if (this.isOpen) {
       const target = event.target as HTMLElement;
-      if (!target.closest('.track-menu-container') && !target.closest('.icon-btn') && !target.closest('.track-options-btn')) {
+      if (!target) return;
+      if (
+        !target.closest('.track-menu-container') &&
+        !target.closest('.icon-btn') &&
+        !target.closest('.track-options-btn') &&
+        !target.closest('.quick-card-menu-btn') &&
+        !target.closest('.ytm-pick-menu-btn') &&
+        !target.closest('.card-menu-btn') &&
+        !target.closest('.fs-song-menu-btn') &&
+        !target.closest('.fs-card-menu-btn') &&
+        !target.closest('.fs-row-menu-btn') &&
+        !target.closest('.fs-spotlight-menu-btn') &&
+        !target.closest('.track-menu-trigger') &&
+        !target.closest('[data-menu-trigger]')
+      ) {
+        this.close();
+      }
+    }
+  }
+
+  @HostListener('document:contextmenu', ['$event'])
+  onDocumentContextMenu(event: MouseEvent) {
+    if (this.isOpen && !this.isMobile) {
+      const target = event.target as HTMLElement;
+      if (!target) return;
+      // If right-clicking inside the open track menu, prevent default and keep it open
+      if (target.closest('.track-menu-container')) {
+        event.preventDefault();
+        return;
+      }
+      // If right-clicking on any song element with its own handler, let that element handle it.
+      // Otherwise, close the active menu.
+      const isSongCard = target.closest('.spotify-quick-card') ||
+                         target.closest('.modern-song-card') ||
+                         target.closest('.ytm-quick-pick-item') ||
+                         target.closest('.fs-song-tile') ||
+                         target.closest('.fs-curated-card') ||
+                         target.closest('.fs-song-row') ||
+                         target.closest('.fs-explore-spotlight') ||
+                         target.closest('.song-list-item') ||
+                         target.closest('[data-track]');
+      if (!isSongCard) {
         this.close();
       }
     }
@@ -109,7 +157,7 @@ export class TrackMenuComponent implements OnChanges {
       this.isArtistsExpanded = false;
       this.loadArtistImage();
     }
-    if (changes['isOpen'] || changes['xPos'] || changes['yPos']) {
+    if (changes['isOpen'] || changes['xPos'] || changes['yPos'] || changes['isContextMenu']) {
       this.calculatePosition();
     }
   }
@@ -119,32 +167,36 @@ export class TrackMenuComponent implements OnChanges {
     
     // Width of desktop track menu
     const menuWidth = 260;
-    // Accurate height of track menu without download option
-    const menuHeight = 460;
+    // Accurate height of track menu
+    const menuHeight = 440;
 
     let finalX = this.xPos;
     let finalY = this.yPos;
 
-    // Prevent going off screen to the right
-    if (finalX + menuWidth > window.innerWidth - 16) {
-      finalX = window.innerWidth - menuWidth - 16;
+    if (this.isContextMenu) {
+      // Right-click context menu: top-left placed at mouse coordinates
+      if (finalX + menuWidth > window.innerWidth - 16) {
+        finalX = Math.max(16, finalX - menuWidth);
+      }
+    } else {
+      // 3-Dots button dropdown: align menu's right edge with button's right edge
+      finalX = this.xPos - menuWidth;
+      if (finalX < 16) {
+        finalX = Math.max(16, this.xPos);
+      }
+      if (finalX + menuWidth > window.innerWidth - 16) {
+        finalX = window.innerWidth - menuWidth - 16;
+      }
     }
-    if (finalX < 16) {
-      finalX = 16;
-    }
-    
-    // Prevent overlapping bottom player bar (~88px) or going off bottom screen
+
+    // Vertical positioning:
     const hasPlayer = !!this.playerService.currentTrack();
     const playerOffset = hasPlayer ? 104 : 20;
     const maxAllowedY = window.innerHeight - playerOffset;
     
     if (finalY + menuHeight > maxAllowedY) {
       // Flip upwards above the trigger element / click coordinate
-      finalY = this.yPos - menuHeight - 12;
-      // If flipping upwards goes too high or still doesn't fit, clamp to maxAllowed
-      if (finalY < 16) {
-        finalY = 16;
-      }
+      finalY = Math.max(16, this.yPos - menuHeight - 8);
       if (finalY + menuHeight > maxAllowedY) {
         finalY = Math.max(16, maxAllowedY - menuHeight);
       }
@@ -324,7 +376,7 @@ export class TrackMenuComponent implements OnChanges {
   }
 
   getArtistImage(): string {
-    return this.artistImage() || this.track?.channelThumbnail || 'ganatubenewlogo.png';
+    return this.artistImage() || this.track?.channelThumbnail || 'ganatube-logo.webp';
   }
 
   getArtistInitials(name: string): string {
@@ -337,12 +389,12 @@ export class TrackMenuComponent implements OnChanges {
 
   getArtistColor(name: string): string {
     const colors = [
-      'linear-gradient(135deg, #a855f7, #ec4899)',
-      'linear-gradient(135deg, #6366f1, #a855f7)',
-      'linear-gradient(135deg, #ec4899, #f43f5e)',
-      'linear-gradient(135deg, #8b5cf6, #d946ef)',
-      'linear-gradient(135deg, #7c3aed, #c026d3)',
-      'linear-gradient(135deg, #a855f7, #f97316)',
+      'linear-gradient(135deg, #F50919, #D90816)',
+      'linear-gradient(135deg, #FF2A38, #B3000E)',
+      'linear-gradient(135deg, #E11D48, #BE123C)',
+      'linear-gradient(135deg, #F43F5E, #9F1239)',
+      'linear-gradient(135deg, #F97316, #DC2626)',
+      'linear-gradient(135deg, #EF4444, #991B1B)',
     ];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -377,7 +429,7 @@ export class TrackMenuComponent implements OnChanges {
   }
 
   onImageError(event: any) {
-    event.target.src = 'ganatubenewlogo.png';
+    event.target.src = 'ganatube-logo.webp';
   }
 
   isDownloadingState = false;

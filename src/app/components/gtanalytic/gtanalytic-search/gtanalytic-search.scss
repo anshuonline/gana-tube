@@ -156,12 +156,12 @@
       color-scheme: dark;
 
       &:focus {
-        border-color: #a855f7;
+        border-color: var(--color-primary);
       }
     }
 
     .btn-apply-range {
-      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      background: var(--gradient-primary);
       color: #ffffff;
       border: none;
       padding: 7px 16px;
@@ -169,12 +169,12 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.25);
+      box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
       transition: all 0.2s ease;
 
       &:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+        box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.4);
       }
     }
   }
@@ -288,7 +288,7 @@
   .loading-bar-animated {
     height: 100%;
     width: 40%;
-    background: linear-gradient(90deg, #a855f7, #ec4899);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
     animation: progressIndeterminate 1.2s infinite ease-in-out;
   }
 }
@@ -369,8 +369,8 @@
       align-items: center;
       justify-content: center;
 
-      &.purple { background: rgba(168, 85, 247, 0.15); color: #ec4899; }
-      &.pink { background: rgba(236, 72, 153, 0.15); color: #f472b6; }
+      &.purple { background: rgba(var(--color-primary-rgb), 0.15); color: var(--color-primary-hover); }
+      &.pink { background: rgba(var(--color-primary-rgb), 0.15); color: #f472b6; }
       &.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
       &.emerald { background: rgba(16, 185, 129, 0.15); color: #34d49a; }
       &.amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
@@ -448,7 +448,7 @@
 .text-blue { color: #38bdf8 !important; }
 .text-amber { color: #f59e0b !important; }
 .text-muted { color: rgba(255, 255, 255, 0.4) !important; }
-.highlight-purple { color: #ec4899 !important; }
+.highlight-purple { color: var(--color-primary-hover) !important; }
 
 /* ── Reusable Dashboard Panel ─────────────────────────────────────────────── */
 .dashboard-panel {
@@ -491,8 +491,8 @@
   border-radius: 8px;
 
   &.gradient-badge {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.2) 0%, rgba(var(--color-primary-rgb), 0.2) 100%);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.3);
     color: #f472b6;
   }
 
@@ -573,9 +573,9 @@
         &:hover { color: #ffffff; }
 
         &.active {
-          background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+          background: var(--gradient-primary);
           color: #ffffff;
-          box-shadow: 0 2px 8px rgba(168, 85, 247, 0.35);
+          box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.35);
         }
       }
     }
@@ -607,8 +607,8 @@
         border-color: rgba(255, 255, 255, 0.25);
 
         .checkbox-indicator {
-          background: #a855f7;
-          border-color: #a855f7;
+          background: var(--color-primary);
+          border-color: var(--color-primary);
 
           &::after {
             content: '';
@@ -651,7 +651,7 @@
         height: 10px;
         border-radius: 50%;
 
-        &.current { background: #a855f7; box-shadow: 0 0 6px #a855f7; }
+        &.current { background: var(--color-primary); box-shadow: 0 0 6px var(--color-primary); }
         &.previous { background: rgba(255, 255, 255, 0.35); }
       }
     }
@@ -677,7 +677,7 @@
 
     &:hover {
       background: #14141e;
-      border-color: rgba(168, 85, 247, 0.3);
+      border-color: rgba(var(--color-primary-rgb), 0.3);
       transform: translateX(3px);
     }
 
@@ -691,7 +691,7 @@
         color: rgba(255, 255, 255, 0.4);
 
         &.top-three {
-          background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+          background: var(--gradient-primary);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
@@ -745,9 +745,9 @@
         border-radius: 6px;
 
         &.positive {
-          background: rgba(168, 85, 247, 0.15);
-          color: #ec4899;
-          border: 1px solid rgba(168, 85, 247, 0.3);
+          background: rgba(var(--color-primary-rgb), 0.15);
+          color: var(--color-primary-hover);
+          border: 1px solid rgba(var(--color-primary-rgb), 0.3);
         }
 
         &.surge {
@@ -842,7 +842,7 @@
         .cat-pct {
           font-size: 11px;
           font-weight: 600;
-          color: #a855f7;
+          color: var(--color-primary);
         }
       }
     }
@@ -875,9 +875,9 @@
     &:hover { color: #ffffff; }
 
     &.active {
-      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      background: var(--gradient-primary);
       color: #ffffff;
-      box-shadow: 0 2px 8px rgba(168, 85, 247, 0.35);
+      box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.35);
     }
   }
 }
@@ -953,7 +953,7 @@
           font-weight: 600;
 
           &.blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-          &.purple { background: rgba(168, 85, 247, 0.15); color: #ec4899; }
+          &.purple { background: rgba(var(--color-primary-rgb), 0.15); color: var(--color-primary-hover); }
         }
       }
     }
@@ -1017,8 +1017,8 @@
         justify-content: center;
         margin-bottom: 4px;
 
-        &.purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-        &.pink { background: rgba(236, 72, 153, 0.15); color: #ec4899; }
+        &.purple { background: rgba(var(--color-primary-rgb), 0.15); color: var(--color-primary); }
+        &.pink { background: rgba(var(--color-primary-rgb), 0.15); color: var(--color-primary-hover); }
         &.blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
         &.emerald { background: rgba(16, 185, 129, 0.15); color: #10b981; }
       }
@@ -1045,7 +1045,7 @@
 
         .fill {
           height: 100%;
-          background: linear-gradient(90deg, #a855f7, #ec4899);
+          background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
           border-radius: 3px;
 
           &.emerald { background: #10b981; }
@@ -1157,9 +1157,9 @@
       gap: 6px;
 
       .query-pill {
-        background: rgba(168, 85, 247, 0.12);
-        border: 1px solid rgba(168, 85, 247, 0.25);
-        color: #ec4899;
+        background: rgba(var(--color-primary-rgb), 0.12);
+        border: 1px solid rgba(var(--color-primary-rgb), 0.25);
+        color: var(--color-primary-hover);
         font-size: 11px;
         font-weight: 600;
         padding: 4px 10px;
@@ -1168,7 +1168,7 @@
         transition: all 0.15s ease;
 
         &:hover {
-          background: rgba(168, 85, 247, 0.25);
+          background: rgba(var(--color-primary-rgb), 0.25);
           color: #ffffff;
         }
       }
@@ -1310,9 +1310,9 @@
       color: #fbbf24;
 
       &.viral {
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25));
+        background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.25), rgba(var(--color-primary-rgb), 0.25));
         color: #f472b6;
-        border: 1px solid rgba(236, 72, 153, 0.3);
+        border: 1px solid rgba(var(--color-primary-rgb), 0.3);
       }
     }
   }
@@ -1356,7 +1356,7 @@
       text-overflow: ellipsis;
       cursor: pointer;
 
-      &:hover { color: #ec4899; }
+      &:hover { color: var(--color-primary-hover); }
     }
 
     .stream-category {
@@ -1493,7 +1493,7 @@
           transition: color 0.15s ease;
 
           &:hover {
-            color: #ec4899;
+            color: var(--color-primary-hover);
             text-decoration: underline;
           }
         }
@@ -1529,9 +1529,9 @@
 }
 
 .btn-inspect {
-  background: rgba(168, 85, 247, 0.12);
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  color: #ec4899;
+  background: rgba(var(--color-primary-rgb), 0.12);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+  color: var(--color-primary-hover);
   font-size: 11px;
   font-weight: 700;
   padding: 4px 10px;
@@ -1540,7 +1540,7 @@
   transition: all 0.15s ease;
 
   &:hover {
-    background: #a855f7;
+    background: var(--color-primary);
     color: #ffffff;
   }
 }
@@ -1726,8 +1726,8 @@
 
     &.highlight {
       grid-column: span 1;
-      border-color: rgba(168, 85, 247, 0.3);
-      background: rgba(168, 85, 247, 0.08);
+      border-color: rgba(var(--color-primary-rgb), 0.3);
+      background: rgba(var(--color-primary-rgb), 0.08);
 
       @media (max-width: 600px) {
         grid-column: span 2;

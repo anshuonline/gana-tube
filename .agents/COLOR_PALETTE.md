@@ -1,86 +1,142 @@
 # GanaTube Project — Official Design System & Color Palette
 
-This document is the **single source of truth** for all AI agents, engineers, and contributors working on **GanaTube** (Frontend) and **ManageAds** (Backend/Admin).
+The file `src/styles/_palette.scss` is the **single source of truth (SSOT)** for all colors, theme tokens, and design variables across **GanaTube**.
+
+> [!IMPORTANT]
+> **Centralized Color Management**: All components, layouts, and styles **must** consume design tokens via CSS custom properties (`var(--color-...)`) or SCSS variables (`$color-...`).
+> **Never hardcode hex or rgb values in component CSS/SCSS.**
+> Modifying token values directly in `src/styles/_palette.scss` automatically updates the entire application without needing manual find-and-replace across components.
 
 ---
 
-## 🎨 Core Color Hierarchy
+## 🎨 Single Source of Truth (`src/styles/_palette.scss`)
 
-| Role | Color Name | Hex / RGBA Code | Tailwind / CSS Class | Description & Usage |
-| :--- | :--- | :--- | :--- | :--- |
-| **Primary Canvas** | **AMOLED Pure Black** | `#000000` | `bg-black`, `bg-[#000000]` | **Mandatory default background** for all screens, modals, and sheets. Saves battery on OLED/AMOLED screens. |
-| **Surface / Card** | **AMOLED Deep Card** | `#0a0a0f` / `#0f0f17` | `bg-[#0a0a0f]`, `bg-white/[0.03]` | Slightly lifted dark surface for cards, panels, bottom sheets, and dropdowns. |
-| **Card Borders** | **Subtle Glass Border** | `rgba(255, 255, 255, 0.08)` | `border-white/[0.08]` | Micro-borders to give structure without breaking the dark minimalist aesthetic. |
-| **Hover Surface** | **Subtle Dark Hover** | `rgba(255, 255, 255, 0.05)` | `hover:bg-white/[0.05]` | Interactive hover state for list rows, dropdown items, and secondary buttons. |
+All design tokens are defined in `:root` and mapped to SCSS variables in `src/styles/_palette.scss`:
 
----
+```scss
+:root {
+  /* ---- Brand / Primary Red (Single Source of Truth) ---- */
+  --color-primary: #F50919;
+  --color-primary-hover: #D90816;
+  --color-primary-soft: #3A1014;
+  --color-primary-glow: rgba(245, 9, 25, 0.35);
 
-## ✍️ Typography & Icon Colors
+  /* ---- Backgrounds & Surfaces (AMOLED Dark) ---- */
+  --color-bg-main: #0A0A0A;
+  --color-bg-card: #141414;
+  --color-bg-card-subtle: #181818;
+  --color-bg-hover: #222222;
+  --color-bg-player: #080808;
 
-| Hierarchy | Color Value | Tailwind Class | Guidelines |
-| :--- | :--- | :--- | :--- |
-| **Primary Text** | `#ffffff` (Pure White) | `text-white` | All primary headings, song titles, active nav labels, and principal icons. |
-| **Secondary Text** | `rgba(255, 255, 255, 0.7)` | `text-white/70`, `text-gray-300` | Artist names, descriptions, subheadings, and secondary labels. |
-| **Muted / Dim Text** | `rgba(255, 255, 255, 0.4)` | `text-white/40`, `text-gray-500` | Timestamps, durations, metadata, inactive icons, and placeholders. |
-| **Disabled Text** | `rgba(255, 255, 255, 0.2)` | `text-white/20`, `text-gray-600` | Disabled buttons, inactive states. |
+  /* ---- Typography Colors ---- */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #B3B3B3;
+  --color-text-muted: #737373;
 
----
+  /* ---- Borders & Dividers ---- */
+  --color-border: #282828;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
 
-## 🔮 Brand Gradient Accents (Purple & Pink)
+  /* ---- Semantic Status Colors ---- */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #F50919;
+  --color-info: #3B82F6;
 
-GanaTube uses a signature vibrant **Purple-to-Pink gradient** for highlights, active tabs, primary action buttons, and subtle ambient glows.
+  /* ---- Brand Gradients & Lighting ---- */
+  --gradient-primary: linear-gradient(135deg, #F50919 0%, #D90816 100%);
+  --gradient-primary-glow: linear-gradient(135deg, #F50919 0%, #FF3B30 100%);
+  --gradient-primary-soft: linear-gradient(135deg, rgba(245, 9, 25, 0.16) 0%, rgba(217, 8, 22, 0.08) 100%);
+  --glow-primary: 0 4px 20px rgba(245, 9, 25, 0.4);
+  --shadow-player: 0 8px 40px rgba(0, 0, 0, 0.8);
+  --glass-bg: rgba(8, 8, 8, 0.75);
+  --glass-blur: blur(24px) saturate(1.4);
 
-```css
-/* Signature Linear Gradient */
-background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-
-/* Tailwind Equivalent */
-bg-gradient-to-r from-purple-500 to-pink-500
-/* Or Darker Variant */
-bg-gradient-to-r from-purple-600 to-pink-600
+  /* ---- Backwards-Compatibility Aliases ---- */
+  --color-bg: var(--color-bg-main);
+  --color-surface: var(--color-bg-card);
+  --color-surface-2: var(--color-bg-hover);
+  --color-secondary: var(--color-primary-hover);
+  --color-accent: var(--color-primary);
+  --color-text: var(--color-text-primary);
+  --color-primary-dark: var(--color-primary-hover);
+}
 ```
 
-### Gradient Tokens:
-- **Gradient Start (Purple)**: `#a855f7` (Tailwind `purple-500`) or `#9333ea` (Tailwind `purple-600`)
-- **Gradient End (Pink)**: `#ec4899` (Tailwind `pink-500`) or `#db2777` (Tailwind `pink-600`)
-- **Gradient Text**:
-  ```html
-  <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">
-    GanaTube
-  </span>
-  ```
-- **Primary CTA Button**:
-  ```html
-  <button class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-purple-600/25 transition">
-    Action
-  </button>
-  ```
-- **Ambient Glows**:
-  ```html
-  <div class="w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-  <div class="w-96 h-96 bg-pink-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-  ```
+---
+
+## 🛠️ SCSS Variable Mappings
+
+For SCSS stylesheets, import `styles/palette` and utilize the pre-declared variables:
+
+```scss
+$color-primary: var(--color-primary);
+$color-primary-hover: var(--color-primary-hover);
+$color-primary-soft: var(--color-primary-soft);
+$color-bg-main: var(--color-bg-main);
+$color-bg-card: var(--color-bg-card);
+$color-bg-hover: var(--color-bg-hover);
+$color-bg-player: var(--color-bg-player);
+$color-text-primary: var(--color-text-primary);
+$color-text-secondary: var(--color-text-secondary);
+$color-text-muted: var(--color-text-muted);
+$color-border: var(--color-border);
+$gradient-primary: var(--gradient-primary);
+$glow-primary: var(--glow-primary);
+```
 
 ---
 
-## 🚦 Functional & Status Colors
+## 📋 Design Tokens Reference Table
 
-| Purpose | Color Hex | Tailwind Classes | Usage Example |
+### 1. Brand & Accent Colors
+| CSS Variable | SCSS Variable | Hex / RGBA | Usage |
 | :--- | :--- | :--- | :--- |
-| **Danger / Delete (STRICT)** | `#ef4444` / `#f87171` | `bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20` | **Mandatory Red** for delete buttons, remove song, delete playlist, leave room. |
-| **Success / Online** | `#10b981` / `#34d49a` | `bg-emerald-500/10 text-emerald-400 border border-emerald-500/20` | Connected status, active room bot, active ad placeholder, success toast. |
-| **Warning / Coins** | `#eab308` / `#facc15` | `text-yellow-400`, `bg-yellow-500/10 text-yellow-400` | G-Coins, ratings stars, spin winner highlights, pending warnings. |
-| **Info / Links** | `#38bdf8` / `#60a5fa` | `text-sky-400`, `hover:text-sky-300` | External documentation links, audio bitrates, secondary badges. |
+| `--color-primary` | `$color-primary` | `#F50919` | Primary Brand Red. Play buttons, active indicators, brand logo accents. |
+| `--color-primary-hover` | `$color-primary-hover` | `#D90816` | Hover state for primary buttons and interactive accents. |
+| `--color-primary-soft` | `$color-primary-soft` | `#3A1014` | Subdued primary tinted background (badges, chips, soft active highlights). |
+| `--color-primary-glow` | — | `rgba(245, 9, 25, 0.35)` | Ambient glow color for player controls and active cards. |
+
+### 2. Backgrounds & Surfaces (AMOLED Dark)
+| CSS Variable | SCSS Variable | Hex Code | Usage |
+| :--- | :--- | :--- | :--- |
+| `--color-bg-main` | `$color-bg-main` | `#0A0A0A` | Global application canvas background. |
+| `--color-bg-card` | `$color-bg-card` | `#141414` | Cards, popups, sidebars, sheets. |
+| `--color-bg-card-subtle` | — | `#181818` | Secondary nested cards, inactive input fields. |
+| `--color-bg-hover` | `$color-bg-hover` | `#222222` | Hover surface for list rows, table rows, dropdown items. |
+| `--color-bg-player` | `$color-bg-player` | `#080808` | Persistent mini-player and full-screen player backdrop. |
+
+### 3. Typography
+| CSS Variable | SCSS Variable | Value | Usage |
+| :--- | :--- | :--- | :--- |
+| `--color-text-primary` | `$color-text-primary` | `#FFFFFF` | Primary headers, track titles, active labels. |
+| `--color-text-secondary` | `$color-text-secondary` | `#B3B3B3` | Artist names, descriptions, subheadings. |
+| `--color-text-muted` | `$color-text-muted` | `#737373` | Durations, metadata, timestamps, placeholders. |
+
+### 4. Borders & Dividers
+| CSS Variable | SCSS Variable | Value | Usage |
+| :--- | :--- | :--- | :--- |
+| `--color-border` | `$color-border` | `#282828` | Standard structural borders. |
+| `--color-border-subtle` | — | `rgba(255, 255, 255, 0.08)` | Subtle card outlines and glass dividers. |
+
+### 5. Semantic Status
+| CSS Variable | Hex Code | Purpose |
+| :--- | :--- | :--- |
+| `--color-success` | `#22C55E` | Online badges, connected states, success toasts. |
+| `--color-warning` | `#F59E0B` | Coin rewards, caution alerts, pending items. |
+| `--color-error` | `#F50919` | Destructive/delete actions, error messages, offline states. |
+| `--color-info` | `#3B82F6` | Informational badges, audio bitrates, hints. |
 
 ---
 
-## 🛡️ Zero-Tolerance Rules for Agents
+## 🛡️ Zero-Tolerance Architectural Rules
 
-1. **NO Light Mode / Gray Backgrounds**:
-   - Never use `#ffffff`, `#f3f4f6`, `#1f2937` or standard gray backgrounds for page canvases. Always use **AMOLED `#000000`**.
-2. **NO Random Color Clashing**:
-   - Do not randomly use blue, green, or orange buttons for primary actions. The primary brand theme is **Purple & Pink Gradient** (`#a855f7` & `#ec4899`) with **White** text.
-3. **Delete Buttons MUST be Red**:
-   - As explicitly mandated by project rules, all delete/destructive buttons must be styled in red (`#ef4444`).
-4. **Transparent & Blurred Overlays**:
-   - Modals, bottom sheets, and dropdowns should use dark glassmorphism: `bg-black/90 backdrop-blur-xl border border-white/10`.
+1. **Always Use Tokens, Never Hardcode**:
+   - Never write `#F50919`, `#0A0A0A`, or `#141414` directly in component `.scss` files. Always reference `var(--color-primary)` or `$color-primary`.
+2. **Central Theme Switching**:
+   - Any theme adjustment must only require editing `src/styles/_palette.scss`. If a component breaks when a color is updated in `_palette.scss`, it violates encapsulation.
+3. **Delete Buttons Must Be Red**:
+   - Destructive actions (delete playlist, remove song, leave room) must use `--color-error` / red styling (`#F50919` or `bg-red-500/10 text-red-400`).
+4. **Dark AMOLED Canvas**:
+   - Never introduce light-colored or pure white canvases. Backgrounds must adhere to `--color-bg-main` (`#0A0A0A`) and `--color-bg-card` (`#141414`).
+

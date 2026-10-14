@@ -106,23 +106,23 @@ export class GtanalyticActiveTimesComponent implements OnInit {
       {
         data: curveA.map((c: any) => c.value || 0),
         label: `${data.day_vs_day.day_a?.name || 'Day A'} (Peak: ${data.day_vs_day.day_a?.peak_hour})`,
-        borderColor: '#ec4899',
-        backgroundColor: 'rgba(236, 72, 153, 0.12)',
+        borderColor: '#F50919',
+        backgroundColor: 'rgba(245, 9, 25, 0.12)',
         borderWidth: 2.5,
         fill: true,
         tension: 0.35,
-        pointBackgroundColor: '#ec4899',
+        pointBackgroundColor: '#F50919',
         pointRadius: 3
       },
       {
         data: curveB.map((c: any) => c.value || 0),
         label: `${data.day_vs_day.day_b?.name || 'Day B'} (Peak: ${data.day_vs_day.day_b?.peak_hour})`,
-        borderColor: '#a855f7',
-        backgroundColor: 'rgba(168, 85, 247, 0.08)',
+        borderColor: '#D90816',
+        backgroundColor: 'rgba(217, 8, 22, 0.08)',
         borderWidth: 2,
         fill: true,
         tension: 0.35,
-        pointBackgroundColor: '#a855f7',
+        pointBackgroundColor: '#D90816',
         pointRadius: 3
       }
     ];
@@ -172,16 +172,16 @@ export class GtanalyticActiveTimesComponent implements OnInit {
       {
         data: list.map((d: any) => d.current || 0),
         label: 'Current Period',
-        backgroundColor: 'rgba(236, 72, 153, 0.85)',
-        borderColor: '#ec4899',
+        backgroundColor: 'rgba(245, 9, 25, 0.85)',
+        borderColor: '#F50919',
         borderWidth: 1,
         borderRadius: 4
       },
       {
         data: list.map((d: any) => d.previous || 0),
         label: 'Previous Period',
-        backgroundColor: 'rgba(168, 85, 247, 0.45)',
-        borderColor: '#a855f7',
+        backgroundColor: 'rgba(217, 8, 22, 0.45)',
+        borderColor: '#D90816',
         borderWidth: 1,
         borderRadius: 4
       }

@@ -29,11 +29,11 @@ const VALID_BITRATES = new Set([320, 160, 96]);
 function decodeEntities(str) {
   if (!str) return '';
   return str
-    .replace(/"/g, '"')
-    .replace(/&/g, '&')
-    .replace(/&#039;|'/g, "'")
-    .replace(/</g, '<')
-    .replace(/>/g, '>');
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&#039;|&apos;|'/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
 }
 
 // Normalize for fuzzy comparison: strip "(From ...)" style suffixes, remix/lofi
@@ -286,8 +286,33 @@ async function searchSaavnSongs(query, limit = 20) {
   return results.map(normalizeSaavnSong).filter(s => s && s.title && s.encryptedUrl);
 }
 
-// Find the best JioSaavn counterpart for a YouTube Music song
-async function matchSaavnSong({ title, artist, album, duration, bitrate }) {
+// Find the best JioSaavn counterpart for a YouTube Music song (or direct JioSaavn songId)
+async function matchSaavnSong({ songId, title, artist, album, duration, bitrate }) {
+  if (songId) {
+    try {
+      const json = await saavnApiJson({ __call: 'song.getDetails', pids: songId });
+      const songs = json?.songs || (Array.isArray(json) ? json : []);
+      const song = songs[0] ? normalizeSaavnSong(songs[0]) : null;
+      if (song?.encryptedUrl) {
+        const streamUrl = await resolveStreamUrl(song.encryptedUrl, bitrate);
+        if (streamUrl) {
+          return {
+            id: song.id,
+            title: song.title,
+            artist: song.artist,
+            album: song.album,
+            duration: song.duration,
+            image: song.image,
+            streamUrl,
+            matchedScore: 1.0
+          };
+        }
+      }
+    } catch (e) {
+      // Fall through to text matching
+    }
+  }
+
   const cleanTitle = String(title || '').trim().slice(0, 120);
   if (!cleanTitle) return null;
 
@@ -372,4 +397,131 @@ async function matchSaavnSong({ title, artist, album, duration, bitrate }) {
   };
 }
 
-module.exports = { searchSaavnSongs, matchSaavnSong };
+// ─── JioSaavn Trending & Latest Songs ─────────────────────────────────────────
+
+// Official JioSaavn "India Superhits Top 50" Playlist IDs
+const SAAVN_TOP50_PLAYLISTS = {
+  hindi: '1134543272',       // Hindi: India Superhits Top 50
+  english: '1134595537',     // International : India Superhits Top 50
+  global: '1134595537',      // International : India Superhits Top 50
+  punjabi: '1134543511',     // Punjabi: India Superhits Top 50
+  telugu: '1134643225',      // Telugu: India Superhits Top 50
+  tamil: '1134651042',       // Tamil: India Superhits Top 50
+  bhojpuri: '1134768973',    // Bhojpuri: India Superhits Top 50
+  haryanvi: '1134770917',    // Haryanvi: India Superhits Top 50
+  kannada: '1134591169',     // Kannada: India Superhits Top 50
+  marathi: '1134710071',     // Marathi: India Superhits Top 50
+  gujarati: '1134743773',    // Gujarati: India Superhits Top 50
+  bengali: '1134638573',     // Bengali: India Superhits Top 50
+  malayalam: '1134705865',   // Malayalam: India Superhits Top 50
+  rajasthani: '1134744088',  // Rajasthani: India Superhits Top 50
+  odia: '1134670616',        // Odia: India Superhits Top 50
+  assamese: '1134655695',    // Assamese: India Superhits Top 50
+};
+
+// Official JioSaavn New Releases / Fresh Drops Playlist IDs
+const SAAVN_FRESH_PLAYLISTS = {
+  hindi: '6689255',          // Taaza Tunes (Hindi Official Fresh Drops)
+  punjabi: '218822376',      // Nave Tunes (Punjabi Official Fresh Drops)
+  english: '110858205',      // Trending Today / Fresh English
+  global: '110858205',
+};
+
+async function fetchSaavnPlaylistTracks(listId) {
+  if (!listId) return [];
+  try {
+    const res = await saavnApiJson({ __call: 'playlist.getDetails', listid: String(listId) });
+    return Array.isArray(res?.list) ? res.list : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function getTrendingSaavnSongs(language = 'hindi', limit = 20, type = 'all') {
+  const langKey = String(language || 'hindi').toLowerCase().trim();
+  const numLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 60);
+  const reqType = String(type || 'all').toLowerCase().trim();
+
+  const top50Id = SAAVN_TOP50_PLAYLISTS[langKey] || SAAVN_TOP50_PLAYLISTS.hindi;
+  const freshId = SAAVN_FRESH_PLAYLISTS[langKey] || SAAVN_FRESH_PLAYLISTS.hindi;
+
+  let rawResults = [];
+
+  if (reqType === 'trending') {
+    rawResults = await fetchSaavnPlaylistTracks(top50Id);
+  } else if (reqType === 'latest') {
+    rawResults = await fetchSaavnPlaylistTracks(freshId);
+    if (!rawResults.length) {
+      // Fallback search if specific fresh playlist is not found
+      const searchRes = await saavnApiJson({ __call: 'search.getResults', q: `Latest ${langKey} Songs`, p: '1', n: String(numLimit) });
+      rawResults = searchRes?.data?.results || searchRes?.results || [];
+    }
+  } else {
+    // 'all' (default): fetch Top 50 and Fresh drops in parallel
+    const [top50List, freshList] = await Promise.all([
+      fetchSaavnPlaylistTracks(top50Id),
+      fetchSaavnPlaylistTracks(freshId)
+    ]);
+    rawResults = [...top50List, ...freshList];
+  }
+
+  // Graceful fallback to search if playlists failed
+  if (!Array.isArray(rawResults) || rawResults.length === 0) {
+    const fallbackRes = await saavnApiJson({
+      __call: 'search.getResults',
+      q: `Top ${langKey.charAt(0).toUpperCase() + langKey.slice(1)} Hits`,
+      p: '1',
+      n: String(numLimit)
+    });
+    rawResults = fallbackRes?.data?.results || fallbackRes?.results || [];
+  }
+
+  const seenIds = new Set();
+  const seenTitleKeys = new Set();
+  const songs = [];
+
+  for (const raw of rawResults) {
+    const song = normalizeSaavnSong(raw);
+    if (!song || !song.id || !song.title) continue;
+    if (seenIds.has(song.id)) continue;
+
+    // Clean up "(Trending Version)" or "[Trending Version]" suffixes
+    let cleanTitle = String(song.title)
+      .replace(/\s*\(?Trending Version\)?/gi, '')
+      .replace(/\s*\[?Trending Version\]?/gi, '')
+      .trim();
+
+    // Skip spam or filler tracks with generic titles
+    const normalizedKey = cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!cleanTitle || normalizedKey === 'trending' || normalizedKey.startsWith('trendingbeat') || normalizedKey.startsWith('trendinginstrumental')) {
+      continue;
+    }
+
+    if (seenTitleKeys.has(normalizedKey)) continue;
+    seenIds.add(song.id);
+    seenTitleKeys.add(normalizedKey);
+
+    // Ensure high-resolution 500x500 saavncdn thumbnail
+    const image = String(song.image || '')
+      .replace(/150x150/g, '500x500')
+      .replace(/50x50/g, '500x500');
+
+    songs.push({
+      id: song.id,
+      title: cleanTitle,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      image,
+      language: song.language || langKey,
+      encryptedUrl: song.encryptedUrl
+    });
+
+    if (songs.length >= numLimit) break;
+  }
+
+  return songs;
+}
+
+module.exports = { searchSaavnSongs, matchSaavnSong, getTrendingSaavnSongs };
+

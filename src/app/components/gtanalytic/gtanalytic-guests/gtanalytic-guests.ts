@@ -443,21 +443,21 @@ export class GtanalyticGuestsComponent {
     }
 
     if (this.selectedCountryCode() === upper) {
-      return '#ec4899'; // Selected vibrant neon
+      return '#FF2A38'; // Selected vibrant red
     }
 
     const max = this.maxCountryGuests();
     const ratio = stat.active_guests / max;
 
-    // GA4 Style Heat Intensity (Purple & Pink gradient palette)
+    // GA4 Style Heat Intensity (Brand Red palette)
     if (ratio >= 0.7) {
-      return '#ec4899'; // Peak: Neon Pink
+      return '#F50919'; // Peak: Brand Red
     } else if (ratio >= 0.35) {
-      return '#d946ef'; // High: Bright Fuchsia
+      return '#DC2626'; // High: Crimson
     } else if (ratio >= 0.12) {
-      return '#a855f7'; // Medium: Brand Purple
+      return '#EF4444'; // Medium: Warm Red
     } else {
-      return '#6366f1'; // Low: Indigo Accent
+      return '#B91C1C'; // Low: Deep Red
     }
   }
 

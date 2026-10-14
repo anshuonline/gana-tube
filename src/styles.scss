@@ -1,4 +1,5 @@
 /* GanaTube - Global Dark Theme */
+@import 'styles/palette';
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
@@ -27,17 +28,6 @@ input, textarea {
 }
 
 :root {
-  /* ── Spotify-style palette ── */
-  --color-bg: #121212;
-  --color-surface: #181818;
-  --color-surface-2: #242424;
-  --color-primary: #a855f7;
-  --color-primary-dark: #9333ea;
-  --color-secondary: #ec4899;
-  --color-accent: #ec4899;
-  --color-text: #ffffff;
-  --color-text-muted: #b3b3b3;
-  --color-border: rgba(255, 255, 255, 0.08);
   --primary-font: 'Urbanist', sans-serif;
   --font: 'Outfit', system-ui, -apple-system, sans-serif;
 }
@@ -49,8 +39,8 @@ html {
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
   font-family: var(--primary-font);
   overflow-x: clip;
   background-attachment: fixed;
@@ -85,7 +75,7 @@ body {
 
 /* Selection */
 ::selection {
-  background: rgba(168, 85, 247, 0.3);
+  background: rgba(245, 9, 25, 0.3);
   color: #fff;
 }
 

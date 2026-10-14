@@ -1,0 +1,524 @@
+/* ==========================================================================
+   GanaTube Modern Home Page — Core Layout & Base Styler
+   Design Language: YouTube Music, Apple Music, and Spotify Fusion
+   Strict Standards: AMOLED Black (#000000), Zero backdrop-filter, Pure CSS
+   ========================================================================== */
+
+@import '../../styles/palette';
+
+/* ---- 1. AMOLED Home Canvas Container ---- */
+.home-content {
+  background-color: #000000;
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 28px 80px;
+  box-sizing: border-box;
+  position: relative;
+  min-height: 100vh;
+
+  @media (max-width: 1024px) {
+    padding: 0 18px 60px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 0 14px 40px;
+  }
+}
+
+/* ---- 1.1 Results Container Gutter Alignment (Zero Edge Clipping) ---- */
+.home-content .results-container,
+.results-container {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  background: transparent;
+  padding: 0 4px;
+  margin: 0;
+
+  @media (max-width: 640px) {
+    padding: 0 2px;
+  }
+}
+
+/* ---- 2. Modern Shelf Section & Content Visibility Optimization ---- */
+.modern-shelf-section {
+  margin: 36px 0 12px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  content-visibility: auto;
+  contain-intrinsic-block-size: 320px;
+  contain: layout style paint;
+
+  @media (max-width: 1024px) {
+    margin: 28px 0 10px;
+    contain-intrinsic-block-size: 280px;
+  }
+
+  @media (max-width: 640px) {
+    margin: 20px 0 8px;
+    contain-intrinsic-block-size: 240px;
+  }
+}
+
+/* Backward-compatibility alias for existing shelf sections */
+.shelf-section {
+  @extend .modern-shelf-section;
+}
+
+/* ---- 3. Modern Shelf Header ---- */
+.modern-shelf-header,
+.shelf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  position: relative;
+  gap: 12px;
+
+  @media (max-width: 1024px) {
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 640px) {
+    margin-bottom: 12px;
+  }
+
+  /* Left Header Group (Title + Optional Subtitle) */
+  .shelf-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  /* Apple Music & Spotify Bold Typographic Title */
+  .shelf-title {
+    font-size: clamp(1.3rem, 2vw, 1.6rem);
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @media (max-width: 640px) {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Optional Contextual Subtitle */
+  .shelf-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary, #b3b3b3);
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: -0.01em;
+
+    @media (max-width: 640px) {
+      font-size: 0.78rem;
+    }
+  }
+
+  /* Shelf Navigation & More Controls */
+  .shelf-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+
+    @media (max-width: 640px) {
+      gap: 6px;
+    }
+  }
+
+  /* More Pill Button (YouTube / Spotify Style) */
+  .shelf-more-pill,
+  .shelf-more-btn {
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    user-select: none;
+    outline: none;
+    line-height: 1.2;
+
+    &:hover {
+      background: #202020;
+      border-color: var(--color-primary, #F50919);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.96);
+      background: #181818;
+    }
+
+    @media (max-width: 640px) {
+      font-size: 0.76rem;
+      padding: 5px 11px;
+    }
+  }
+
+  /* Scroll Navigation Buttons Group */
+  .shelf-nav-buttons {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    @media (max-width: 768px) {
+      display: none; // Hidden on touch devices; natural swipe physics take over
+    }
+  }
+
+  /* Circular Carousel Scroll Button */
+  .shelf-scroll-btn,
+  .shelf-nav-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    outline: none;
+    padding: 0;
+    flex-shrink: 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2;
+      transition: transform 0.15s ease;
+    }
+
+    &:hover {
+      background: #222222;
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+      color: #ffffff;
+    }
+
+    &:active {
+      transform: scale(0.94);
+      background: #181818;
+    }
+
+    &[disabled],
+    &.disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      pointer-events: none;
+      transform: none;
+    }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+}
+
+/* ---- 4. Ultra-Smooth Horizontal Scroll Rail ---- */
+.shelf-scroll-rail,
+.modern-scroll-rail,
+.shelf-grid {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  gap: 16px;
+  padding: 6px 4px 16px;
+  margin: 0;
+  box-sizing: border-box;
+  transform: translateZ(0); // Hardware acceleration
+
+  /* Hidden scrollbars across all modern engines */
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // IE/Edge
+  &::-webkit-scrollbar {
+    display: none; // Webkit
+    width: 0;
+    height: 0;
+  }
+
+  /* Direct children scroll snapping */
+  > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 1024px) {
+    gap: 14px;
+    padding: 4px 4px 14px;
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    gap: 12px;
+    padding: 4px 4px 12px;
+    margin: 0;
+  }
+}
+
+/* ---- 5. Skeleton Loaders (Solid Dark Base + Pure CSS Shimmer Sweep) ---- */
+
+/* Shimmer Sweep Animation (Pure CSS without blur or backdrop-filter) */
+@keyframes shimmerSweepAnim {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Shimmer Sweep Overlay Element */
+.shimmer-sweep,
+.skeleton-shimmer-sweep {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 35%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.05) 65%,
+      transparent 100%
+    );
+    animation: shimmerSweepAnim 1.6s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Skeleton Shelf Container */
+.home-skeleton-shelf,
+.skeleton-shelf {
+  margin: 36px 0 12px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  user-select: none;
+  pointer-events: none;
+
+  @media (max-width: 1024px) {
+    margin: 28px 0 10px;
+  }
+
+  @media (max-width: 640px) {
+    margin: 20px 0 8px;
+  }
+
+  /* Skeleton Header Row */
+  .skeleton-shelf-header,
+  .shelf-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  /* Title Bar Placeholder */
+  .skeleton-title-bar {
+    width: 220px;
+    max-width: 60%;
+    height: 24px;
+    border-radius: 8px;
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Pill Placeholder */
+  .skeleton-pill {
+    width: 64px;
+    height: 28px;
+    border-radius: 999px;
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Rail of Skeleton Cards */
+  .skeleton-rail {
+    display: flex;
+    gap: 16px;
+    overflow: hidden;
+    padding: 4px 0 14px;
+
+    @media (max-width: 1024px) {
+      gap: 14px;
+    }
+
+    @media (max-width: 640px) {
+      gap: 11px;
+    }
+  }
+
+  /* Skeleton Card Staggered Delay */
+  .skeleton-card:nth-child(2) .shimmer-sweep::after,
+  .skeleton-card:nth-child(2) .skeleton-shimmer-sweep::after {
+    animation-delay: 0.12s;
+  }
+  .skeleton-card:nth-child(3) .shimmer-sweep::after,
+  .skeleton-card:nth-child(3) .skeleton-shimmer-sweep::after {
+    animation-delay: 0.24s;
+  }
+  .skeleton-card:nth-child(4) .shimmer-sweep::after,
+  .skeleton-card:nth-child(4) .skeleton-shimmer-sweep::after {
+    animation-delay: 0.36s;
+  }
+  .skeleton-card:nth-child(5) .shimmer-sweep::after,
+  .skeleton-card:nth-child(5) .skeleton-shimmer-sweep::after {
+    animation-delay: 0.48s;
+  }
+  .skeleton-card:nth-child(6) .shimmer-sweep::after,
+  .skeleton-card:nth-child(6) .skeleton-shimmer-sweep::after {
+    animation-delay: 0.60s;
+  }
+}
+
+/* Skeleton Card Structure (Solid Dark Base #141414 + Subtle Border) */
+.skeleton-card,
+.skeleton-song-card {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 12px;
+  width: 215px;
+  flex: 0 0 215px;
+  box-sizing: border-box;
+
+  @media (max-width: 1024px) {
+    width: 180px;
+    flex: 0 0 180px;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  @media (max-width: 768px) {
+    width: 160px;
+    flex: 0 0 160px;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  @media (max-width: 640px) {
+    width: 160px;
+    flex: 0 0 160px;
+    padding: 8px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  /* Square Artwork Placeholder */
+  .skeleton-artwork,
+  .skeleton-thumb,
+  .skeleton-thumbnail {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    background: #181818;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Circular Variant for Artists */
+  &.circular,
+  &.circle-card {
+    align-items: center;
+    text-align: center;
+
+    .skeleton-artwork,
+    .skeleton-thumb,
+    .skeleton-thumbnail {
+      border-radius: 50%;
+    }
+
+    .skeleton-text-group {
+      align-items: center;
+    }
+  }
+
+  /* Text Lines Wrapper */
+  .skeleton-text-group,
+  .skeleton-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    position: relative;
+  }
+
+  /* Skeleton Line Placeholders */
+  .skeleton-line {
+    height: 12px;
+    border-radius: 4px;
+    background: #181818;
+    position: relative;
+    overflow: hidden;
+
+    &.title {
+      width: 85%;
+      height: 14px;
+    }
+
+    &.subtitle {
+      width: 60%;
+      height: 11px;
+    }
+
+    &.short {
+      width: 40%;
+      height: 10px;
+    }
+  }
+}
+
+/* Wrapper for home skeleton shelves */
+.home-shelves-skeleton {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}

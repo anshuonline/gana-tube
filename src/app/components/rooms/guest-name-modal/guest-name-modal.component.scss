@@ -66,9 +66,9 @@
     height: 64px;
     margin: 0 auto 16px;
     border-radius: 50%;
-    background: rgba(124, 58, 237, 0.12);
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    color: #A78BFA;
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+    color: var(--color-primary);
   }
 
   .description {
@@ -110,7 +110,7 @@
         }
 
         &:focus {
-          border-color: #9333EA;
+          border-color: var(--color-primary);
           background: rgba(255, 255, 255, 0.08);
         }
       }
@@ -144,7 +144,7 @@
 
   .btn-primary {
     width: 100%;
-    background: linear-gradient(135deg, #9333EA, #EC4899);
+    background: var(--gradient-primary);
     color: #FFF;
     border: none;
     border-radius: 12px;
@@ -161,7 +161,7 @@
 
     &:not(:disabled):hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+      box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
     }
   }
 }
@@ -173,7 +173,7 @@
   color: #9C9CA6;
 
   a {
-    color: #A78BFA;
+    color: var(--color-primary);
     text-decoration: none;
     font-weight: 500;
 

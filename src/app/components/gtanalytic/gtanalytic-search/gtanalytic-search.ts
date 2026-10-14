@@ -206,12 +206,12 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
       {
         data: currentSeries,
         label: currentLabel,
-        borderColor: '#a855f7',
-        backgroundColor: 'rgba(168, 85, 247, 0.15)',
+        borderColor: '#F50919',
+        backgroundColor: 'rgba(245, 9, 25, 0.15)',
         borderWidth: 2.5,
         fill: true,
         tension: 0.35,
-        pointBackgroundColor: '#ec4899',
+        pointBackgroundColor: '#D90816',
         pointBorderColor: '#ffffff',
         pointRadius: currentSeries.length > 25 ? 2 : 4,
         pointHoverRadius: 6
@@ -277,8 +277,8 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
         {
           data: list.map((c: any) => c.total),
           backgroundColor: [
-            '#a855f7', // Purple
-            '#ec4899', // Pink
+            '#F50919', // Brand Red
+            '#D90816', // Dark Red
             '#3b82f6', // Blue
             '#10b981', // Emerald
             '#f59e0b', // Amber
@@ -328,8 +328,8 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
       datasets: [
         {
           data: list.map((m: any) => m.total_searches),
-          backgroundColor: 'rgba(168, 85, 247, 0.85)',
-          hoverBackgroundColor: '#ec4899',
+          backgroundColor: 'rgba(245, 9, 25, 0.85)',
+          hoverBackgroundColor: '#D90816',
           borderRadius: 6,
           borderSkipped: false
         }
@@ -373,8 +373,8 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
       datasets: [
         {
           data: d.history.counts,
-          borderColor: '#a855f7',
-          backgroundColor: 'rgba(168, 85, 247, 0.15)',
+          borderColor: '#F50919',
+          backgroundColor: 'rgba(245, 9, 25, 0.15)',
           fill: true,
           tension: 0.3,
           borderWidth: 2,

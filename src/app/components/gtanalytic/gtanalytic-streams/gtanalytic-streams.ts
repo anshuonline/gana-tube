@@ -47,8 +47,8 @@ export class GtanalyticStreamsComponent {
     return [{
       data: list.map((s: any) => s.play_count || 0),
       label: 'Total Plays',
-      backgroundColor: 'rgba(168, 85, 247, 0.85)',
-      borderColor: '#a855f7',
+      backgroundColor: 'rgba(245, 9, 25, 0.85)',
+      borderColor: '#F50919',
       borderWidth: 1,
       borderRadius: 6
     }];

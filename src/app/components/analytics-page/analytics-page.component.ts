@@ -156,8 +156,8 @@ export class AnalyticsPageComponent implements OnInit {
       this.userGrowthData = [{
         data: this.analyticsData.user_growth.map((g: any) => g.new_users),
         label: 'New Users',
-        backgroundColor: 'rgba(168, 85, 247, 0.2)',
-        borderColor: 'rgba(168, 85, 247, 1)',
+        backgroundColor: 'rgba(245, 9, 25, 0.2)',
+        borderColor: 'rgba(245, 9, 25, 1)',
         borderWidth: 2,
         fill: true
       }];

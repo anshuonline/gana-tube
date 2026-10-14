@@ -223,12 +223,12 @@ export class SearchResultsComponent implements OnChanges {
 
   getArtistGradient(name: string): string {
     const colors = [
-      ['#a855f7', '#ec4899'],
-      ['#8b5cf6', '#d946ef'],
-      ['#9333ea', '#db2777'],
-      ['#7c3aed', '#c026d3'],
-      ['#a855f7', '#f43f5e'],
-      ['#8b5cf6', '#ec4899']
+      ['#F50919', '#D90816'],
+      ['#FF2A38', '#B3000E'],
+      ['#E11D48', '#BE123C'],
+      ['#F43F5E', '#9F1239'],
+      ['#F97316', '#DC2626'],
+      ['#EF4444', '#991B1B']
     ];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {

@@ -187,7 +187,7 @@
         <div class="song-list">
           <div *ngFor="let s of dailyData().top_songs || []; let idx = index" class="song-item">
             <span class="song-rank" [class.top]="idx < 3">{{ idx + 1 }}</span>
-            <img [src]="s.thumbnail || '/ganatubenewlogo.png'" alt="" class="song-thumb" />
+            <img [src]="s.thumbnail || '/ganatube-logo.webp'" alt="" class="song-thumb" />
             <div class="song-meta">
               <span class="song-title">{{ s.title }}</span>
               <span class="song-id">{{ s.video_id }}</span>

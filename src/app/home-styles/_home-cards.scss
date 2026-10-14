@@ -1,0 +1,813 @@
+/* ==========================================================================
+   GanaTube Modern Home Cards & Shelves
+   Styles for:
+   1. Spotify-Style Quick Access 6-Grid (.spotify-quick-grid)
+   2. YouTube Music 4-Row Quick Picks Rail (.ytm-quick-picks-rail)
+   3. Spotify & Apple Music Standard Album Cards (.modern-song-card & .modern-shelf-grid)
+
+   STRICT COMPLIANCE:
+   - NO backdrop-filter or -webkit-backdrop-filter used anywhere.
+   - AMOLED deep card surfaces with smooth GPU transitions.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. SPOTIFY-STYLE QUICK ACCESS 6-GRID (.spotify-quick-grid)
+   -------------------------------------------------------------------------- */
+
+.spotify-quick-section {
+  position: relative;
+  width: 100%;
+}
+
+.quick-greeting {
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin: 28px 0 16px;
+  line-height: 1.25;
+
+  .quick-greeting-sub {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 4px;
+    letter-spacing: normal;
+  }
+}
+
+.spotify-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 360px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spotify-quick-card {
+  height: 78px;
+  background: #000000;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease-out, border-color 0.15s ease;
+  contain: layout style;
+
+  &:hover {
+    background: #181818 !important;
+    border-color: rgba(255, 255, 255, 0.12);
+    transition: background 0s !important; /* Instant on hover — catches fast list sweeps */
+
+    .quick-play-overlay {
+      opacity: 1;
+    }
+
+    .quick-play-btn {
+      transform: scale(1);
+    }
+  }
+
+  &.active,
+  &.is-playing {
+    border-color: var(--color-primary, #f50919);
+    background: rgba(var(--color-primary-rgb, 245, 9, 25), 0.12) !important;
+
+    .quick-play-overlay {
+      opacity: 1;
+    }
+
+    .quick-play-btn {
+      transform: scale(1);
+    }
+  }
+
+  /* Thumbnail Wrapper & Image: 78px x 78px */
+  .quick-card-thumb-wrap {
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+    max-width: 78px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px 0 0 8px;
+    flex-shrink: 0;
+    background: #181818;
+  }
+
+  .quick-card-thumb,
+  .quick-thumb,
+  img.quick-thumb,
+  img {
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+    max-width: 78px;
+    object-fit: cover;
+    border-radius: 8px 0 0 8px;
+    display: block;
+    flex-shrink: 0;
+    background: #181818;
+  }
+
+  /* Center Play Overlay on Thumbnail (Option B: cleanly bounded in 78x78 thumb) */
+  .quick-play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px 0 0 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .quick-play-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--color-primary, #f50919);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    border: none !important;
+    outline: none !important;
+    cursor: pointer;
+    pointer-events: auto;
+    transform: scale(0.85);
+    transition: transform 0.2s ease, background 0.2s ease;
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+
+    &:hover {
+      transform: scale(1.08);
+      background: var(--color-primary-hover, #ff1a2b);
+    }
+
+    svg {
+      display: block;
+      margin-left: 2px;
+    }
+
+    &.playing svg {
+      margin-left: 0;
+    }
+  }
+
+  /* Card info */
+  .quick-card-info,
+  .quick-info,
+  .card-info {
+    padding: 0 14px;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    overflow: hidden;
+
+    .quick-card-title,
+    .song-title,
+    h4 {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      line-height: 1.3;
+      display: block;
+    }
+
+    .quick-card-channel,
+    .quick-card-artist,
+    .artist-name,
+    p,
+    span.channel {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.65);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      line-height: 1.25;
+      display: block;
+    }
+  }
+
+  /* Sleek, borderless 3-Dots Options Menu Button */
+  .quick-card-menu-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-left: 4px;
+    flex-shrink: 0;
+    padding: 0;
+    outline: none !important;
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      color: #ffffff;
+    }
+
+    svg {
+      display: block;
+    }
+  }
+
+  @media (hover: none) {
+    &.active,
+    &.is-playing {
+      .quick-play-overlay {
+        opacity: 1;
+      }
+      .quick-play-btn {
+        transform: scale(1);
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .quick-card-info {
+      padding: 0 10px;
+    }
+
+    .quick-card-menu-btn {
+      margin-right: 6px;
+    }
+  }
+}
+
+/* Fallback / global specificity guarantee for .quick-card-menu-btn */
+.quick-card-menu-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   2. YOUTUBE MUSIC QUICK PICKS 4-ROW COLUMN RAIL (.ytm-quick-picks-rail)
+   -------------------------------------------------------------------------- */
+
+.ytm-quick-picks-rail {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(300px, 35vw, 360px);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 4px 12px;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    grid-auto-columns: clamp(260px, 80vw, 320px);
+    gap: 8px;
+    padding: 4px 4px 8px;
+  }
+}
+
+.ytm-track-row,
+.ytm-quick-pick-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.15s ease-out, border-color 0.15s ease;
+  position: relative;
+  scroll-snap-align: start;
+  contain: layout style;
+
+  &:hover {
+    background: #181818 !important;
+    transition: background 0s !important; /* Instant appear on hover — catches fast vertical / list sweeps */
+
+    .ytm-row-menu,
+    .ytm-pick-menu-btn,
+    .track-options-btn {
+      opacity: 1;
+    }
+
+    .ytm-thumb-overlay,
+    .ytm-pick-play-overlay {
+      opacity: 1;
+    }
+  }
+
+  &.active,
+  &.is-playing {
+    background: rgba(var(--color-primary-rgb, 245, 9, 25), 0.1);
+    border-left: 3px solid var(--color-primary, #f50919);
+
+    .ytm-row-title {
+      color: var(--color-primary, #f50919);
+    }
+
+    .ytm-row-menu,
+    .track-options-btn {
+      opacity: 1;
+    }
+  }
+
+  /* Thumbnail */
+  .ytm-row-thumb-wrap,
+  .ytm-pick-thumb-wrap {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #181818;
+  }
+
+  .ytm-row-thumb,
+  .ytm-pick-thumb,
+  .ytm-thumb,
+  img.ytm-thumb,
+  img {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+    background: #181818;
+  }
+
+  .ytm-thumb-overlay,
+  .ytm-pick-play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: 8px;
+    color: #ffffff;
+    pointer-events: none;
+  }
+
+  /* Info column */
+  .ytm-row-info,
+  .ytm-pick-info,
+  .track-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+
+    .ytm-row-title,
+    .ytm-pick-title,
+    .track-title,
+    h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    .ytm-row-channel,
+    .ytm-row-artist,
+    .ytm-pick-artist,
+    .track-channel,
+    p {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.55);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      line-height: 1.2;
+    }
+  }
+
+  /* 3-dots Menu Button */
+  .ytm-pick-menu-btn,
+  .ytm-row-menu,
+  .track-options-btn,
+  .row-menu-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50% !important;
+    background: transparent !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    outline: none;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      color: #ffffff !important;
+      opacity: 1 !important;
+      transform: scale(1.1);
+    }
+
+    &.menu-open {
+      opacity: 1 !important;
+      background: rgba(255, 255, 255, 0.15) !important;
+      color: #ffffff !important;
+    }
+  }
+
+  @media (hover: none) {
+    .ytm-row-menu,
+    .track-options-btn,
+    .row-menu-btn {
+      opacity: 0.7;
+    }
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   3. SPOTIFY & APPLE MUSIC STANDARD ALBUM CARDS (.modern-song-card)
+   -------------------------------------------------------------------------- */
+
+.modern-shelf-grid,
+.shelf-grid {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  padding: 6px 4px 16px !important;
+  margin: 0 !important;
+  scroll-behavior: smooth !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    gap: 12px !important;
+    padding: 4px 4px 12px !important;
+  }
+}
+
+.modern-song-card,
+.song-card.modern-song-card {
+  flex: 0 0 235px !important;
+  width: 235px !important;
+  max-width: 235px !important;
+  aspect-ratio: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1);
+  position: relative;
+  contain: layout style;
+
+  &:hover {
+    transform: translateY(-4px);
+
+    .modern-card-thumb img {
+      transform: scale(1.04);
+    }
+
+    .modern-play-fab,
+    .play-fab,
+    .play-btn-overlay {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-menu-btn,
+    .track-options-btn {
+      opacity: 1;
+    }
+  }
+
+  &.active,
+  &.is-playing {
+    .modern-card-thumb {
+      border-color: rgba(var(--color-primary-rgb), 0.6);
+      box-shadow: 0 6px 22px rgba(var(--color-primary-rgb), 0.3);
+    }
+
+    .modern-card-title,
+    .modern-track-title {
+      color: var(--color-primary);
+    }
+  }
+
+  &.menu-open {
+    z-index: 100;
+
+    .card-menu-btn,
+    .track-options-btn {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex: 0 0 175px !important;
+    width: 175px !important;
+    max-width: 175px !important;
+    gap: 8px;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  /* Artwork Container */
+  .modern-card-thumb {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+
+    /* Floating Play FAB */
+    .modern-play-fab,
+    .play-fab,
+    .play-btn-overlay {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(var(--color-primary-rgb), 0.5);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      z-index: 5;
+      outline: none;
+
+      &:hover {
+        transform: scale(1.08) translateY(0);
+        box-shadow: 0 8px 24px rgba(var(--color-primary-rgb), 0.7);
+      }
+
+      &.playing {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      svg {
+        display: block;
+        margin-left: 2px;
+      }
+    }
+
+    /* Active Ripple Equalizer Indicator */
+    .play-ripple,
+    .equalizer-indicator {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3.5px;
+      z-index: 4;
+      pointer-events: none;
+
+      .bar {
+        width: 3.5px;
+        background: var(--color-primary, #a855f7);
+        border-radius: 2px;
+        animation: cardEqualizerBounce 1.2s ease-in-out infinite;
+
+        &:nth-child(1) { height: 14px; animation-delay: 0s; }
+        &:nth-child(2) { height: 22px; animation-delay: 0.2s; }
+        &:nth-child(3) { height: 10px; animation-delay: 0.4s; }
+        &:nth-child(4) { height: 18px; animation-delay: 0.15s; }
+      }
+    }
+
+    /* 3-dots Menu Button in top-right */
+    .card-menu-btn,
+    .track-options-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.65);
+      color: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      z-index: 6;
+      cursor: pointer;
+      outline: none;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.9);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.24);
+        transform: scale(1.08);
+      }
+
+      &.menu-open {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.95);
+        color: #ffffff;
+      }
+    }
+
+    @media (hover: none) {
+      .card-menu-btn,
+      .track-options-btn {
+        opacity: 0.85;
+      }
+    }
+  }
+
+  /* Metadata UNDERNEATH the artwork */
+  .modern-card-meta,
+  .modern-card-info {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 8px;
+
+    .modern-card-title,
+    .modern-track-title,
+    .track-title {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.04rem;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.2s ease;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .modern-card-artist,
+    .modern-track-channel,
+    .track-channel {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 0.85rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+      margin-bottom: 0;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Equalizer Keyframes & Reduced Motion
+   -------------------------------------------------------------------------- */
+
+@keyframes cardEqualizerBounce {
+  0%, 100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modern-song-card,
+  .spotify-quick-card,
+  .ytm-track-row,
+  .modern-card-thumb img,
+  .modern-play-fab,
+  .play-fab,
+  .quick-play-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .play-ripple .bar,
+  .equalizer-indicator .bar {
+    animation: none !important;
+  }
+}

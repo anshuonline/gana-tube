@@ -30,7 +30,7 @@ function renderOfflinePage() {
         border-radius: 24px;
         padding: 40px 28px;
         text-align: center;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 80px rgba(168, 85, 247, 0.12);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 80px rgba(245, 9, 25, 0.15);
         backdrop-filter: blur(20px);
       }
       .glow-bg {
@@ -40,7 +40,7 @@ function renderOfflinePage() {
         transform: translateX(-50%);
         width: 180px;
         height: 180px;
-        background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, rgba(168, 85, 247, 0.15) 50%, transparent 70%);
+        background: radial-gradient(circle, rgba(245, 9, 25, 0.35) 0%, rgba(217, 8, 22, 0.15) 50%, transparent 70%);
         filter: blur(30px);
         pointer-events: none;
         z-index: 0;
@@ -60,8 +60,8 @@ function renderOfflinePage() {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       }
       .icon-box svg {
-        stroke: #ec4899;
-        filter: drop-shadow(0 0 12px rgba(236, 72, 153, 0.5));
+        stroke: var(--color-primary, #F50919);
+        filter: drop-shadow(0 0 12px rgba(245, 9, 25, 0.5));
         animation: pulse 2.5s ease-in-out infinite;
       }
       .status-badge {
@@ -104,7 +104,7 @@ function renderOfflinePage() {
       .retry-btn {
         width: 100%;
         padding: 14px 24px;
-        background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+        background: var(--gradient-primary, linear-gradient(135deg, #F50919 0%, #D90816 100%));
         border: none;
         border-radius: 14px;
         color: #ffffff;
@@ -112,7 +112,7 @@ function renderOfflinePage() {
         font-weight: 600;
         cursor: pointer;
         transition: all 0.25s ease;
-        box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35);
+        box-shadow: 0 8px 25px rgba(245, 9, 25, 0.35);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -120,7 +120,7 @@ function renderOfflinePage() {
       }
       .retry-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(236, 72, 153, 0.5);
+        box-shadow: 0 12px 30px rgba(245, 9, 25, 0.5);
       }
       .retry-btn:active {
         transform: translateY(0);

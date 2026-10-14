@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
+    "dev": "ng serve",
     "start:dev": "ng serve",
     "build": "echo Skipping frontend compilation because assets are pre-built",
     "build:local": "ng build",

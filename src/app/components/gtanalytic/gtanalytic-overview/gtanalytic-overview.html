@@ -192,7 +192,7 @@
         <div class="song-list">
           <div *ngFor="let s of topSongs(); let idx = index" class="song-item">
             <span class="song-rank">{{ idx + 1 }}</span>
-            <img [src]="s.thumbnail || '/ganatubenewlogo.png'" alt="Thumb" class="song-thumb" />
+            <img [src]="s.thumbnail || '/ganatube-logo.webp'" alt="Thumb" class="song-thumb" />
             <div class="song-meta">
               <span class="song-title">{{ s.title }}</span>
               <span class="song-artist">{{ s.artist || s.video_id }}</span>
@@ -225,7 +225,7 @@
 
           <div *ngFor="let s of guestTopSongs(); let idx = index" class="song-item">
             <span class="song-rank rank-pink">{{ idx + 1 }}</span>
-            <img [src]="s.thumbnail || '/ganatubenewlogo.png'" alt="Thumb" class="song-thumb" />
+            <img [src]="s.thumbnail || '/ganatube-logo.webp'" alt="Thumb" class="song-thumb" />
             <div class="song-meta">
               <span class="song-title">{{ s.title }}</span>
               <span class="song-artist">{{ s.artist || 'Guest Visitor' }}</span>

@@ -30,7 +30,7 @@
             <div class="cm-artwork" [class.ad-active]="showCoverAd">
               <img 
                 *ngIf="!imageLoadError"
-                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatubenewlogo.png'" 
+                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatube-logo.webp'" 
                 [alt]="playerService.currentTrack()?.title"
                 (error)="onImageError()"
                 class="cm-album-art"
@@ -94,8 +94,8 @@
               </button>
 
               <button class="cm-btn cm-btn-secondary" (click)="playerService.toggleRepeat()">
-                <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="28" style="stroke: #9333ea"></svg>
-                <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="28" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+                <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="28" style="stroke: var(--color-primary)"></svg>
+                <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="28" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : 'var(--color-primary)'"></svg>
               </button>
             </div>
           </div>
@@ -268,7 +268,7 @@
             <div class="cm-artwork" [class.ad-active]="showCoverAd">
               <img 
                 *ngIf="!imageLoadError"
-                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatubenewlogo.png'" 
+                [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatube-logo.webp'" 
                 [alt]="playerService.currentTrack()?.title"
                 (error)="onImageError()"
                 class="cm-album-art"
@@ -332,8 +332,8 @@
               </button>
 
               <button class="cm-btn cm-btn-secondary" (click)="playerService.toggleRepeat()">
-                <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="28" style="stroke: #9333ea"></svg>
-                <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="28" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+                <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="28" style="stroke: var(--color-primary)"></svg>
+                <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="28" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : 'var(--color-primary)'"></svg>
               </button>
             </div>
           </div>

@@ -279,6 +279,30 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     }
     
     this.isLoading.set(true);
+    if (this.playlist.language) {
+      this.youtubeApi.getSaavnTrending(this.playlist.language, 30).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (trendingSongs) => {
+          if (trendingSongs && trendingSongs.length > 0) {
+            this.songs.set(trendingSongs);
+            this.isLoading.set(false);
+            this.fetchMissingDurations();
+            this.loadSuggestedSongs();
+          } else {
+            this.fallbackToPlaylistQueries();
+          }
+        },
+        error: () => {
+          this.fallbackToPlaylistQueries();
+        }
+      });
+      return;
+    }
+
+    this.fallbackToPlaylistQueries();
+  }
+
+  private fallbackToPlaylistQueries(): void {
+    this.isLoading.set(true);
     this.youtubeApi.getPlaylistSongs(this.playlist.searchQueries, this.playlist.id).pipe(takeUntil(this.destroy$)).subscribe((results) => {
       this.songs.set(results);
       this.isLoading.set(false);

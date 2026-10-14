@@ -76,24 +76,24 @@ export class GtanalyticDailyComponent implements OnInit {
       {
         data: days.map((d: any) => d.total_plays || 0),
         label: 'Total Plays',
-        backgroundColor: 'rgba(168, 85, 247, 0.15)',
-        borderColor: '#a855f7',
+        backgroundColor: 'rgba(245, 9, 25, 0.15)',
+        borderColor: '#F50919',
         borderWidth: 2,
         fill: true,
         tension: 0.4,
         pointRadius: 4,
-        pointBackgroundColor: '#a855f7'
+        pointBackgroundColor: '#F50919'
       },
       {
         data: days.map((d: any) => d.guest_plays || 0),
         label: 'Guest Plays',
-        backgroundColor: 'rgba(236, 72, 153, 0.1)',
-        borderColor: '#ec4899',
+        backgroundColor: 'rgba(217, 8, 22, 0.1)',
+        borderColor: '#D90816',
         borderWidth: 2,
         fill: true,
         tension: 0.4,
         pointRadius: 4,
-        pointBackgroundColor: '#ec4899'
+        pointBackgroundColor: '#D90816'
       }
     ];
   });
@@ -199,13 +199,13 @@ export class GtanalyticDailyComponent implements OnInit {
           return +(gPlays * 210 / 3600).toFixed(1);
         }),
         label: 'Guest Hours',
-        backgroundColor: 'rgba(236, 72, 153, 0.1)',
-        borderColor: '#ec4899',
+        backgroundColor: 'rgba(217, 8, 22, 0.1)',
+        borderColor: '#D90816',
         borderWidth: 2,
         fill: false,
         tension: 0.4,
         pointRadius: 3,
-        pointBackgroundColor: '#ec4899'
+        pointBackgroundColor: '#D90816'
       }
     ];
   });

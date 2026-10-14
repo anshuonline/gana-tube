@@ -11,6 +11,7 @@ export interface PlaylistMeta {
   is_owner?: boolean;
   is_saved?: boolean;
   playCount?: number;
+  description?: string;
 }
 
 export const PLAYLISTS: PlaylistMeta[] = [

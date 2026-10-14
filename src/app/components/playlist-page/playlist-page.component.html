@@ -1,61 +1,69 @@
 <div class="playlist-page">
-  <button class="back-btn" (click)="goBack()">
-    <svg lucideArrowLeft [attr.size]="24"></svg>
+  <button class="back-btn" (click)="goBack()" aria-label="Go back" title="Go back">
+    <svg lucideArrowLeft [attr.size]="22"></svg>
   </button>
 
-  <div class="playlist-header">
-    <div class="playlist-cover-container">
-      <img *ngIf="playlist.id !== 'liked-songs'" [src]="playlist.coverImage" [alt]="displayTitle" class="playlist-cover" loading="eager" fetchpriority="high" width="300" height="300" (error)="$event.target.onerror = null; $event.target.src = 'https://ui-avatars.com/api/?name=' + displayTitle + '&background=random&color=fff&size=400'">
-      
+  <!-- Spotify-Style Editorial Playlist Header -->
+  <div class="spotify-header">
+    <div class="spotify-cover-box">
+      <img *ngIf="playlist.id !== 'liked-songs'"
+           [src]="playlist.coverImage"
+           [alt]="displayTitle"
+           class="spotify-cover"
+           loading="eager"
+           fetchpriority="high"
+           width="232"
+           height="232"
+           (error)="$event.target.onerror = null; $event.target.src = 'https://ui-avatars.com/api/?name=' + displayTitle + '&background=random&color=fff&size=400'">
 
-      <div *ngIf="playlist.id === 'liked-songs'" class="liked-songs-cover">
-        <svg lucideHeart [attr.size]="64" fill="white" stroke="none" class="glowing-heart"></svg>
+      <div *ngIf="playlist.id === 'liked-songs'" class="spotify-liked-cover">
+        <svg lucideHeart [attr.size]="72" fill="white" stroke="none" class="glowing-heart"></svg>
       </div>
     </div>
-    <div class="playlist-info">
-      <h1 class="playlist-title">{{ displayTitle }}</h1>
-      <p class="playlist-meta">
-        {{ playlist.creator ? playlist.creator : 'GanaTube Curated' }}
-        <span *ngIf="playlist.is_public !== undefined"> • {{ playlist.is_public ? 'Public' : 'Private' }}</span>
-        • {{ isLoading() ? 'Loading...' : songs().length + ' songs' }}
-      </p>
 
-      <div class="playlist-stats" *ngIf="playlist.id !== 'liked-songs'">
-        <span>{{ getFormattedPlayCount() }}</span>
-        <span class="dot-separator">•</span>
-        <span>{{ getEstimatedDuration() }}</span>
-      </div>
+    <div class="spotify-meta-col">
+      <span class="spotify-type-label">
+        {{ playlist.is_public !== undefined ? (playlist.is_public ? 'Public Playlist' : 'Private Playlist') : 'Playlist' }}
+      </span>
 
-      <div class="playlist-actions">
-        <div class="actions-primary">
-          <button class="pl-action-btn pl-play-all" (click)="playAll()" [disabled]="isLoading() || songs().length === 0">
-            <svg lucidePlay [attr.size]="18" fill="currentColor"></svg>
-            <span>Play all</span>
-          </button>
-          
-          <button class="pl-action-btn pl-outline pl-shuffle" (click)="shufflePlay()" [disabled]="isLoading() || songs().length === 0">
-            <svg lucideShuffle [attr.size]="18"></svg>
-            <span>Shuffle</span>
-          </button>
-        </div>
+      <h1 class="spotify-playlist-title" [title]="displayTitle">{{ displayTitle }}</h1>
 
-        <div class="actions-secondary" *ngIf="playlist.id !== 'liked-songs'">
-          <ng-container *ngIf="!playlist.is_owner">
-            <button class="pl-action-btn pl-outline pl-save" (click)="toggleSavePlaylist()" [class.active]="isSaved()">
-              <svg lucideFolderPlus [attr.size]="18" *ngIf="!isSaved()"></svg>
-              <svg lucideCheck [attr.size]="18" *ngIf="isSaved()"></svg>
-              <span>{{ isSaved() ? 'Saved' : 'Save Playlist' }}</span>
-            </button>
-          </ng-container>
+      <p class="spotify-playlist-desc" *ngIf="playlist.description">{{ playlist.description }}</p>
 
-          <button class="pl-action-btn pl-outline pl-share" (click)="sharePlaylist()" [class.active]="isCopied()">
-            <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="18"></svg>
-            <svg *ngIf="isCopied()" lucideCheck [attr.size]="18"></svg>
-            <span>{{ isCopied() ? 'Copied' : 'Share' }}</span>
-          </button>
-        </div>
+      <div class="spotify-meta-line">
+        <span class="spotify-creator-name">{{ playlist.creator ? playlist.creator : 'GanaTube Curated' }}</span>
+        <span class="spotify-meta-sep">•</span>
+        <span class="spotify-song-count">{{ isLoading() ? 'Loading...' : songs().length + ' songs' }}</span>
+        <span class="spotify-meta-sep" *ngIf="playlist.id !== 'liked-songs'">•</span>
+        <span class="spotify-stats-plays" *ngIf="playlist.id !== 'liked-songs'">{{ getFormattedPlayCount() }}</span>
+        <span class="spotify-meta-sep" *ngIf="playlist.id !== 'liked-songs'">•</span>
+        <span class="spotify-duration" *ngIf="playlist.id !== 'liked-songs'">{{ getEstimatedDuration() }}</span>
       </div>
     </div>
+  </div>
+
+  <!-- Spotify-Style Action Bar (Iconic Big Play Button + Controls) -->
+  <div class="spotify-action-bar">
+    <button class="spotify-play-btn" (click)="playAll()" [disabled]="isLoading() || songs().length === 0" [attr.aria-label]="'Play ' + displayTitle" title="Play">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </button>
+
+    <button class="spotify-icon-btn spotify-shuffle-btn" (click)="shufflePlay()" [disabled]="isLoading() || songs().length === 0" title="Shuffle Play">
+      <svg lucideShuffle [attr.size]="22"></svg>
+    </button>
+
+    <ng-container *ngIf="playlist.id !== 'liked-songs' && !playlist.is_owner">
+      <button class="spotify-icon-btn spotify-save-btn" (click)="toggleSavePlaylist()" [class.active]="isSaved()" [title]="isSaved() ? 'Saved to Library' : 'Save to Library'">
+        <svg lucideHeart [attr.size]="24" [attr.fill]="isSaved() ? 'currentColor' : 'none'"></svg>
+      </button>
+    </ng-container>
+
+    <button class="spotify-icon-btn spotify-share-btn" (click)="sharePlaylist()" [class.active]="isCopied()" [title]="isCopied() ? 'Link Copied' : 'Share Playlist'">
+      <svg *ngIf="!isCopied()" lucideShare2 [attr.size]="22"></svg>
+      <svg *ngIf="isCopied()" lucideCheck [attr.size]="22"></svg>
+    </button>
   </div>
 
   <div class="playlist-content">

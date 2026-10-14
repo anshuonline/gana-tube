@@ -5,8 +5,8 @@
   <svg width="0" height="0" style="position: absolute" aria-hidden="true">
     <defs>
       <linearGradient id="gtHeartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#a855f7"/>
-        <stop offset="100%" stop-color="#ec4899"/>
+        <stop offset="0%" stop-color="var(--color-primary)"/>
+        <stop offset="100%" stop-color="var(--color-primary-hover)"/>
       </linearGradient>
     </defs>
   </svg>
@@ -134,7 +134,7 @@
               <h4>Auto-play</h4>
               <p>Add similar content to the end of the queue</p>
             </div>
-            <label class="gt-switch purple">
+            <label class="gt-switch">
               <input type="checkbox" [checked]="playerService.isAutoplayEnabled()" (change)="onAutoplayToggle()">
               <span class="gt-slider round"></span>
             </label>
@@ -406,8 +406,8 @@
             class="fs-bar-btn secondary repeat-btn" 
             (click)="playerService.toggleRepeat()" 
             [title]="'Repeat: ' + playerService.repeatMode()">
-            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="18" style="stroke: #a855f7"></svg>
-            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="18" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#a855f7'"></svg>
+            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="18" style="stroke: var(--color-primary)"></svg>
+            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="18" [style.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : 'var(--color-primary)'"></svg>
           </button>
 
           <button 

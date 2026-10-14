@@ -591,7 +591,7 @@
   transition: color 0.2s;
 
   svg[fill="currentColor"] {
-    color: #e91e63;
+    color: var(--color-primary);
   }
 }
 
@@ -806,7 +806,7 @@
     &:hover,
     &:active {
       background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(168, 85, 247, 0.3);
+      border-color: rgba(var(--color-primary-rgb), 0.3);
       transform: translateY(-1px);
     }
   }
@@ -818,7 +818,7 @@
     color: rgba(255, 255, 255, 0.7);
 
     svg {
-      color: #ec4899;
+      color: var(--color-primary);
     }
   }
 
@@ -863,7 +863,7 @@
     -webkit-backdrop-filter: blur(28px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(168, 85, 247, 0.08);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(var(--color-primary-rgb), 0.08);
   }
 
   .cm-tab-btn {
@@ -892,13 +892,13 @@
     }
 
     &.active {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(236, 72, 153, 0.16) 100%);
-      border-color: rgba(168, 85, 247, 0.35);
+      background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.22) 0%, rgba(var(--color-primary-rgb), 0.16) 100%);
+      border-color: rgba(var(--color-primary-rgb), 0.35);
       color: #ffffff;
-      box-shadow: 0 4px 16px rgba(168, 85, 247, 0.25);
+      box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.25);
 
       .cm-tab-icon-wrap {
-        color: #d946ef;
+        color: var(--color-primary);
         transform: scale(1.05);
       }
 
@@ -937,7 +937,7 @@
       display: block;
       width: 2.5px;
       border-radius: 2px;
-      background: linear-gradient(180deg, #ec4899 0%, #a855f7 100%);
+      background: var(--gradient-primary);
       animation: tab-eq-bounce 0.8s ease-in-out infinite;
 
       &:nth-child(1) { height: 8px; animation-delay: 0s; }
@@ -961,9 +961,9 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 
     .active & {
-      background: rgba(168, 85, 247, 0.35);
+      background: rgba(var(--color-primary-rgb), 0.35);
       color: #ffffff;
-      border-color: rgba(168, 85, 247, 0.5);
+      border-color: rgba(var(--color-primary-rgb), 0.5);
     }
   }
 

@@ -16,7 +16,7 @@
     transform: translate(-50%, -50%);
     width: 380px;
     height: 380px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(236, 72, 153, 0.05) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--color-primary-rgb), 0.15) 0%, rgba(var(--color-primary-rgb), 0.05) 50%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }
@@ -103,8 +103,8 @@
 
     &:focus {
       outline: none;
-      border-color: #a855f7;
-      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
       background: #14141c;
     }
 
@@ -117,7 +117,7 @@
 .btn-login-submit {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  background: var(--gradient-primary);
   border: none;
   border-radius: 12px;
   color: #ffffff;
@@ -125,11 +125,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.25);
+  box-shadow: 0 8px 24px rgba(var(--color-primary-rgb), 0.25);
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 12px 28px rgba(168, 85, 247, 0.35);
+    box-shadow: 0 12px 28px rgba(var(--color-primary-rgb), 0.35);
   }
 
   &:active:not(:disabled) {
@@ -231,8 +231,8 @@
   top: calc(100% + 10px);
   right: 0;
   background: #0d0d14;
-  border: 1px solid rgba(236, 72, 153, 0.5);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.95), 0 0 20px rgba(236, 72, 153, 0.25);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.95), 0 0 20px rgba(var(--color-primary-rgb), 0.25);
   padding: 8px 14px;
   border-radius: 12px;
   display: flex;
@@ -248,7 +248,7 @@
     font-weight: 700;
     color: #ffffff;
     letter-spacing: 0.3px;
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -266,8 +266,8 @@
     width: 10px;
     height: 10px;
     background: #0d0d14;
-    border-left: 1px solid rgba(236, 72, 153, 0.5);
-    border-top: 1px solid rgba(236, 72, 153, 0.5);
+    border-left: 1px solid rgba(var(--color-primary-rgb), 0.5);
+    border-top: 1px solid rgba(var(--color-primary-rgb), 0.5);
     transform: rotate(45deg);
   }
 

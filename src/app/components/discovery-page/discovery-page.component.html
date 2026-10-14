@@ -2,64 +2,314 @@
   
   <div class="discovery-main">
     
-    <!-- Discovery Header -->
-    <div class="top-header-section" *ngIf="!isSearching">
-      <div class="header-icon-box">
-        <svg lucideCompass [attr.size]="24"></svg>
-      </div>
-      <div class="header-text-content">
-        <h2>Discover the Vibe</h2>
-        <p>Curated tracks that everyone is listening to</p>
-      </div>
-    </div>
+    <!-- ─── Skeleton Loading State ──────────────────────────────────────── -->
+    <div class="fs-explore-skeleton-wrap" *ngIf="isInitialLoading">
+      <div class="fs-skeleton-spotlight shimmer"></div>
 
-    <!-- Video Feed -->
-    <div class="discovery-feed">
-      <!-- Loading State -->
-      <div class="loading-state" *ngIf="isSearching">
-        <div class="spinner"></div>
-        <p>{{ loadingMessage }}</p>
-      </div>
-      
-      <!-- Error State -->
-      <div class="error-state" *ngIf="errorMessage">
-        <p>{{ errorMessage }}</p>
-      </div>
-
-      <!-- Results Grid (Premium Gradient Style) -->
-      <div class="discovery-gradient-grid" *ngIf="results.length > 0 && !isSearching">
-        <div class="gradient-track-card" *ngFor="let track of results; let i = index" (click)="onPlay(track)" (contextmenu)="onRightClick($event, track)" [style.animation-delay]="i * 0.05 + 's'">
-          
-          <div class="thumbnail-wrapper">
-            <img [src]="track.thumbnailHigh || track.thumbnail" alt="thumbnail" />
-            <div class="play-overlay">
-              <svg lucidePlay [attr.size]="32" [attr.fill]="'currentColor'"></svg>
-            </div>
-          </div>
-          
-          <div class="info-container">
-            <h3 class="title" [title]="track.title">{{ track.title }}</h3>
-            <p class="channel">
-              <svg lucideMusic [attr.size]="12"></svg>
-              {{ track.channelTitle }}
-            </p>
-          </div>
-          
+      <div class="fs-skeleton-section">
+        <div class="fs-skeleton-line shimmer" style="width: 220px; height: 26px;"></div>
+        <div class="fs-skeleton-row">
+          <div class="fs-skeleton-tile shimmer" *ngFor="let s of [1,2,3,4,5,6]"></div>
         </div>
       </div>
 
-      <!-- Scroll loader -->
-      <div class="scroll-loader" *ngIf="loadingMore">
-         <div class="spinner-small"></div>
+      <div class="fs-skeleton-section">
+        <div class="fs-skeleton-line shimmer" style="width: 180px; height: 26px;"></div>
+        <div class="fs-moods-grid">
+          <div class="fs-skeleton-mood shimmer" *ngFor="let m of [1,2,3,4,5,6,7,8]"></div>
+        </div>
       </div>
     </div>
+
+    <!-- ─── Error State ────────────────────────────────────────────────── -->
+    <div class="fs-explore-empty" *ngIf="!isInitialLoading && errorMessage && !spotlight">
+      <div class="empty-icon-wrap">
+        <svg lucideCompass [attr.size]="44"></svg>
+      </div>
+      <h2>Nothing to explore right now</h2>
+      <p>{{ errorMessage }}</p>
+      <button class="fs-explore-retry" (click)="loadExploreData()">
+        Retry
+      </button>
+    </div>
+
+    <!-- ─── Live Content ───────────────────────────────────────────────── -->
+    <div class="fs-explore-content" *ngIf="!isInitialLoading && spotlight">
+
+      <!-- ─── Page Header ─────────────────────────────────────────────── -->
+      <header class="fs-explore-header">
+        <div class="fs-header-left">
+          <h1 class="fs-explore-heading">Explore</h1>
+          <p class="fs-explore-sub">Live charts, fresh drops & moods tuned for you</p>
+        </div>
+        <div class="fs-explore-live-badge">
+          <span class="live-pulse-dot"></span>
+          <svg lucideTrendingUp [attr.size]="14"></svg>
+          <span>Trending Now</span>
+        </div>
+      </header>
+
+      <!-- ─── Spotlight Hero (Trending #1 Track) ───────────────────────── -->
+      <section class="fs-explore-spotlight" [class.playing]="isSpotlightPlaying()" (contextmenu)="spotlight && onRightClick($event, spotlight)">
+        <div class="fs-spotlight-art" (click)="handleSpotlightPlay()">
+          <img
+            [src]="spotlight.thumbnailHigh || spotlight.thumbnail"
+            [alt]="spotlight.title"
+            loading="lazy"
+            (error)="onImgError($event, spotlight)"
+          />
+          <div class="fs-spotlight-art-overlay">
+            <svg *ngIf="!isSpotlightPlaying()" lucidePlay [attr.size]="36" fill="currentColor"></svg>
+            <svg *ngIf="isSpotlightPlaying()" lucidePause [attr.size]="36" fill="currentColor"></svg>
+          </div>
+        </div>
+
+        <div class="fs-spotlight-info">
+          <span class="fs-spotlight-eyebrow">
+            <svg lucideTrendingUp [attr.size]="14"></svg>
+            Trending #1 • Live Chart
+          </span>
+          <h2 class="fs-spotlight-title" [title]="spotlight.title">{{ spotlight.title }}</h2>
+          <p class="fs-spotlight-artist">{{ spotlight.channelTitle }}</p>
+
+          <div class="fs-spotlight-actions">
+            <button class="fs-spotlight-play-btn" (click)="handleSpotlightPlay()">
+              <svg *ngIf="!isSpotlightPlaying()" lucidePlay [attr.size]="18" fill="currentColor"></svg>
+              <svg *ngIf="isSpotlightPlaying()" lucidePause [attr.size]="18" fill="currentColor"></svg>
+              <span>{{ isSpotlightPlaying() ? 'Pause' : 'Play Now' }}</span>
+            </button>
+            <button class="fs-spotlight-radio-btn" (click)="exploreArtist(spotlight.channelTitle)">
+              More from artist
+            </button>
+            <button type="button" class="fs-spotlight-menu-btn track-options-btn" (click)="on3DotClick($event, spotlight)" title="Options">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Trending Now Carousel ───────────────────────────────────── -->
+      <section class="fs-shelf-section" *ngIf="trendingNow.length > 0">
+        <div class="fs-shelf-header">
+          <div>
+            <span class="fs-shelf-eyebrow">LIVE TRENDING CHART • INDIA</span>
+            <h2 class="fs-shelf-title">Trending Now</h2>
+          </div>
+          <div class="fs-carousel-controls">
+            <button class="carousel-nav-btn" (click)="scrollTrending('left')" aria-label="Previous">
+              <svg lucideChevronLeft [attr.size]="20"></svg>
+            </button>
+            <button class="carousel-nav-btn" (click)="scrollTrending('right')" aria-label="Next">
+              <svg lucideChevronRight [attr.size]="20"></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="fs-trending-carousel" #trendingRail>
+          <div
+            class="fs-song-tile modern-song-card"
+            *ngFor="let song of trendingNow; let i = index"
+            [class.active]="isCurrentTrack(song)"
+            (click)="onPlayTrack(song, trendingNow)"
+            (contextmenu)="onRightClick($event, song)"
+          >
+            <!-- Artwork with rank badge, hover play, and 3-dots menu -->
+            <div class="fs-song-tile-art modern-card-thumb">
+              <img
+                [src]="song.thumbnailHigh || song.thumbnail"
+                [alt]="song.title"
+                loading="lazy"
+                (error)="onImgError($event, song)"
+              />
+              <span class="fs-song-tile-rank">#{{ i + 1 }}</span>
+
+              <!-- Active Equalizer Wave Indicator -->
+              <div class="play-ripple" *ngIf="isCurrentTrack(song) && playerService.isPlaying()">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              </div>
+
+              <!-- 3-Dots Menu Button (Top Right) -->
+              <button type="button" class="fs-song-menu-btn track-options-btn" (click)="on3DotClick($event, song)" title="Options">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+              </button>
+
+              <!-- Play FAB (Bottom Right) -->
+              <div class="fs-song-tile-play play-fab" [class.show]="isCurrentTrack(song)" [class.playing]="isCurrentTrack(song) && playerService.isPlaying()">
+                <svg *ngIf="isCurrentTrack(song) && playerService.isPlaying()" lucidePause [attr.size]="18" fill="currentColor"></svg>
+                <svg *ngIf="!(isCurrentTrack(song) && playerService.isPlaying())" lucidePlay [attr.size]="18" fill="currentColor"></svg>
+              </div>
+            </div>
+
+            <!-- Meta details -->
+            <div class="fs-song-tile-meta modern-card-info">
+              <h4 class="fs-song-tile-title modern-track-title" [title]="song.title">{{ song.title }}</h4>
+              <p class="fs-song-tile-artist modern-track-channel" [title]="song.channelTitle">{{ song.channelTitle }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Dynamic Curated Mood Results (When selected) ────────────── -->
+      <section class="fs-shelf-section fs-curated-active-section" id="curated-mood-section" *ngIf="selectedCategory">
+        <div class="fs-shelf-header">
+          <div>
+            <span class="fs-shelf-eyebrow">CURATED SELECTION</span>
+            <h2 class="fs-shelf-title">{{ selectedCategory.name }}</h2>
+          </div>
+          <button class="fs-clear-curated-btn" (click)="clearCategory()">
+            Show All
+          </button>
+        </div>
+
+        <!-- Curating spinner -->
+        <div class="fs-curating-loader" *ngIf="isCuratingMood">
+          <div class="spinner"></div>
+          <p>Tuning frequencies for {{ selectedCategory.name }}...</p>
+        </div>
+
+        <!-- Curated Grid -->
+        <div class="fs-curated-grid" *ngIf="!isCuratingMood && curatedTracks.length > 0">
+          <div
+            class="fs-curated-card modern-song-card"
+            *ngFor="let track of curatedTracks"
+            [class.active]="isCurrentTrack(track)"
+            (click)="onPlayTrack(track, curatedTracks)"
+            (contextmenu)="onRightClick($event, track)"
+          >
+            <div class="fs-curated-thumb-wrap modern-card-thumb">
+              <img
+                [src]="track.thumbnailHigh || track.thumbnail"
+                [alt]="track.title"
+                loading="lazy"
+                (error)="onImgError($event, track)"
+              />
+              <!-- Active Equalizer Wave Indicator -->
+              <div class="play-ripple" *ngIf="isCurrentTrack(track) && playerService.isPlaying()">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              </div>
+
+              <!-- 3-Dots Menu Button (Top Right) -->
+              <button type="button" class="fs-card-menu-btn track-options-btn" (click)="on3DotClick($event, track)" title="Options">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+              </button>
+
+              <div class="fs-curated-play-overlay play-fab" [class.playing]="isCurrentTrack(track) && playerService.isPlaying()">
+                <svg *ngIf="isCurrentTrack(track) && playerService.isPlaying()" lucidePause [attr.size]="24" fill="currentColor"></svg>
+                <svg *ngIf="!(isCurrentTrack(track) && playerService.isPlaying())" lucidePlay [attr.size]="24" fill="currentColor"></svg>
+              </div>
+            </div>
+            <div class="fs-curated-meta modern-card-info">
+              <h4 class="fs-curated-title modern-track-title" [title]="track.title">{{ track.title }}</h4>
+              <p class="fs-curated-artist modern-track-channel">{{ track.channelTitle }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Moods & Genres Browse Grid ──────────────────────────────── -->
+      <section class="fs-shelf-section">
+        <div class="fs-shelf-header">
+          <div>
+            <span class="fs-shelf-eyebrow">BROWSE ALL</span>
+            <h2 class="fs-shelf-title">Moods & Genres</h2>
+          </div>
+        </div>
+
+        <div class="fs-moods-grid">
+          <button
+            *ngFor="let cat of categories"
+            class="fs-mood-tile"
+            [style.background]="cat.gradient"
+            (click)="selectCategory(cat)"
+          >
+            <span class="fs-mood-tile-name">{{ cat.name }}</span>
+            <span class="fs-mood-tile-icon" [ngSwitch]="cat.icon">
+              <svg *ngSwitchCase="'heart'" lucideHeart [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'flame'" lucideFlame [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'coffee'" lucideCoffee [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'zap'" lucideZap [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'music'" lucideMusic [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'activity'" lucideActivity [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'sparkles'" lucideSparkles [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'headphones'" lucideHeadphones [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'radio'" lucideRadio [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'disc'" lucideDisc [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchCase="'compass'" lucideCompass [attr.size]="52" strokeWidth="1.6"></svg>
+              <svg *ngSwitchDefault lucideMusic [attr.size]="52" strokeWidth="1.6"></svg>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ─── Latest Releases & Fresh Drops (Row List Layout) ─────────── -->
+      <section class="fs-shelf-section" *ngIf="freshDrops.length > 0">
+        <div class="fs-shelf-header">
+          <div>
+            <span class="fs-shelf-eyebrow">NEW MUSIC • OFFICIAL RELEASES</span>
+            <h2 class="fs-shelf-title">Latest Releases & Fresh Drops</h2>
+          </div>
+        </div>
+
+        <div class="fs-fresh-drops-list">
+          <div
+            class="fs-song-row"
+            *ngFor="let drop of freshDrops; let i = index"
+            [class.active]="isCurrentTrack(drop)"
+            (click)="onPlayTrack(drop, freshDrops)"
+            (contextmenu)="onRightClick($event, drop)"
+          >
+            <!-- Track Index Number / Equalizer -->
+            <div class="fs-song-index-col">
+              <span *ngIf="!isCurrentTrack(drop)" class="fs-song-index-num">{{ i + 1 }}</span>
+              <svg *ngIf="!isCurrentTrack(drop)" lucidePlay [attr.size]="14" fill="currentColor" class="fs-song-index-hover-play"></svg>
+              <span *ngIf="isCurrentTrack(drop)" class="fs-playing-equalizer">
+                <span class="eq-bar bar-1"></span>
+                <span class="eq-bar bar-2"></span>
+                <span class="eq-bar bar-3"></span>
+              </span>
+            </div>
+
+            <!-- Artwork Thumbnail -->
+            <div class="fs-song-thumb-wrap">
+              <img
+                [src]="drop.thumbnailHigh || drop.thumbnail"
+                [alt]="drop.title"
+                loading="lazy"
+                (error)="onImgError($event, drop)"
+              />
+              <div class="fs-song-thumb-overlay" [class.show]="isCurrentTrack(drop)">
+                <svg *ngIf="isCurrentTrack(drop)" lucidePause [attr.size]="16" fill="currentColor"></svg>
+                <svg *ngIf="!isCurrentTrack(drop)" lucidePlay [attr.size]="16" fill="currentColor"></svg>
+              </div>
+            </div>
+
+            <!-- Title & Artist -->
+            <div class="fs-song-info">
+              <span class="fs-song-title" [title]="drop.title">{{ drop.title }}</span>
+              <span class="fs-song-artist" [title]="drop.channelTitle">{{ drop.channelTitle }}</span>
+            </div>
+
+            <!-- Right metadata -->
+            <div class="fs-song-right">
+              <span class="fs-fresh-tag">Fresh</span>
+              <span class="fs-song-duration" *ngIf="drop.duration">{{ formatDuration(drop.duration) }}</span>
+              <button type="button" class="fs-row-menu-btn track-options-btn" (click)="on3DotClick($event, drop)" title="Options">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
   </div>
 
-  <!-- Floating Aura Chat Bubble -->
+  <!-- ─── Floating Aura AI Chat Assistant ─────────────────────────────── -->
   <div class="aura-container" [class.minimized]="isAuraMinimized" [class.has-player]="playerService.currentTrack() !== null">
     
-    <!-- Collapsed FAB -->
-    <button class="aura-fab" *ngIf="isAuraMinimized" (click)="toggleAura()">
+    <!-- Collapsed Floating FAB Button -->
+    <button class="aura-fab" *ngIf="isAuraMinimized" (click)="toggleAura()" title="Curate with Aura AI">
       <svg lucideSparkles [attr.size]="24"></svg>
     </button>
 
@@ -68,9 +318,9 @@
       <div class="ask-header">
         <div class="header-left">
           <svg lucideSparkles [attr.size]="20" class="ask-icon"></svg>
-          <h3>Aura</h3>
+          <h3>Aura AI Vibe Curator</h3>
         </div>
-        <button class="minimize-btn" (click)="toggleAura()">
+        <button class="minimize-btn" (click)="toggleAura()" title="Minimize">
           <svg lucideMinus [attr.size]="20"></svg>
         </button>
       </div>
@@ -78,22 +328,28 @@
       <div class="ask-body">
         <p>Tell me what you're in the mood for. I'll curate the perfect mix instantly.</p>
         <div class="prompt-examples">
-          <button (click)="askQuery = 'Anuv Jain & Prateek Kuhad vibe'; askAI()">"Anuv Jain & Prateek Kuhad vibe"</button>
-          <button (click)="askQuery = 'Late night driving mix'; askAI()">"Late night driving mix"</button>
-          <button (click)="askQuery = 'English Hindi Gen Z mix'; askAI()">"English Hindi Gen Z mix"</button>
+          <button (click)="askQuery = 'Anuv Jain & Prateek Kuhad vibe'; askAI()">
+            "Anuv Jain & Prateek Kuhad vibe"
+          </button>
+          <button (click)="askQuery = 'Late night driving mix'; askAI()">
+            "Late night driving mix"
+          </button>
+          <button (click)="askQuery = 'Bollywood 90s monsoon memories'; askAI()">
+            "Bollywood 90s monsoon memories"
+          </button>
         </div>
       </div>
       
       <div class="ask-input-area">
         <textarea 
           [(ngModel)]="askQuery" 
-          placeholder="E.g., Arijit Singh romantic hits..."
+          placeholder="E.g., Arijit Singh acoustic heartbreaks..."
           (keyup.enter)="$event.preventDefault(); askAI()"
           rows="2"
         ></textarea>
-        <button class="send-btn" (click)="askAI()" [disabled]="isSearching || !askQuery.trim()">
-          <span *ngIf="!isSearching">Curate</span>
-          <div class="spinner-small" *ngIf="isSearching"></div>
+        <button class="send-btn" (click)="askAI()" [disabled]="isSearchingAI || !askQuery.trim()">
+          <span *ngIf="!isSearchingAI">Curate</span>
+          <div class="spinner-small" *ngIf="isSearchingAI"></div>
         </button>
       </div>
     </div>

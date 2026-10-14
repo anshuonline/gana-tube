@@ -1107,7 +1107,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
 
   getSpeedProgressBackground(speed: number): string {
     const pct = Math.max(0, Math.min(100, ((speed - 1) / (5 - 1)) * 100));
-    return `linear-gradient(to right, #a855f7 0%, #ec4899 ${pct}%, rgba(255, 255, 255, 0.15) ${pct}%, rgba(255, 255, 255, 0.15) 100%)`;
+    return `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary-hover, var(--color-primary)) ${pct}%, rgba(255, 255, 255, 0.15) ${pct}%, rgba(255, 255, 255, 0.15) 100%)`;
   }
 
   @HostListener('document:click', ['$event'])

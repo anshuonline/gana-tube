@@ -1,8 +1,8 @@
 /* Desktop styling (default) */
 .track-menu-container {
   position: fixed; /* Escape all overflow containers */
-  background: #121212; /* AMOLED Black as requested */
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #0a0a0f; /* Pure AMOLED Deep Card */
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.9);
   min-width: 260px;
@@ -175,17 +175,17 @@
     padding: 8px 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #ec4899;
+    color: var(--color-primary-hover);
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    background: rgba(168, 85, 247, 0.08);
+    background: rgba(var(--color-primary-rgb), 0.08);
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(168, 85, 247, 0.18);
-      color: #f472b6;
+      background: rgba(var(--color-primary-rgb), 0.18);
+      color: var(--color-primary);
     }
 
     svg {
@@ -204,9 +204,13 @@
 .track-menu-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: transparent;
   z-index: 999998;
-  animation: fadeIn 0.3s ease-out;
+
+  @media (max-width: 768px) {
+    background: rgba(0, 0, 0, 0.7);
+    animation: fadeIn 0.3s ease-out;
+  }
 }
 
 @keyframes fadeIn {

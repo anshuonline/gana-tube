@@ -140,7 +140,7 @@
           margin-top: 4px;
           
           &.admin {
-            color: #EC4899;
+            color: var(--color-primary-hover);
           }
         }
       }
@@ -272,7 +272,7 @@
         outline: none;
 
         &:focus {
-          border-color: rgba(147,51,234,0.5);
+          border-color: rgba(var(--color-primary-rgb), 0.5);
         }
       }
 

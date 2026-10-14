@@ -80,12 +80,12 @@ export class GtanalyticUsersComponent {
     return [{
       data: list.map((item: any) => parseInt(item.new_users) || 0),
       label: 'New Registrations',
-      borderColor: '#a855f7',
-      backgroundColor: 'rgba(168, 85, 247, 0.2)',
+      borderColor: '#F50919',
+      backgroundColor: 'rgba(245, 9, 25, 0.2)',
       borderWidth: 2,
       fill: true,
       tension: 0.35,
-      pointBackgroundColor: '#ec4899',
+      pointBackgroundColor: '#D90816',
       pointRadius: 3
     }];
   });

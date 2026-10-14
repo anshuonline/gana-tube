@@ -18,8 +18,8 @@ export interface UserProfileData {
   providedIn: 'root'
 })
 export class UserService {
+  private apiUrl = 'https://manageads.ganatube.in/user-api.php';
   private analyticsService = inject(AnalyticsService);
-  private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/user-api.php' : 'https://manageads.ganatube.in/user-api.php';
   
   // State for the logged-in user
   displayName = signal<string | null>(null);

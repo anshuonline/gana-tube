@@ -26,11 +26,11 @@
   .loading-bar-wrap {
     width: 220px;
     height: 6px;
-    background: rgba(107, 33, 168, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     border-radius: 9999px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 4px 18px rgba(107, 33, 168, 0.25);
+    box-shadow: 0 4px 18px rgba(var(--color-primary-rgb), 0.25);
 
     .loading-bar-indeterminate {
       position: absolute;
@@ -38,8 +38,8 @@
       bottom: 0;
       left: 0;
       border-radius: 9999px;
-      background: linear-gradient(90deg, #6b21a8 0%, #be185d 50%, #6b21a8 100%);
-      box-shadow: 0 0 12px rgba(190, 24, 93, 0.5);
+      background: var(--gradient-primary);
+      box-shadow: 0 0 12px rgba(var(--color-primary-rgb), 0.5);
       animation: indeterminateBar 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite;
     }
   }
@@ -285,15 +285,15 @@
 
   &:hover, &:focus-visible {
     transform: translateY(-6px);
-    border-color: #ec4899;
-    box-shadow: 0 20px 35px -10px rgba(107, 33, 168, 0.16), 0 0 0 1px #e9d5ff;
+    border-color: var(--color-primary);
+    box-shadow: 0 20px 35px -10px rgba(var(--color-primary-rgb), 0.16), 0 0 0 1px rgba(var(--color-primary-rgb), 0.2);
 
     .card-thumb {
       transform: scale(1.05);
     }
 
     .read-link {
-      color: #9d174d;
+      color: var(--color-primary);
       gap: 9px;
     }
   }
@@ -760,7 +760,7 @@
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: linear-gradient(135deg, #6b21a8 0%, #be185d 100%);
+          background: var(--gradient-primary);
           border: none;
           padding: 14px 32px;
           border-radius: 9999px;
@@ -768,7 +768,7 @@
           font-size: 1rem;
           font-weight: 700;
           cursor: pointer;
-          box-shadow: 0 10px 24px -5px rgba(107, 33, 168, 0.4);
+          box-shadow: 0 10px 24px -5px rgba(var(--color-primary-rgb), 0.4);
           transition: all 0.25s ease;
 
           @media (max-width: 768px) {

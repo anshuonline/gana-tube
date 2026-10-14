@@ -7,19 +7,37 @@
     "fullscreen"
   ],
   "display": "fullscreen",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
   "orientation": "any",
   "categories": ["music", "entertainment"],
   "icons": [
     {
-      "src": "web-app-manifest-192x192.png",
+      "src": "/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "web-app-manifest-512x512.png",
+      "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -40,7 +58,7 @@
       "short_name": "Search",
       "description": "Search for songs, artists, albums",
       "url": "/?action=search",
-      "icons": [{ "src": "ganatube.png", "sizes": "512x512" }]
+      "icons": [{ "src": "/web-app-manifest-512x512.png", "sizes": "512x512" }]
     }
   ]
 }

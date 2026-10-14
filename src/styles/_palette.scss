@@ -1,0 +1,76 @@
+/* ============================================================
+   GanaTube — Centralized Color Palette & Design Tokens
+   Single source of truth for all colors and design variables.
+   Changing colors here automatically cascades to the entire app.
+   Based on ganatube-react design tokens.
+   ============================================================ */
+
+:root {
+  /* ---- Brand / Primary Red (Single Source of Truth) ---- */
+  --color-primary: #F50919;
+  --color-primary-hover: #D90816;
+  --color-primary-soft: #3A1014;
+  --color-primary-glow: rgba(245, 9, 25, 0.35);
+
+  /* ---- RGB Channels for Alpha Utility ---- */
+  --color-primary-rgb: 245, 9, 25;
+  --color-primary-hover-rgb: 217, 8, 22;
+
+  /* ---- Backgrounds & Surfaces (AMOLED Dark) ---- */
+  --color-bg-main: #000000;
+  --color-bg-card: #0a0a0f;
+  --color-bg-card-subtle: #101016;
+  --color-bg-hover: #161620;
+  --color-bg-player: #000000;
+
+  /* ---- Typography Colors ---- */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #B3B3B3;
+  --color-text-muted: #737373;
+
+  /* ---- Borders & Dividers ---- */
+  --color-border: #282828;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+
+  /* ---- Semantic Status Colors ---- */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #F50919;
+  --color-info: #3B82F6;
+
+  /* ---- Brand Gradients & Lighting ---- */
+  --gradient-primary: linear-gradient(135deg, #F50919 0%, #D90816 100%);
+  --gradient-primary-glow: linear-gradient(135deg, #F50919 0%, #FF3B30 100%);
+  --gradient-primary-soft: linear-gradient(135deg, rgba(245, 9, 25, 0.16) 0%, rgba(217, 8, 22, 0.08) 100%);
+  --glow-primary: 0 4px 20px rgba(245, 9, 25, 0.4);
+  --shadow-player: 0 8px 40px rgba(0, 0, 0, 0.8);
+  --glass-bg: rgba(8, 8, 8, 0.75);
+  --glass-blur: blur(24px) saturate(1.4);
+
+  /* ---- Backwards-Compatibility Aliases (Maps old purple/pink tokens to primary red system) ---- */
+  --color-bg: var(--color-bg-main);
+  --color-surface: var(--color-bg-card);
+  --color-surface-2: var(--color-bg-hover);
+  --color-secondary: var(--color-primary-hover);
+  --color-accent: var(--color-primary);
+  --color-text: var(--color-text-primary);
+  --color-primary-dark: var(--color-primary-hover);
+  --brand-gradient: var(--gradient-primary);
+  --accent-purple: var(--color-primary);
+  --accent-pink: var(--color-primary-hover);
+}
+
+/* ---- SCSS Variable Mappings ---- */
+$color-primary: var(--color-primary);
+$color-primary-hover: var(--color-primary-hover);
+$color-primary-soft: var(--color-primary-soft);
+$color-bg-main: var(--color-bg-main);
+$color-bg-card: var(--color-bg-card);
+$color-bg-hover: var(--color-bg-hover);
+$color-bg-player: var(--color-bg-player);
+$color-text-primary: var(--color-text-primary);
+$color-text-secondary: var(--color-text-secondary);
+$color-text-muted: var(--color-text-muted);
+$color-border: var(--color-border);
+$gradient-primary: var(--gradient-primary);
+$glow-primary: var(--glow-primary);

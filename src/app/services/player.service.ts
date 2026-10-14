@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject, NgZone, effect } from '@angular/core';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, timeout } from 'rxjs';
+import { firstValueFrom, timeout, take } from 'rxjs';
 import { YouTubeSearchResult } from './youtube-api.service';
 import { AlgorithmService } from './algorithm.service';
 import { YoutubeApiService } from './youtube-api.service';
@@ -1333,20 +1333,25 @@ export class PlayerService {
     const bitrate = bitrateMap[this.resolvedQuality()] || 320;
 
     try {
+      const saavnSongId = track.videoId.startsWith('saavn_') ? track.videoId.replace('saavn_', '') : '';
       const params = new URLSearchParams({
         title: String(track.title || '').slice(0, 120),
         artist: String(track.channelTitle || '').slice(0, 120),
         album: '',
-        duration: String(Math.round(track.duration || 0)),
+        duration: String(Math.round(Number(track.duration) || 0)),
         bitrate: String(bitrate)
       });
+      if (saavnSongId) {
+        params.set('songId', saavnSongId);
+      }
       const res: any = await firstValueFrom(
         this.http.get(`/api/saavn/match?${params.toString()}`, { responseType: 'json' })
           .pipe(timeout(4500))
       );
       const match = res?.match;
       if (match?.streamUrl) {
-        if (!verifySaavnMatch(track, match)) {
+        const isDirectSaavn = track.source === 'saavn' || track.videoId.startsWith('saavn_');
+        if (!isDirectSaavn && !verifySaavnMatch(track, match)) {
           console.info('[Player] Saavn validation failed (title/artist mismatch) — playing exact YouTube video instead');
           return null;
         }
@@ -1368,6 +1373,25 @@ export class PlayerService {
     // Engine supervisor: stale loads (superseded by a newer track) stand down,
     // and claiming YT always silences the Saavn/offline audio engines
     if (genToken !== undefined && genToken !== this.saavnToken) return;
+
+    // If videoId is a saavn_ pseudo-id, search YouTube for the song to resolve a playable videoId
+    if (videoId && videoId.startsWith('saavn_')) {
+      const current = this.currentTrack();
+      const query = `${current?.title || ''} ${current?.channelTitle || ''}`.trim();
+      if (query) {
+        this.youtubeApi.searchMusic(query, 1).pipe(take(1)).subscribe({
+          next: (results) => {
+            if (genToken !== undefined && genToken !== this.saavnToken) return;
+            if (results && results.length > 0 && results[0].videoId) {
+              this.loadInYtPlayer(results[0].videoId, genToken);
+            }
+          },
+          error: () => {}
+        });
+        return;
+      }
+    }
+
     this.isPlayingSaavn.set(false);
     this.isPlayingOffline.set(false);
     try { this.htmlAudio?.pause(); } catch (e) {}
@@ -1615,10 +1639,7 @@ export class PlayerService {
   private awardSpinChance(): void {
     const user = this.authService.currentUser();
     if (user && user.email) {
-      // Assuming apiUrl is the same as environment or hardcoded
-      const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-        ? 'http://localhost/manageads/wheel-api.php' 
-        : 'https://manageads.ganatube.in/wheel-api.php';
+      const backendUrl = 'https://manageads.ganatube.in/wheel-api.php';
         
       this.http.post<any>(`${backendUrl}?action=add_chance`, { email: user.email })
         .subscribe({

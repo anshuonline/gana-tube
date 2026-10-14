@@ -49,12 +49,12 @@
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    background: rgba(168, 85, 247, 0.12);
-    border: 1px solid rgba(168, 85, 247, 0.25);
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ec4899;
+    color: var(--color-primary);
     flex-shrink: 0;
   }
 
@@ -115,18 +115,18 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: rgba(168, 85, 247, 0.1);
-    border: 1px solid rgba(168, 85, 247, 0.25);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.25);
     padding: 4px 10px;
     border-radius: 100px;
     font-size: 12px;
-    color: #d8b4fe;
+    color: var(--color-primary);
 
     .pulse-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #a855f7;
+      background: var(--color-primary);
     }
 
     b {
@@ -152,7 +152,7 @@
       transition: all 0.16s;
 
       &:hover {
-        color: #ec4899;
+        color: var(--color-primary);
       }
     }
 
@@ -215,11 +215,11 @@
   }
 
   &.active {
-    background: rgba(168, 85, 247, 0.12);
-    border-color: #a855f7;
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border-color: var(--color-primary);
 
     .checkbox-indicator {
-      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      background: var(--gradient-primary);
       border-color: transparent;
       color: #ffffff;
     }
@@ -229,7 +229,7 @@
     }
 
     .english-name {
-      color: #d8b4fe;
+      color: var(--color-primary);
     }
   }
 
@@ -302,7 +302,7 @@
     height: 48px;
     border: none;
     border-radius: 14px;
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    background: var(--gradient-primary);
     color: #ffffff;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -356,7 +356,7 @@
     line-height: 1.35;
 
     svg {
-      color: #a855f7;
+      color: var(--color-primary);
       flex-shrink: 0;
     }
 

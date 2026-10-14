@@ -16,6 +16,7 @@ export interface YouTubeSearchResult {
   artist?: string;
   author?: string;
   album?: string;
+  source?: string;
 }
 
 /**
@@ -66,9 +67,7 @@ export class YoutubeApiService {
   // Cached app_init data (Performance: 4 API calls → 1)
   private _appInitData: any = null;
   private _appInitLoaded = new ReplaySubject<any>(1);
-  private _manageUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost')
-    ? 'http://localhost/manageads/managegt-api.php'
-    : 'https://manageads.ganatube.in/managegt-api.php';
+  private _manageUrl = 'https://manageads.ganatube.in/managegt-api.php';
 
   constructor(private http: HttpClient) {
     this.fetchLiveCuratedSongs();
@@ -131,7 +130,7 @@ export class YoutubeApiService {
   }
 
   private fetchLiveCuratedSongs() {
-    const fetchUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/curated-songs.json' : 'https://manageads.ganatube.in/curated-songs.json';
+    const fetchUrl = 'https://manageads.ganatube.in/curated-songs.json';
       
     this.http.get<Record<string, any[]>>(fetchUrl)
       .subscribe({
@@ -153,6 +152,34 @@ export class YoutubeApiService {
     return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/trending`, { params }).pipe(
       catchError((err) => {
         console.warn('Backend trending server failed, falling back to search API:', err);
+        return this.searchMusic(`Trending ${language} Songs`, limit);
+      })
+    );
+  }
+
+  getSaavnTrending(language: string = 'Hindi', limit: number = 20, type: string = 'all'): Observable<YouTubeSearchResult[]> {
+    const backendUrl = (environment as any).backendUrl || '/api';
+    const params = new HttpParams()
+      .set('language', language)
+      .set('limit', limit.toString())
+      .set('type', type);
+
+    return this.http.get<{ songs?: any[] } | any[]>(`${backendUrl}/saavn/trending`, { params }).pipe(
+      map(res => {
+        const rawSongs = Array.isArray(res) ? res : (res?.songs || []);
+        return rawSongs.map((song: any) => ({
+          videoId: song.id ? (String(song.id).startsWith('saavn_') ? String(song.id) : 'saavn_' + song.id) : ('saavn_' + Math.random().toString(36).slice(2)),
+          title: this.decodeHtml(song.title || ''),
+          thumbnail: getHighResThumbnail(song.image || song.thumbnail || ''),
+          thumbnailHigh: getHighResThumbnail(song.image || song.thumbnailHigh || song.thumbnail || ''),
+          channelTitle: song.artist || song.channelTitle || 'JioSaavn',
+          duration: song.duration ? Number(song.duration) : undefined,
+          publishedAt: '',
+          source: 'saavn'
+        } as YouTubeSearchResult));
+      }),
+      catchError(err => {
+        console.warn('JioSaavn trending failed, falling back to search API:', err);
         return this.searchMusic(`Trending ${language} Songs`, limit);
       })
     );

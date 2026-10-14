@@ -67,6 +67,12 @@ export interface SponsoredAd {
   customCode?: string;
 }
 
+export interface HeroSlideTrack {
+  title?: string;
+  artist?: string;
+  image: string;
+}
+
 export interface HeroSlide {
   lang: string;
   badge: string;
@@ -74,6 +80,7 @@ export interface HeroSlide {
   subtitle: string;
   artists: string;
   image: string;
+  trackImages?: HeroSlideTrack[];
   gradient: string;
   accentColor: string;
   ambientGlow: string;
@@ -267,18 +274,24 @@ export class App implements OnInit {
   showLanguageModal = signal<boolean>(false);
   isMobileView = signal<boolean>(false);
 
-  // Netflix / Amazon Prime Style Hero Carousel Slides
+  // Netflix / Amazon Prime / YouTube Music Style Hero Carousel Slides
   heroSlides: HeroSlide[] = [
     {
       lang: 'Hindi',
       badge: '🔥 #1 ON GANATUBE',
       title: 'Bollywood Blockbusters',
       subtitle: 'The hottest Hindi anthems, soulful romantic melodies and club chartbusters',
-      artists: 'Arijit Singh • Shreya Ghoshal • Badshah • Pritam • Sachin-Jigar',
+      artists: 'Navjot Ahuja • ARJN • Aditya Rikhari • Anuv Jain • Yo Yo Honey Singh',
       image: 'images/hindi-singers.png',
-      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(236, 72, 153, 0.28) 0%, rgba(168, 85, 247, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
-      accentColor: '#ec4899',
-      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(236, 72, 153, 0.45) 0%, rgba(168, 85, 247, 0.22) 45%, transparent 70%)'
+      trackImages: [
+        { title: 'Khat', artist: 'Navjot Ahuja', image: 'https://yt3.googleusercontent.com/uzfTAu64E4d7zsoQHAd2sOX24RIYd5jYeaX3B_STbS0lk0X_cxrTquiFmZEU3khp6WwtTFrrmEEiaEg=w600-h600-l90-rj' },
+        { title: 'KALYANI (Remix)', artist: 'ARJN', image: 'https://yt3.googleusercontent.com/naKgO_9vvIczuf7Vq1llQyRAQOOW898kBZN3pio-Bkbfcmdu3Gv14_ivEBZiHAow8VbPEq1bhO0j2DU=w600-h600-l90-rj' },
+        { title: 'Sahiba', artist: 'Aditya Rikhari', image: 'https://yt3.googleusercontent.com/Ul_rEl0e18WiBv-HIKRla87l0-K8uNSrKmFIwR6N0206bAAF27juOMDfBydQK1UOjRJ1SCxNuCPd2l56=w600-h600-l90-rj' },
+        { title: 'Arz Kiya Hai | Coke Studio Bharat', artist: 'Anuv Jain', image: 'https://yt3.googleusercontent.com/D8zrTH1RKP2TDB_Zg60FO9CLeb8WehGyT7wnSKjc0cXEwgt9AYcRuWWIg3UMkmIZJsO2SMOg6l1J8bV-=w600-h600-l90-rj' }
+      ],
+      gradient: 'radial-gradient(ellipse at 80% 50%, rgba(245, 9, 25, 0.28) 0%, rgba(217, 8, 22, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
+      accentColor: '#F50919',
+      ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(245, 9, 25, 0.45) 0%, rgba(217, 8, 22, 0.22) 45%, transparent 70%)'
     },
     {
       lang: 'Punjabi',
@@ -287,6 +300,12 @@ export class App implements OnInit {
       subtitle: 'Chart-topping dhol rhythms, trap anthems and unstoppable Punjabi energy',
       artists: 'Diljit Dosanjh • Sidhu Moose Wala • Karan Aujla • AP Dhillon',
       image: 'images/punjabi-singers.png',
+      trackImages: [
+        { title: 'Ashke', artist: 'Karan Aujla', image: 'https://c.saavncdn.com/918/AUJLA-SZN-1-Punjabi-2026-20260930131343-500x500.jpg' },
+        { title: 'Guzarish', artist: 'Satinder Sartaaj', image: 'https://c.saavncdn.com/137/Guzarish-Punjabi-2026-20260928151003-500x500.jpg' },
+        { title: 'Boyfriend', artist: 'Karan Aujla, IKKY', image: 'https://c.saavncdn.com/621/P-POP-CULTURE-Punjabi-2025-20250820043757-500x500.jpg' },
+        { title: 'For A Reason', artist: 'Karan Aujla', image: 'https://c.saavncdn.com/621/P-POP-CULTURE-Punjabi-2025-20250820043757-500x500.jpg' }
+      ],
       gradient: 'radial-gradient(ellipse at 80% 50%, rgba(245, 158, 11, 0.26) 0%, rgba(239, 68, 68, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#f59e0b',
       ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(245, 158, 11, 0.42) 0%, rgba(239, 68, 68, 0.2) 45%, transparent 70%)'
@@ -298,6 +317,12 @@ export class App implements OnInit {
       subtitle: 'The biggest international chartbusters dominating Spotify and Billboard charts',
       artists: 'The Weeknd • Taylor Swift • Drake • Dua Lipa • Bruno Mars',
       image: 'images/english-singers.png',
+      trackImages: [
+        { title: 'Nicole Kidman', artist: 'ADÉLA', image: 'https://yt3.googleusercontent.com/mHa1sg5pmlgudnTZ_XOcJ-0VAKuFDodEstxurIF2C6RttpfyyeaqC75FmPQjlc2BQQ5JfvGaFuU69dhs=w600-h600-l90-rj' },
+        { title: 'Earrings', artist: 'Malcolm Todd', image: 'https://yt3.googleusercontent.com/sm9gz2XQFzc-Gp7qsQzIJGuIsowoyVI43ki4048evRTzCi8IN2FcTyv42YttCDRH-93amTRkG05hqnOK=w600-h600-l90-rj' },
+        { title: "Ain't In LA", artist: 'ADÉLA', image: 'https://yt3.googleusercontent.com/mHa1sg5pmlgudnTZ_XOcJ-0VAKuFDodEstxurIF2C6RttpfyyeaqC75FmPQjlc2BQQ5JfvGaFuU69dhs=w600-h600-l90-rj' },
+        { title: 'Beauty And A Beat (feat. Nicki Minaj)', artist: 'Justin Bieber', image: 'https://yt3.googleusercontent.com/jXXzY2fTfxgr0_wR_I_V8W3Ai0L3ece217Biqm0tY36I9VAoce09xXmjgt8mXggTVgGGBHdJ3eAyICY=w600-h600-l90-rj' }
+      ],
       gradient: 'radial-gradient(ellipse at 80% 50%, rgba(99, 102, 241, 0.28) 0%, rgba(6, 182, 212, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#6366f1',
       ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(99, 102, 241, 0.45) 0%, rgba(6, 182, 212, 0.2) 45%, transparent 70%)'
@@ -309,6 +334,12 @@ export class App implements OnInit {
       subtitle: 'Electrifying festive beats, trending reels music and viral dance numbers',
       artists: 'Pawan Singh • Khesari Lal Yadav • Shilpi Raj • Arvind Akela Kallu',
       image: 'images/bhojpuri-singers.png',
+      trackImages: [
+        { title: 'Sorry Sorry', artist: 'Pawan Singh', image: 'https://c.saavncdn.com/936/Bhojpuriya-Raja-Bhojpuri-2016-500x500.jpg' },
+        { title: 'Palang Sagwan Ke', artist: 'Khesari Lal Yadav', image: 'https://c.saavncdn.com/431/Palang-Sagwan-Ke-From-Doli-Saja-Ke-Rakhna-Bhojpuri-2022-20220827101113-500x500.jpg' },
+        { title: 'Chhalakata Hamro Jawaniya', artist: 'Pawan Singh', image: 'https://c.saavncdn.com/936/Bhojpuriya-Raja-Bhojpuri-2016-500x500.jpg' },
+        { title: 'Saj Ke Sawar Ke', artist: 'Khesari Lal Yadav', image: 'https://c.saavncdn.com/367/Muqaddar-Bhojpuri-2017-20220916100920-500x500.jpg' }
+      ],
       gradient: 'radial-gradient(ellipse at 80% 50%, rgba(239, 68, 68, 0.26) 0%, rgba(234, 179, 8, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#ef4444',
       ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(239, 68, 68, 0.42) 0%, rgba(234, 179, 8, 0.2) 45%, transparent 70%)'
@@ -320,6 +351,12 @@ export class App implements OnInit {
       subtitle: 'Heavy basslines, desi swag and trending regional club tracks ruling north India',
       artists: 'Gulzaar Chhaniwala • Renuka Panwar • Masoom Sharma • Diler Kharkiya',
       image: 'images/haryanvi-singers.png',
+      trackImages: [
+        { title: 'Barsaat', artist: 'Banjaare, Roni', image: 'https://c.saavncdn.com/376/Barsaat-Unknown-2026-20260629181139-500x500.jpg' },
+        { title: 'Bairan', artist: 'Banjaare', image: 'https://c.saavncdn.com/238/Bairan-Unknown-2026-20260223182954-500x500.jpg' },
+        { title: 'Sheesha', artist: 'Mitta Ror', image: 'https://c.saavncdn.com/034/Sheesha-Aakhya-Mai-Aakh-Ghali-Jo-Beran-Unknown-2026-20260123134431-500x500.jpg' },
+        { title: 'Kabze', artist: 'Bintu Pabra', image: 'https://c.saavncdn.com/465/Kabze-Haryanvi-2026-20260430221253-500x500.jpg' }
+      ],
       gradient: 'radial-gradient(ellipse at 80% 50%, rgba(16, 185, 129, 0.26) 0%, rgba(132, 204, 22, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#10b981',
       ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(16, 185, 129, 0.42) 0%, rgba(132, 204, 22, 0.2) 45%, transparent 70%)'
@@ -331,6 +368,12 @@ export class App implements OnInit {
       subtitle: 'Timeless poetic melodies, rich lyrical legacy and contemporary Bengali pop',
       artists: 'Arijit Singh • Shreya Ghoshal • Anupam Roy • Jeet Gannguli',
       image: 'images/bengali-singers.png',
+      trackImages: [
+        { title: 'Mayabini', artist: 'Zubeen Garg', image: 'https://c.saavncdn.com/555/Tumi-Zubeen-Garg-2007-500x500.jpg' },
+        { title: 'Tor Sudhu Tor', artist: 'Rupak Tiary, Savvy', image: 'https://c.saavncdn.com/118/Tor-Sudhu-Tor-From-DeSu7-Bengali-2026-20260904154801-500x500.jpg' },
+        { title: 'Aaina Mon Bhanga', artist: 'Zubeen Garg', image: 'https://c.saavncdn.com/010/Bolo-Na-Tumi-Amar-Bengali-2021-20210218205104-500x500.jpg' },
+        { title: 'Patar Bashori', artist: 'Ishaan, Sunidhi Nayak', image: 'https://c.saavncdn.com/202/Patar-Bashori-Coke-Studio-Bangla-Bengali-2026-20260724054459-500x500.jpg' }
+      ],
       gradient: 'radial-gradient(ellipse at 80% 50%, rgba(20, 184, 166, 0.28) 0%, rgba(244, 114, 182, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#14b8a6',
       ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(20, 184, 166, 0.42) 0%, rgba(244, 114, 182, 0.2) 45%, transparent 70%)'
@@ -342,6 +385,12 @@ export class App implements OnInit {
       subtitle: 'Legendary cinematic compositions, mass hero intros and electrifying hooks',
       artists: 'Anirudh Ravichander • A.R. Rahman • Sid Sriram • Yuvan Shankar Raja',
       image: 'images/tamil-singers.png',
+      trackImages: [
+        { title: 'Radhimaa', artist: 'Sai Abhyankkar', image: 'https://c.saavncdn.com/877/Radhimaa-From-Think-Indie-Tamil-2026-20260827192132-500x500.jpg' },
+        { title: 'Raga of Revenge', artist: 'Anirudh Ravichander', image: 'https://c.saavncdn.com/606/DC-Original-Motion-Picture-Soundtrack-Tamil-2026-20260727061230-500x500.jpg' },
+        { title: 'Ooroda Oththa Don', artist: 'Sai Abhyankkar', image: 'https://c.saavncdn.com/631/Ooroda-Oththa-Don-From-Baththa-Tamil-2026-20260922133220-500x500.jpg' },
+        { title: 'Pesamale', artist: 'Siri Xander', image: 'https://c.saavncdn.com/868/Pesamale-Tamil-2026-20260922125033-500x500.jpg' }
+      ],
       gradient: 'radial-gradient(ellipse at 80% 50%, rgba(234, 179, 8, 0.26) 0%, rgba(147, 51, 234, 0.14) 45%, rgba(7, 7, 11, 0.98) 75%)',
       accentColor: '#eab308',
       ambientGlow: 'radial-gradient(circle at 75% 45%, rgba(234, 179, 8, 0.42) 0%, rgba(147, 51, 234, 0.22) 45%, transparent 70%)'
@@ -354,27 +403,77 @@ export class App implements OnInit {
   private heroTouchStartX = 0;
   private heroTouchStartY = 0;
 
+  getHeroSlideTracks(slide: HeroSlide): HeroSlideTrack[] {
+    if (!slide) return [];
+    const langKey = (slide.lang || '').toLowerCase();
+
+    // 1. Priority 1: Dynamically extract real songs from the linked ManageGT playlist
+    const heroMeta = this.heroData()[slide.lang];
+    let targetPlaylistId = '';
+    if (heroMeta?.buttonLink) {
+      const match = heroMeta.buttonLink.match(/playlist\/([^\/\?#]+)/);
+      if (match) targetPlaylistId = match[1];
+    }
+
+    let pl = targetPlaylistId
+      ? this.allPlaylists().find(p => p.id === targetPlaylistId || p.slug === targetPlaylistId)
+      : this.customPlaylists().find(p => p.language?.toLowerCase() === langKey);
+
+    if (!pl) {
+      pl = this.allPlaylists().find(p => p.language?.toLowerCase() === langKey);
+    }
+
+    if (pl && pl.preloadedSongs && pl.preloadedSongs.length > 0) {
+      return pl.preloadedSongs.slice(0, 4).map((s: any) => ({
+        title: s.title || '',
+        artist: s.channelTitle || s.artist || s.subtitle || '',
+        image: s.thumbnailHigh || s.thumbnail || s.image || pl!.coverImage || ''
+      }));
+    }
+
+    // 2. Fallback: slide.trackImages (configured to match the playlist songs)
+    if (slide.trackImages && slide.trackImages.length > 0) {
+      return slide.trackImages.slice(0, 4);
+    }
+    return [];
+  }
+
   computedHeroSlides = computed(() => {
     const heroDataMap = this.heroData() || {};
+    // Reactively track playlist signals so hero stack updates when playlists load
+    const _custom = this.customPlaylists();
+    const _all = this.allPlaylists();
+
     return this.heroSlides.map(slide => {
       // Find matching key case-insensitively
       const customKey = Object.keys(heroDataMap).find(
         k => k.toLowerCase() === slide.lang.toLowerCase()
       );
       const custom = customKey ? heroDataMap[customKey] : undefined;
-      if (custom) {
-        const customImg = this.formatHeroImageUrl(custom.imageUrl);
-        return {
-          ...slide,
-          badge: custom.badge || slide.badge,
-          title: custom.title || slide.title,
-          subtitle: custom.subtitle || slide.subtitle,
-          image: customImg || slide.image,
-          buttonText: custom.buttonText || slide.buttonText || 'Listen Now',
-          buttonLink: custom.buttonLink || ''
-        };
+      const customImg = custom ? this.formatHeroImageUrl(custom.imageUrl) : '';
+      const targetTracks = this.getHeroSlideTracks(slide);
+
+      let slideArtists = slide.artists;
+      if (targetTracks && targetTracks.length > 0) {
+        const uniqueArtists = Array.from(new Set(
+          targetTracks.map(t => (t.artist || '').split(/,|&|feat\.|ft\./i)[0].trim()).filter(Boolean)
+        )).slice(0, 5);
+        if (uniqueArtists.length >= 2) {
+          slideArtists = uniqueArtists.join(' • ');
+        }
       }
-      return slide;
+
+      return {
+        ...slide,
+        badge: custom?.badge || slide.badge,
+        title: custom?.title || slide.title,
+        artists: slideArtists,
+        subtitle: custom?.subtitle || slide.subtitle,
+        image: customImg || slide.image,
+        trackImages: targetTracks,
+        buttonText: custom?.buttonText || slide.buttonText || 'Listen Now',
+        buttonLink: custom?.buttonLink || slide.buttonLink || ''
+      };
     });
   });
 
@@ -585,12 +684,88 @@ export class App implements OnInit {
   showAd = signal<boolean>(true);
 
   // Home feed dynamic chips
-  dynamicChips = signal<string[]>(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh']);
+  dynamicChips = signal<string[]>(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh', 'Pritam', 'Shreya Ghoshal']);
+  activeChip = signal<string>('All');
+  @ViewChild('quickPillsRail') quickPillsRail?: ElementRef<HTMLElement>;
+
+  scrollPills(direction: 'left' | 'right'): void {
+    if (!this.quickPillsRail?.nativeElement) return;
+    const distance = direction === 'left' ? -280 : 280;
+    this.quickPillsRail.nativeElement.scrollBy({ left: distance, behavior: 'smooth' });
+  }
+
+  selectChip(chip: string): void {
+    this.activeChip.set(chip);
+    if (chip === 'All') {
+      this.resetSearchState();
+    } else if (chip.toLowerCase() === 'trending') {
+      // Direct Link: JioSaavn Official Live Trending Chart
+      this.currentQuery = 'Trending (JioSaavn)';
+      this.analyticsService.setLastSearch('Trending');
+      this.isLoading.set(true);
+      this.hasSearched.set(true);
+      this.results.set([]);
+      this.hasMoreSongs.set(false);
+      const lang = this.homeScreenLanguage() || 'Hindi';
+      this.youtubeApi.getSaavnTrending(lang, 48, 'trending').subscribe({
+        next: (songs) => {
+          this.results.set(songs || []);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.warn('Failed to load JioSaavn trending for chip, falling back to search:', err);
+          this.onSearch('Trending ' + lang + ' Songs');
+        }
+      });
+    } else if (chip.toLowerCase() === 'new releases') {
+      // Direct Link: JioSaavn Official Latest Releases Chart
+      this.currentQuery = 'New Releases (JioSaavn)';
+      this.analyticsService.setLastSearch('New Releases');
+      this.isLoading.set(true);
+      this.hasSearched.set(true);
+      this.results.set([]);
+      this.hasMoreSongs.set(false);
+      const lang = this.homeScreenLanguage() || 'Hindi';
+      this.youtubeApi.getSaavnTrending(lang, 48, 'latest').subscribe({
+        next: (songs) => {
+          this.results.set(songs || []);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.warn('Failed to load JioSaavn latest releases, falling back to search:', err);
+          this.onSearch('Latest ' + lang + ' Songs');
+        }
+      });
+    } else if (chip.startsWith('More from ')) {
+      const artist = chip.replace('More from ', '').trim();
+      this.onSearch(artist + ' songs');
+    } else if (chip.endsWith(' Mix')) {
+      const artist = chip.replace(' Mix', '').trim();
+      this.onSearch(artist + ' mix');
+    } else {
+      this.onSearch(chip);
+    }
+  }
+
+  getGreeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  }
+
+  getQuickPicksTracks(): YouTubeSearchResult[] {
+    const shelves = this.loadedShelves();
+    if (shelves && shelves.length > 0 && shelves[0].songs) {
+      return shelves[0].songs.slice(0, 6);
+    }
+    return [];
+  }
 
   // Dynamic Hero Header Data
   heroData = signal<Record<string, { badge: string; title: string; subtitle: string; imageUrl: string; buttonText: string; buttonLink?: string }>>({});
 
-  private manageApiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/managegt-api.php' : 'https://manageads.ganatube.in/managegt-api.php';
+  private manageApiUrl = 'https://manageads.ganatube.in/managegt-api.php';
 
   showFeedbackPopup = signal<boolean>(false);
   feedbackPopupConfig = signal<FeedbackPopupConfig>(DEFAULT_FEEDBACK_POPUP_CONFIG);
@@ -634,9 +809,7 @@ export class App implements OnInit {
         }
         this.hoverPreviewAudio = new Audio();
         
-        const apiUrl = window.location.hostname === 'localhost'
-          ? 'http://localhost/manageads/stream.php'
-          : 'https://manageads.ganatube.in/stream.php';
+        const apiUrl = 'https://manageads.ganatube.in/stream.php';
           
         this.hoverPreviewAudio.src = `${apiUrl}?id=${track.videoId}`;
         // Random start time between 30 and 80 seconds
@@ -669,8 +842,7 @@ export class App implements OnInit {
   }
 
   getAdIframeUrl(placeholder: string): string {
-    const isLocalhost = typeof window !== 'undefined' && window.location.origin.includes('localhost');
-    const baseUrl = isLocalhost ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
+    const baseUrl = 'https://manageads.ganatube.in';
     return `${baseUrl}/ad_iframe.php?placeholder=${placeholder}`;
   }
 
@@ -835,7 +1007,7 @@ export class App implements OnInit {
   }
   
   activeMenuTrack = signal<any | null>(null);
-  activeMenuPosition = signal<{x: number, y: number} | null>(null);
+  activeMenuPosition = signal<{x: number, y: number, isContextMenu?: boolean} | null>(null);
 
   activePlaylistMenu = signal<any | null>(null);
   activePlaylistMenuPosition = signal<{x: number, y: number} | null>(null);
@@ -843,19 +1015,35 @@ export class App implements OnInit {
   playlistModalTrack = signal<any | null>(null);
   newPlaylistName = signal<string>('');
 
-  toggleMenu(track: any, event: MouseEvent) {
+  onRightClick(event: MouseEvent, track: any) {
+    if (!track) return;
+    event.preventDefault();
     event.stopPropagation();
-    if (this.activeMenuTrack()?.videoId === track.videoId) {
+    this.activeMenuPosition.set({ x: event.clientX, y: event.clientY, isContextMenu: true });
+    this.activeMenuTrack.set(track);
+  }
+
+  toggleMenu(track: any, event: MouseEvent) {
+    if (!track) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const isContext = event.type === 'contextmenu';
+    if (this.activeMenuTrack()?.videoId === track.videoId && !isContext) {
       this.closeMenu();
     } else {
-      if (event.type === 'contextmenu') {
+      if (isContext) {
         // Right-click: Position at mouse coordinates
-        this.activeMenuPosition.set({ x: event.clientX, y: event.clientY });
+        this.activeMenuPosition.set({ x: event.clientX, y: event.clientY, isContextMenu: true });
       } else {
         // Left-click on button: Position relative to button
-        const target = event.currentTarget as HTMLElement;
-        const rect = target.getBoundingClientRect();
-        this.activeMenuPosition.set({ x: rect.right, y: rect.bottom });
+        const target = (event.currentTarget || event.target) as HTMLElement;
+        const btn = target?.closest('button') || target;
+        if (btn && typeof btn.getBoundingClientRect === 'function') {
+          const rect = btn.getBoundingClientRect();
+          this.activeMenuPosition.set({ x: rect.right, y: rect.bottom + 4, isContextMenu: false });
+        } else {
+          this.activeMenuPosition.set({ x: event.clientX || 100, y: event.clientY || 100, isContextMenu: false });
+        }
       }
       this.activeMenuTrack.set(track);
     }
@@ -1299,32 +1487,99 @@ export class App implements OnInit {
       }
     }, { allowSignalWrites: true });
 
-    // Dynamic chips effect based on currently playing track
+    // Dynamic chips effect based on currently playing track with separated artists
     effect(() => {
       const track: any = this.playerService.currentTrack();
       if (track) {
         const title = track.title || track.snippet?.title || '';
-        let channel = track.channelTitle || track.snippet?.channelTitle || '';
         
-        if (channel.toLowerCase().includes('vevo') || channel.toLowerCase().includes('official')) {
-          channel = channel.replace(/vevo/ig, '').replace(/official/ig, '').trim();
+        // 1. Gather all raw artist candidates
+        const rawCandidates: string[] = [];
+        if (track.artist) rawCandidates.push(track.artist);
+        if (track.channelTitle) rawCandidates.push(track.channelTitle);
+        if (track.snippet?.channelTitle) rawCandidates.push(track.snippet.channelTitle);
+        if (track.author) rawCandidates.push(track.author);
+        if (Array.isArray(track.artists)) {
+          track.artists.forEach((a: any) => {
+            if (typeof a === 'string') rawCandidates.push(a);
+            else if (a?.name) rawCandidates.push(a.name);
+          });
         }
-        if (!channel) channel = 'Artist';
 
-        // Keep 'All' as the first chip for resetting
-        const chips = [
-          'All',
-          `More from ${channel}`,
-          `${channel} Mix`,
-          'Similar Songs',
-          'Indie Pop',
-          'Trending',
-          'Chill Vibes'
-        ];
-        // Deduplicate and set
-        this.dynamicChips.set([...new Set(chips)].slice(0, 8));
+        // Known record labels and non-artist channels to ignore
+        const ignoredLabels = new Set([
+          'vevo', 'official', 'records', 'music', 'audio', 't-series', 'tseries',
+          'zee music company', 'zee music', 'sony music india', 'sony music', 'speed records',
+          'tips official', 'tips', 'yrf', 'desi music factory', 'geet mp3', 'saregama',
+          'saregama music', 'label', 'jiosaavn', 'youtube', 'artist', 'topic', 'channel',
+          'series', 'entertainment', 'films', 'white hill music', 'eros now', 'aditya music'
+        ]);
+
+        const extractedArtists: string[] = [];
+
+        rawCandidates.forEach(raw => {
+          if (!raw) return;
+          // Split by commas, &, feat, ft, with, x
+          const parts = raw.split(/,|&|\/|\bfeat\.?\b|\bft\.?\b|\bwith\b|\bx\b|\bvs\b/i);
+          for (let p of parts) {
+            let cleaned = p
+              .replace(/[-_]\s*topic/ig, '')
+              .replace(/vevo/ig, '')
+              .replace(/official/ig, '')
+              .replace(/^by\s+/i, '')
+              .replace(/["'\[\]()]/g, '')
+              .trim();
+
+            const lower = cleaned.toLowerCase();
+            if (
+              cleaned.length >= 2 &&
+              cleaned.length <= 35 &&
+              !ignoredLabels.has(lower) &&
+              !Array.from(ignoredLabels).some(lbl => lower === lbl || lower === lbl + ' music')
+            ) {
+              // Deduplicate case-insensitively
+              if (!extractedArtists.some(existing => existing.toLowerCase() === lower)) {
+                extractedArtists.push(cleaned);
+              }
+            }
+          }
+        });
+
+        // If no artists extracted from channel/artist fields, try parsing from title
+        if (extractedArtists.length === 0 && title) {
+          const featMatch = title.match(/(?:feat\.?|ft\.?|featuring)\s+([^()\[\]\-\|]+)/i);
+          if (featMatch && featMatch[1]) {
+            const featParts = featMatch[1].split(/,|&|\/|\bfeat\.?\b|\bft\.?\b|\bwith\b|\bx\b/i);
+            featParts.forEach((p: string) => {
+              const c = p.trim().replace(/^by\s+/i, '');
+              if (c.length >= 2 && c.length <= 35 && !ignoredLabels.has(c.toLowerCase())) {
+                if (!extractedArtists.some(existing => existing.toLowerCase() === c.toLowerCase())) {
+                  extractedArtists.push(c);
+                }
+              }
+            });
+          }
+        }
+
+        // Build separated dynamic chips
+        const chips: string[] = ['All'];
+
+        // Each artist gets their own dedicated "More from {Artist}" pill!
+        extractedArtists.slice(0, 5).forEach(artist => {
+          chips.push(`More from ${artist}`);
+        });
+
+        // Add 1 artist Mix if an artist is available
+        if (extractedArtists.length > 0) {
+          chips.push(`${extractedArtists[0]} Mix`);
+        }
+
+        // Contextual pills (Trending linked to JioSaavn, Similar Songs, Moods)
+        chips.push('Trending', 'Similar Songs', 'New Releases', 'Romantic', 'Chill Vibes', 'Party Hits');
+
+        this.dynamicChips.set([...new Set(chips)].slice(0, 12));
       } else {
-        this.dynamicChips.set(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh']);
+        this.dynamicChips.set(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh', 'Pritam', 'Shreya Ghoshal']);
       }
     }, { allowSignalWrites: true });
 
@@ -1440,14 +1695,28 @@ export class App implements OnInit {
           this.loadingPageTitle.set(rawTitle);
         }
 
+        const legacyHeroMap: Record<string, string> = {
+          '47667010': 'pl_haryanvi_top_hits',
+          'hero-haryanvi': 'pl_haryanvi_top_hits',
+          'hero-punjabi': 'pl_punjabi_top_hits',
+          'hero-bhojpuri': 'pl_bhojpuri_top_hits',
+          'hero-bengali': 'pl_bengali_top_hits',
+          'hero-hindi': 'pl_1790599778763698',
+          'hero-english': 'pl_1790534902051187',
+          '76069476': 'pl_1790534902051187',
+          'hero-tamil': 'VLPLamJg0WJQQ2c',
+          'hero-telugu': 'VLPLWXoJf562HqQ'
+        };
+        const resolvedId = legacyHeroMap[playlistId] || playlistId;
+
         // 1. Check if already in allPlaylists()
-        let targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+        let targetPlaylist = this.allPlaylists().find(p => p.id === resolvedId || p.slug === resolvedId || p.id === playlistId || p.slug === playlistId);
 
         // 2. If not found and custom playlists haven't finished loading yet, await them!
         if (!targetPlaylist && !this.isCustomPlaylistsLoaded) {
           await this.fetchCustomPlaylists();
           if (this.currentLoadingPlaylistId !== playlistId) return;
-          targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+          targetPlaylist = this.allPlaylists().find(p => p.id === resolvedId || p.slug === resolvedId || p.id === playlistId || p.slug === playlistId);
         }
 
         if (targetPlaylist) {
@@ -1810,6 +2079,7 @@ export class App implements OnInit {
   }
 
   resetSearchState(event?: Event): void {
+    this.activeChip.set('All');
     this.cachedHeroEl = null;
     if (event) event.preventDefault();
     this.isSearchMode.set(false);
@@ -1908,7 +2178,7 @@ export class App implements OnInit {
               id: `artist-${artistName}`,
               title: artistName,
               language: '',
-              coverImage: songs[0]?.thumbnailHigh || songs[0]?.thumbnail || 'ganatubenewlogo.png',
+              coverImage: songs[0]?.thumbnailHigh || songs[0]?.thumbnail || 'ganatube-logo.webp',
               preloadedSongs: songs,
               searchQueries: [],
               creator: 'Artist',
@@ -1947,7 +2217,7 @@ export class App implements OnInit {
               id: id,
               title: cleanTitle,
               language: '',
-              coverImage: artist.thumb || artist.songs[0]?.thumbnailHigh || artist.songs[0]?.thumbnail || 'ganatubenewlogo.png',
+              coverImage: artist.thumb || artist.songs[0]?.thumbnailHigh || artist.songs[0]?.thumbnail || 'ganatube-logo.webp',
               preloadedSongs: artist.songs,
               searchQueries: [],
               creator: 'Artist',
@@ -2171,11 +2441,7 @@ export class App implements OnInit {
     }
     this.startHeroTimer();
 
-    // Dynamic API URL for Localhost vs Live Domain (ganatube.in)
-    const host = window.location.hostname;
-    const adApiUrl = host === 'localhost' 
-      ? 'http://localhost/manageads/api.php' 
-      : 'https://manageads.ganatube.in/api.php';
+    const adApiUrl = 'https://manageads.ganatube.in/api.php';
 
     // Combined Ads Fetch: 4 requests → 1 (Performance Optimization)
     fetch(`${adApiUrl}?action=app_ads`)
@@ -2499,10 +2765,7 @@ export class App implements OnInit {
       if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) {
         this.heroData.set(data);
       } else {
-        // Direct fetch fallback in case app_init didn't contain custom_header
-        const apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') 
-          ? 'http://localhost/manageads/managegt-api.php' 
-          : 'https://manageads.ganatube.in/managegt-api.php';
+        const apiUrl = 'https://manageads.ganatube.in/managegt-api.php';
         this.http.get<any>(`${apiUrl}?action=get_header&t=${Date.now()}`).pipe(
           catchError(() => of({}))
         ).subscribe(directData => {
@@ -2619,19 +2882,29 @@ export class App implements OnInit {
             };
           });
 
-          // Extract 'Trending' and 'Suggested for You'
-          const trendingShelf = algoShelves.length > 0 ? [algoShelves[0]] : [];
-          const suggestedShelf = algoShelves.length > 1 ? [algoShelves[1]] : [];
-          const restOfAlgorithmicShelves = algoShelves.length > 2 ? algoShelves.slice(2) : [];
+          // Separate 'Suggested for You' (powered dynamically by JioSaavn Trending)
+          let suggestedShelf: ShelfDefinition[] = [];
+          const suggestedIdx = algoShelves.findIndex(s => s.title.toLowerCase().startsWith('suggested for you'));
+          if (suggestedIdx >= 0) {
+            suggestedShelf = [algoShelves.splice(suggestedIdx, 1)[0]];
+          } else {
+            suggestedShelf = [{
+              title: 'Suggested for You',
+              query: '',
+              language: l
+            }];
+          }
+
+          // Mark shelf for JioSaavn trending dynamic loading (no offline dummy songs!)
+          suggestedShelf[0].type = 'saavn_trending';
+          suggestedShelf[0].songs = undefined;
+
+          const restOfAlgorithmicShelves = algoShelves;
 
           // If multiple languages, tag algorithmic titles with language name
           if (isMultiLang) {
-            if (trendingShelf.length > 0) {
-              trendingShelf[0].title = `${trendingShelf[0].title} (${l})`;
-              trendingShelf[0].language = l;
-            }
             if (suggestedShelf.length > 0) {
-              suggestedShelf[0].title = `${suggestedShelf[0].title} (${l})`;
+              suggestedShelf[0].title = `Suggested for You (${l})`;
               suggestedShelf[0].language = l;
             }
             restOfAlgorithmicShelves.forEach(s => {
@@ -2639,37 +2912,14 @@ export class App implements OnInit {
               s.language = l;
             });
           } else {
-            if (trendingShelf.length > 0) trendingShelf[0].language = l;
-            if (suggestedShelf.length > 0) suggestedShelf[0].language = l;
+            if (suggestedShelf.length > 0) {
+              suggestedShelf[0].title = 'Suggested for You';
+              suggestedShelf[0].language = l;
+            }
             restOfAlgorithmicShelves.forEach(s => { s.language = l; });
           }
 
-          // Populate offline suggestions directly in 'Suggested for You' to avoid API call
-          const offlinePool = customShelves.flatMap(s => s.songs || []);
-          if (suggestedShelf.length > 0 && offlinePool.length > 0) {
-            let recentSuggested: string[] = [];
-            try {
-              recentSuggested = JSON.parse(localStorage.getItem(`gt_recent_suggested_${l}`) || '[]');
-            } catch(e) {}
-
-            let freshPool = offlinePool.filter(s => !recentSuggested.includes(s.videoId));
-            if (freshPool.length < 10) {
-              freshPool = offlinePool;
-              recentSuggested = [];
-            }
-
-            const shuffledPool = [...freshPool].sort(() => 0.5 - Math.random()).slice(0, 15);
-            const newRecent = [...recentSuggested, ...shuffledPool.map(s => s.videoId)].slice(-50);
-            try {
-              localStorage.setItem(`gt_recent_suggested_${l}`, JSON.stringify(newRecent));
-            } catch(e) {}
-
-            suggestedShelf[0].songs = shuffledPool;
-            suggestedShelf[0].type = 'custom';
-          }
-
           shelvesByLanguage.push([
-            ...trendingShelf,
             ...suggestedShelf,
             ...restOfAlgorithmicShelves,
             ...customShelves
@@ -2739,8 +2989,12 @@ export class App implements OnInit {
             }
           } else {
             const shelfLang = def.language || primaryLang;
-            const fetchObservable = def.type === 'trending'
-              ? this.youtubeApi.getTrendingMusic(shelfLang, 12)
+            const isSaavnTrending = def.title.startsWith('Suggested for You') ||
+                                    def.type === 'saavn_trending' ||
+                                    def.type === 'trending' ||
+                                    def.title.toLowerCase().includes('trending');
+            const fetchObservable = isSaavnTrending
+              ? this.youtubeApi.getSaavnTrending(shelfLang, 48, 'trending')
               : this.youtubeApi.searchMusic(def.query, 15);
 
             fetchObservable.subscribe({
@@ -2754,9 +3008,6 @@ export class App implements OnInit {
                 }
 
                 if (songs && songs.length > 0) {
-                  if (def.title.startsWith('Suggested for You')) {
-                    songs = songs.sort(() => 0.5 - Math.random());
-                  }
 
                   let dedupedSongs = songs.filter(s => {
                     if (!s || !s.videoId) return false;
@@ -2828,8 +3079,12 @@ export class App implements OnInit {
         return of(def.songs);
       } else {
         const shelfLang = def.language || language || this.homeScreenLanguage();
-        const fetchObservable = def.type === 'trending'
-          ? this.youtubeApi.getTrendingMusic(shelfLang, 12)
+        const isSaavnTrending = def.title.startsWith('Suggested for You') ||
+                                def.type === 'saavn_trending' ||
+                                def.type === 'trending' ||
+                                def.title.toLowerCase().includes('trending');
+        const fetchObservable = isSaavnTrending
+          ? this.youtubeApi.getSaavnTrending(shelfLang, 48, 'trending')
           : this.youtubeApi.searchMusic(def.query, 15);
 
         return fetchObservable.pipe(
@@ -2849,10 +3104,6 @@ export class App implements OnInit {
         const newShelves: any[] = [];
         results.forEach((songs: any, index: number) => {
           if (songs && songs.length > 0) {
-            if (nextDefs[index].title.startsWith('Suggested for You')) {
-              songs = songs.sort(() => 0.5 - Math.random());
-            }
-            
             let dedupedSongs = songs.filter((s: any) => {
               if (!s || !s.videoId) return false;
               if (this.displayedVideoIds.has(s.videoId)) return false;
@@ -3066,10 +3317,9 @@ export class App implements OnInit {
       });
       return;
     }
-
     if (this.searchFilter() === 'playlists') {
       // Fetch Community Playlists & YouTube Playlists in parallel
-      const url = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
+      const url = 'https://manageads.ganatube.in/playlist-api.php';
       
       const communityPromise = fetch(`${url}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
         .then(res => res.json())
@@ -3078,8 +3328,8 @@ export class App implements OnInit {
             return data.data.map((pl: any) => ({
               videoId: pl.playlist_id,
               title: pl.playlist_name,
-              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
-              thumbnailHigh: (pl.songs && pl.songs.length > 0 && (pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail)) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatube-logo.webp',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && (pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail)) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatube-logo.webp',
               channelTitle: pl.owner,
               publishedAt: pl.created_at,
               type: 'community-playlist'
@@ -3234,7 +3484,7 @@ export class App implements OnInit {
       });
 
       // 3. Playlist matches (community + YT Music)
-      const playlistUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost') ? 'http://localhost/manageads/playlist-api.php' : 'https://manageads.ganatube.in/playlist-api.php';
+      const playlistUrl = 'https://manageads.ganatube.in/playlist-api.php';
 
       const communityPlaylistPromise = fetch(`${playlistUrl}?action=getAllPublicPlaylists&q=${encodeURIComponent(query)}`)
         .then(res => res.json())
@@ -3243,8 +3493,8 @@ export class App implements OnInit {
             return data.data.slice(0, 6).map((pl: any) => ({
               videoId: pl.playlist_id,
               title: pl.playlist_name,
-              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
-              thumbnailHigh: (pl.songs && pl.songs.length > 0 && (pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail)) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatubenewlogo.png',
+              thumbnail: (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatube-logo.webp',
+              thumbnailHigh: (pl.songs && pl.songs.length > 0 && (pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail)) ? getHighResThumbnail(pl.songs[0].thumbnailHigh || pl.songs[0].thumbnail) : 'ganatube-logo.webp',
               channelTitle: pl.owner,
               publishedAt: pl.created_at,
               type: 'community-playlist'
@@ -3514,18 +3764,38 @@ export class App implements OnInit {
         try {
           const urlObj = new URL(link);
           if (urlObj.hostname === 'ganatube.in' || urlObj.hostname === 'www.ganatube.in' || (currentOrigin && urlObj.origin === currentOrigin)) {
+            const playlistId = urlObj.pathname.replace(/^\/playlist\//, '').replace(/\/$/, '');
+            const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+            if (targetPlaylist) {
+              this.openPlaylist(targetPlaylist);
+              return;
+            }
             this.router.navigateByUrl(urlObj.pathname + urlObj.search + urlObj.hash);
             return;
           }
         } catch (e) {}
         window.open(link, '_blank');
       } else {
+        const playlistId = link.replace(/^\/playlist\//, '').replace(/\/$/, '');
+        const targetPlaylist = this.allPlaylists().find(p => p.id === playlistId || p.slug === playlistId);
+        if (targetPlaylist) {
+          this.openPlaylist(targetPlaylist);
+          return;
+        }
         this.router.navigateByUrl(link);
       }
       return;
     }
 
     const langLower = lang.toLowerCase();
+    // 1. Dynamic Check: Find published custom playlist from ManageGT for this language
+    const customPl = this.customPlaylists().find(p => p.language?.toLowerCase() === langLower);
+    if (customPl) {
+      this.openPlaylist(customPl);
+      return;
+    }
+
+    // 2. Legacy fallback
     const playlistSlug = langLower === 'english' ? '76069476' : `hero-${langLower}`;
     const targetPlaylist = this.allPlaylists().find(p => p.slug === playlistSlug || p.id === playlistSlug);
     
@@ -3663,7 +3933,7 @@ export class App implements OnInit {
       title: pl.name,
       language: this.homeScreenLanguage(),
       coverImage: pl.tracks.length > 0 && pl.tracks[0].thumbnailHigh ? pl.tracks[0].thumbnailHigh : 
-                 (pl.tracks.length > 0 && pl.tracks[0].thumbnail ? pl.tracks[0].thumbnail : 'ganatubenewlogo.png'),
+                 (pl.tracks.length > 0 && pl.tracks[0].thumbnail ? pl.tracks[0].thumbnail : 'ganatube-logo.webp'),
       preloadedSongs: pl.tracks,
       searchQueries: [],
       creator: pl.owner || (this.authService.currentUser()?.displayName || username),
@@ -3727,7 +3997,7 @@ export class App implements OnInit {
           title: pl.playlist_name,
           language: this.homeScreenLanguage(),
           coverImage: pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnailHigh ? pl.songs[0].thumbnailHigh : 
-                     (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail ? pl.songs[0].thumbnail : 'ganatubenewlogo.png'),
+                     (pl.songs && pl.songs.length > 0 && pl.songs[0].thumbnail ? pl.songs[0].thumbnail : 'ganatube-logo.webp'),
           preloadedSongs: pl.songs || [],
           searchQueries: [],
           creator: (email && pl.owner_email === email) ? (this.authService.currentUser()?.displayName || pl.owner) : pl.owner,
@@ -3825,7 +4095,7 @@ export class App implements OnInit {
       id: 'liked-songs',
       title: 'Liked Songs',
       language: this.homeScreenLanguage(),
-      coverImage: likedSongs.length > 0 && likedSongs[0].thumbnail ? likedSongs[0].thumbnail : 'ganatubenewlogo.png',
+      coverImage: likedSongs.length > 0 && likedSongs[0].thumbnail ? likedSongs[0].thumbnail : 'ganatube-logo.webp',
       preloadedSongs: likedSongs,
       searchQueries: []
     };
@@ -3889,7 +4159,7 @@ export class App implements OnInit {
       id: 'recently-played',
       title: 'Recently Played',
       language: this.homeScreenLanguage(),
-      coverImage: recentPlays.length > 0 && recentPlays[0].thumbnail ? recentPlays[0].thumbnail : 'ganatubenewlogo.png',
+      coverImage: recentPlays.length > 0 && recentPlays[0].thumbnail ? recentPlays[0].thumbnail : 'ganatube-logo.webp',
       preloadedSongs: recentPlays,
       searchQueries: []
     };

@@ -177,8 +177,8 @@ import { CastService } from '../../services/cast.service';
             (click)="playerService.toggleRepeat()"
             [title]="'Repeat: ' + playerService.repeatMode()"
           >
-            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" stroke="#9333ea"></svg>
-            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+            <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="20" stroke="var(--color-primary)"></svg>
+            <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="20" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : 'var(--color-primary)'"></svg>
           </button>
         </div>
       </div>
@@ -393,8 +393,8 @@ import { CastService } from '../../services/cast.service';
               (click)="playerService.toggleRepeat()"
               [title]="'Repeat: ' + playerService.repeatMode()"
             >
-              <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="24" stroke="#9333ea"></svg>
-              <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="24" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : '#9333ea'"></svg>
+              <svg *ngIf="playerService.repeatMode() === 'one'" lucideRepeat1 [attr.size]="24" stroke="var(--color-primary)"></svg>
+              <svg *ngIf="playerService.repeatMode() !== 'one'" lucideRepeat [attr.size]="24" [attr.stroke]="playerService.repeatMode() === 'none' ? 'rgba(255,255,255,0.4)' : 'var(--color-primary)'"></svg>
             </button>
           </div>
           
@@ -517,7 +517,7 @@ export class MusicPlayerComponent implements OnDestroy {
   getSleepSliderBackground(): string {
     const val = this.customSleepTime();
     const percent = Math.min(100, Math.max(0, ((val - 1) / 119) * 100));
-    return `linear-gradient(to right, #a855f7 0%, #ec4899 ${percent}%, rgba(255, 255, 255, 0.15) ${percent}%, rgba(255, 255, 255, 0.15) 100%)`;
+    return `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary-hover, var(--color-primary)) ${percent}%, rgba(255, 255, 255, 0.15) ${percent}%, rgba(255, 255, 255, 0.15) 100%)`;
   }
 
   constructor(
