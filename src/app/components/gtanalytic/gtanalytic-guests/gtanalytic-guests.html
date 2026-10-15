@@ -181,6 +181,9 @@
                   <span class="guest-dot active-dot"></span>
                   <code>{{ g.guest_id }}</code>
                 </div>
+                <div class="device-pill" *ngIf="g.device_type" [title]="(g.os || '') + (g.browser ? ' · ' + g.browser : '')">
+                  {{ deviceLabel(g) }}
+                </div>
               </td>
               <td>
                 <span class="ip-badge">{{ g.ip_address || 'Hidden/Internal' }}</span>
@@ -312,6 +315,9 @@
                   <span class="guest-dot"></span>
                   <code>{{ g.guest_id }}</code>
                 </div>
+                <div class="device-pill" *ngIf="g.device_type" [title]="(g.os || '') + (g.browser ? ' · ' + g.browser : '')">
+                  {{ deviceLabel(g) }}
+                </div>
               </td>
               <td>
                 <span class="ip-badge">{{ g.ip_address || '—' }}</span>
@@ -412,6 +418,26 @@
                 <span *ngIf="quickExcludingIp() === selectedGuest().ip_address">Excluding IP...</span>
                 <span *ngIf="quickExcludingIp() !== selectedGuest().ip_address">🚫 Exclude This IP From Tracking</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Device & Screen Box -->
+          <div class="detail-box">
+            <div class="detail-box-head">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <span>Device & Screen</span>
+            </div>
+            <div class="detail-val-large" *ngIf="selectedGuest().device_type">
+              {{ deviceIcon(selectedGuest()) }} {{ selectedGuest().device_type }}
+            </div>
+            <div *ngIf="!selectedGuest().device_type" class="text-muted" style="font-size: 13px; padding-top: 4px;">
+              Device info not recorded for this guest yet
+            </div>
+            <div class="detail-sub-row" *ngIf="selectedGuest().screen_size">
+              <span class="geo-text">Screen: {{ selectedGuest().screen_size }}</span>
+            </div>
+            <div class="detail-sub-meta" *ngIf="selectedGuest().os || selectedGuest().browser">
+              {{ selectedGuest().os || 'Unknown OS' }}<span *ngIf="selectedGuest().browser"> · {{ selectedGuest().browser }}</span>
             </div>
           </div>
 

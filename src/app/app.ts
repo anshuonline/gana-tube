@@ -270,7 +270,7 @@ export class App implements OnInit {
 
   // Language filter
   availableLanguages = ['Hindi', 'Punjabi', 'English', 'Bhojpuri', 'Haryanvi', 'Bengali', 'Tamil'];
-  homeScreenLanguage = signal<string>('Hindi');
+  homeScreenLanguage = signal<string>('English');
   showLanguageModal = signal<boolean>(false);
   isMobileView = signal<boolean>(false);
 
@@ -397,7 +397,7 @@ export class App implements OnInit {
     }
   ];
 
-  currentHeroSlideIndex = signal<number>(0);
+  currentHeroSlideIndex = signal<number>(2); // English slide (default home language)
   isHeroPaused = signal<boolean>(false);
   private heroTimer: any = null;
   private heroTouchStartX = 0;
@@ -2394,14 +2394,14 @@ export class App implements OnInit {
       }
     }
 
-    // Load saved language if available
+    // Load saved language if available — default is English for first-time users
     const savedLang = localStorage.getItem('homeScreenLanguage');
     if (savedLang && this.availableLanguages.includes(savedLang)) {
       this.homeScreenLanguage.set(savedLang);
-      const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === savedLang.toLowerCase());
-      if (slideIdx !== -1) {
-        this.currentHeroSlideIndex.set(slideIdx);
-      }
+    }
+    const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === this.homeScreenLanguage().toLowerCase());
+    if (slideIdx !== -1) {
+      this.currentHeroSlideIndex.set(slideIdx);
     }
     this.startHeroTimer();
 

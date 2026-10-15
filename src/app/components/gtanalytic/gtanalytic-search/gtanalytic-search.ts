@@ -222,7 +222,7 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
       datasets.push({
         data: prevSeries,
         label: prevLabel,
-        borderColor: 'rgba(255, 255, 255, 0.35)',
+        borderColor: 'rgba(139, 92, 246, 0.9)',
         backgroundColor: 'transparent',
         borderWidth: 1.8,
         borderDash: [5, 5],
@@ -278,11 +278,11 @@ export class GtanalyticSearchComponent implements OnInit, OnDestroy {
           data: list.map((c: any) => c.total),
           backgroundColor: [
             '#F50919', // Brand Red
-            '#D90816', // Dark Red
-            '#3b82f6', // Blue
-            '#10b981', // Emerald
-            '#f59e0b', // Amber
-            '#8b5cf6'  // Violet
+            '#facc15', // Yellow
+            '#10b981', // Green
+            '#8b5cf6', // Purple
+            '#fb923c', // Orange
+            '#3b82f6'  // Blue
           ],
           borderColor: '#0a0a0f',
           borderWidth: 2,

@@ -39,7 +39,7 @@ import { UserService } from '../../services/user.service';
 import { AnalyticsService } from '../../services/analytics.service';
 import { FormsModule } from '@angular/forms';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
-import { AffiliateStickerComponent } from '../affiliate-sticker/affiliate-sticker.component';
+import { AffiliateCardsComponent } from '../affiliate-cards/affiliate-cards.component';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CastService } from '../../services/cast.service';
 import { RoomService } from '../../services/room.service';
@@ -83,7 +83,7 @@ import { ADSTERRA_TAGS } from '../ads/ads.config';
     LucideVolume1,
     LucideVolumeX,
     TrackMenuComponent,
-    AffiliateStickerComponent
+    AffiliateCardsComponent
   ],
   templateUrl: './full-screen-player.component.html',
   styleUrls: ['./full-screen-player.component.scss']

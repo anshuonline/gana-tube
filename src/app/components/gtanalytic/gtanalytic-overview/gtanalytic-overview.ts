@@ -48,7 +48,7 @@ export class GtanalyticOverviewComponent {
 
     return [{
       data: [registered, guest],
-      backgroundColor: ['#F50919', '#D90816'],
+      backgroundColor: ['#10b981', '#facc15'],
       borderColor: ['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.4)'],
       borderWidth: 2
     }];

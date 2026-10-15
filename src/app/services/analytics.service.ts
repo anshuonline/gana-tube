@@ -68,6 +68,39 @@ export class AnalyticsService {
     return false;
   }
 
+  /** Detects guest device info: Mobile/PC, OS, browser and screen size */
+  private getDeviceInfo() {
+    if (typeof navigator === 'undefined') {
+      return { device_type: 'Unknown', os: 'Unknown', browser: 'Unknown', screen_size: 'Unknown' };
+    }
+    const ua = navigator.userAgent || '';
+    const isTablet = /iPad|Tablet|PlayBook|Silk/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua));
+    const isMobile = !isTablet && (/Mobi|Android|iPhone|iPod|Windows Phone|IEMobile|BlackBerry|Opera Mini/i.test(ua) || ((navigator as any).maxTouchPoints > 1 && /Macintosh/i.test(ua)));
+    let os = 'Unknown';
+    if (/Windows NT 10/.test(ua)) os = 'Windows 10/11';
+    else if (/Windows NT 6\.3/.test(ua)) os = 'Windows 8.1';
+    else if (/Windows NT 6\.1/.test(ua)) os = 'Windows 7';
+    else if (/Windows/.test(ua)) os = 'Windows';
+    else if (/Android/.test(ua)) os = 'Android';
+    else if (/iPhone|iPad|iPod/.test(ua) || ((navigator as any).maxTouchPoints > 1 && /Macintosh/i.test(ua))) os = 'iOS';
+    else if (/Mac OS X/.test(ua)) os = 'macOS';
+    else if (/CrOS/.test(ua)) os = 'ChromeOS';
+    else if (/Linux/.test(ua)) os = 'Linux';
+    let browser = 'Unknown';
+    if (/Edg\//.test(ua)) browser = 'Edge';
+    else if (/OPR\/|Opera/.test(ua)) browser = 'Opera';
+    else if (/SamsungBrowser/.test(ua)) browser = 'Samsung Internet';
+    else if (/Firefox\//.test(ua)) browser = 'Firefox';
+    else if (/Chrome\//.test(ua)) browser = 'Chrome';
+    else if (/Safari\//.test(ua)) browser = 'Safari';
+    return {
+      device_type: isTablet ? 'Tablet' : (isMobile ? 'Mobile' : 'PC'),
+      os,
+      browser,
+      screen_size: `${window.screen.width}x${window.screen.height}`
+    };
+  }
+
   startGuestTracking() {
     if (this.isBotEnvironment()) return;
     if (this.timeTrackingInterval) {
@@ -94,7 +127,8 @@ export class AnalyticsService {
           guest_id: guestId, 
           seconds,
           current_page: page,
-          last_search: this.lastSearchQuery
+          last_search: this.lastSearchQuery,
+          ...this.getDeviceInfo()
         }),
         keepalive: true
       });

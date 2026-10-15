@@ -20,7 +20,7 @@ export class IntroVideoComponent implements OnInit {
     this.showOverlay.set(true);
     setTimeout(() => {
       this.dismiss();
-    }, 2500);
+    }, 1750);
   }
 
   skipIntro(): void {
@@ -33,6 +33,6 @@ export class IntroVideoComponent implements OnInit {
     setTimeout(() => {
       this.showOverlay.set(false);
       this.fadingOut.set(false);
-    }, 800);
+    }, 470);
   }
 }

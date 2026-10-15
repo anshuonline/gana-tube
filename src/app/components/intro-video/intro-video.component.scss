@@ -1,93 +1,121 @@
-@import url('https://fonts.cdnfonts.com/css/allison-dream');
+/* Professional startup splash (YouTube / Spotify style)
+   - Only transform + opacity animations (GPU compositor friendly, 60fps)
+   - No blur, no glow, no shadows, no filters */
+
+:host {
+  display: contents;
+}
 
 .intro-overlay {
   position: fixed;
   inset: 0;
   z-index: 99999999;
-  background: #121212;
+  background: #0a0a0a;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   user-select: none;
   cursor: pointer;
-  pointer-events: all;
   opacity: 1;
-  transition: opacity 0.72s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.fading {
     opacity: 0;
     pointer-events: none;
-
-    .intro-content {
-      transform: scale(1.16);
-    }
   }
 }
 
-.intro-content {
+.intro-brand {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 100%;
+  gap: clamp(12px, 2.5vw, 18px);
   padding: 0 24px;
-  transform: scale(1);
-  transition: transform 0.75s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.intro-signature {
-  position: relative;
-  margin: 0;
-  padding: 0 24px;
-  font-family: 'Allison Dream', cursive, sans-serif;
-  font-size: clamp(4.5rem, 15vw, 9.5rem);
-  font-weight: 400;
-  color: #ffffff;
-  line-height: 1.15;
-  letter-spacing: 0.02em;
-  text-align: center;
-  display: inline-block;
-  white-space: nowrap;
+.intro-logo {
+  width: clamp(46px, 9.5vw, 60px);
+  height: auto;
+  border-radius: 12%;
+  user-drag: none;
+  -webkit-user-drag: none;
+  opacity: 0;
+  transform: scale(0.72);
+  animation: gt-logo-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  will-change: transform, opacity;
+}
 
-  /* STRICT: Absolutely NO glow, shadows, or color haze */
-  text-shadow: none !important;
-  filter: none !important;
+.intro-wordmark {
+  font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: clamp(1.85rem, 6.5vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: gt-word-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.32s forwards;
+  will-change: transform, opacity;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-
-  /* Pro cinematic fade-in entrance with subtle scale */
-  opacity: 0;
-  transform: scale(0.9);
-  animation: proFadeInZoom 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards;
 }
 
-@keyframes proFadeInZoom {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  100% {
+/* Slim loading bar (bottom edge) */
+.intro-progress-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.intro-progress-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #f50919;
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: gt-progress-in 1.4s cubic-bezier(0.25, 0, 0.2, 1) 0.15s forwards;
+  will-change: transform;
+}
+
+@keyframes gt-logo-in {
+  to {
     opacity: 1;
     transform: scale(1);
   }
 }
 
-@media (max-width: 640px) {
-  .intro-signature {
-    font-size: clamp(2.8rem, 14vw, 4.6rem);
-    padding: 0 16px;
+@keyframes gt-word-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gt-progress-in {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .intro-brand {
+    gap: 10px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-overlay,
-  .intro-content,
-  .intro-signature {
+  .intro-overlay {
     transition: none !important;
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+  }
+  .intro-logo,
+  .intro-wordmark,
+  .intro-progress-fill {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
   }
 }

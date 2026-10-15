@@ -399,7 +399,14 @@ async function matchSaavnSong({ songId, title, artist, album, duration, bitrate 
 
 // ─── JioSaavn Trending & Latest Songs ─────────────────────────────────────────
 
-// Official JioSaavn "India Superhits Top 50" Playlist IDs
+// Official JioSaavn "Trending Today" featured chart (live, daily-refreshed)
+// Resolved via webapi.get token: https://www.jiosaavn.com/featured/trending-today/I3kvhipIy73uCJW60TJk1Q__
+const SAAVN_TRENDING_FEATURED = {
+  hindi: 'I3kvhipIy73uCJW60TJk1Q__',
+};
+
+// Official JioSaavn "India Superhits Top 50" Playlist IDs (fallback for languages
+// without a featured trending chart)
 const SAAVN_TOP50_PLAYLISTS = {
   hindi: '1134543272',       // Hindi: India Superhits Top 50
   english: '1134595537',     // International : India Superhits Top 50
@@ -437,6 +444,23 @@ async function fetchSaavnPlaylistTracks(listId) {
   }
 }
 
+// Featured charts (e.g. "Trending Today") resolve via webapi.get token, not
+// numeric playlist IDs. `n` controls how many songs come back (default 5).
+async function fetchSaavnFeaturedTracks(token, limit) {
+  if (!token) return [];
+  try {
+    const res = await saavnApiJson({
+      __call: 'webapi.get',
+      token: String(token),
+      type: 'playlist',
+      n: String(Math.min(Math.max(parseInt(limit, 10) || 20, 1), 60))
+    });
+    return Array.isArray(res?.list) ? res.list : [];
+  } catch (e) {
+    return [];
+  }
+}
+
 async function getTrendingSaavnSongs(language = 'hindi', limit = 20, type = 'all') {
   const langKey = String(language || 'hindi').toLowerCase().trim();
   const numLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 60);
@@ -448,7 +472,14 @@ async function getTrendingSaavnSongs(language = 'hindi', limit = 20, type = 'all
   let rawResults = [];
 
   if (reqType === 'trending') {
-    rawResults = await fetchSaavnPlaylistTracks(top50Id);
+    // Live "Trending Today" chart first (matches jiosaavn.com/featured/trending-today),
+    // then the per-language Top 50 playlist as fallback. Only languages with a
+    // featured token use the live chart — others keep their Top 50 playlist.
+    const featuredToken = SAAVN_TRENDING_FEATURED[langKey];
+    rawResults = featuredToken ? await fetchSaavnFeaturedTracks(featuredToken, numLimit) : [];
+    if (!rawResults.length) {
+      rawResults = await fetchSaavnPlaylistTracks(top50Id);
+    }
   } else if (reqType === 'latest') {
     rawResults = await fetchSaavnPlaylistTracks(freshId);
     if (!rawResults.length) {
@@ -523,5 +554,122 @@ async function getTrendingSaavnSongs(language = 'hindi', limit = 20, type = 'all
   return songs;
 }
 
-module.exports = { searchSaavnSongs, matchSaavnSong, getTrendingSaavnSongs };
+// ─── JioSaavn Albums & Artist Shelves (dynamic home feed) ────────────────────
+
+// Album cards for the home feed — square art, title, primary artist.
+// JioSaavn's album search endpoint returns dedicated album entities.
+async function searchSaavnAlbums(query, limit = 12) {
+  const q = String(query || '').trim().slice(0, 120);
+  if (!q) return [];
+
+  const json = await saavnApiJson({
+    __call: 'search.getAlbumResults',
+    q,
+    p: '1',
+    n: String(Math.min(Math.max(parseInt(limit, 10) || 12, 1), 30))
+  });
+  if (!json) return [];
+
+  const results = json?.data?.results || json?.results || [];
+  if (!Array.isArray(results)) return [];
+
+  const seen = new Set();
+  const albums = [];
+  for (const raw of results) {
+    const info = raw.more_info || raw;
+    const title = decodeEntities(raw.title || info.title || '').trim();
+    const id = info.id || raw.id;
+    if (!title || !id || seen.has(id)) continue;
+    seen.add(id);
+
+    const image = String(info.image || raw.image || '')
+      .replace('150x150', '500x500')
+      .replace('50x50', '500x500');
+
+    let artist = '';
+    const map = info.artistMap;
+    if (map?.primary_artists?.length) {
+      artist = map.primary_artists.map(a => a?.name).filter(Boolean).join(', ');
+    } else if (info.primary_artists) {
+      artist = decodeEntities(String(info.primary_artists));
+    } else {
+      artist = decodeEntities(String(raw.subtitle || '').replace(/<[^>]*>/g, '')).trim();
+    }
+
+    albums.push({
+      id: String(id),
+      title,
+      artist: artist || 'Unknown Artist',
+      image,
+      year: info.year || (info.release_date ? String(info.release_date).slice(0, 4) : ''),
+      songCount: parseInt(info.song_count, 10) || 0,
+      language: info.language || raw.language || ''
+    });
+    if (albums.length >= limit) break;
+  }
+  return albums;
+}
+
+// Full album page data: metadata + playable track list (encrypted URLs intact
+// so the same playback pipeline as trending songs is reused end-to-end).
+async function getSaavnAlbumDetails(albumId) {
+  const id = String(albumId || '').trim();
+  if (!id) return null;
+
+  const json = await saavnApiJson({ __call: 'content.getAlbumDetails', albumid: id });
+  if (!json) return null;
+
+  const list = Array.isArray(json?.list) ? json.list : [];
+  const songs = list.map(normalizeSaavnSong).filter(s => s && s.title && s.encryptedUrl);
+  if (!songs.length) return null;
+
+  let artist = '';
+  const map = json.artistMap || json.more_info?.artistMap;
+  if (map?.primary_artists?.length) {
+    artist = map.primary_artists.map(a => a?.name).filter(Boolean).join(', ');
+  } else if (json.primary_artists) {
+    artist = decodeEntities(String(json.primary_artists));
+  }
+
+  return {
+    id,
+    title: decodeEntities(json.title || json.album || songs[0]?.album || 'Album'),
+    artist: artist || songs[0]?.artist || 'Unknown Artist',
+    coverImage: String(json.image || songs[0]?.image || '').replace('150x150', '500x500').replace('50x50', '500x500'),
+    year: json.year || '',
+    songCount: songs.length,
+    preloadedSongs: songs.map(s => ({
+      id: s.id,
+      title: s.title,
+      artist: s.artist,
+      album: s.album || json.title || '',
+      duration: s.duration,
+      image: s.image,
+      language: s.language
+    }))
+  };
+}
+
+// "Because you like {artist}" shelves — search the artist and keep only the
+// candidates genuinely by that artist (same matching rule as playback).
+async function getSaavnArtistTopSongs(artistName, limit = 15) {
+  const name = String(artistName || '').trim().slice(0, 80);
+  if (!name) return [];
+
+  const results = await searchSaavnSongs(`${name} songs`, Math.min(Math.max(limit * 2, 20), 30));
+  if (!results.length) return [];
+
+  const own = results.filter(s => artistNamesMatchAny(name, s.artist));
+  const picked = (own.length >= 4 ? own : results).slice(0, limit);
+  return picked.map(s => ({ ...s, language: s.language || '' }));
+}
+
+module.exports = {
+  searchSaavnSongs,
+  matchSaavnSong,
+  getTrendingSaavnSongs,
+  searchSaavnAlbums,
+  getSaavnAlbumDetails,
+  getSaavnArtistTopSongs
+};
 

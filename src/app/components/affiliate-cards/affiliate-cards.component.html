@@ -1,0 +1,50 @@
+<div class="gt-aff-rail" *ngIf="visibleProducts.length > 0">
+  <div class="gt-aff-rail-head">
+    <span class="gt-aff-rail-title">Amazon Offers</span>
+    <span class="gt-aff-sponsored">Sponsored</span>
+  </div>
+
+  <div class="gt-aff-cards">
+    <div
+      class="gt-aff-card"
+      *ngFor="let p of visibleProducts; let i = index; trackBy: trackById"
+      [style.animation-delay.ms]="i * 90"
+      (click)="stopPropagation($event)"
+    >
+      <a
+        class="gt-aff-card-link"
+        [href]="p.amazonUrl"
+        target="_blank"
+        rel="sponsored nofollow noopener noreferrer"
+        [attr.aria-label]="'View ' + p.name + ' on Amazon (sponsored)'"
+      >
+        <span class="gt-aff-card-thumb">
+          <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" decoding="async" (error)="hideThumb($event)" />
+        </span>
+        <span class="gt-aff-card-body">
+          <span class="gt-aff-offer">
+            <span class="gt-aff-offer-dot"></span>
+            <span class="gt-aff-offer-text">Limited Offer</span>
+          </span>
+          <span class="gt-aff-card-name">{{ p.name }}</span>
+          <span class="gt-aff-card-buyrow">
+            <span class="gt-aff-card-price">
+              {{ p.priceLabel }}
+              <span class="gt-aff-card-shop">on Amazon</span>
+            </span>
+            <span class="gt-aff-card-cta" aria-hidden="true">Buy now</span>
+          </span>
+        </span>
+      </a>
+      <button
+        type="button"
+        class="gt-aff-card-close"
+        (click)="dismiss($event, p.id)"
+        [attr.aria-label]="'Dismiss offer for ' + p.name"
+        title="Dismiss"
+      >
+        <svg lucideX [attr.size]="13"></svg>
+      </button>
+    </div>
+  </div>
+</div>

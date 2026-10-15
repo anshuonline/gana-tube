@@ -110,9 +110,10 @@
             </svg>
           </div>
 
-          <!-- Amazon affiliate sticker (YT-Shorts style, rotates products) -->
-          <app-affiliate-sticker position="bottom-left"></app-affiliate-sticker>
         </div>
+
+        <!-- Amazon affiliate offer cards (desktop side rail / mobile shelf) -->
+        <app-affiliate-cards *ngIf="activeView === 'artwork' && (!isDesktop || !isSidebarVisible)"></app-affiliate-cards>
       </div>
 
       <!-- Lists View Container -->

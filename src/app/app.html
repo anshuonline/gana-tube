@@ -1187,7 +1187,7 @@
 
             <!-- Hardcore In-Feed Ad (Every 2 sections) -->
             <div class="in-feed-ad-container" *ngIf="shelfIdx % 2 === 1">
-              <app-gt-native-banner *ngIf="shelfIdx === 1"></app-gt-native-banner>
+              <app-gt-native-banner *ngIf="shelfIdx === 1" [fallbackTag]="inFeedAdTag()"></app-gt-native-banner>
               <app-adsterra-banner *ngIf="shelfIdx !== 1" [tag]="inFeedAdTag()"></app-adsterra-banner>
               <span class="ad-label">Sponsored</span>
             </div>

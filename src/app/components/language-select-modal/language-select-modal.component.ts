@@ -17,14 +17,14 @@ export interface LanguageOption {
   styleUrls: ['./language-select-modal.component.scss']
 })
 export class LanguageSelectModalComponent implements OnInit {
-  @Input() currentLanguage = 'Hindi';
+  @Input() currentLanguage = 'English';
   @Input() initialSelectedLanguages: string[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() select = new EventEmitter<string>();
   @Output() saveLanguages = new EventEmitter<{ selected: string[]; active: string }>();
 
   selectedLanguages = signal<string[]>([]);
-  activeLanguage = signal<string>('Hindi');
+  activeLanguage = signal<string>('English');
 
   languages: LanguageOption[] = [
     { code: 'Hindi', native: 'हिन्दी', subtitle: 'Bollywood & Indie Pop' },
@@ -43,11 +43,11 @@ export class LanguageSelectModalComponent implements OnInit {
     } else if (this.currentLanguage) {
       initial = [this.currentLanguage];
     } else {
-      initial = ['Hindi', 'English', 'Punjabi'];
+      initial = ['English', 'Hindi', 'Punjabi'];
     }
 
     this.selectedLanguages.set(initial);
-    this.activeLanguage.set(this.currentLanguage || initial[0] || 'Hindi');
+    this.activeLanguage.set(this.currentLanguage || initial[0] || 'English');
   }
 
   isSelected(code: string): boolean {
@@ -77,7 +77,7 @@ export class LanguageSelectModalComponent implements OnInit {
 
   resetToDefaults(): void {
     this.selectedLanguages.set(['English', 'Hindi', 'Tamil', 'Punjabi']);
-    this.activeLanguage.set('Hindi');
+    this.activeLanguage.set('English');
   }
 
   closeModal(): void {

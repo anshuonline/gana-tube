@@ -107,6 +107,20 @@ export class GtanalyticGuestsComponent {
     }
   }
 
+  deviceIcon(g: any): string {
+    const t = (g?.device_type || '').toLowerCase();
+    if (t === 'mobile') return '📱';
+    if (t === 'tablet') return '📲';
+    if (t === 'pc') return '💻';
+    return '🖥️';
+  }
+
+  deviceLabel(g: any): string {
+    if (!g?.device_type) return '';
+    const screen = g?.screen_size ? ` · ${g.screen_size}` : '';
+    return `${this.deviceIcon(g)} ${g.device_type}${screen}`;
+  }
+
   formatRelativeTime(dateStr: string | null): string {
     if (!dateStr) return 'N/A';
     let dStr = dateStr;

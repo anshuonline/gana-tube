@@ -298,7 +298,7 @@ export class PlayerService {
   isAutoplayEnabled = signal<boolean>(
     typeof localStorage !== 'undefined' ? localStorage.getItem('gt_autoplay') !== 'false' : true
   );
-  currentLanguage = signal<string>('Hindi');
+  currentLanguage = signal<string>('English');
   isPlaylistContext = signal<boolean>(false);
   isCrossfadeEnabled = signal<boolean>(
     typeof localStorage !== 'undefined' ? localStorage.getItem('gt_crossfade') === 'true' : false

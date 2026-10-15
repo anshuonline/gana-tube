@@ -117,12 +117,12 @@ export class GtanalyticActiveTimesComponent implements OnInit {
       {
         data: curveB.map((c: any) => c.value || 0),
         label: `${data.day_vs_day.day_b?.name || 'Day B'} (Peak: ${data.day_vs_day.day_b?.peak_hour})`,
-        borderColor: '#D90816',
-        backgroundColor: 'rgba(217, 8, 22, 0.08)',
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.08)',
         borderWidth: 2,
         fill: true,
         tension: 0.35,
-        pointBackgroundColor: '#D90816',
+        pointBackgroundColor: '#8b5cf6',
         pointRadius: 3
       }
     ];
@@ -180,8 +180,8 @@ export class GtanalyticActiveTimesComponent implements OnInit {
       {
         data: list.map((d: any) => d.previous || 0),
         label: 'Previous Period',
-        backgroundColor: 'rgba(217, 8, 22, 0.45)',
-        borderColor: '#D90816',
+        backgroundColor: 'rgba(139, 92, 246, 0.6)',
+        borderColor: '#8b5cf6',
         borderWidth: 1,
         borderRadius: 4
       }
