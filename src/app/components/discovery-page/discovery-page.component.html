@@ -81,7 +81,7 @@
             <button class="fs-spotlight-radio-btn" (click)="exploreArtist(spotlight.channelTitle)">
               More from artist
             </button>
-            <button type="button" class="fs-spotlight-menu-btn track-options-btn" (click)="on3DotClick($event, spotlight)" title="Options">
+            <button type="button" class="fs-spotlight-menu-btn" (click)="on3DotClick($event, spotlight)" title="Options">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
             </button>
           </div>
@@ -293,7 +293,7 @@
             <div class="fs-song-right">
               <span class="fs-fresh-tag">Fresh</span>
               <span class="fs-song-duration" *ngIf="drop.duration">{{ formatDuration(drop.duration) }}</span>
-              <button type="button" class="fs-row-menu-btn track-options-btn" (click)="on3DotClick($event, drop)" title="Options">
+              <button type="button" class="fs-row-menu-btn" (click)="on3DotClick($event, drop)" title="Options">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               </button>
             </div>

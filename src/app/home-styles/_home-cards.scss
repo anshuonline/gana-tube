@@ -262,12 +262,122 @@
   }
 
   @media (max-width: 640px) {
-    .quick-card-info {
-      padding: 0 10px;
+    height: 54px;
+
+    .quick-card-thumb-wrap,
+    .quick-card-thumb,
+    .quick-thumb,
+    img.quick-thumb,
+    img {
+      width: 54px !important;
+      height: 54px !important;
+      min-width: 54px !important;
+      max-width: 54px !important;
+    }
+
+    .quick-play-overlay {
+      width: 54px;
+      height: 54px;
+    }
+
+    .quick-play-btn {
+      width: 26px;
+      height: 26px;
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    .quick-card-info,
+    .quick-info,
+    .card-info {
+      padding: 0 8px;
+      gap: 2px;
+
+      .quick-card-title,
+      .song-title,
+      h4 {
+        font-size: 0.78rem;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .quick-card-channel,
+      .quick-card-artist,
+      .artist-name,
+      p,
+      span.channel {
+        font-size: 0.68rem;
+        line-height: 1.15;
+      }
     }
 
     .quick-card-menu-btn {
-      margin-right: 6px;
+      width: 24px !important;
+      height: 24px !important;
+      min-width: 24px !important;
+      margin-right: 4px !important;
+      margin-left: 0 !important;
+
+      svg {
+        width: 13px !important;
+        height: 13px !important;
+      }
+    }
+  }
+
+  @media (max-width: 420px) {
+    height: 50px;
+
+    .quick-card-thumb-wrap,
+    .quick-card-thumb,
+    .quick-thumb,
+    img.quick-thumb,
+    img {
+      width: 50px !important;
+      height: 50px !important;
+      min-width: 50px !important;
+      max-width: 50px !important;
+    }
+
+    .quick-play-overlay {
+      width: 50px;
+      height: 50px;
+    }
+
+    .quick-card-info,
+    .quick-info,
+    .card-info {
+      padding: 0 6px;
+
+      .quick-card-title,
+      .song-title,
+      h4 {
+        font-size: 0.74rem;
+      }
+
+      .quick-card-channel,
+      .quick-card-artist,
+      .artist-name,
+      p,
+      span.channel {
+        font-size: 0.64rem;
+      }
+    }
+
+    .quick-card-menu-btn {
+      width: 22px !important;
+      height: 22px !important;
+      min-width: 22px !important;
+      margin-right: 3px !important;
+      margin-left: 0 !important;
+
+      svg {
+        width: 12px !important;
+        height: 12px !important;
+      }
     }
   }
 }
@@ -291,6 +401,12 @@
   &:hover {
     background: rgba(255, 255, 255, 0.12) !important;
     color: #ffffff;
+  }
+
+  @media (max-width: 640px) {
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
   }
 }
 

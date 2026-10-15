@@ -699,8 +699,8 @@ export class App implements OnInit {
     if (chip === 'All') {
       this.resetSearchState();
     } else if (chip.toLowerCase() === 'trending') {
-      // Direct Link: JioSaavn Official Live Trending Chart
-      this.currentQuery = 'Trending (JioSaavn)';
+      // Direct Link: Official Live Trending Chart
+      this.currentQuery = 'Trending Hits';
       this.analyticsService.setLastSearch('Trending');
       this.isLoading.set(true);
       this.hasSearched.set(true);
@@ -713,13 +713,13 @@ export class App implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.warn('Failed to load JioSaavn trending for chip, falling back to search:', err);
+          console.warn('Failed to load trending for chip, falling back to search:', err);
           this.onSearch('Trending ' + lang + ' Songs');
         }
       });
     } else if (chip.toLowerCase() === 'new releases') {
-      // Direct Link: JioSaavn Official Latest Releases Chart
-      this.currentQuery = 'New Releases (JioSaavn)';
+      // Direct Link: Official Latest Releases Chart
+      this.currentQuery = 'New Releases';
       this.analyticsService.setLastSearch('New Releases');
       this.isLoading.set(true);
       this.hasSearched.set(true);
@@ -732,7 +732,7 @@ export class App implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.warn('Failed to load JioSaavn latest releases, falling back to search:', err);
+          console.warn('Failed to load latest releases, falling back to search:', err);
           this.onSearch('Latest ' + lang + ' Songs');
         }
       });
@@ -1892,8 +1892,10 @@ export class App implements OnInit {
           }
         } else {
           this.isSearchMode.set(false);
+          if (url !== 'home') {
+            this.hasSearched.set(false);
+          }
         }
-        
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
@@ -2311,6 +2313,8 @@ export class App implements OnInit {
 
   openDiscoveryPage() {
     this.closeMobileMenu();
+    this.isSearchMode.set(false);
+    this.hasSearched.set(false);
     this.router.navigate(['/discovery']);
   }
 
@@ -2496,7 +2500,21 @@ export class App implements OnInit {
           return;
         }
 
-        // 2. Fetch exact video details by ID
+        // 2. If it's a GanaTube stream pseudo-id (gt_ or legacy saavn_), play directly
+        if (videoId.startsWith('gt_') || videoId.startsWith('saavn_')) {
+          this.playerService.playTrack({
+            videoId: videoId,
+            title: 'Playing Track',
+            channelTitle: 'GanaTube',
+            thumbnail: '/ganatube-logo.webp',
+            thumbnailHigh: '/ganatube-logo.webp',
+            publishedAt: new Date().toISOString(),
+            source: 'gt'
+          });
+          return;
+        }
+
+        // 3. Fetch exact video details by ID
         this.youtubeApi.getVideoDetails([videoId]).subscribe({
           next: (res) => {
             if (res && res.length > 0 && res[0].title && !res[0].title.includes('Playing from link') && !res[0].title.includes('Loading Track')) {

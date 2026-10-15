@@ -1333,7 +1333,9 @@ export class PlayerService {
     const bitrate = bitrateMap[this.resolvedQuality()] || 320;
 
     try {
-      const saavnSongId = track.videoId.startsWith('saavn_') ? track.videoId.replace('saavn_', '') : '';
+      const saavnSongId = track.videoId.startsWith('gt_')
+        ? track.videoId.replace('gt_', '')
+        : (track.videoId.startsWith('saavn_') ? track.videoId.replace('saavn_', '') : '');
       const params = new URLSearchParams({
         title: String(track.title || '').slice(0, 120),
         artist: String(track.channelTitle || '').slice(0, 120),
@@ -1350,9 +1352,9 @@ export class PlayerService {
       );
       const match = res?.match;
       if (match?.streamUrl) {
-        const isDirectSaavn = track.source === 'saavn' || track.videoId.startsWith('saavn_');
+        const isDirectSaavn = track.source === 'saavn' || track.source === 'gt' || track.videoId.startsWith('gt_') || track.videoId.startsWith('saavn_');
         if (!isDirectSaavn && !verifySaavnMatch(track, match)) {
-          console.info('[Player] Saavn validation failed (title/artist mismatch) — playing exact YouTube video instead');
+          console.info('[Player] Stream validation failed (title/artist mismatch) — playing exact YouTube video instead');
           return null;
         }
         const entry = { streamUrl: match.streamUrl, duration: match.duration || 0 };
@@ -1374,8 +1376,8 @@ export class PlayerService {
     // and claiming YT always silences the Saavn/offline audio engines
     if (genToken !== undefined && genToken !== this.saavnToken) return;
 
-    // If videoId is a saavn_ pseudo-id, search YouTube for the song to resolve a playable videoId
-    if (videoId && videoId.startsWith('saavn_')) {
+    // If videoId is a gt_ or saavn_ pseudo-id, search YouTube for the song to resolve a playable videoId
+    if (videoId && (videoId.startsWith('gt_') || videoId.startsWith('saavn_'))) {
       const current = this.currentTrack();
       const query = `${current?.title || ''} ${current?.channelTitle || ''}`.trim();
       if (query) {

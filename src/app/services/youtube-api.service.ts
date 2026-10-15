@@ -168,18 +168,18 @@ export class YoutubeApiService {
       map(res => {
         const rawSongs = Array.isArray(res) ? res : (res?.songs || []);
         return rawSongs.map((song: any) => ({
-          videoId: song.id ? (String(song.id).startsWith('saavn_') ? String(song.id) : 'saavn_' + song.id) : ('saavn_' + Math.random().toString(36).slice(2)),
+          videoId: song.id ? (String(song.id).startsWith('gt_') ? String(song.id) : (String(song.id).startsWith('saavn_') ? 'gt_' + String(song.id).replace('saavn_', '') : 'gt_' + song.id)) : ('gt_' + Math.random().toString(36).slice(2)),
           title: this.decodeHtml(song.title || ''),
           thumbnail: getHighResThumbnail(song.image || song.thumbnail || ''),
           thumbnailHigh: getHighResThumbnail(song.image || song.thumbnailHigh || song.thumbnail || ''),
-          channelTitle: song.artist || song.channelTitle || 'JioSaavn',
+          channelTitle: song.artist || song.channelTitle || 'GanaTube',
           duration: song.duration ? Number(song.duration) : undefined,
           publishedAt: '',
-          source: 'saavn'
+          source: 'gt'
         } as YouTubeSearchResult));
       }),
       catchError(err => {
-        console.warn('JioSaavn trending failed, falling back to search API:', err);
+        console.warn('Live trending failed, falling back to search API:', err);
         return this.searchMusic(`Trending ${language} Songs`, limit);
       })
     );

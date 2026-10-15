@@ -9,7 +9,7 @@
 
 .discovery-main {
   width: 100%;
-  padding: 88px 0 120px;
+  padding: 72px 0 120px;
   box-sizing: border-box;
 
   @media (max-width: 768px) {
@@ -272,6 +272,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      position: static;
+      flex-shrink: 0;
+      opacity: 1;
       cursor: pointer;
       transition: all 0.2s ease;
 
@@ -1042,6 +1045,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      position: static;
+      flex-shrink: 0;
       cursor: pointer;
       opacity: 1;
       transition: all 0.2s ease;

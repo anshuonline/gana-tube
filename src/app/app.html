@@ -112,7 +112,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="hasSearched() || isSearchMode()" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'" [class.is-gtanalytic]="currentPage() === 'gtanalytic'" [class.is-managegt]="currentPage() === 'managegt'">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="(currentPage() === 'home' || currentPage() === 'search') && (hasSearched() || isSearchMode())" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'" [class.is-gtanalytic]="currentPage() === 'gtanalytic'" [class.is-managegt]="currentPage() === 'managegt'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
 
       <!-- Ambient Background -->
@@ -423,7 +423,7 @@
               </div>
               <div class="setting-info">
                 <h3>New UI <span class="new-badge">NEW</span></h3>
-                <p>Complete Spotify-style playlist design, modern AMOLED Black aesthetic, and polished player interface.</p>
+                <p>Complete modern playlist design, sleek AMOLED Black aesthetic, and polished player interface.</p>
               </div>
             </div>
           </div>
@@ -1559,8 +1559,12 @@
         </div>
         <div class="seo-tag-chips-wrap">
           <a [routerLink]="['/search']" [queryParams]="{ q: 'free music online without ads' }" class="seo-search-pill">free music online without ads</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'listen songs online free without login' }" class="seo-search-pill">listen songs online without login</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'listen to free music unblocked' }" class="seo-search-pill">listen to free music unblocked</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'unblocked music player' }" class="seo-search-pill">unblocked music player</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'free music streaming unblocked' }" class="seo-search-pill">free music streaming unblocked</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'free music online unblocked' }" class="seo-search-pill">free music online unblocked</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'music player unblocked' }" class="seo-search-pill">music player unblocked</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'listen songs online free without login' }" class="seo-search-pill">listen songs online without login</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'ad free music streaming' }" class="seo-search-pill">ad-free music streaming</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'best free music app in india' }" class="seo-search-pill">best free music app in india</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'hindi songs online free' }" class="seo-search-pill">hindi songs online free</a>

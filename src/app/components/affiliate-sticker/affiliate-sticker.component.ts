@@ -12,10 +12,10 @@ interface AffiliateProduct {
 // Amazon affiliate products (rotates when 2+ are listed)
 const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
   {
-    name: 'ZEBRONICS Astra 35 Speaker',
-    imageUrl: 'https://m.media-amazon.com/images/I/319RaAZHSYL._SY300_SX300_QL70_ML2_.jpg',
-    amazonUrl: 'https://www.amazon.in/dp/B0DJ3FFC8R?linkCode=ll2&tag=ganatubexfree-21&linkId=4e2c7d65e0477a3caa89f1f736b0738d&ref_=as_li_ss_tl',
-    priceLabel: '₹699'
+    name: 'realme Buds T310 Wireless Earbuds',
+    imageUrl: 'https://m.media-amazon.com/images/I/41XzpmsbuOL.jpg',
+    amazonUrl: 'https://www.amazon.in/realme-Wireless-Earbuds-Spatial-Charging/dp/B0DBGP48NW?_encoding=UTF8&pd_rd_w=GcMVY&content-id=amzn1.sym.608f7859-2f04-48fd-b75f-b5a0022b3499&pf_rd_p=608f7859-2f04-48fd-b75f-b5a0022b3499&pf_rd_r=GF1CMPGYQ1YT0BC4FANH&pd_rd_wg=y6fT3&pd_rd_r=edc3d09c-002a-44b0-9297-1388613e8d98&th=1&linkCode=ll2&tag=ganatubexfree-21&linkId=b642e1585f4a90985e7ae9208779fe9d&ref_=as_li_ss_tl',
+    priceLabel: '₹2,199'
   }
 ];
 
