@@ -20,12 +20,15 @@ import {
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { AdsterraBannerComponent } from '../ads/adsterra-banner/adsterra-banner.component';
+import { ADSTERRA_TAGS } from '../ads/ads.config';
 
 @Component({
   selector: 'app-car-mode-player',
   standalone: true,
   imports: [
     CommonModule, 
+    AdsterraBannerComponent,
     FormsModule,
     LucideChevronDown, 
     LucidePlay, 
@@ -54,8 +57,7 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   private algorithmService = inject(AlgorithmService);
   private cdr = inject(ChangeDetectorRef);
 
-  @Input() playerCoverAd: any = null;
-  @Input() safePlayerCoverAdUrl: any = null;
+  readonly coverAdTag = ADSTERRA_TAGS.banner300x250;
 
   isListening = false;
   searchQuery = '';
@@ -132,7 +134,7 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
         const loopAd = () => {
           // Wait 5 seconds before showing ad
           const t1 = setTimeout(() => {
-            if (this.playerCoverAd && this.playerCoverAd.isActive && this.isVisible) {
+            if (this.isVisible) {
               this.showCoverAd = true;
               this.cdr.detectChanges();
             }

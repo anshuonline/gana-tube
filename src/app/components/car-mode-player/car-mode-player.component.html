@@ -39,17 +39,9 @@
                 <span>GanaTube</span>
               </div>
               
-              <!-- Ad Overlay -->
-              <div class="cm-ad-overlay" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
-                <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" [href]="playerCoverAd?.linkUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
-                  <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="cm-ad-media" />
-                </a>
-                <iframe *ngIf="playerCoverAd?.customCode" 
-                        [src]="safePlayerCoverAdUrl"
-                        class="cm-ad-media"
-                        scrolling="no"
-                        frameborder="0">
-                </iframe>
+              <!-- Hardcore Ad Overlay (Ad ↔ Cover loop) -->
+              <div class="cm-ad-overlay" [class.active]="showCoverAd">
+                <app-adsterra-banner [tag]="coverAdTag"></app-adsterra-banner>
                 <span class="cm-ad-label">Ad</span>
               </div>
             </div>
@@ -277,17 +269,9 @@
                 <span>GanaTube</span>
               </div>
               
-              <!-- Ad Overlay -->
-              <div class="cm-ad-overlay" [class.active]="showCoverAd" *ngIf="playerCoverAd?.isActive">
-                <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" [href]="playerCoverAd?.linkUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
-                  <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="cm-ad-media" />
-                </a>
-                <iframe *ngIf="playerCoverAd?.customCode" 
-                        [src]="safePlayerCoverAdUrl"
-                        class="cm-ad-media"
-                        scrolling="no"
-                        frameborder="0">
-                </iframe>
+              <!-- Hardcore Ad Overlay (Ad ↔ Cover loop) -->
+              <div class="cm-ad-overlay" [class.active]="showCoverAd">
+                <app-adsterra-banner [tag]="coverAdTag"></app-adsterra-banner>
                 <span class="cm-ad-label">Ad</span>
               </div>
             </div>

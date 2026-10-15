@@ -1,11 +1,10 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, computed, inject, HostListener, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DomSanitizer, SafeResourceUrl, Title, Meta } from '@angular/platform-browser';
+import { Title, Meta } from '@angular/platform-browser';
 import { YoutubeApiService, YouTubeSearchResult } from '../../services/youtube-api.service';
 import { PlayerService } from '../../services/player.service';
 import { UserService } from '../../services/user.service';
 import { PlaylistMeta } from '../../data/playlists.data';
-import { SponsoredAd } from '../../app';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles } from '@lucide/angular';
 import { TrackMenuComponent } from '../track-menu/track-menu.component';
@@ -15,11 +14,13 @@ import { takeUntil } from 'rxjs/operators';
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
 import { AppStateService } from '../../services/app-state.service';
+import { AdsterraBannerComponent } from '../ads/adsterra-banner/adsterra-banner.component';
+import { AdsterraTag, pickLeaderboardTag } from '../ads/ads.config';
 
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, DragDropModule, TrackMenuComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles],
+  imports: [CommonModule, DragDropModule, TrackMenuComponent, AdsterraBannerComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -36,7 +37,17 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   isLoadingMore = signal<boolean>(false);
   isLoading = signal<boolean>(true);
   isCopied = signal<boolean>(false);
-  playlistAd = signal<SponsoredAd | null>(null);
+
+  // Hardcore in-feed ads between songs
+  viewportWidth = signal<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  playlistAdTag = computed<AdsterraTag>(() => pickLeaderboardTag(this.viewportWidth()));
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (typeof window !== 'undefined') {
+      this.viewportWidth.set(window.innerWidth);
+    }
+  }
 
   // Suggested songs state
   suggestedSongs = signal<YouTubeSearchResult[]>([]);
@@ -104,7 +115,6 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     return t;
   }
 
-  private sanitizer = inject(DomSanitizer);
   private youtubeApi = inject(YoutubeApiService);
   public playerService = inject(PlayerService);
   private userService = inject(UserService);
@@ -163,7 +173,6 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
       });
       this.loadSongs();
     }
-    this.loadAd();
   }
 
   ngOnDestroy(): void {
@@ -208,34 +217,6 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
     }
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   }
-
-  loadAd(): void {
-    const host = window.location.hostname;
-    const adApiUrl = host === 'localhost' 
-      ? 'http://localhost/manageads/api.php' 
-      : 'https://manageads.ganatube.in/api.php';
-
-    fetch(`${adApiUrl}?placeholder=playlist_in_feed_banner`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.isActive) {
-          this.playlistAd.set(data);
-        }
-      })
-      .catch(err => console.error('Failed to load playlist ad', err));
-  }
-
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  }
-
-  getAdIframeUrl(placeholder: string): string {
-    const isLocalhost = typeof window !== 'undefined' && window.location.origin.includes('localhost');
-    const baseUrl = isLocalhost ? 'http://localhost/manageads' : 'https://manageads.ganatube.in';
-    return `${baseUrl}/ad_iframe.php?placeholder=${placeholder}`;
-  }
-
-  safePlaylistAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('playlist_in_feed_banner'));
 
   loadSongs(keepLimit: boolean = false): void {
     if (!keepLimit) {

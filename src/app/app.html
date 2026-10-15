@@ -516,8 +516,6 @@
 
     <app-room-view
       *ngIf="currentPage() === 'rooms-view'"
-      [playerCoverAd]="playerCoverAd()"
-      [safePlayerCoverAdUrl]="safePlayerCoverAdUrl"
       (openSaveToPlaylist)="openSaveToPlaylist($event)">
     </app-room-view>
 
@@ -1187,17 +1185,10 @@
               </div>
             </ng-container>
 
-            <!-- Repeating In-Feed Ad Banner (Every 3 sections) -->
-            <div class="in-feed-ad-container" *ngIf="inFeedAd()?.isActive && shelfIdx % 3 === 0">
-              <a *ngIf="!inFeedAd()?.customCode" [href]="inFeedAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">
-                <img [src]="inFeedAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
-              </a>
-              <iframe *ngIf="inFeedAd()?.customCode" 
-                      [src]="safeHomeFeedAdUrl"
-                      class="sponsored-ad-iframe"
-                      scrolling="no"
-                      frameborder="0">
-              </iframe>
+            <!-- Hardcore In-Feed Ad (Every 2 sections) -->
+            <div class="in-feed-ad-container" *ngIf="shelfIdx % 2 === 1">
+              <app-gt-native-banner *ngIf="shelfIdx === 1"></app-gt-native-banner>
+              <app-adsterra-banner *ngIf="shelfIdx !== 1" [tag]="inFeedAdTag()"></app-adsterra-banner>
               <span class="ad-label">Sponsored</span>
             </div>
 
@@ -1372,49 +1363,8 @@
       (back)="closePlaylist()">
     </app-playlist-page>
 
-    <!-- Modern Footer -->
-    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts' && (currentPage() !== 'home' || isHomeFullyLoaded())">
-      <div class="footer-giant-brand">ganatube.in</div>
-      <div class="footer-content">
-        <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
-          <h3 class="col-title" style="font-size: 1.8rem; margin-bottom: 8px;">Experience seamless, distraction-free music streaming with ganatube.in.</h3>
-          <p class="col-desc" style="font-size: 1rem; color: rgba(255, 255, 255, 0.7); max-width: 600px;">We prioritize speed, privacy, and exceptional audio quality. Enjoy powerful features like lightning-fast search, PC background playback, and collaborative listening rooms. Our mission is to deliver a premium musical journey without any interruptions.</p>
-        </div>
-        <div class="footer-col">
-          <h3 class="col-title">Ecosystem & Features</h3>
-          <ul class="col-links">
-            <li><a routerLink="/features">Features</a></li>
-            <li><a routerLink="/how-it-works">How It Works</a></li>
-            <li><a routerLink="/faq">FAQ</a></li>
-            <li><a routerLink="/blog">Blogs</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3 class="col-title">Corporate & Legal</h3>
-          <ul class="col-links">
-            <!-- <li><a routerLink="/advertise">Advertise With Us</a></li> -->
-            <li><a routerLink="/about">About Us</a></li>
-            <li><a routerLink="/privacy-policy">Privacy Policy</a></li>
-            <li><a routerLink="/terms-of-service">Terms of Service</a></li>
-            <li><a routerLink="/cookie-policy">Cookie Policy</a></li>
-            <li><a routerLink="/dmca">DMCA & Copyright Policy</a></li>
-            <li><a routerLink="/disclaimer">Disclaimer</a></li>
-            <li><a routerLink="/contact">Contact</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom-bar" style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 40px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-        <div class="copyright" style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;">
-          &copy; {{ currentYear || '2026' }} ganatube.in. All rights reserved.
-        </div>
-        <div class="app-version" style="color: rgba(255, 255, 255, 0.3); font-size: 0.8rem; font-family: monospace;">
-          App Version {{ appVersion }}
-        </div>
-      </div>
-    </footer>
-
-    <!-- SEO & Discovery Showcase Section (Why GanaTube & High-Intent SEO Hubs) - ONLY ON HOME PAGE (BELOW FOOTER) -->
-    <div class="footer-seo-container" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode() && isHomeFullyLoaded()">
+    <!-- SEO & Discovery Showcase Section (Why GanaTube & High-Intent SEO Hubs) - ONLY ON HOME PAGE -->
+    <div class="footer-seo-container" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode()">
       
       <!-- TOP HUB: Browse Music by Genre, Mood & Theme (Pills/Chips Bar) -->
       <section class="seo-card-block seo-genres-block">
@@ -1687,24 +1637,52 @@
       </section>
 
     </div>
+
+    <!-- Modern Footer -->
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts'">
+      <div class="footer-giant-brand">ganatube.in</div>
+      <div class="footer-content">
+        <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
+          <h3 class="col-title" style="font-size: 1.8rem; margin-bottom: 8px;">Experience seamless, distraction-free music streaming with ganatube.in.</h3>
+          <p class="col-desc" style="font-size: 1rem; color: rgba(255, 255, 255, 0.7); max-width: 600px;">We prioritize speed, privacy, and exceptional audio quality. Enjoy powerful features like lightning-fast search, PC background playback, and collaborative listening rooms. Our mission is to deliver a premium musical journey without any interruptions.</p>
+        </div>
+        <div class="footer-col">
+          <h3 class="col-title">Ecosystem & Features</h3>
+          <ul class="col-links">
+            <li><a routerLink="/features">Features</a></li>
+            <li><a routerLink="/how-it-works">How It Works</a></li>
+            <li><a routerLink="/faq">FAQ</a></li>
+            <li><a routerLink="/blog">Blogs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3 class="col-title">Corporate & Legal</h3>
+          <ul class="col-links">
+            <!-- <li><a routerLink="/advertise">Advertise With Us</a></li> -->
+            <li><a routerLink="/about">About Us</a></li>
+            <li><a routerLink="/privacy-policy">Privacy Policy</a></li>
+            <li><a routerLink="/terms-of-service">Terms of Service</a></li>
+            <li><a routerLink="/cookie-policy">Cookie Policy</a></li>
+            <li><a routerLink="/dmca">DMCA & Copyright Policy</a></li>
+            <li><a routerLink="/disclaimer">Disclaimer</a></li>
+            <li><a routerLink="/contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom-bar" style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 40px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="copyright" style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;">
+          &copy; {{ currentYear || '2026' }} ganatube.in. All rights reserved.
+        </div>
+        <div class="app-version" style="color: rgba(255, 255, 255, 0.3); font-size: 0.8rem; font-family: monospace;">
+          App Version {{ appVersion }}
+        </div>
+      </div>
+    </footer>
   </main>
 
-  <!-- Global Sponsored Ad Banner (Only shown if active and not on admin/managegt/gtanalytic) -->
-  <div class="sponsored-ad-banner" *ngIf="sponsoredAd() && sponsoredAd()?.isActive && !isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms'">
-    
-    <!-- Show Image if no custom code -->
-    <a *ngIf="!sponsoredAd()?.customCode" [href]="sponsoredAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">
-      <img [src]="sponsoredAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
-    </a>
-
-    <!-- Show Iframe if custom code exists -->
-    <iframe *ngIf="sponsoredAd()?.customCode" 
-            [src]="safeBottomPlayerAdUrl"
-            class="sponsored-ad-iframe"
-            scrolling="no"
-            frameborder="0">
-    </iframe>
-
+  <!-- Hardcore Global Ad Banner (above mini player) -->
+  <div class="sponsored-ad-banner" *ngIf="!isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms'">
+    <app-adsterra-banner [tag]="bottomAdTag()"></app-adsterra-banner>
     <span class="ad-label">Sponsored</span>
   </div>
 
@@ -1719,8 +1697,6 @@
   <div class="top-loading-bar" [class.loading]="isRouteLoading()" [class.done]="isRouteDone()"></div>
   <app-full-screen-player 
     [isVisible]="isFullScreenPlayerVisible()"
-    [playerCoverAd]="playerCoverAd()"
-    [safePlayerCoverAdUrl]="safePlayerCoverAdUrl"
     (closePlayer)="closeFullScreenPlayer()"
     (openPlaylist)="openSaveToPlaylist($event)"
     (openCarMode)="toggleCarMode()">
@@ -1729,8 +1705,6 @@
   <!-- Car Mode Player Overlay -->
   <app-car-mode-player
     [isVisible]="isCarModeVisible()"
-    [playerCoverAd]="playerCoverAd()"
-    [safePlayerCoverAdUrl]="safePlayerCoverAdUrl"
     (closeMode)="closeCarMode()">
   </app-car-mode-player>
 
@@ -1997,3 +1971,4 @@
 
 <!-- Entry Splash Ad Gate (24-hour reward interstitial) -->
 <app-entry-splash-ad *ngIf="!isAdminPage()"></app-entry-splash-ad>
+<app-gt-social-bar *ngIf="!isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic'"></app-gt-social-bar>

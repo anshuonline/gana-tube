@@ -490,7 +490,8 @@
   position: relative;
   width: 100%;
   max-width: 728px;
-  height: 90px;
+  height: auto;
+  min-height: 90px;
   margin: 16px auto;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -498,8 +499,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0;
-  overflow: visible;
+  padding: 6px 0;
+  overflow: hidden;
 
   .ad-link-wrapper, .sponsored-ad-iframe {
     width: 100%;
@@ -536,7 +537,7 @@
 
   @media (max-width: 768px) {
     max-width: calc(100% - 20px);
-    height: 58px;
+    min-height: 64px;
     margin: 16px auto;
   }
 }

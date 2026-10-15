@@ -1845,7 +1845,7 @@
   @media (max-width: 768px) {
     bottom: 80px; /* Sit above the 70px mobile nav */
     max-width: calc(100% - 20px); /* 10px margin on each side for max screen usage */
-    height: 58px; /* Perfectly fits scaled 728x90 banners (42px-48px) with clean padding */
+    height: 64px; /* Fits 468x60 and 320x50 banners with clean padding */
   }
 }
 
@@ -1854,17 +1854,19 @@
   position: relative;
   width: 100%;
   max-width: 970px; /* Billboard width */
-  height: 250px; /* Billboard height */
+  min-height: 120px;
+  height: auto;
   margin: 40px auto; /* Centered with vertical margin between shelves */
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  padding: 0;
-  overflow: visible;
+  padding: 10px 0;
+  overflow: hidden;
 
   .ad-link-wrapper, .sponsored-ad-iframe {
     width: 100%;
@@ -1902,7 +1904,7 @@
 
   @media (max-width: 768px) {
     max-width: calc(100% - 20px);
-    height: 180px; /* Balanced responsive mobile height */
+    min-height: 120px;
     margin: 20px auto;
   }
 }

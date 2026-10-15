@@ -38,6 +38,8 @@ import { TrackMenuComponent } from '../../track-menu/track-menu.component';
 import { AppStateService } from '../../../services/app-state.service';
 import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.component';
 import { RoomSwitchModalComponent } from '../room-switch-modal/room-switch-modal.component';
+import { AdsterraBannerComponent } from '../../ads/adsterra-banner/adsterra-banner.component';
+import { ADSTERRA_TAGS } from '../../ads/ads.config';
 
 @Component({
   selector: 'app-room-view',
@@ -45,6 +47,7 @@ import { RoomSwitchModalComponent } from '../room-switch-modal/room-switch-modal
   imports: [
     CommonModule, 
     FormsModule,
+    AdsterraBannerComponent,
     LucideUsers, 
     LucideLogOut,
     LucidePlay,
@@ -85,16 +88,7 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   private userService = inject(UserService);
   private algorithmService = inject(AlgorithmService);
 
-  @Input() set playerCoverAd(val: any) {
-    this._playerCoverAd = val;
-    this.restartAdLoop();
-  }
-  get playerCoverAd() {
-    return this._playerCoverAd;
-  }
-  private _playerCoverAd: any = null;
-
-  @Input() safePlayerCoverAdUrl: any = null;
+  readonly coverAdTag = ADSTERRA_TAGS.banner300x250;
 
   showCoverAd = false;
   private adTimers: any[] = [];
@@ -340,11 +334,11 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     const track = this.playerService.currentTrack();
     const isVideo = this.playerService.isVideoMode();
 
-    if (track && !isVideo && this.playerCoverAd && this.playerCoverAd.isActive) {
+    if (track && !isVideo) {
       const loopAd = () => {
         // Wait 5 seconds before showing ad
         const t1 = setTimeout(() => {
-          if (this.playerCoverAd && this.playerCoverAd.isActive && !this.playerService.isVideoMode()) {
+          if (!this.playerService.isVideoMode()) {
             this.showCoverAd = true;
             this.cdr.detectChanges();
           } else {

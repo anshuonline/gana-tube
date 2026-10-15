@@ -106,22 +106,9 @@
           <p style="font-size: 14px; font-weight: 500;">Loading...</p>
         </div>
 
-        <!-- Animated Cover Ad Overlay (Active when video is off) -->
-        <div class="room-cover-ad-container" [class.active]="showCoverAd && !playerService.isVideoMode()" *ngIf="playerCoverAd?.isActive && !playerService.isVideoMode()">
-          <a *ngIf="!playerCoverAd?.customCode && playerCoverAd?.imageUrl" 
-             [href]="playerCoverAd?.linkUrl" 
-             target="_blank" 
-             rel="noopener noreferrer" 
-             (click)="$event.stopPropagation()">
-            <img [src]="playerCoverAd?.imageUrl" alt="Sponsored" class="room-cover-ad-media" />
-          </a>
-          <iframe *ngIf="playerCoverAd?.customCode" 
-                  [src]="safePlayerCoverAdUrl"
-                  class="room-cover-ad-media"
-                  scrolling="no"
-                  frameborder="0"
-                  (click)="$event.stopPropagation()">
-          </iframe>
+        <!-- Hardcore Cover Ad Overlay (Active when video is off) -->
+        <div class="room-cover-ad-container" [class.active]="showCoverAd && !playerService.isVideoMode()" *ngIf="!playerService.isVideoMode()">
+          <app-adsterra-banner [tag]="coverAdTag"></app-adsterra-banner>
           <span class="room-cover-ad-label">Sponsored</span>
         </div>
 

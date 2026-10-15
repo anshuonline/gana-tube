@@ -122,17 +122,9 @@
           </div>
         </div>
 
-        <!-- Playlist In-Feed Ad (Every 10 songs, Max 5) -->
-        <div class="playlist-ad-row" *ngIf="playlistAd()?.isActive && i % 10 === 9 && i < 50">
-          <a *ngIf="!playlistAd()?.customCode" [href]="playlistAd()?.linkUrl" target="_blank" rel="noopener noreferrer" class="ad-link-wrapper">
-            <img [src]="playlistAd()?.imageUrl" alt="Sponsored Ad" class="sponsored-ad-image" />
-          </a>
-          <iframe *ngIf="playlistAd()?.customCode" 
-                  [src]="safePlaylistAdUrl"
-                  class="sponsored-ad-iframe"
-                  scrolling="no"
-                  frameborder="0">
-          </iframe>
+        <!-- Hardcore In-Feed Ad (Every 6 songs, Max 6) -->
+        <div class="playlist-ad-row" *ngIf="i % 6 === 5 && i < 36">
+          <app-adsterra-banner [tag]="playlistAdTag()"></app-adsterra-banner>
           <span class="ad-label">Sponsored</span>
         </div>
       </ng-container>

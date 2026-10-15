@@ -44,6 +44,8 @@ import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-
 import { CastService } from '../../services/cast.service';
 import { RoomService } from '../../services/room.service';
 import { Subscription } from 'rxjs';
+import { AdsterraBannerComponent } from '../ads/adsterra-banner/adsterra-banner.component';
+import { ADSTERRA_TAGS } from '../ads/ads.config';
 
 @Component({
   selector: 'app-full-screen-player',
@@ -52,6 +54,7 @@ import { Subscription } from 'rxjs';
     CommonModule, 
     FormsModule,
     DragDropModule,
+    AdsterraBannerComponent,
     LucideChevronDown, 
     LucidePlay, 
     LucidePause, 
@@ -134,8 +137,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   lastSearchedQuery = '';
   private searchSub: Subscription | null = null;
 
-  @Input() playerCoverAd: any = null;
-  @Input() safePlayerCoverAdUrl: any = null;
+  readonly coverAdTag = ADSTERRA_TAGS.banner300x250;
 
   activeView: 'artwork' | 'queue' | 'lyrics' | 'related' | 'search' = 'artwork';
   isSidebarVisible = false;
@@ -272,7 +274,7 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
         const loopAd = () => {
           // Wait 5 seconds before showing ad
           const t1 = setTimeout(() => {
-            if (this.playerCoverAd && this.playerCoverAd.isActive && this.isVisible) {
+            if (this.isVisible) {
               this.showCoverAd = true;
             }
             

@@ -51,6 +51,10 @@ import { CuratedPlaylistsComponent } from './components/curated-playlists/curate
   import { PromoPopupModalComponent } from './components/promo-popup-modal/promo-popup-modal.component';
   import { BackgroundPlayPopupComponent } from './components/background-play-popup/background-play-popup.component';
   import { EntrySplashAdComponent } from './components/entry-splash-ad/entry-splash-ad.component';
+import { AdsterraBannerComponent } from './components/ads/adsterra-banner/adsterra-banner.component';
+import { NativeBannerComponent } from './components/ads/native-banner/native-banner.component';
+import { SocialBarComponent } from './components/ads/social-bar/social-bar.component';
+import { ADSTERRA_TAGS, pickLeaderboardTag } from './components/ads/ads.config';
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { RoomFeaturesPopupComponent } from './components/room-features-popup/room-features-popup.component';
@@ -59,13 +63,6 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
 registerSwiperElements();
-
-export interface SponsoredAd {
-  isActive: boolean;
-  imageUrl?: string;
-  linkUrl?: string;
-  customCode?: string;
-}
 
 export interface HeroSlideTrack {
   title?: string;
@@ -151,6 +148,9 @@ export interface HeroSlide {
     PromoPopupModalComponent,
     BackgroundPlayPopupComponent,
     EntrySplashAdComponent,
+    AdsterraBannerComponent,
+    NativeBannerComponent,
+    SocialBarComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
     RoomFeaturesPopupComponent,
@@ -677,11 +677,19 @@ export class App implements OnInit {
   linkCopied = false;
   pageContent = PAGE_CONTENT;
 
-  // Sponsored Ad State
-  sponsoredAd = signal<SponsoredAd | null>(null);
-  inFeedAd = signal<SponsoredAd | null>(null);
-  playerCoverAd = signal<SponsoredAd | null>(null);
-  showAd = signal<boolean>(true);
+  // Hardcore Ad State (direct ad-network tags — ManageAds removed)
+  viewportWidth = signal<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  bottomAdTag = computed(() => pickLeaderboardTag(this.viewportWidth()));
+  inFeedAdTag = computed(() =>
+    this.viewportWidth() >= 900 ? ADSTERRA_TAGS.banner728x90 : ADSTERRA_TAGS.banner160x300
+  );
+
+  @HostListener('window:resize')
+  onViewportResize(): void {
+    if (typeof window !== 'undefined') {
+      this.viewportWidth.set(window.innerWidth);
+    }
+  }
 
   // Home feed dynamic chips
   dynamicChips = signal<string[]>(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh', 'Pritam', 'Shreya Ghoshal']);
@@ -841,15 +849,6 @@ export class App implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  getAdIframeUrl(placeholder: string): string {
-    const baseUrl = 'https://manageads.ganatube.in';
-    return `${baseUrl}/ad_iframe.php?placeholder=${placeholder}`;
-  }
-
-  safeHomeFeedAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('home_feed_banner'));
-  safeBottomPlayerAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('bottom_player_banner'));
-  safePlayerCoverAdUrl: SafeResourceUrl = this.getSafeUrl(this.getAdIframeUrl('player_cover_ad'));
-
   // ── Strict Ad Suppression Guard for GTAnalytic & ManageGT ──
   isAnalyticsOrManageGt(customUrl?: string): boolean {
     const page = this.currentPage();
@@ -899,7 +898,12 @@ export class App implements OnInit {
         'div[class*="google_ads"]',
         '#google-vignette',
         '.google-anchor-ad',
-        '.sponsored-ad-banner'
+        '.sponsored-ad-banner',
+        '.in-feed-ad-container',
+        '.playlist-ad-row',
+        'app-adsterra-banner',
+        'app-gt-native-banner',
+        'app-gt-social-bar'
       ];
       document.querySelectorAll(selectors.join(',')).forEach(el => {
         try {
@@ -907,50 +911,6 @@ export class App implements OnInit {
         } catch (e) {}
       });
     } catch (e) {}
-  }
-
-  injectHeaderScript(customHtml: string): void {
-    if (typeof window === 'undefined' || !customHtml) return;
-    
-    try {
-      let cleanHtml = customHtml.trim();
-      if (cleanHtml.includes('\\"') || cleanHtml.includes('\\r\\n') || cleanHtml.includes('\\n') || cleanHtml.includes("\\'")) {
-        cleanHtml = cleanHtml
-          .replace(/\\r\\n/g, '\n')
-          .replace(/\\n/g, '\n')
-          .replace(/\\r/g, '\n')
-          .replace(/\\"/g, '"')
-          .replace(/\\'/g, "'");
-      }
-
-      const container = document.createElement('div');
-      container.innerHTML = cleanHtml;
-      
-      Array.from(container.childNodes).forEach(node => {
-        if (node.nodeName.toLowerCase() === 'script') {
-          const originalScript = node as HTMLScriptElement;
-          const newScript = document.createElement('script');
-          
-          Array.from(originalScript.attributes).forEach(attr => {
-            const cleanVal = attr.value.replace(/^["']|["']$/g, '');
-            newScript.setAttribute(attr.name, cleanVal);
-          });
-          
-          if (originalScript.text) {
-            newScript.text = originalScript.text;
-          } else if (originalScript.innerHTML) {
-            newScript.innerHTML = originalScript.innerHTML;
-          }
-          
-          document.head.appendChild(newScript);
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-          // If there are other tags (e.g. meta, link, noscript, style), append them directly
-          document.head.appendChild(node.cloneNode(true));
-        }
-      });
-    } catch (e) {
-      console.error('Error injecting header script:', e);
-    }
   }
 
   // Helpers for Fallback Design
@@ -2444,30 +2404,6 @@ export class App implements OnInit {
       }
     }
     this.startHeroTimer();
-
-    const adApiUrl = 'https://manageads.ganatube.in/api.php';
-
-    // Combined Ads Fetch: 4 requests → 1 (Performance Optimization)
-    fetch(`${adApiUrl}?action=app_ads`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.ads) {
-          const bottom = data.ads['bottom_player_banner'];
-          if (bottom && bottom.isActive) this.sponsoredAd.set(bottom);
-          const inFeed = data.ads['home_feed_banner'];
-          if (inFeed && inFeed.isActive) this.inFeedAd.set(inFeed);
-          const cover = data.ads['player_cover_ad'];
-          if (cover && cover.isActive) this.playerCoverAd.set(cover);
-        }
-        if (data && Array.isArray(data.header_scripts)) {
-          data.header_scripts.forEach((script: any) => {
-            if (script && script.custom_code) {
-              this.injectHeaderScript(script.custom_code);
-            }
-          });
-        }
-      })
-      .catch(err => console.error('Failed to load ads', err));
 
     this.apiKeyMissing = false;
 
