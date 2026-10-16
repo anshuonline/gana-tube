@@ -991,7 +991,7 @@ app.get('/api/yt-videos', async (req, res) => {
 // ytmusic-api handles ALL discovery (search/albums/artists/radio). These
 // endpoints only resolve a direct stream URL for a chosen song so the client
 // can play via HTML5 <audio> (background playback + MediaSession).
-const { searchSaavnSongs, matchSaavnSong, getTrendingSaavnSongs, searchSaavnAlbums, getSaavnAlbumDetails, getSaavnArtistTopSongs } = require('./saavnEngine.js');
+const { searchSaavnSongs, matchSaavnSong, getTrendingSaavnSongs } = require('./saavnEngine.js');
 const saavnCache = new Map();
 const SAAVN_CACHE_TTL = 30 * 60 * 1000;
 

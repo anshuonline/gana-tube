@@ -397,7 +397,7 @@ export class App implements OnInit {
     }
   ];
 
-  currentHeroSlideIndex = signal<number>(2); // English slide (default home language)
+  currentHeroSlideIndex = signal<number>(0);
   isHeroPaused = signal<boolean>(false);
   private heroTimer: any = null;
   private heroTouchStartX = 0;
@@ -2394,14 +2394,14 @@ export class App implements OnInit {
       }
     }
 
-    // Load saved language if available — default is English for first-time users
+    // Load saved language if available
     const savedLang = localStorage.getItem('homeScreenLanguage');
     if (savedLang && this.availableLanguages.includes(savedLang)) {
       this.homeScreenLanguage.set(savedLang);
-    }
-    const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === this.homeScreenLanguage().toLowerCase());
-    if (slideIdx !== -1) {
-      this.currentHeroSlideIndex.set(slideIdx);
+      const slideIdx = this.heroSlides.findIndex(s => s.lang.toLowerCase() === savedLang.toLowerCase());
+      if (slideIdx !== -1) {
+        this.currentHeroSlideIndex.set(slideIdx);
+      }
     }
     this.startHeroTimer();
 

@@ -24,7 +24,7 @@ export class LanguageSelectModalComponent implements OnInit {
   @Output() saveLanguages = new EventEmitter<{ selected: string[]; active: string }>();
 
   selectedLanguages = signal<string[]>([]);
-  activeLanguage = signal<string>('English');
+  activeLanguage = signal<string>('Hindi');
 
   languages: LanguageOption[] = [
     { code: 'Hindi', native: 'हिन्दी', subtitle: 'Bollywood & Indie Pop' },
@@ -43,11 +43,11 @@ export class LanguageSelectModalComponent implements OnInit {
     } else if (this.currentLanguage) {
       initial = [this.currentLanguage];
     } else {
-      initial = ['English', 'Hindi', 'Punjabi'];
+      initial = ['Hindi', 'English', 'Punjabi'];
     }
 
     this.selectedLanguages.set(initial);
-    this.activeLanguage.set(this.currentLanguage || initial[0] || 'English');
+    this.activeLanguage.set(this.currentLanguage || initial[0] || 'Hindi');
   }
 
   isSelected(code: string): boolean {
@@ -77,7 +77,7 @@ export class LanguageSelectModalComponent implements OnInit {
 
   resetToDefaults(): void {
     this.selectedLanguages.set(['English', 'Hindi', 'Tamil', 'Punjabi']);
-    this.activeLanguage.set('English');
+    this.activeLanguage.set('Hindi');
   }
 
   closeModal(): void {
