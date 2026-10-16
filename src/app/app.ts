@@ -744,6 +744,41 @@ export class App implements OnInit {
           this.onSearch('Latest ' + lang + ' Songs');
         }
       });
+    } else if (chip.toLowerCase() === 'similar songs') {
+      const currentTrack = this.playerService.currentTrack();
+      if (currentTrack && currentTrack.videoId) {
+        this.currentQuery = '';
+        if (this.searchBar) {
+          this.searchBar.clearQuery();
+        }
+        this.analyticsService.setLastSearch(`Similar to ${currentTrack.title}`);
+        this.isLoading.set(true);
+        this.hasSearched.set(true);
+        this.results.set([]);
+        this.hasMoreSongs.set(false);
+        const fallbackQuery = `${currentTrack.channelTitle || ''} ${currentTrack.title || ''}`.trim();
+        this.youtubeApi.getRadioTracks(currentTrack.videoId, fallbackQuery).subscribe({
+          next: (tracks) => {
+            this.results.set(tracks || []);
+            this.isLoading.set(false);
+          },
+          error: (err) => {
+            console.warn('Failed to load similar songs for chip:', err);
+            this.youtubeApi.searchMusic(fallbackQuery, 25).subscribe({
+              next: (tracks) => {
+                this.results.set(tracks || []);
+                this.isLoading.set(false);
+              },
+              error: () => {
+                this.results.set([]);
+                this.isLoading.set(false);
+              }
+            });
+          }
+        });
+      } else {
+        this.selectChip('Trending');
+      }
     } else if (chip.startsWith('More from ')) {
       const artist = chip.replace('More from ', '').trim();
       this.onSearch(artist + ' songs');
@@ -852,10 +887,10 @@ export class App implements OnInit {
   // ── Strict Ad Suppression Guard for GTAnalytic & ManageGT ──
   isAnalyticsOrManageGt(customUrl?: string): boolean {
     const page = this.currentPage();
-    if (page === 'managegt' || page === 'gtanalytic') return true;
+    if (page === 'managegt' || page === 'gtanalytic' || page === 'cms-management' || page === 'cms-admin') return true;
     if (typeof window !== 'undefined') {
       const p = (customUrl || window.location.pathname || '').toLowerCase();
-      if (p.startsWith('/gtanalytic') || p.startsWith('/managegt') || p.includes('gtanalytic') || p.includes('managegt')) {
+      if (p.startsWith('/gtanalytic') || p.startsWith('/managegt') || p.includes('gtanalytic') || p.includes('managegt') || p.startsWith('/cms-management') || p.startsWith('/cms-admin')) {
         return true;
       }
     }
@@ -1772,8 +1807,9 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
 
-      } else if (event.urlAfterRedirects.startsWith('/managegt') || event.urlAfterRedirects.startsWith('/gtanalytic')) {
-        this.currentPage.set(event.urlAfterRedirects.split('/')[1]);
+      } else if (event.urlAfterRedirects.startsWith('/managegt') || event.urlAfterRedirects.startsWith('/gtanalytic') || event.urlAfterRedirects.startsWith('/cms-management') || event.urlAfterRedirects.startsWith('/cms-admin')) {
+        const seg = event.urlAfterRedirects.split('/')[1];
+        this.currentPage.set(seg === 'cms-admin' ? 'cms-management' : seg);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       } else if (url === 'language') {
@@ -1833,7 +1869,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'discovery', 'offline', 'curated-playlists', 'blog'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'cms-management', 'cms-admin', 'discovery', 'offline', 'curated-playlists', 'blog'].includes(url) || this.pageContent[url]) {
         this.selectedPlaylist.set(null);
         this.loadingPageTitle.set('');
         this.currentPage.set(url);
@@ -3254,7 +3290,27 @@ export class App implements OnInit {
     this.isLoading.set(true);
     this.hasSearched.set(true);
     this.results.set([]);
-    this.hasMoreSongs.set(true);
+    if (query.trim().toLowerCase() === 'similar songs') {
+      const currentTrack = this.playerService.currentTrack();
+      if (currentTrack && currentTrack.videoId) {
+        const fallbackQuery = `${currentTrack.channelTitle || ''} ${currentTrack.title || ''}`.trim();
+        this.youtubeApi.getRadioTracks(currentTrack.videoId, fallbackQuery).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => {
+            if (this.currentQuery !== query) return;
+            this.results.set(res || []);
+            this.isLoading.set(false);
+            this.hasMoreSongs.set(false);
+            this.analyticsService.recordSearch(`Similar to ${currentTrack.title}`, 'songs', (res || []).length);
+          },
+          error: () => {
+            if (this.currentQuery !== query) return;
+            this.results.set([]);
+            this.isLoading.set(false);
+          }
+        });
+        return;
+      }
+    }
 
     if (this.searchFilter() === 'albums') {
       this.youtubeApi.searchMusic(query, 50, 'album').pipe(takeUntil(this.destroy$)).subscribe({

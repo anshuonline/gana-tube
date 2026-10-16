@@ -76,22 +76,60 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
-// ── Global IP Rate Limiter (Protects server from rogue client loops & bots) ──
+// Helper to identify internal GanaTube web-app traffic vs external API callers
+function isInternalClient(req) {
+  const origin = (req.headers.origin || '').toLowerCase();
+  const referer = (req.headers.referer || '').toLowerCase();
+  const secFetchSite = (req.headers['sec-fetch-site'] || '').toLowerCase();
+  const host = (req.headers.host || '').toLowerCase();
+
+  // 1. Browser same-origin metadata
+  if (secFetchSite === 'same-origin' || secFetchSite === 'same-site') {
+    return true;
+  }
+
+  // 2. Origin or Referer header matches GanaTube or local dev
+  if (
+    origin.includes('ganatube.in') ||
+    referer.includes('ganatube.in') ||
+    origin.includes('localhost') ||
+    referer.includes('localhost') ||
+    origin.includes('127.0.0.1') ||
+    referer.includes('127.0.0.1')
+  ) {
+    return true;
+  }
+
+  // 3. In-app webviews / privacy browsers visiting ganatube host
+  if (host.includes('ganatube.in') && !origin && !referer) {
+    return true;
+  }
+
+  return false;
+}
+
+// ── Rate Limiter Config (Internal vs Public Safeguards) ──
 const ipRequestWindow = new Map();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
-const MAX_REQUESTS_PER_MINUTE = 150;     // Max 150 requests per minute per IP (~2.5 req/sec sustained)
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;      // 1 minute window
+const MAX_INTERNAL_REQUESTS_PER_MINUTE = 300; // Ultra-generous quota for real listeners & shared Wi-Fi
+const MAX_EXTERNAL_REQUESTS_PER_MINUTE = 10;  // External API callers / bots (strict 10 req/min cap)
 
 // Auto-cleanup stale IP records every 60 seconds
 setInterval(() => {
   const now = Date.now();
-  for (const [ip, data] of ipRequestWindow.entries()) {
+  for (const [key, data] of ipRequestWindow.entries()) {
     if (now - data.windowStart > RATE_LIMIT_WINDOW_MS) {
-      ipRequestWindow.delete(ip);
+      ipRequestWindow.delete(key);
     }
   }
 }, RATE_LIMIT_WINDOW_MS);
 
 app.use((req, res, next) => {
+  // Only apply rate limiting to /api/ routes (static assets, css, js, icons never blocked)
+  if (!req.path.startsWith('/api/')) {
+    return next();
+  }
+
   // Extract real client IP behind Cloudflare / LiteSpeed proxies
   const clientIp = req.headers['cf-connecting-ip'] || 
                    req.headers['x-real-ip'] || 
@@ -99,27 +137,45 @@ app.use((req, res, next) => {
                    req.socket.remoteAddress || 
                    'unknown';
 
+  const internal = isInternalClient(req);
+  const maxAllowed = internal ? MAX_INTERNAL_REQUESTS_PER_MINUTE : MAX_EXTERNAL_REQUESTS_PER_MINUTE;
+  const ipKey = `${clientIp}_${internal ? 'int' : 'ext'}`;
+
   const now = Date.now();
-  let record = ipRequestWindow.get(clientIp);
+  let record = ipRequestWindow.get(ipKey);
 
   if (!record || (now - record.windowStart) > RATE_LIMIT_WINDOW_MS) {
     record = { windowStart: now, count: 1 };
-    ipRequestWindow.set(clientIp, record);
+    ipRequestWindow.set(ipKey, record);
     return next();
   }
 
   record.count++;
 
-  if (record.count > MAX_REQUESTS_PER_MINUTE) {
+  if (record.count > maxAllowed) {
     res.setHeader('Retry-After', '60');
+    res.setHeader('X-RateLimit-Limit', maxAllowed.toString());
+    res.setHeader('X-RateLimit-Remaining', '0');
     return res.status(429).json({ 
       error: 'Too Many Requests', 
-      message: 'Rate limit exceeded. Please wait a moment.' 
+      message: internal 
+        ? 'Rate limit exceeded. Please wait a moment.' 
+        : 'Public API rate limit exceeded (max 5 requests per minute). Visit https://ganatube.in for full music streaming.',
+      retryAfter: 60
     });
   }
 
   next();
 });
+
+// ── 50-Hour Aggressive In-Memory Cache (Protects server from external searches) ──
+const searchCache = new Map();
+const SEARCH_CACHE_TTL = 50 * 60 * 60 * 1000; // 50 hours in ms (180,000,000 ms)
+const MAX_SEARCH_CACHE_SIZE = 3000; // LRU cap to protect Node memory
+
+const radioCache = new Map();
+const RADIO_CACHE_TTL = 50 * 60 * 60 * 1000; // 50 hours in ms
+const MAX_RADIO_CACHE_SIZE = 2000;
 
 let ytmusicInstance = null;
 
@@ -318,14 +374,19 @@ function enhanceQuery(rawQuery) {
 // ────────────────────────────────────────────────────────────────────────────
 
 const trendingCache = {};
+const TRENDING_CACHE_TTL = 50 * 60 * 60 * 1000; // 50 hours
 
 app.get('/api/trending', async (req, res) => {
+  const isInternal = isInternalClient(req);
   const lang = req.query.lang || 'Hindi';
-  const limit = parseInt(req.query.limit) || 12;
+  let limit = parseInt(req.query.limit) || (isInternal ? 12 : 10);
+  if (!isInternal && limit > 10) {
+    limit = 10; // External users capped to max 10 to save bandwidth
+  }
   const cacheKey = lang.toLowerCase();
 
-  // 1 hour cache (3600000 ms)
-  if (trendingCache[cacheKey] && (Date.now() - trendingCache[cacheKey].timestamp < 3600000)) {
+  // 50 hour cache
+  if (trendingCache[cacheKey] && (Date.now() - trendingCache[cacheKey].timestamp < TRENDING_CACHE_TTL)) {
     let results = [...trendingCache[cacheKey].results];
     // Shuffle the cached results so it looks different on refresh
     results = results.sort(() => 0.5 - Math.random());
@@ -377,20 +438,32 @@ app.get('/api/trending', async (req, res) => {
   }
 });
 
-// Search endpoint
+// Search endpoint (with 50-hour aggressive in-memory caching)
 app.get('/api/songs', async (req, res) => {
   const rawQuery = req.query.q;
   if (!rawQuery) {
     return res.status(400).json({ error: 'Search query parameter "q" is required' });
   }
 
-  const query = enhanceQuery(rawQuery);   // ← apply smart enhancement
+  const isInternal = isInternalClient(req);
+  let limit = parseInt(req.query.limit) || (isInternal ? 20 : 10);
+  if (!isInternal && limit > 10) {
+    limit = 10; // External callers strictly capped at 10 items
+  }
+
+  const query = enhanceQuery(rawQuery);
+  const type = req.query.type || 'song';
+  const cacheKey = `${type}_${query.toLowerCase().trim()}`;
+
+  // Check 50-hour cache (180,000,000 ms)
+  const cached = searchCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < SEARCH_CACHE_TTL)) {
+    return res.json(cached.results.slice(0, limit));
+  }
 
   try {
     const yt = await getYTMusic();
-    const limit = parseInt(req.query.limit) || 20;
-    const type = req.query.type || 'song';
-    console.log(`Searching ${type}s: "${rawQuery}" → enhanced: "${query}" (limit: ${limit})`);
+    console.log(`Searching ${type}s: "${rawQuery}" → enhanced: "${query}" (limit: ${limit}) [isInternal: ${isInternal}]`);
     
     let results = [];
     if (type === 'album') {
@@ -401,9 +474,9 @@ app.get('/api/songs', async (req, res) => {
       results = await yt.searchSongs(query);
     }
     
-    // Always enforce the limit, whether it is 1 or 50.
-    if (results && results.length > limit) {
-      results = results.slice(0, limit);
+    // Always enforce limit on fresh results
+    if (results && results.length > (isInternal ? 50 : 20)) {
+      results = results.slice(0, (isInternal ? 50 : 20));
     }
 
     // Map to standard YouTubeSearchResult format expected by Angular frontend
@@ -434,7 +507,17 @@ app.get('/api/songs', async (req, res) => {
       };
     });
 
-    res.json(mappedResults);
+    // Save to 50-hour cache
+    if (searchCache.size >= MAX_SEARCH_CACHE_SIZE) {
+      const oldestKey = searchCache.keys().next().value;
+      searchCache.delete(oldestKey);
+    }
+    searchCache.set(cacheKey, {
+      timestamp: Date.now(),
+      results: mappedResults
+    });
+
+    res.json(mappedResults.slice(0, limit));
   } catch (error) {
     console.error('Error during search:', error);
     res.status(500).json({ error: 'An error occurred during search' });
@@ -581,40 +664,83 @@ app.get('/api/playlist', async (req, res) => {
 
 // Radio / Related Tracks endpoint (uses official YouTube Music RDAMVM radio mix)
 app.get('/api/radio', async (req, res) => {
-  const videoId = (req.query.videoId || '').toString().trim();
-  if (!videoId) return res.status(400).json({ error: 'videoId required' });
+  let videoId = (req.query.videoId || '').toString().trim();
+  const query = (req.query.query || '').toString().trim();
+  if (!videoId && !query) return res.status(400).json({ error: 'videoId or query required' });
+
+  const isInternal = isInternalClient(req);
+  let limit = parseInt(req.query.limit) || (isInternal ? 50 : 10);
+  if (!isInternal && limit > 10) {
+    limit = 10; // Cap external callers to 10
+  }
+
+  const radioCacheKey = `radio_${videoId}_${query.toLowerCase()}`;
+  const cachedRadio = radioCache.get(radioCacheKey);
+  if (cachedRadio && (Date.now() - cachedRadio.timestamp < RADIO_CACHE_TTL)) {
+    return res.json(cachedRadio.results.slice(0, limit));
+  }
 
   try {
     const yt = await getYTMusic();
-    const data = await yt.constructRequest('next', { playlistId: 'RDAMVM' + videoId, isAudioOnly: true });
-    const queueRenderer = data.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer;
-    const contents = queueRenderer?.content?.playlistPanelRenderer?.contents || [];
 
-    let songs = contents
-      .map(item => item.playlistPanelVideoRenderer)
-      .filter(Boolean)
-      .map(item => {
-        const thumbs = item.thumbnail?.thumbnails || [];
-        const rawDuration = item.lengthText?.runs?.[0]?.text || '';
-        return {
-          videoId: item.videoId,
-          title: item.title?.runs?.[0]?.text || 'Unknown',
-          channelTitle: item.shortBylineText?.runs?.map(r => r.text).join('') || 'Unknown Artist',
-          thumbnail: toHDUrl(thumbs[0]?.url || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/mqdefault.jpg` : '')),
-          thumbnailHigh: toHDUrl(thumbs[thumbs.length - 1]?.url || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg` : '')),
-          duration: parseDurationToSeconds(rawDuration),
-          publishedAt: new Date().toISOString()
-        };
-      })
-      .filter(s => s.videoId && s.videoId !== videoId);
+    // 1. Check if videoId is a valid 11-char YouTube ID (not a gt_ or saavn_ pseudo-id)
+    const isYouTubeId = videoId && /^[A-Za-z0-9_-]{11}$/.test(videoId) && !videoId.startsWith('gt_') && !videoId.startsWith('saavn_');
+    let resolvedVideoId = isYouTubeId ? videoId : null;
 
-    // Fallback if radio had fewer than 5 tracks
+    // If it's a JioSaavn / custom ID, resolve the true YouTube videoId using title + artist
+    if (!resolvedVideoId) {
+      const searchTarget = query || videoId.replace(/^(gt_|saavn_)/, '');
+      if (searchTarget) {
+        try {
+          const searchRes = await yt.searchSongs(searchTarget);
+          if (searchRes && searchRes.length > 0 && searchRes[0].videoId) {
+            resolvedVideoId = searchRes[0].videoId;
+          }
+        } catch (searchErr) {
+          console.warn('Failed to resolve true YouTube videoId:', searchErr.message);
+        }
+      }
+    }
+
+    let songs = [];
+
+    // 2. Fetch official RDAMVM radio mix using the verified YouTube videoId
+    if (resolvedVideoId) {
+      try {
+        const data = await yt.constructRequest('next', { playlistId: 'RDAMVM' + resolvedVideoId, isAudioOnly: true });
+        const queueRenderer = data.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer;
+        const contents = queueRenderer?.content?.playlistPanelRenderer?.contents || [];
+
+        songs = contents
+          .map(item => item.playlistPanelVideoRenderer)
+          .filter(Boolean)
+          .map(item => {
+            const thumbs = item.thumbnail?.thumbnails || [];
+            const rawDuration = item.lengthText?.runs?.[0]?.text || '';
+            return {
+              videoId: item.videoId,
+              title: item.title?.runs?.[0]?.text || 'Unknown',
+              channelTitle: item.shortBylineText?.runs?.map(r => r.text).join('') || 'Unknown Artist',
+              thumbnail: toHDUrl(thumbs[0]?.url || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/mqdefault.jpg` : '')),
+              thumbnailHigh: toHDUrl(thumbs[thumbs.length - 1]?.url || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg` : '')),
+              duration: parseDurationToSeconds(rawDuration),
+              publishedAt: new Date().toISOString()
+            };
+          })
+          .filter(s => s.videoId && s.videoId !== resolvedVideoId && s.videoId !== videoId);
+      } catch (radioErr) {
+        console.warn('RDAMVM fetch error:', radioErr.message);
+      }
+    }
+
+    // 3. Fallback: If radio produced fewer than 5 tracks, search using clean artist/song query
+    // NEVER append "similar songs" because YouTube literally searches for the words "similar songs"
     if (songs.length < 5) {
-      const q = (req.query.query || '').toString().trim() || videoId;
-      const searchRes = await yt.searchSongs(`${q} similar songs`);
+      const q = query || videoId;
+      const searchRes = await yt.searchSongs(q);
       const existing = new Set(songs.map(s => s.videoId));
       (searchRes || []).forEach(s => {
-        if (!s.videoId || s.videoId === videoId || existing.has(s.videoId)) return;
+        if (!s.videoId || s.videoId === videoId || s.videoId === resolvedVideoId || existing.has(s.videoId)) return;
         existing.add(s.videoId);
         const thumbs = s.thumbnails || [];
         songs.push({
@@ -629,7 +755,17 @@ app.get('/api/radio', async (req, res) => {
       });
     }
 
-    res.json(songs);
+    // Save to 50-hour radio cache
+    if (radioCache.size >= MAX_RADIO_CACHE_SIZE) {
+      const oldestKey = radioCache.keys().next().value;
+      radioCache.delete(oldestKey);
+    }
+    radioCache.set(radioCacheKey, {
+      timestamp: Date.now(),
+      results: songs
+    });
+
+    res.json(songs.slice(0, limit));
   } catch (err) {
     console.error('Radio fetch error:', err.message);
     res.status(500).json({ error: 'Failed to fetch radio tracks' });
@@ -642,15 +778,21 @@ app.get('/api/artist-search', async (req, res) => {
     const q = (req.query.q || '').toString().trim();
     if (!q) return res.json([]);
 
+    const isInternal = isInternalClient(req);
+    let limit = parseInt(req.query.limit) || (isInternal ? 12 : 10);
+    if (!isInternal && limit > 10) {
+      limit = 10; // Cap external callers to 10
+    }
+
     const cacheKey = `asearch_${q.toLowerCase()}`;
     const cached = artistCache.get(cacheKey);
-    if (cached && Date.now() - cached.ts < ARTIST_CACHE_TTL) {
-      return res.json(cached.data);
+    if (cached && Date.now() - cached.ts < 180000000) { // 50 hours
+      return res.json(cached.data.slice(0, limit));
     }
 
     const yt = await getYTMusic();
     const artists = await yt.searchArtists(q);
-    const top = (artists || []).slice(0, 12).filter(a => a.artistId);
+    const top = (artists || []).slice(0, limit).filter(a => a.artistId);
 
     const toHDUrl = (url) => {
       if (!url) return '';
@@ -670,7 +812,7 @@ app.get('/api/artist-search', async (req, res) => {
     });
 
     artistCache.set(cacheKey, { ts: Date.now(), data: withThumbs });
-    res.json(withThumbs);
+    res.json(withThumbs.slice(0, limit));
   } catch (err) {
     console.error('Artist search error:', err.message);
     res.json([]);

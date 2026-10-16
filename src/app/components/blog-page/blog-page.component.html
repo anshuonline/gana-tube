@@ -1,20 +1,20 @@
 <div class="blog-page-root">
 
-  <!-- Centered Loading Bar Overlay (No text, pure purple-pink animated bar with blur) -->
+  <!-- Centered Indeterminate Loading Bar -->
   <div class="blog-center-loader" *ngIf="isLoading">
     <div class="loading-bar-wrap">
       <div class="loading-bar-indeterminate"></div>
     </div>
   </div>
 
-  <!-- Dedicated Blog Top Navbar (Replaces Main App Navbar) -->
+  <!-- Dedicated Blog Top Navbar -->
   <header class="blog-header-nav">
     <div class="nav-content">
       <div class="nav-left" (click)="goToHome()" role="button" tabindex="0">
         <img src="ganatube-logo.webp" alt="GanaTube Logo" class="brand-logo" />
         <span class="brand-name">GanaTube</span>
         <span class="brand-divider">/</span>
-        <span class="brand-sub">Blogs</span>
+        <span class="brand-sub">Editorial</span>
       </div>
 
       <div class="nav-right">
@@ -26,136 +26,324 @@
     </div>
   </header>
 
-  <!-- Main Content Container (White Background) -->
+  <!-- Main Content Canvas -->
   <main class="blog-main-content">
     
-    <!-- 1. Blog Listing View -->
+    <!-- ================= 1. BLOG LISTING VIEW ================= -->
     <div *ngIf="!currentPost" class="blog-list-view">
       
-      <!-- Hero Header -->
-      <section class="blog-hero">
-        <div class="hero-tag">
-          <svg lucideBookOpen [attr.size]="14"></svg>
-          <span>Articles & Insights</span>
+      <!-- Spotlight Hero Article Banner (Spotify Style) -->
+      <section class="spotlight-hero" *ngIf="featuredPost && selectedCategory === 'all' && !searchFilter" (click)="openPost(featuredPost.slug)">
+        <div class="spotlight-bg" [style.backgroundImage]="'url(' + featuredPost.coverImage + ')'"></div>
+        <div class="spotlight-overlay"></div>
+
+        <div class="spotlight-content">
+          <div class="spotlight-badge">
+            <svg lucideSparkles [attr.size]="14"></svg>
+            <span>Spotlight Story</span>
+          </div>
+
+          <h1 class="spotlight-title">{{ featuredPost.title }}</h1>
+          <p class="spotlight-excerpt">{{ featuredPost.excerpt }}</p>
+
+          <div class="spotlight-footer">
+            <div class="spotlight-author">
+              <span class="author-avatar-sm" [style.background]="getAuthor(featuredPost.authorId).gradient">
+                {{ getAuthor(featuredPost.authorId).initials }}
+              </span>
+              <div class="author-details">
+                <span class="author-name">{{ featuredPost.author }}</span>
+                <span class="author-sub">{{ getAuthor(featuredPost.authorId).role }} • {{ featuredPost.date }}</span>
+              </div>
+            </div>
+
+            <button class="spotlight-btn" (click)="$event.stopPropagation(); openPost(featuredPost.slug)">
+              <span>Read Full Story</span>
+              <svg lucideArrowRight [attr.size]="16"></svg>
+            </button>
+          </div>
         </div>
-        <h1 class="hero-title">Blogs</h1>
-        <p class="hero-subtitle">
-          Curated guides, streaming tips, and music culture for continuous, uninterrupted listening.
-        </p>
       </section>
 
-      <!-- Posts Grid -->
-      <div class="posts-grid">
-        <article
-          class="post-card"
-          *ngFor="let post of visiblePosts"
-          (click)="openPost(post.slug)"
-          tabindex="0"
-          role="button"
-          (keydown.enter)="openPost(post.slug)"
-        >
-          <!-- Thumbnail Banner -->
-          <div class="card-thumb-wrap">
-            <img
-              [src]="post.coverImage"
-              [alt]="post.title"
-              (error)="onImageError($event, post)"
-              loading="lazy"
-              class="card-thumb"
-            />
-            <div class="thumb-overlay"></div>
-            <span class="card-tag">{{ post.tags[0] }}</span>
-          </div>
-
-          <!-- Card Body -->
-          <div class="card-body">
-            <div class="card-meta">
-              <span class="meta-item">
-                <svg lucideClock [attr.size]="13"></svg> {{ post.date }}
-              </span>
-              <span class="meta-dot">•</span>
-              <span class="meta-item">{{ post.readTime }}</span>
-            </div>
-
-            <h2 class="card-title">{{ post.title }}</h2>
-            <p class="card-excerpt">{{ post.excerpt }}</p>
-
-            <div class="card-footer">
-              <div class="tag-pills">
-                <span class="tag-pill" *ngFor="let tag of post.tags.slice(0, 2)">#{{ tag }}</span>
-              </div>
-              <span class="read-link">
-                Read Article
-                <svg lucideArrowRight [attr.size]="15"></svg>
-              </span>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Load More Section -->
-      <div class="load-more-section" *ngIf="posts.length > PAGE_SIZE">
-        <p class="posts-count-indicator">
-          Showing <strong>{{ visiblePosts.length }}</strong> of <strong>{{ posts.length }}</strong> articles
-        </p>
-
+      <!-- Category Filter Pills Bar -->
+      <section class="category-pills-bar">
         <button
-          *ngIf="hasMorePosts"
-          class="load-more-btn"
-          (click)="loadMore()"
-          [disabled]="isLoadingMore"
-          aria-label="Load more blog articles"
+          class="cat-pill"
+          [class.active]="selectedCategory === 'all' && !searchFilter"
+          (click)="clearFilter()"
         >
-          <ng-container *ngIf="!isLoadingMore">
-            <span>Load More Articles</span>
-            <svg lucideChevronDown [attr.size]="18"></svg>
-          </ng-container>
-          <ng-container *ngIf="isLoadingMore">
-            <svg lucideLoader2 class="spin-icon" [attr.size]="18"></svg>
-            <span>Loading articles...</span>
-          </ng-container>
+          All Stories
         </button>
+        <button
+          class="cat-pill"
+          *ngFor="let cat of categoriesList"
+          [class.active]="selectedCategory === cat.name"
+          (click)="setCategory(cat.name)"
+        >
+          {{ cat.name }} <span class="pill-badge">{{ cat.count }}</span>
+        </button>
+      </section>
 
-        <div *ngIf="!hasMorePosts" class="all-loaded-badge">
-          <svg lucideCheck [attr.size]="15"></svg>
-          <span>You have explored all articles</span>
-        </div>
+      <!-- Active Search / Tag Filter Banner -->
+      <div class="active-filter-indicator" *ngIf="searchFilter">
+        <span>Filtering by tag: <strong>#{{ searchFilter }}</strong></span>
+        <button class="clear-filter-btn" (click)="clearFilter()">✕ Clear</button>
       </div>
+
+      <!-- Two-Column Layout: Main Grid + Sticky Sidebar -->
+      <div class="blog-two-col-layout">
+        
+        <!-- Left: Main Articles Grid -->
+        <div class="articles-main-col">
+          
+          <div class="posts-grid">
+            <article
+              class="spotify-post-card"
+              *ngFor="let post of visiblePosts"
+              (click)="openPost(post.slug)"
+              tabindex="0"
+              role="button"
+              (keydown.enter)="openPost(post.slug)"
+            >
+              <!-- Card Thumbnail -->
+              <div class="card-thumb-container">
+                <img
+                  [src]="post.coverImage"
+                  [alt]="post.title"
+                  (error)="onImageError($event, post)"
+                  loading="lazy"
+                  class="card-thumb-img"
+                />
+                <div class="card-thumb-shade"></div>
+                <span class="card-category-pill">{{ post.category || post.tags[0] }}</span>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body">
+                <div class="card-meta-line">
+                  <span class="meta-date">
+                    <svg lucideClock [attr.size]="12"></svg>
+                    {{ post.date }}
+                  </span>
+                  <span class="meta-dot">•</span>
+                  <span class="meta-time">{{ post.readTime }}</span>
+                </div>
+
+                <h2 class="card-title">{{ post.title }}</h2>
+                <p class="card-excerpt">{{ post.excerpt }}</p>
+
+                <!-- Author Row & Read Action -->
+                <div class="card-footer-row">
+                  <div class="author-snippet">
+                    <span class="mini-avatar" [style.background]="getAuthor(post.authorId).gradient">
+                      {{ getAuthor(post.authorId).initials }}
+                    </span>
+                    <span class="author-name-text">{{ post.author }}</span>
+                  </div>
+
+                  <span class="read-action-link">
+                    <span>Read</span>
+                    <svg lucideArrowRight [attr.size]="14"></svg>
+                  </span>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-posts" *ngIf="visiblePosts.length === 0">
+            <svg lucideBookOpen [attr.size]="36"></svg>
+            <p>No articles found for this selection.</p>
+            <button class="reset-btn" (click)="clearFilter()">Show All Stories</button>
+          </div>
+
+          <!-- Load More Section -->
+          <div class="load-more-section" *ngIf="filteredPosts.length > PAGE_SIZE">
+            <p class="posts-count-indicator">
+              Showing <strong>{{ visiblePosts.length }}</strong> of <strong>{{ filteredPosts.length }}</strong> articles
+            </p>
+
+            <button
+              *ngIf="hasMorePosts"
+              class="load-more-btn"
+              (click)="loadMore()"
+              [disabled]="isLoadingMore"
+            >
+              <ng-container *ngIf="!isLoadingMore">
+                <span>Load More Articles</span>
+                <svg lucideChevronDown [attr.size]="18"></svg>
+              </ng-container>
+              <ng-container *ngIf="isLoadingMore">
+                <svg lucideLoader2 class="spin-icon" [attr.size]="18"></svg>
+                <span>Loading articles...</span>
+              </ng-container>
+            </button>
+
+            <div *ngIf="!hasMorePosts && visiblePosts.length > 0" class="all-loaded-badge">
+              <svg lucideCheck [attr.size]="15"></svg>
+              <span>You have explored all articles in this category</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Sticky Desktop Sidebar -->
+        <aside class="blog-sidebar-col">
+          
+          <!-- Widget 1: About GanaTube Editorial (E-E-A-T AdSense) -->
+          <div class="sidebar-widget about-editorial-widget">
+            <div class="widget-header">
+              <span class="widget-tag">Editorial Board</span>
+              <div class="verified-pill">
+                <svg lucideShieldCheck [attr.size]="13"></svg>
+                Verified
+              </div>
+            </div>
+            <h3 class="editorial-title">About GanaTube Editorial</h3>
+            <p class="editorial-mission">
+              GanaTube Editorial is an independent music technology and cultural publication. Led by technologist <strong>Anshu Saxena</strong> and dedicated cultural critics, our team delivers deep analysis on Indian cinema soundtracks, regional folk heritage, Desi Hip-Hop, and browser audio engineering.
+            </p>
+            <div class="editorial-stats">
+              <div class="stat-box">
+                <span class="stat-num">{{ allPublishedPosts.length }}+</span>
+                <span class="stat-lbl">Articles</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-num">{{ authors.length }}</span>
+                <span class="stat-lbl">Authors</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-num">100%</span>
+                <span class="stat-lbl">Free Access</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 2: Trending / Top 5 Stories -->
+          <div class="sidebar-widget trending-widget">
+            <div class="widget-header">
+              <div class="header-with-icon">
+                <svg lucideTrendingUp [attr.size]="16" class="trending-icon"></svg>
+                <h4>Top Trending Reads</h4>
+              </div>
+            </div>
+            <div class="trending-list">
+              <div
+                class="trending-item"
+                *ngFor="let item of trendingPosts; let i = index"
+                (click)="openPost(item.slug)"
+              >
+                <span class="trend-rank">0{{ i + 1 }}</span>
+                <div class="trend-info">
+                  <span class="trend-category">{{ item.category }}</span>
+                  <h5 class="trend-title">{{ item.title }}</h5>
+                  <span class="trend-read">{{ item.readTime }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 3: Meet the Authors (AdSense E-E-A-T) -->
+          <div class="sidebar-widget authors-widget">
+            <div class="widget-header">
+              <div class="header-with-icon">
+                <svg lucideUser [attr.size]="16" class="authors-icon"></svg>
+                <h4>Meet Our Contributors</h4>
+              </div>
+            </div>
+            <div class="authors-mini-list">
+              <div class="author-mini-card" *ngFor="let a of authors">
+                <div class="author-avatar" [style.background]="a.gradient">
+                  {{ a.initials }}
+                </div>
+                <div class="author-mini-info">
+                  <span class="author-mini-name">{{ a.name }}</span>
+                  <span class="author-mini-role">{{ a.role }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 4: Topics Cloud -->
+          <div class="sidebar-widget tags-widget">
+            <div class="widget-header">
+              <div class="header-with-icon">
+                <svg lucideTag [attr.size]="16" class="tags-icon"></svg>
+                <h4>Explore Topics</h4>
+              </div>
+            </div>
+            <div class="tags-cloud">
+              <button
+                class="tag-chip"
+                *ngFor="let tag of popularTags"
+                (click)="filterByTag(tag)"
+                [class.active-tag]="searchFilter === tag"
+              >
+                #{{ tag }}
+              </button>
+            </div>
+          </div>
+
+        </aside>
+
+      </div>
+
     </div>
 
-    <!-- 2. Single Post View -->
+    <!-- ================= 2. SINGLE POST VIEW ================= -->
     <div *ngIf="currentPost" class="single-post-view">
       
-      <!-- Top Action Navigation -->
-      <div class="back-nav-bar">
-        <button class="back-to-blogs-btn" (click)="goToBlogList()">
-          <svg lucideArrowLeft [attr.size]="18"></svg>
-          <span>Back to Blogs</span>
+      <!-- Top Actions Bar -->
+      <div class="post-top-bar">
+        <button class="blog-back-btn" (click)="goToBlogList()" title="Back to All Articles">
+          <svg lucideArrowLeft [attr.size]="16"></svg>
+          <span>Back to All Articles</span>
+        </button>
+
+        <button class="blog-share-btn" (click)="copyShareLink()" title="Share Article">
+          <svg *ngIf="!copiedShareLink" lucideShare2 [attr.size]="16"></svg>
+          <svg *ngIf="copiedShareLink" lucideCheck [attr.size]="16"></svg>
+          <span>{{ copiedShareLink ? 'Link Copied!' : 'Share Article' }}</span>
         </button>
       </div>
 
       <article class="article-sheet">
+        
+        <!-- Post Header -->
         <header class="article-header">
-          <div class="article-category-badge">{{ currentPost.tags[0] }}</div>
-          <h1 class="article-title">{{ currentPost.title }}</h1>
-          
-          <div class="article-meta-row">
-            <div class="meta-badge">
-              <svg lucideUser [attr.size]="14"></svg>
-              <span>{{ currentPost.author }}</span>
-            </div>
-            <div class="meta-badge">
-              <svg lucideClock [attr.size]="14"></svg>
-              <span>{{ currentPost.date }}</span>
-            </div>
-            <div class="meta-badge">
-              <span>{{ currentPost.readTime }}</span>
+          <div class="header-badges-row">
+            <span class="article-cat-badge">{{ currentPost.category || currentPost.tags[0] }}</span>
+            <span class="article-date">
+              <svg lucideClock [attr.size]="13"></svg>
+              {{ currentPost.date }}
+            </span>
+            <span class="article-read">{{ currentPost.readTime }}</span>
+          </div>
+
+          <h1 class="article-headline">{{ currentPost.title }}</h1>
+          <p class="article-lead">{{ currentPost.excerpt }}</p>
+
+          <!-- Top Author Byline -->
+          <div class="article-author-byline">
+            <span class="author-avatar-md" [style.background]="getAuthor(currentPost.authorId).gradient">
+              {{ getAuthor(currentPost.authorId).initials }}
+            </span>
+            <div class="byline-info">
+              <div class="byline-name-row">
+                <span class="byline-author-name">{{ currentPost.author }}</span>
+                <span class="verified-tag">
+                  <svg lucideShieldCheck [attr.size]="13"></svg>
+                  Verified Editorial
+                </span>
+              </div>
+              <span class="byline-author-role">{{ getAuthor(currentPost.authorId).role }}</span>
             </div>
           </div>
         </header>
 
-        <!-- Only 1 Featured Cover Image -->
+        <!-- Featured Cover Image with Ambient Glow -->
         <div class="article-hero-media">
+          <div class="ambient-glow" [style.backgroundImage]="'url(' + currentPost.coverImage + ')'"></div>
           <img
             [src]="currentPost.coverImage"
             [alt]="currentPost.title"
@@ -164,27 +352,81 @@
           />
         </div>
 
-        <!-- Clean Article Typography Body -->
-        <div class="article-prose" [innerHTML]="currentPost.content"></div>
+        <!-- High-Contrast Clean Article Prose -->
+        <div class="article-body-prose" [innerHTML]="currentPost.content"></div>
 
-        <!-- Footer with Tags and Back Navigation -->
-        <footer class="article-sheet-footer">
-          <div class="topics-group">
-            <span class="topics-title">Topics:</span>
-            <div class="tags-cluster">
-              <span class="topic-chip" *ngFor="let tag of currentPost.tags">{{ tag }}</span>
+        <!-- Tags Row -->
+        <div class="article-tags-wrap">
+          <span class="tags-label">Tagged In:</span>
+          <div class="tags-list">
+            <span class="tag-item" *ngFor="let tag of currentPost.tags" (click)="filterByTag(tag); goToBlogList()">
+              #{{ tag }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ================= E-E-A-T AUTHOR BIO BOX (ADSENSE COMPLIANCE) ================= -->
+        <section class="author-eeat-card">
+          <div class="eeat-top">
+            <div class="eeat-avatar" [style.background]="getAuthor(currentPost.authorId).gradient">
+              {{ getAuthor(currentPost.authorId).initials }}
+            </div>
+            <div class="eeat-meta">
+              <div class="eeat-name-line">
+                <span class="eeat-label">Written By</span>
+                <h4 class="eeat-name">{{ currentPost.author }}</h4>
+                <span class="eeat-badge">
+                  <svg lucideShieldCheck [attr.size]="14"></svg>
+                  Verified Editorial Contributor
+                </span>
+              </div>
+              <span class="eeat-role">{{ getAuthor(currentPost.authorId).role }} • {{ getAuthor(currentPost.authorId).location }}</span>
             </div>
           </div>
 
-          <div class="bottom-action-row">
-            <button class="bottom-return-btn" (click)="goToBlogList()">
-              <svg lucideArrowLeft [attr.size]="16"></svg>
-              <span>Explore More Blogs</span>
-            </button>
+          <p class="eeat-bio">{{ getAuthor(currentPost.authorId).bio }}</p>
+
+          <div class="eeat-expertise-row">
+            <span class="expertise-title">Areas of Expertise:</span>
+            <div class="expertise-pills">
+              <span class="exp-tag" *ngFor="let exp of getAuthor(currentPost.authorId).expertise">{{ exp }}</span>
+            </div>
           </div>
-        </footer>
+        </section>
+
+        <!-- ================= RELATED ARTICLES ================= -->
+        <section class="related-articles-section" *ngIf="getRelatedPosts(currentPost).length > 0">
+          <h3 class="related-title">More From GanaTube Editorial</h3>
+          <div class="related-grid">
+            <article class="related-card" *ngFor="let rel of getRelatedPosts(currentPost)" (click)="openPost(rel.slug)">
+              <div class="related-thumb">
+                <img [src]="rel.coverImage" [alt]="rel.title" loading="lazy" />
+                <span class="related-tag">{{ rel.category || rel.tags[0] }}</span>
+              </div>
+              <div class="related-info">
+                <h4 class="related-headline">{{ rel.title }}</h4>
+                <div class="related-meta">
+                  <span>{{ rel.author }}</span>
+                  <span>•</span>
+                  <span>{{ rel.readTime }}</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Bottom Return Button -->
+        <div class="bottom-action-row">
+          <button class="bottom-return-btn" (click)="goToBlogList()">
+            <svg lucideArrowLeft [attr.size]="16"></svg>
+            <span>Explore All Blog Stories</span>
+          </button>
+        </div>
+
       </article>
+
     </div>
 
   </main>
+
 </div>

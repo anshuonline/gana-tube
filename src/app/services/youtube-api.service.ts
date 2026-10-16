@@ -508,7 +508,7 @@ export class YoutubeApiService {
       map(results => results.filter((track: YouTubeSearchResult) => !this.isBanned(track))),
       catchError((err) => {
         console.warn('Radio endpoint failed, falling back to searchMusic:', err);
-        return this.searchMusic(`${queryFallback || videoId} similar songs`, 25);
+        return this.searchMusic(queryFallback || videoId, 25);
       })
     );
   }

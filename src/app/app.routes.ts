@@ -21,6 +21,11 @@ export const routes: Routes = [
   { path: 'user/:username/:id', children: [] },
   { path: 'blog', children: [] },
   { path: 'blog/:slug', children: [] },
+  {
+    path: 'cms-management',
+    loadComponent: () => import('./components/cms-management/cms-management.component').then(m => m.CmsManagementComponent)
+  },
+  { path: 'cms-admin', redirectTo: 'cms-management', pathMatch: 'full' },
   { path: 'rooms', children: [] },
   { path: 'rooms/:roomId', children: [] },
   { path: 'release-notes', redirectTo: 'home', pathMatch: 'full' },

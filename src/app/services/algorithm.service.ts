@@ -3,7 +3,7 @@ import { YoutubeApiService, YouTubeSearchResult } from './youtube-api.service';
 import { AuthService } from './auth.service';
 import { UserService } from './user.service';
 import { Observable, of, forkJoin } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, timeout } from 'rxjs/operators';
 
 export interface HistoryEntry extends YouTubeSearchResult {
   listened_at: number;
@@ -301,13 +301,6 @@ export class AlgorithmService {
     ];
     const finalQuery = queryFormats[Math.floor(Math.random() * queryFormats.length)].trim().replace(/\s+/g, ' ');
 
-    const shelves: ShelfDefinition[] = [
-      {
-        title: 'Suggested for You',
-        query: finalQuery
-      }
-    ];
-
     // Context-Aware Naming (no emojis)
     const hour = new Date().getHours();
     let timeGreeting = 'Day';
@@ -331,11 +324,6 @@ export class AlgorithmService {
       timeQuery = `${nights[Math.floor(Math.random() * nights.length)]} ${language} songs`;
     }
 
-    shelves.push({
-      title: 'Your ' + timeGreeting,
-      query: timeQuery
-    });
-
     // Generate personalized title: "Made for {username}" or "Made for You" for guests
     const currentUser = this.authService.currentUser();
     const rawUsername = (this.userService.displayName() || currentUser?.displayName || (currentUser?.email ? currentUser.email.split('@')[0] : '') || '').trim();
@@ -343,37 +331,36 @@ export class AlgorithmService {
       ? `Made for ${rawUsername.length > 20 ? rawUsername.substring(0, 20) : rawUsername}`
       : 'Made for You';
 
+    const otherShelves: ShelfDefinition[] = [];
+
     if (this.profile.history.length < 3) {
       // New user — show broad discovery shelves
       const newUsers2 = ['all time best', 'classic hits', 'golden era'];
-      shelves.push({ title: 'All-Time Classics', query: `${newUsers2[Math.floor(Math.random() * newUsers2.length)]} ${language} songs` });
+      otherShelves.push({ title: 'All-Time Classics', query: `${newUsers2[Math.floor(Math.random() * newUsers2.length)]} ${language} songs` });
 
       const genericModifiers = ['top', 'trending', 'popular', 'best hits'];
       const madeForYouQuery = `${genericModifiers[Math.floor(Math.random() * genericModifiers.length)]} ${language} songs ${randomYear}`;
-      shelves.push({
+      otherShelves.push({
         title: madeForTitle,
         query: madeForYouQuery,
         isMadeForYou: true
       });
     } else {
       // --- Personalized shelves ---
-
       // "More from {Artist}" — fetch NEW songs by their top artist
       if (topArtists.length > 0) {
         const artistQueryFormats = ['official songs', 'all songs', 'top hits', 'best collection'];
-        shelves.push({
+        otherShelves.push({
           title: 'More from ' + topArtists[0],
           query: `${topArtists[0]} ${artistQueryFormats[Math.floor(Math.random() * artistQueryFormats.length)]} in ${language}`
         });
       }
 
       // "Made for {username}" / "Made for You" — smart genre-based discovery
-      // When user has 20+ liked songs, use genre analysis for truly personalized results
       const likedCount = this.profile.liked_songs.length;
       let madeForYouQuery = '';
       
       if (likedCount >= 20 && topGenres.length > 0) {
-        // Smart mode: combine top genre + language
         const genreLabels: Record<string, string> = {
           'lofi': 'lofi chill',
           'romantic': 'romantic love',
@@ -383,7 +370,6 @@ export class AlgorithmService {
           'bollywood': 'bollywood'
         };
         
-        // Regional genres only survive when they match the selected language
         let genreQuery = this.sanitizeGenreForLanguage(topGenres[0], language);
         if (genreQuery) {
           genreQuery = genreLabels[genreQuery] || genreQuery;
@@ -396,15 +382,258 @@ export class AlgorithmService {
         madeForYouQuery = `${genericModifiers[Math.floor(Math.random() * genericModifiers.length)]} ${language} songs ${randomYear}`;
       }
 
-      shelves.push({
+      otherShelves.push({
         title: madeForTitle,
         query: madeForYouQuery,
         isMadeForYou: true
       });
+    }
 
+    // Build the dynamic time shelf with user's last 100 listened + liked songs and related tracks
+    return this.buildTimeBasedShelf(timeGreeting, timeQuery, language).pipe(
+      map(timeShelf => {
+        return [
+          {
+            title: 'Suggested for You',
+            query: finalQuery
+          },
+          timeShelf,
+          ...otherShelves
+        ];
+      }),
+      catchError(err => {
+        console.warn('Failed to build dynamic time shelf, using fallback query:', err);
+        return of([
+          {
+            title: 'Suggested for You',
+            query: finalQuery
+          },
+          {
+            title: 'Your ' + timeGreeting,
+            query: timeQuery
+          },
+          ...otherShelves
+        ]);
+      })
+    );
+  }
+
+  /**
+   * Builds the dynamic time shelf ("Your Late Night Feels" / "Your Morning Boost" etc.):
+   * 1. Extracts songs from user's last 100 listened musics (recentPlays) + liked musics + profile history.
+   * 2. Filters them strictly matching the target language.
+   * 3. If no matching songs in that language -> Fallbacks to trending songs in that language.
+   * 4. If matching songs exist -> Takes 4-6 user songs and fetches radio-related songs to provide a fresh curated shelf.
+   */
+  private buildTimeBasedShelf(timeGreeting: string, fallbackQuery: string, language: string): Observable<ShelfDefinition> {
+    const shelfTitle = 'Your ' + timeGreeting;
+
+    // 1. Gather pool from recent plays (up to 100), liked songs, and profile history
+    const rawList: any[] = [
+      ...(this.userService.recentPlays ? this.userService.recentPlays() : []),
+      ...(this.userService.likedSongs ? this.userService.likedSongs() : []),
+      ...(this.profile.history || [])
+    ];
+
+    const seenIds = new Set<string>();
+    const userSongsPool: YouTubeSearchResult[] = [];
+
+    for (const item of rawList) {
+      if (item && typeof item === 'object' && item.videoId && item.title) {
+        if (!seenIds.has(item.videoId)) {
+          seenIds.add(item.videoId);
+          userSongsPool.push({
+            videoId: item.videoId,
+            title: item.title,
+            channelTitle: item.channelTitle || '',
+            thumbnail: item.thumbnail || '',
+            thumbnailHigh: item.thumbnailHigh || item.thumbnail || '',
+            publishedAt: item.publishedAt || '',
+            duration: item.duration || 0,
+            type: item.type || 'song'
+          });
+        }
       }
+    }
 
-    return of(shelves);
+    // 2. Filter user songs matching the selected language
+    const matchingSongs = userSongsPool.filter(song => this.isSongMatchingLanguage(song, language));
+
+    // 3. Fallback: If user has 0 listened/liked songs in this language -> Trending songs for that language!
+    if (matchingSongs.length === 0) {
+      return this.youtubeApi.getSaavnTrending(language, 20, 'trending').pipe(
+        timeout(8000),
+        map(trendingSongs => {
+          if (trendingSongs && trendingSongs.length > 0) {
+            return {
+              title: shelfTitle,
+              query: `${language} trending songs`,
+              songs: trendingSongs,
+              type: 'trending' as const,
+              language: language
+            };
+          }
+          throw new Error('No trending songs returned from Saavn');
+        }),
+        catchError(() => {
+          return this.youtubeApi.searchMusic(`trending ${language} hit songs`, 15).pipe(
+            timeout(6000),
+            map(searchSongs => ({
+              title: shelfTitle,
+              query: fallbackQuery,
+              songs: searchSongs || [],
+              type: 'search' as const,
+              language: language
+            })),
+            catchError(() => of({
+              title: shelfTitle,
+              query: fallbackQuery,
+              songs: [],
+              type: 'search' as const,
+              language: language
+            }))
+          );
+        })
+      );
+    }
+
+    // 4. User HAS listened/liked songs in this language!
+    // Pick 4-6 songs from matching songs (mix of recent + liked)
+    const shuffled = [...matchingSongs].sort(() => 0.5 - Math.random());
+    const pickedDirectSongs = shuffled.slice(0, 6);
+    const seedTrack = pickedDirectSongs[0];
+    const seedQuery = `${seedTrack.channelTitle || ''} ${seedTrack.title || ''}`.trim();
+
+    return this.youtubeApi.getRadioTracks(seedTrack.videoId, seedQuery).pipe(
+      timeout(8000),
+      map(relatedTracks => {
+        const combined = [...pickedDirectSongs];
+        const existingVideoIds = new Set(pickedDirectSongs.map(s => s.videoId));
+
+        for (const track of relatedTracks || []) {
+          if (track && track.videoId && !existingVideoIds.has(track.videoId)) {
+            existingVideoIds.add(track.videoId);
+            combined.push(track);
+          }
+        }
+
+        return {
+          title: shelfTitle,
+          query: seedQuery,
+          songs: combined.slice(0, 20),
+          language: language
+        };
+      }),
+      catchError(err => {
+        console.warn('Failed to fetch radio tracks for time-based shelf, falling back to direct songs:', err);
+        return of({
+          title: shelfTitle,
+          query: seedQuery,
+          songs: pickedDirectSongs,
+          language: language
+        });
+      })
+    );
+  }
+
+  /**
+   * Language matching helper to verify if a user song belongs to a specific language.
+   */
+  public isSongMatchingLanguage(song: YouTubeSearchResult, targetLang: string): boolean {
+    if (!song || !targetLang) return false;
+    const lang = targetLang.toLowerCase().trim();
+
+    // 1. Explicit language field if present
+    const explicitLang = ((song as any).language || (song as any).lang || '').toLowerCase().trim();
+    if (explicitLang) {
+      if (explicitLang === lang) return true;
+      if (lang === 'hindi' && explicitLang === 'bollywood') return true;
+      if (explicitLang !== lang) return false;
+    }
+
+    const text = `${song.title || ''} ${song.channelTitle || ''} ${(song as any).artist || ''}`.toLowerCase();
+
+    // 2. Scripts and language-specific markers
+    const hasTamilScript = /[\u0B80-\u0BFF]/.test(text);
+    const hasTeluguScript = /[\u0C00-\u0C7F]/.test(text);
+    const hasMalayalamScript = /[\u0D00-\u0D7F]/.test(text);
+    const hasKannadaScript = /[\u0C80-\u0CFF]/.test(text);
+    const hasBengaliScript = /[\u0980-\u09FF]/.test(text);
+    const hasGurmukhiScript = /[\u0A00-\u0A7F]/.test(text);
+    const hasDevanagariScript = /[\u0900-\u097F]/.test(text);
+
+    // If text has a script of a DIFFERENT regional language, it's not a match
+    if (hasTamilScript && lang !== 'tamil') return false;
+    if (hasTeluguScript && lang !== 'telugu') return false;
+    if (hasMalayalamScript && lang !== 'malayalam') return false;
+    if (hasKannadaScript && lang !== 'kannada') return false;
+    if (hasBengaliScript && lang !== 'bengali') return false;
+    if (hasGurmukhiScript && lang !== 'punjabi') return false;
+
+    // Check language-specific keywords / artists / labels
+    if (lang === 'punjabi') {
+      if (hasGurmukhiScript) return true;
+      const punjabiRegex = /\b(punjabi|sidhu|moosewala|karan aujla|diljit|dosanjh|ap dhillon|amrit maan|b praak|jaani|jassi gill|jass manak|gurdas maan|sharry maan|parmish verma|mankirt|hardy sandhu|guru randhawa|ammy virk|sukhe|speed records|white hill music|geet mp3)\b/i;
+      return punjabiRegex.test(text);
+    }
+
+    if (lang === 'bhojpuri') {
+      const bhojpuriRegex = /\b(bhojpuri|pawan singh|khesari|dinesh lal|nirahua|akshara singh|shilpi raj|pramod premi|kallu|ankush raja|wave music|worldwide records bhojpuri)\b/i;
+      return bhojpuriRegex.test(text);
+    }
+
+    if (lang === 'haryanvi') {
+      const haryanviRegex = /\b(haryanvi|sapna choudhary|renuka panwar|masoom sharma|gulzaar chhaniwala|diler kharkiya|sonotek|mor music)\b/i;
+      return haryanviRegex.test(text);
+    }
+
+    if (lang === 'tamil') {
+      if (hasTamilScript) return true;
+      const tamilRegex = /\b(tamil|anirudh|vijay|dhanush|ar rahman|think music india|sony music south)\b/i;
+      return tamilRegex.test(text);
+    }
+
+    if (lang === 'telugu') {
+      if (hasTeluguScript) return true;
+      const teluguRegex = /\b(telugu|aditya music|geetha arts|lahari music)\b/i;
+      return teluguRegex.test(text);
+    }
+
+    if (lang === 'bengali') {
+      if (hasBengaliScript) return true;
+      const bengaliRegex = /\b(bengali|bangla|svf music|ashomapto)\b/i;
+      return bengaliRegex.test(text);
+    }
+
+    if (lang === 'english') {
+      if (hasDevanagariScript || hasTamilScript || hasTeluguScript || hasMalayalamScript || hasKannadaScript || hasBengaliScript || hasGurmukhiScript) {
+        return false;
+      }
+      const indianChannels = /\b(t-series|tseries|zee music|sony music india|yrf|tips official|saregama|speed records|geet mp3)\b/i;
+      if (indianChannels.test(text)) return false;
+
+      const englishRegex = /\b(english|pop|rock|hip hop|rap|ed sheeran|taylor swift|justin bieber|dua lipa|billie eilish|the weeknd|drake|ariana grande|bruno mars|eminem|charlie puth|maroon 5|post malone|selena gomez|rihanna|coldplay|imagine dragons|shawn mendes|adele|katy perry|sia|alan walker|marshmello|chainsmokers|david guetta|avicii)\b/i;
+      if (englishRegex.test(text)) return true;
+      const indianKeywords = /\b(hindi|bollywood|punjabi|bhojpuri|haryanvi|tamil|telugu|bengali|arijit|neha|jubin|shreya|pritam|badshah)\b/i;
+      return !indianKeywords.test(text);
+    }
+
+    if (lang === 'hindi') {
+      if (hasDevanagariScript) {
+        if (/\b(bhojpuri|haryanvi)\b/i.test(text)) return false;
+        return true;
+      }
+      const hindiRegex = /\b(hindi|bollywood|t-series|tseries|zee music|sony music india|yrf|tips official|saregama|arijit|neha kakkar|jubin nautiyal|shreya ghoshal|pritam|badshah|atif aslam|sonu nigam|kumar sanu|udit narayan|alka yagnik|sunidhi|darshan raval|armaan malik|kk|mohit chauhan|ankit tiwari|himesh|vishal-shekhar|sachin-jigar|yo yo honey singh|stebin ben)\b/i;
+      if (hindiRegex.test(text)) return true;
+
+      const otherRegional = /\b(punjabi|bhojpuri|haryanvi|tamil|telugu|bengali|malayalam|kannada)\b/i;
+      if (!otherRegional.test(text)) {
+        return true;
+      }
+      return false;
+    }
+
+    return false;
   }
 
   public getAutoplayQueue(currentTrack: YouTubeSearchResult): Observable<YouTubeSearchResult[]> {

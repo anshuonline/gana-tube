@@ -9,7 +9,7 @@
   <div class="sidebar-backdrop" *ngIf="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
 
   <!-- Sidebar -->
-  <nav class="app-sidebar" [class.mobile-open]="isMobileMenuOpen()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts'">
+  <nav class="app-sidebar" [class.mobile-open]="isMobileMenuOpen()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog'">
     <div class="sidebar-items">
       <div class="sidebar-item" (click)="resetSearchState()" [class.active]="currentPage() === 'home'">
         <svg lucideHome [attr.size]="24"></svg>
@@ -55,7 +55,7 @@
   </nav>
 
   <!-- Header -->
-  <header class="app-header" [class.scrolled]="isScrolled()" [class.header-hidden]="isNavbarHidden() && isNavbarAutoHide()" *ngIf="currentPage() !== 'rooms-view' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog' && currentPage() !== 'profile'">
+  <header class="app-header" [class.scrolled]="isScrolled()" [class.header-hidden]="isNavbarHidden() && isNavbarAutoHide()" *ngIf="currentPage() !== 'rooms-view' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog' && currentPage() !== 'profile'">
     <div class="header-inner">
       <div class="header-left">
         <!-- Mobile Hamburger Menu -->
@@ -112,7 +112,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="(currentPage() === 'home' || currentPage() === 'search') && (hasSearched() || isSearchMode())" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'" [class.is-gtanalytic]="currentPage() === 'gtanalytic'" [class.is-managegt]="currentPage() === 'managegt'">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="(currentPage() === 'home' || currentPage() === 'search') && (hasSearched() || isSearchMode())" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'" [class.is-gtanalytic]="currentPage() === 'gtanalytic'" [class.is-managegt]="currentPage() === 'managegt'" [class.is-blog]="currentPage() === 'blog'" [class.is-cms-management]="currentPage() === 'cms-management' || currentPage() === 'cms-admin'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
 
       <!-- Ambient Background -->
@@ -731,13 +731,15 @@
         </button>
 
         <div class="quick-pills-bar" #quickPillsRail>
+          <!-- 1st: All Pill -->
           <button type="button"
                   class="quick-pill"
-                  [class.active]="activeChip() === chip"
-                  *ngFor="let chip of dynamicChips()"
-                  (click)="selectChip(chip)">
-            {{ chip }}
+                  [class.active]="activeChip() === 'All'"
+                  (click)="selectChip('All')">
+            All
           </button>
+
+          <!-- 2nd: Languages Filter Pill -->
           <button type="button"
                   class="quick-pill lang-pill"
                   (click)="openLanguageModal()"
@@ -749,6 +751,17 @@
             </svg>
             <span>Languages</span>
           </button>
+
+          <!-- 3rd+: Remaining Dynamic Chips -->
+          <ng-container *ngFor="let chip of dynamicChips()">
+            <button type="button"
+                    *ngIf="chip !== 'All'"
+                    class="quick-pill"
+                    [class.active]="activeChip() === chip"
+                    (click)="selectChip(chip)">
+              {{ chip }}
+            </button>
+          </ng-container>
         </div>
 
         <button type="button" class="pills-nav-btn next-btn" (click)="scrollPills('right')" aria-label="Next" title="Scroll Right">
@@ -1325,8 +1338,8 @@
     </div>
 
 
-    <!-- ManageGT & GTAnalytic Sections (Router Outlet) -->
-    <div class="managegt-wrapper" *ngIf="currentPage() === 'managegt' || currentPage() === 'gtanalytic'">
+    <!-- ManageGT, GTAnalytic & CMS Management Sections (Router Outlet) -->
+    <div class="managegt-wrapper" *ngIf="currentPage() === 'managegt' || currentPage() === 'gtanalytic' || currentPage() === 'cms-management' || currentPage() === 'cms-admin'">
       <router-outlet></router-outlet>
     </div>
 
@@ -1639,7 +1652,7 @@
     </div>
 
     <!-- Modern Footer -->
-    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts'">
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts'">
       <div class="footer-giant-brand">ganatube.in</div>
       <div class="footer-content">
         <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
@@ -1681,7 +1694,7 @@
   </main>
 
   <!-- Hardcore Global Ad Banner (above mini player) -->
-  <div class="sponsored-ad-banner" *ngIf="!isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms'">
+  <div class="sponsored-ad-banner" *ngIf="!isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms' && currentPage() !== 'blog'">
     <app-adsterra-banner [tag]="bottomAdTag()"></app-adsterra-banner>
     <span class="ad-label">Sponsored</span>
   </div>

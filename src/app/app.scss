@@ -701,7 +701,9 @@
   }
 
   &.is-gtanalytic,
-  &.is-managegt {
+  &.is-managegt,
+  &.is-cms-management,
+  &.is-blog {
     max-width: 100%;
     width: 100%;
     margin: 0;
