@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { catchError, EMPTY, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -93,11 +94,14 @@ export class AnalyticsService {
     else if (/Firefox\//.test(ua)) browser = 'Firefox';
     else if (/Chrome\//.test(ua)) browser = 'Chrome';
     else if (/Safari\//.test(ua)) browser = 'Safari';
+    const screenSize = (typeof window !== 'undefined' && window.screen) 
+      ? `${window.screen.width}x${window.screen.height}` 
+      : 'Unknown';
     return {
       device_type: isTablet ? 'Tablet' : (isMobile ? 'Mobile' : 'PC'),
       os,
       browser,
-      screen_size: `${window.screen.width}x${window.screen.height}`
+      screen_size: screenSize
     };
   }
 
@@ -172,7 +176,8 @@ export class AnalyticsService {
           artist: track.channelTitle || track.artist || '',
           is_guest: isGuest,
           guest_id: guestId,
-          current_page: page
+          current_page: page,
+          ...this.getDeviceInfo()
         })
       });
     } catch(e) {
@@ -215,16 +220,22 @@ export class AnalyticsService {
   }
 
   getAnalytics(password: string, filter: string = 'all_time') {
-    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getAnalytics&pwd=${encodeURIComponent(password)}&filter=${filter}`);
+    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getAnalytics&pwd=${encodeURIComponent(password)}&filter=${filter}`).pipe(
+      catchError(err => (err?.name === 'AbortError' || err?.message?.includes('aborted')) ? EMPTY : throwError(() => err))
+    );
   }
 
   getGuestGeography(password: string, range: string = 'dau') {
-    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getGuestGeography&pwd=${encodeURIComponent(password)}&range=${encodeURIComponent(range)}`);
+    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getGuestGeography&pwd=${encodeURIComponent(password)}&range=${encodeURIComponent(range)}`).pipe(
+      catchError(err => (err?.name === 'AbortError' || err?.message?.includes('aborted')) ? EMPTY : throwError(() => err))
+    );
   }
 
   getRoomAnalytics(password: string) {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
-    return this.http.get<{status: string, data?: any, message?: string}>(`${backendUrl}/room-analytics?pwd=${encodeURIComponent(password)}`);
+    return this.http.get<{status: string, data?: any, message?: string}>(`${backendUrl}/room-analytics?pwd=${encodeURIComponent(password)}`).pipe(
+      catchError(err => (err?.name === 'AbortError' || err?.message?.includes('aborted')) ? EMPTY : throwError(() => err))
+    );
   }
 
   getExcludedIps(password: string) {

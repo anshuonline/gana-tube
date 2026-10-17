@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -35,7 +35,7 @@ export interface CityBeacon {
   templateUrl: './gtanalytic-guests.html',
   styleUrls: ['./gtanalytic-guests.scss']
 })
-export class GtanalyticGuestsComponent {
+export class GtanalyticGuestsComponent implements OnDestroy {
   dataService = inject(GtanalyticDataService);
 
   searchQuery = signal<string>('');
@@ -797,6 +797,10 @@ export class GtanalyticGuestsComponent {
         this.settingsErrorMsg.set('Network error purging bot records');
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.geoSub?.unsubscribe();
   }
 }
 
