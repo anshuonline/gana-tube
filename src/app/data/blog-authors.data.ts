@@ -27,7 +27,7 @@ export const BLOG_AUTHORS: BlogAuthor[] = [
     location: 'New Delhi, India',
     bio: 'Founder of GanaTube and Chief Editorial Director. Technologist, web architect, and music curator dedicated to engineering ultra-fast, distraction-free audio streaming and spotlighting Indian musical innovation.',
     expertise: ['Audio Streaming', 'Music Tech', 'Product Architecture', 'Playback Systems'],
-    articleCount: 21,
+    articleCount: 33,
     socialLinks: {
       twitter: 'https://twitter.com/ganatube',
       linkedin: 'https://linkedin.com/company/ganatube',
@@ -44,7 +44,7 @@ export const BLOG_AUTHORS: BlogAuthor[] = [
     location: 'Mumbai, India',
     bio: 'Senior cultural journalist with over 8 years covering contemporary Hindi cinema soundtracks, classic ghazals, semi-classical compositions, and the evolving artistry of Indian playback legends.',
     expertise: ['Bollywood Melodies', 'Vocal Analysis', 'Soundtracks', 'Sufi Classics'],
-    articleCount: 22,
+    articleCount: 26,
     socialLinks: {
       twitter: 'https://twitter.com/pooja_music'
     }
@@ -59,7 +59,7 @@ export const BLOG_AUTHORS: BlogAuthor[] = [
     location: 'Bengaluru, India',
     bio: 'Music analyst tracking India’s rapidly expanding independent music movement, Desi Hip-Hop (DHH) subcultures, underground rap scenes, and breakthrough bedroom producers.',
     expertise: ['Desi Hip-Hop', 'Indie Pop', 'Urban Beats', 'Music Production'],
-    articleCount: 19,
+    articleCount: 23,
     socialLinks: {
       twitter: 'https://twitter.com/rohan_v_music'
     }
@@ -74,7 +74,7 @@ export const BLOG_AUTHORS: BlogAuthor[] = [
     location: 'Pune, India',
     bio: 'Audio acoustics researcher and streaming technology analyst exploring lossless bitrate streaming, web-audio codecs, spatial soundscapes, and digital signal processing in modern web players.',
     expertise: ['Lossless Codecs', 'Web Audio API', 'Spatial Acoustics', 'Hi-Fi Streaming'],
-    articleCount: 10,
+    articleCount: 18,
     socialLinks: {
       linkedin: 'https://linkedin.com/in/snehapatel-audio'
     }
@@ -89,7 +89,7 @@ export const BLOG_AUTHORS: BlogAuthor[] = [
     location: 'Chandigarh, India',
     bio: 'Cultural archivist and music columnist documenting the global rise of the Punjabi wave, qawwali traditions, and regional folk rhythms across the Indian subcontinent.',
     expertise: ['Punjabi Wave', 'Folk Traditions', 'Concert Reviews', 'Global Fusion'],
-    articleCount: 11,
+    articleCount: 13,
     socialLinks: {
       twitter: 'https://twitter.com/kabirmehta_music'
     }
