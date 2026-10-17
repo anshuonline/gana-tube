@@ -4,3 +4,4 @@ Disallow: /managegt
 Disallow: /admin
 
 Sitemap: https://ganatube.in/sitemap.xml
+Sitemap: https://ganatube.in/sitemap-blogs.xml
