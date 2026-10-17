@@ -111,5 +111,12 @@
     <div class="menu-item disabled-item" (click)="startRadio($event)">
       <svg lucideRadio [attr.size]="20"></svg> Start radio
     </div>
+
+    <hr class="menu-divider">
+
+    <div class="menu-item block-item" (click)="blockTrack($event)">
+      <svg lucideBan [attr.size]="20" style="color: #ef4444;"></svg>
+      <span style="color: #ef4444; font-weight: 600;">Block on GanaTube</span>
+    </div>
   </div>
 </div>

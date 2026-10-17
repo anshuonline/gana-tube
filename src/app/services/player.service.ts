@@ -13,6 +13,7 @@ import { SpinService } from './spin.service';
 import { AnalyticsService } from './analytics.service';
 
 import { OfflineService } from './offline.service';
+import { ContentFilterService } from './content-filter.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -155,6 +156,7 @@ export class PlayerService {
   private authService = inject(AuthService);
   private spinService = inject(SpinService);
   public offlineService = inject(OfflineService);
+  private contentFilter = inject(ContentFilterService);
   private trackStartTime: number = 0;
   // Qualified play tracking (prevents instant skips from artificially inflating plays and play time)
   private currentPlayTrackedId: string | null = null;
@@ -681,7 +683,15 @@ export class PlayerService {
   // Determine if user is in a room
   isInRoom = computed(() => !!this.roomService.currentRoomInfo());
 
-  playTrack(track: Track): void { if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) { this.toastService.show("You cannot play music directly while listening in a room.", 'error'); return; }
+  playTrack(track: Track): void {
+    if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) {
+      this.toastService.show("You cannot play music directly while listening in a room.", 'error');
+      return;
+    }
+    if (this.contentFilter.isBlocked(track)) {
+      this.toastService.show("This song has been blocked and cannot be played.", 'error');
+      return;
+    }
     this.triggerEngagement();
     this.isShuffled.set(false);
     this.isPlaylistContext.set(false);
@@ -737,22 +747,28 @@ export class PlayerService {
       this.toastService.show('You cannot play music directly while listening in a room.', 'error');
       return;
     }
+    const filteredTracks = this.contentFilter.filterTracks(tracks);
+    if (!filteredTracks.length) {
+      this.toastService.show('No playable songs in this list.', 'error');
+      return;
+    }
+    const safeStartIndex = Math.min(Math.max(0, startIndex), filteredTracks.length - 1);
     this.triggerEngagement();
     this.isShuffled.set(false);
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-    this.queue.set(tracks);
-    this.currentIndex.set(startIndex);
+    this.queue.set(filteredTracks);
+    this.currentIndex.set(safeStartIndex);
     this.playerState.set('loading');
 
     if (!this.isRemoteUpdate && this.roomService.currentRoomInfo()) {
-      this.roomService.adminQueueUpdate(tracks, this.currentIndex());
+      this.roomService.adminQueueUpdate(filteredTracks, this.currentIndex());
     }
     this.isRemoteUpdate = false;
     
-    if (tracks[startIndex]) {
-      const first = tracks[startIndex];
+    if (filteredTracks[safeStartIndex]) {
+      const first = filteredTracks[safeStartIndex];
       if (typeof localStorage !== 'undefined' && first && first.videoId) {
         try {
           if (first.title && !first.title.includes('Playing from link') && !first.title.includes('Loading Track')) {
@@ -760,8 +776,8 @@ export class PlayerService {
           }
         } catch (e) {}
       }
-      this.location.replaceState('/play?v=' + tracks[startIndex].videoId);
-      this.loadInPlayer(tracks[startIndex].videoId);
+      this.location.replaceState('/play?v=' + filteredTracks[safeStartIndex].videoId);
+      this.loadInPlayer(filteredTracks[safeStartIndex].videoId);
     }
   }
 
@@ -828,15 +844,28 @@ export class PlayerService {
     if (!q.length) return;
     let nextIdx = this.currentIndex() + 1;
     if (this.isShuffled()) {
-      nextIdx = Math.floor(Math.random() * q.length);
-    } else if (nextIdx >= q.length) {
-      if (this.repeatMode() === 'all' || this.isPlaylistContext()) {
-        nextIdx = 0;
-      } else if (this.isAutoplayEnabled()) {
-        this.handleTrackEnd();
-        return;
-      } else {
-        return;
+      let attempts = 0;
+      do {
+        nextIdx = Math.floor(Math.random() * q.length);
+        attempts++;
+      } while (attempts < 10 && this.contentFilter.isBlocked(q[nextIdx]));
+    } else {
+      while (nextIdx < q.length && this.contentFilter.isBlocked(q[nextIdx])) {
+        nextIdx++;
+      }
+      if (nextIdx >= q.length) {
+        if (this.repeatMode() === 'all' || this.isPlaylistContext()) {
+          nextIdx = 0;
+          while (nextIdx < q.length && this.contentFilter.isBlocked(q[nextIdx])) {
+            nextIdx++;
+          }
+          if (nextIdx >= q.length) return;
+        } else if (this.isAutoplayEnabled()) {
+          this.handleTrackEnd();
+          return;
+        } else {
+          return;
+        }
       }
     }
     this.currentIndex.set(nextIdx);
@@ -854,7 +883,16 @@ export class PlayerService {
       return;
     }
     let prevIdx = this.currentIndex() - 1;
-    if (prevIdx < 0) prevIdx = this.repeatMode() === 'all' ? q.length - 1 : 0;
+    while (prevIdx >= 0 && this.contentFilter.isBlocked(q[prevIdx])) {
+      prevIdx--;
+    }
+    if (prevIdx < 0) {
+      prevIdx = this.repeatMode() === 'all' ? q.length - 1 : 0;
+      while (prevIdx >= 0 && this.contentFilter.isBlocked(q[prevIdx])) {
+        prevIdx--;
+      }
+    }
+    if (prevIdx < 0) return;
     this.currentIndex.set(prevIdx);
     this.playerState.set('loading');
     this.loadInPlayer(q[prevIdx].videoId);
@@ -864,13 +902,25 @@ export class PlayerService {
     this.triggerEngagement();
     const q = this.queue();
     if (index >= 0 && index < q.length) {
+      if (this.contentFilter.isBlocked(q[index])) {
+        this.toastService.show("This song has been blocked.", 'error');
+        return;
+      }
       this.currentIndex.set(index);
       this.playerState.set('loading');
       this.loadInPlayer(q[index].videoId);
     }
   }
 
-  addToQueue(track: Track): void { if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) { this.toastService.show("You cannot add music directly while listening in a room.", 'error'); return; }
+  addToQueue(track: Track): void {
+    if (this.isInRoom() && !this.roomService.isAdmin() && !this.isRemoteUpdate) {
+      this.toastService.show("You cannot add music directly while listening in a room.", 'error');
+      return;
+    }
+    if (this.contentFilter.isBlocked(track)) {
+      this.toastService.show("This song is blocked and cannot be added to queue.", 'error');
+      return;
+    }
     const q = this.queue();
     this.queue.set([...q, track]);
     if (q.length === 0) {
@@ -879,6 +929,10 @@ export class PlayerService {
   }
 
   addNext(track: Track): void {
+    if (this.contentFilter.isBlocked(track)) {
+      this.toastService.show("This song is blocked and cannot be added to queue.", 'error');
+      return;
+    }
     const q = this.queue();
     const curr = this.currentIndex();
     if (q.length === 0) {

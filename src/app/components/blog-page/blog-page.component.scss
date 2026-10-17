@@ -165,8 +165,7 @@
   .spotlight-bg {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
+    background: radial-gradient(circle at 80% 20%, rgba(var(--color-primary-rgb), 0.22) 0%, rgba(12, 12, 18, 0.98) 70%);
     transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
@@ -449,23 +448,35 @@
         }
 
         .card-body {
-          padding: 18px;
+          padding: 24px;
           display: flex;
           flex-direction: column;
           flex: 1;
-          gap: 10px;
+          gap: 12px;
 
           .card-meta-line {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.74rem;
+            justify-content: space-between;
+            font-size: 0.76rem;
             color: rgba(255, 255, 255, 0.5);
 
-            .meta-date {
-              display: inline-flex;
-              align-items: center;
-              gap: 4px;
+            .card-category-pill {
+              background: rgba(var(--color-primary-rgb), 0.12);
+              color: var(--color-primary);
+              border: 1px solid rgba(var(--color-primary-rgb), 0.25);
+              padding: 3px 10px;
+              border-radius: 6px;
+              font-size: 0.7rem;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 0.04em;
+            }
+
+            .meta-time {
+              font-size: 0.76rem;
+              font-weight: 600;
+              color: rgba(255, 255, 255, 0.5);
             }
           }
 
@@ -1111,8 +1122,8 @@
       blockquote {
         margin: 24px 0;
         padding: 16px 20px;
-        background: rgba(var(--color-primary-rgb), 0.06);
-        border-left: 4px solid var(--color-primary);
+        background: rgba(255, 255, 255, 0.03);
+        border-left: 4px solid rgba(255, 255, 255, 0.2);
         border-radius: 0 12px 12px 0;
         font-style: italic;
         color: rgba(255, 255, 255, 0.9);

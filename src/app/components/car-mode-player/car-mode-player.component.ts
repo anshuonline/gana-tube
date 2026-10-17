@@ -20,15 +20,12 @@ import {
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { AdsterraBannerComponent } from '../ads/adsterra-banner/adsterra-banner.component';
-import { ADSTERRA_TAGS } from '../ads/ads.config';
 
 @Component({
   selector: 'app-car-mode-player',
   standalone: true,
   imports: [
     CommonModule, 
-    AdsterraBannerComponent,
     FormsModule,
     LucideChevronDown, 
     LucidePlay, 
@@ -57,8 +54,6 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   private algorithmService = inject(AlgorithmService);
   private cdr = inject(ChangeDetectorRef);
 
-  readonly coverAdTag = ADSTERRA_TAGS.banner300x250;
-
   isListening = false;
   searchQuery = '';
   searchResults: YouTubeSearchResult[] = [];
@@ -70,9 +65,6 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
   activePanel = signal<'player' | 'queue' | 'search'>('player');
   queueFullScreen = signal<boolean>(false);
   searchFullScreen = signal<boolean>(false);
-  
-  showCoverAd = false;
-  private adTimers: any[] = [];
   
   private recognition: any;
 
@@ -123,37 +115,8 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      const track = this.playerService.currentTrack();
+      this.playerService.currentTrack();
       this.imageLoadError = false;
-      
-      // Manage Ad Timers
-      if (track) {
-        this.clearAdTimers();
-        this.showCoverAd = false;
-        
-        const loopAd = () => {
-          // Wait 5 seconds before showing ad
-          const t1 = setTimeout(() => {
-            if (this.isVisible) {
-              this.showCoverAd = true;
-              this.cdr.detectChanges();
-            }
-            
-            // Wait 5 seconds before hiding (total cycle = 10s)
-            const t2 = setTimeout(() => {
-              this.showCoverAd = false;
-              this.cdr.detectChanges();
-              
-              // Start next cycle
-              loopAd();
-            }, 5000);
-            this.adTimers.push(t2);
-          }, 5000);
-          this.adTimers.push(t1);
-        };
-        
-        loopAd();
-      }
     }, { allowSignalWrites: true });
   }
 
@@ -169,12 +132,6 @@ export class CarModePlayerComponent implements OnInit, OnDestroy {
     if (this.recognition) {
       this.recognition.stop();
     }
-    this.clearAdTimers();
-  }
-  
-  clearAdTimers(): void {
-    this.adTimers.forEach(t => clearTimeout(t));
-    this.adTimers = [];
   }
 
   setupSpeechRecognition() {

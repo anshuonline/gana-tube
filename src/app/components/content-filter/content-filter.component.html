@@ -1,0 +1,541 @@
+<div class="content-filter-root">
+
+  <!-- Admin Password Screen (GTAnalytics Style - Master Password Only) -->
+  <div class="content-filter-lock-screen" *ngIf="!isAuthenticated()">
+    <div class="lock-card">
+      <div class="brand-badge">
+        <img src="ganatube-logo.webp" alt="GanaTube" class="brand-logo" />
+        <span class="badge-text">Content Filter</span>
+      </div>
+
+      <h1 class="lock-title">Admin Access</h1>
+      <p class="lock-subtitle">Enter your master security key to manage blocked songs and content filters</p>
+
+      <div class="input-group">
+        <label for="adminFilterPwd">Master Password</label>
+        <input 
+          id="adminFilterPwd"
+          type="password" 
+          [ngModel]="adminPassword()" 
+          (ngModelChange)="adminPassword.set($event)"
+          (keyup.enter)="unlockWithPassword()"
+          placeholder="Enter master password..."
+          class="lock-input"
+          autocomplete="current-password"
+          autofocus
+        />
+      </div>
+
+      <button 
+        (click)="unlockWithPassword()" 
+        [disabled]="isVerifying() || !adminPassword().trim()"
+        class="btn-lock-submit">
+        <span *ngIf="!isVerifying()">Unlock Panel</span>
+        <span *ngIf="isVerifying()" class="loading-state">
+          <span class="spinner"></span> Verifying...
+        </span>
+      </button>
+
+      <div *ngIf="authError()" class="lock-error-banner">
+        <svg lucideAlertTriangle [attr.size]="16"></svg>
+        <span>{{ authError() }}</span>
+      </div>
+
+      <div class="lock-footer-action">
+        <button class="btn-return-home" (click)="navigateToMusic()">
+          <svg lucideArrowLeft [attr.size]="14"></svg>
+          <span>Return to GanaTube</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="isAuthenticated()">
+    <!-- Top Navigation Bar -->
+    <header class="cf-topbar">
+      <div class="topbar-brand" (click)="navigateToMusic()" role="button" tabindex="0">
+        <img src="ganatube-logo.webp" alt="GanaTube Logo" class="brand-logo" />
+        <div class="brand-text">
+          <div class="brand-title">
+            <span>GanaTube</span>
+            <span class="badge-filter">Content Filter</span>
+          </div>
+          <span class="brand-sub">Global Song Blacklist & Restrictions</span>
+        </div>
+      </div>
+
+      <div class="topbar-status">
+        <div class="status-pill active" title="Filter rules enforced across entire website">
+          <span class="status-dot"></span>
+          <span class="status-label">Active Protection Enforced</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="action-btn secondary" (click)="navigateToMusic()">
+          <svg lucideArrowLeft [attr.size]="16"></svg>
+          <span>Music Player</span>
+        </button>
+        <button class="action-btn outline" (click)="exportBlocklist()" title="Export Blocklist to JSON">
+          <svg lucideDownload [attr.size]="16"></svg>
+          <span>Export</span>
+        </button>
+        <button class="action-btn outline" (click)="triggerImportFile(fileInput)" title="Import Blocklist from JSON">
+          <svg lucideUpload [attr.size]="16"></svg>
+          <span>Import</span>
+        </button>
+        <button class="action-btn outline logout-btn" (click)="lockPanel()" title="Lock Content Filter Panel">
+          <svg lucideLock [attr.size]="15"></svg>
+          <span>Lock Panel</span>
+        </button>
+        <input #fileInput type="file" accept=".json" style="display: none" (change)="onFileSelected($event)" />
+      </div>
+    </header>
+
+  <!-- Main Canvas -->
+  <main class="cf-main">
+
+    <!-- KPI Metric Cards Grid -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap rose">
+          <svg lucideBan [attr.size]="22"></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ totalBlockedCount() }}</span>
+          <span class="kpi-label">Total Blocked Content</span>
+        </div>
+        <span class="kpi-sub">Completely hidden across site</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap purple">
+          <svg lucideMusic [attr.size]="22"></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ exactIdCount() }}</span>
+          <span class="kpi-label">Specific Video IDs</span>
+        </div>
+        <span class="kpi-sub">Exact track matches blocked</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap amber">
+          <svg lucideFilter [attr.size]="22"></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ keywordCount() }}</span>
+          <span class="kpi-label">Keyword & Artist Rules</span>
+        </div>
+        <span class="kpi-sub">Pattern-based filter rules</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap emerald">
+          <svg lucideShieldCheck [attr.size]="22"></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-value">Live Sync</span>
+          <span class="kpi-label">Cloud Enforcement</span>
+        </div>
+        <span class="kpi-sub">Synced with ManageAds DB</span>
+      </div>
+    </section>
+
+    <!-- Block Creator Section -->
+    <section class="creator-section">
+      <div class="creator-card">
+        <div class="creator-header">
+          <div class="creator-title-wrap">
+            <div class="header-icon-badge">
+              <svg lucideShieldAlert [attr.size]="20"></svg>
+            </div>
+            <div>
+              <h2 class="creator-title">Block Songs from GanaTube</h2>
+              <p class="creator-desc">Search and select any song or paste a YouTube ID to permanently hide it across Search, Feeds, Playlists & Player.</p>
+            </div>
+          </div>
+
+          <!-- Mode Tabs -->
+          <div class="tab-pills">
+            <button class="tab-pill" [class.active]="activeAddTab() === 'search'" (click)="activeAddTab.set('search')">
+              <svg lucideSearch [attr.size]="15"></svg>
+              <span>Search & Select</span>
+            </button>
+            <button class="tab-pill" [class.active]="activeAddTab() === 'direct'" (click)="activeAddTab.set('direct')">
+              <svg lucideExternalLink [attr.size]="15"></svg>
+              <span>Direct URL / ID</span>
+            </button>
+            <button class="tab-pill" [class.active]="activeAddTab() === 'keyword'" (click)="activeAddTab.set('keyword')">
+              <svg lucideSlidersHorizontal [attr.size]="15"></svg>
+              <span>Keyword / Artist</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Common Reason Selector -->
+        <div class="reason-selector-bar">
+          <span class="reason-label">
+            <svg lucideInfo [attr.size]="14"></svg>
+            Block Reason:
+          </span>
+          <div class="reason-chips">
+            <button 
+              type="button"
+              class="reason-chip" 
+              *ngFor="let reason of blockReasons" 
+              [class.active]="selectedReason() === reason"
+              (click)="selectedReason.set(reason)">
+              {{ reason }}
+            </button>
+          </div>
+          <input 
+            *ngIf="selectedReason() === 'Custom Administrative Block'"
+            type="text" 
+            class="custom-reason-input" 
+            placeholder="Enter custom block reason..."
+            [ngModel]="customReasonText()"
+            (ngModelChange)="customReasonText.set($event)" />
+        </div>
+
+        <!-- TAB 1: Search & Select (Strict Priority #1 YTMusic API) -->
+        <div class="tab-content" *ngIf="activeAddTab() === 'search'">
+          <form class="search-form" (ngSubmit)="onSearchSubmit()">
+            <div class="search-input-wrap">
+              <svg lucideSearch [attr.size]="18" class="search-icon"></svg>
+              <input 
+                type="text" 
+                class="cf-search-input" 
+                placeholder="Search any song by title or artist (e.g. Kesariya, Arijit Singh, Sidhu Moose Wala)..."
+                [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event)"
+                name="searchQuery" />
+              <button 
+                *ngIf="searchQuery()" 
+                type="button" 
+                class="clear-query-btn" 
+                (click)="searchQuery.set('')">
+                <svg lucideX [attr.size]="16"></svg>
+              </button>
+            </div>
+            <button type="submit" class="cf-submit-btn primary" [disabled]="isSearching() || !searchQuery().trim()">
+              <svg *ngIf="!isSearching()" lucideSearch [attr.size]="16"></svg>
+              <span *ngIf="isSearching()" class="spinner-sm"></span>
+              <span>{{ isSearching() ? 'Searching...' : 'Search Songs' }}</span>
+            </button>
+          </form>
+
+          <!-- Search Results Grid -->
+          <div class="search-results-area" *ngIf="searchResults().length > 0">
+            <div class="results-header">
+              <span class="results-count">{{ searchResults().length }} songs found. Select any song to block:</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="song-card" *ngFor="let track of searchResults()">
+                <div class="card-thumb-wrap">
+                  <img [src]="track.thumbnail" [alt]="track.title" class="card-thumb" loading="lazy" />
+                  <div class="thumb-overlay">
+                    <span class="video-id-badge">{{ track.videoId }}</span>
+                  </div>
+                </div>
+
+                <div class="card-meta">
+                  <h4 class="song-title" [title]="track.title">{{ track.title }}</h4>
+                  <p class="song-artist" [title]="track.channelTitle || track.artist">{{ track.channelTitle || track.artist }}</p>
+                </div>
+
+                <div class="card-actions">
+                  <button 
+                    *ngIf="!isSongBlocked(track.videoId)"
+                    type="button" 
+                    class="block-btn" 
+                    (click)="blockSearchResult(track)"
+                    title="Block this song everywhere">
+                    <svg lucideBan [attr.size]="15"></svg>
+                    <span>Block Song</span>
+                  </button>
+
+                  <div *ngIf="isSongBlocked(track.videoId)" class="already-blocked-wrap">
+                    <span class="blocked-badge">
+                      <svg lucideShieldCheck [attr.size]="14"></svg>
+                      Blocked
+                    </span>
+                    <button 
+                      type="button" 
+                      class="unblock-mini-btn" 
+                      (click)="unblockItem({ id: '', videoId: track.videoId, title: track.title, matchType: 'exact_id', blockedAt: 0 }, $event)"
+                      title="Unblock this song">
+                      Unblock
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-search-state" *ngIf="hasSearched() && searchResults().length === 0 && !isSearching()">
+            <svg lucideInfo [attr.size]="36"></svg>
+            <p>No songs found matching "{{ searchQuery() }}". Try a different song name or artist.</p>
+          </div>
+        </div>
+
+        <!-- TAB 2: Direct URL / ID -->
+        <div class="tab-content" *ngIf="activeAddTab() === 'direct'">
+          <div class="direct-form">
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label class="form-label">YouTube Video URL or Video ID <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  class="cf-text-input" 
+                  placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ or dQw4w9WgXcQ"
+                  [ngModel]="directInput()"
+                  (ngModelChange)="directInput.set($event)" />
+                <span class="form-help">Supports standard URLs, youtu.be, shorts, or raw 11-char video IDs</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Song Title (Optional)</label>
+                <input 
+                  type="text" 
+                  class="cf-text-input" 
+                  placeholder="e.g. Track Title for reference"
+                  [ngModel]="directTitle()"
+                  (ngModelChange)="directTitle.set($event)" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Artist / Channel (Optional)</label>
+                <input 
+                  type="text" 
+                  class="cf-text-input" 
+                  placeholder="e.g. Artist or Channel Name"
+                  [ngModel]="directArtist()"
+                  (ngModelChange)="directArtist.set($event)" />
+              </div>
+            </div>
+
+            <div class="form-submit-row">
+              <button 
+                type="button" 
+                class="cf-submit-btn primary" 
+                (click)="blockDirectSubmit()"
+                [disabled]="!directInput().trim()">
+                <svg lucideBan [attr.size]="16"></svg>
+                <span>Block Video ID Immediately</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Keyword / Artist Pattern -->
+        <div class="tab-content" *ngIf="activeAddTab() === 'keyword'">
+          <div class="keyword-form">
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label class="form-label">Pattern Phrase / Keyword <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  class="cf-text-input" 
+                  placeholder="e.g. Bad Artist Name, offensive word, or unwanted remix phrase..."
+                  [ngModel]="keywordInput()"
+                  (ngModelChange)="keywordInput.set($event)" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Rule Matching Type</label>
+                <select 
+                  class="cf-select-input"
+                  [ngModel]="keywordType()"
+                  (ngModelChange)="keywordType.set($event)">
+                  <option value="title_contains">Match Song Title (Contains phrase)</option>
+                  <option value="artist_match">Match Artist Name (All songs by artist)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-submit-row">
+              <button 
+                type="button" 
+                class="cf-submit-btn primary" 
+                (click)="blockKeywordSubmit()"
+                [disabled]="!keywordInput().trim()">
+                <svg lucideSlidersHorizontal [attr.size]="16"></svg>
+                <span>Add Filter Rule</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Active Blocklist Section -->
+    <section class="blocklist-section">
+      <div class="blocklist-card">
+        
+        <!-- Table Toolbar -->
+        <div class="blocklist-toolbar">
+          <div class="toolbar-title-wrap">
+            <h3 class="blocklist-title">Active Blocked Content</h3>
+            <span class="count-badge">{{ filteredBlocklist().length }} of {{ totalBlockedCount() }} active</span>
+          </div>
+
+          <div class="toolbar-controls">
+            <!-- Filter Pills -->
+            <div class="filter-pills">
+              <button class="filter-pill" [class.active]="blocklistFilterType() === 'all'" (click)="blocklistFilterType.set('all')">
+                All ({{ totalBlockedCount() }})
+              </button>
+              <button class="filter-pill" [class.active]="blocklistFilterType() === 'exact_id'" (click)="blocklistFilterType.set('exact_id')">
+                Video IDs ({{ exactIdCount() }})
+              </button>
+              <button class="filter-pill" [class.active]="blocklistFilterType() === 'title_contains' || blocklistFilterType() === 'artist_match'" (click)="blocklistFilterType.set('title_contains')">
+                Keywords ({{ keywordCount() }})
+              </button>
+            </div>
+
+            <!-- Search in blocklist -->
+            <div class="table-search-wrap">
+              <svg lucideSearch [attr.size]="15" class="table-search-icon"></svg>
+              <input 
+                type="text" 
+                class="table-search-input" 
+                placeholder="Search blocked songs..."
+                [ngModel]="blocklistQuery()"
+                (ngModelChange)="blocklistQuery.set($event)" />
+              <button *ngIf="blocklistQuery()" class="clear-table-search" (click)="blocklistQuery.set('')">
+                <svg lucideX [attr.size]="14"></svg>
+              </button>
+            </div>
+
+            <!-- Clear All Button (Strict Red Destructive Rule) -->
+            <button 
+              *ngIf="totalBlockedCount() > 0"
+              type="button" 
+              class="clear-all-btn destructive" 
+              (click)="showClearModal.set(true)">
+              <svg lucideTrash2 [attr.size]="15"></svg>
+              <span>Clear All</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Blocklist Grid / List -->
+        <div class="blocklist-items" *ngIf="filteredBlocklist().length > 0">
+          <div class="blocked-item-row" *ngFor="let item of filteredBlocklist()">
+            
+            <div class="item-visual">
+              <img 
+                *ngIf="item.thumbnail" 
+                [src]="item.thumbnail" 
+                [alt]="item.title" 
+                class="item-thumb" 
+                onerror="this.src='ganatube-logo.webp'" />
+              <div *ngIf="!item.thumbnail" class="item-thumb-placeholder">
+                <svg lucideSlidersHorizontal [attr.size]="20"></svg>
+              </div>
+            </div>
+
+            <div class="item-details">
+              <div class="item-title-line">
+                <h4 class="item-title" [title]="item.title">{{ item.title }}</h4>
+                
+                <span class="type-pill" [class.exact]="item.matchType === 'exact_id'" [class.kw]="item.matchType === 'title_contains' || item.matchType === 'artist_match'">
+                  {{ item.matchType === 'exact_id' ? 'Video ID' : (item.matchType === 'artist_match' ? 'Artist Rule' : 'Title Keyword') }}
+                </span>
+              </div>
+
+              <div class="item-sub-line">
+                <span class="item-artist" *ngIf="item.artist">{{ item.artist }}</span>
+                <span class="dot-sep" *ngIf="item.artist && item.videoId">•</span>
+                <span 
+                  *ngIf="item.videoId" 
+                  class="id-pill" 
+                  (click)="copyVideoId(item.videoId, $event)" 
+                  title="Click to copy Video ID">
+                  <code>{{ item.videoId }}</code>
+                  <svg *ngIf="copiedId() !== item.videoId" lucideCopy [attr.size]="12"></svg>
+                  <svg *ngIf="copiedId() === item.videoId" lucideCheck [attr.size]="12" class="copied-icon"></svg>
+                </span>
+                <span class="dot-sep">•</span>
+                <span class="item-date">Blocked: {{ formatDate(item.blockedAt) }}</span>
+              </div>
+
+              <div class="item-reason-line" *ngIf="item.reason">
+                <span class="reason-tag">
+                  <svg lucideShieldAlert [attr.size]="12"></svg>
+                  {{ item.reason }}
+                </span>
+              </div>
+            </div>
+
+            <div class="item-actions">
+              <a 
+                *ngIf="item.videoId" 
+                [href]="'https://www.youtube.com/watch?v=' + item.videoId" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="yt-link-btn" 
+                title="View on YouTube">
+                <svg lucideExternalLink [attr.size]="16"></svg>
+              </a>
+
+              <!-- Unblock Button (Strict Red Destructive Rule) -->
+              <button 
+                type="button" 
+                class="unblock-btn destructive" 
+                (click)="unblockItem(item, $event)"
+                title="Unblock this song and restore to site">
+                <svg lucideTrash2 [attr.size]="15"></svg>
+                <span>Unblock</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-blocklist" *ngIf="filteredBlocklist().length === 0">
+          <div class="empty-icon-ring">
+            <svg lucideShieldCheck [attr.size]="44"></svg>
+          </div>
+          <h4 class="empty-title">
+            {{ totalBlockedCount() === 0 ? 'No Blocked Content' : 'No items match your search filter' }}
+          </h4>
+          <p class="empty-desc">
+            {{ totalBlockedCount() === 0 ? 'Use the search bar above to select and block songs from appearing anywhere on GanaTube.' : 'Try adjusting your search query or switching filter tabs.' }}
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Clear All Confirmation Modal -->
+  <div class="cf-modal-overlay" *ngIf="showClearModal()" (click)="showClearModal.set(false)">
+    <div class="cf-modal" (click)="$event.stopPropagation()">
+      <div class="modal-icon-wrap red">
+        <svg lucideAlertTriangle [attr.size]="28"></svg>
+      </div>
+      <h3 class="modal-title">Clear All Blocked Content?</h3>
+      <p class="modal-desc">
+        Are you sure you want to remove all <strong>{{ totalBlockedCount() }}</strong> blocked songs and keyword rules? Once cleared, these songs will become visible and playable across GanaTube again.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn secondary" (click)="showClearModal.set(false)">
+          Cancel
+        </button>
+        <button type="button" class="modal-btn destructive" (click)="confirmClearAll()">
+          <svg lucideTrash2 [attr.size]="16"></svg>
+          <span>Yes, Clear All</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  </ng-container>
+
+</div>

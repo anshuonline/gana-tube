@@ -38,8 +38,6 @@ import { TrackMenuComponent } from '../../track-menu/track-menu.component';
 import { AppStateService } from '../../../services/app-state.service';
 import { GuestNameModalComponent } from '../guest-name-modal/guest-name-modal.component';
 import { RoomSwitchModalComponent } from '../room-switch-modal/room-switch-modal.component';
-import { AdsterraBannerComponent } from '../../ads/adsterra-banner/adsterra-banner.component';
-import { ADSTERRA_TAGS } from '../../ads/ads.config';
 
 @Component({
   selector: 'app-room-view',
@@ -47,7 +45,6 @@ import { ADSTERRA_TAGS } from '../../ads/ads.config';
   imports: [
     CommonModule, 
     FormsModule,
-    AdsterraBannerComponent,
     LucideUsers, 
     LucideLogOut,
     LucidePlay,
@@ -87,11 +84,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   private youtubeApi = inject(YoutubeApiService);
   private userService = inject(UserService);
   private algorithmService = inject(AlgorithmService);
-
-  readonly coverAdTag = ADSTERRA_TAGS.banner300x250;
-
-  showCoverAd = false;
-  private adTimers: any[] = [];
 
   @Output() openSaveToPlaylist = new EventEmitter<any>();
 
@@ -201,12 +193,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
       }
     }, { allowSignalWrites: true });
 
-    // Manage Cover Ad Timers (active when not in video mode)
-    effect(() => {
-      const track = this.playerService.currentTrack();
-      const isVideo = this.playerService.isVideoMode();
-      this.restartAdLoop();
-    }, { allowSignalWrites: true });
   }
 
   onGuestNameConfirmed(name: string) {
@@ -304,7 +290,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnDestroy() {
-    this.clearAdTimers();
     this.roomService.getSocket().off('room:error', this.errorHandler);
     if (this.likeSub) {
       this.likeSub.unsubscribe();
@@ -317,49 +302,6 @@ export class RoomViewComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
     if (this.playerService.isVideoMode()) {
       this.playerService.isVideoMode.set(false);
-    }
-    // Do NOT leave room on destroy — room persists while navigating
-  }
-
-  clearAdTimers(): void {
-    this.adTimers.forEach(t => clearTimeout(t));
-    this.adTimers = [];
-  }
-
-  restartAdLoop(): void {
-    this.clearAdTimers();
-    this.showCoverAd = false;
-    this.cdr.detectChanges();
-
-    const track = this.playerService.currentTrack();
-    const isVideo = this.playerService.isVideoMode();
-
-    if (track && !isVideo) {
-      const loopAd = () => {
-        // Wait 5 seconds before showing ad
-        const t1 = setTimeout(() => {
-          if (!this.playerService.isVideoMode()) {
-            this.showCoverAd = true;
-            this.cdr.detectChanges();
-          } else {
-            this.showCoverAd = false;
-            this.cdr.detectChanges();
-          }
-
-          // Wait 5 seconds before hiding (total cycle = 10s)
-          const t2 = setTimeout(() => {
-            this.showCoverAd = false;
-            this.cdr.detectChanges();
-
-            // Start next cycle
-            loopAd();
-          }, 5000);
-          this.adTimers.push(t2);
-        }, 5000);
-        this.adTimers.push(t1);
-      };
-
-      loopAd();
     }
   }
 

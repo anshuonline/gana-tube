@@ -14,13 +14,11 @@ import { takeUntil } from 'rxjs/operators';
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
 import { AppStateService } from '../../services/app-state.service';
-import { AdsterraBannerComponent } from '../ads/adsterra-banner/adsterra-banner.component';
-import { AdsterraTag, pickLeaderboardTag } from '../ads/ads.config';
 
 @Component({
   selector: 'app-playlist-page',
   standalone: true,
-  imports: [CommonModule, DragDropModule, TrackMenuComponent, AdsterraBannerComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles],
+  imports: [CommonModule, DragDropModule, TrackMenuComponent, LucidePlay, LucideArrowLeft, LucideShare2, LucideCheck, LucideHeart, LucideFolderPlus, LucideMoreVertical, LucideGripVertical, LucideShuffle, LucidePlus, LucideRefreshCw, LucideSparkles],
   templateUrl: './playlist-page.component.html',
   styleUrls: ['./playlist-page.component.scss']
 })
@@ -37,17 +35,6 @@ export class PlaylistPageComponent implements OnInit, OnChanges, OnDestroy {
   isLoadingMore = signal<boolean>(false);
   isLoading = signal<boolean>(true);
   isCopied = signal<boolean>(false);
-
-  // Hardcore in-feed ads between songs
-  viewportWidth = signal<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  playlistAdTag = computed<AdsterraTag>(() => pickLeaderboardTag(this.viewportWidth()));
-
-  @HostListener('window:resize')
-  onWindowResize(): void {
-    if (typeof window !== 'undefined') {
-      this.viewportWidth.set(window.innerWidth);
-    }
-  }
 
   // Suggested songs state
   suggestedSongs = signal<YouTubeSearchResult[]>([]);

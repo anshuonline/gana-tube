@@ -27,7 +27,7 @@
         <div class="cm-now-playing cm-mobile-now-playing">
           <!-- Album Art -->
           <div class="cm-artwork-wrapper">
-            <div class="cm-artwork" [class.ad-active]="showCoverAd">
+            <div class="cm-artwork">
               <img 
                 *ngIf="!imageLoadError"
                 [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatube-logo.webp'" 
@@ -37,12 +37,6 @@
               />
               <div *ngIf="imageLoadError" class="cm-artwork-fallback">
                 <span>GanaTube</span>
-              </div>
-              
-              <!-- Hardcore Ad Overlay (Ad ↔ Cover loop) -->
-              <div class="cm-ad-overlay" [class.active]="showCoverAd">
-                <app-adsterra-banner [tag]="coverAdTag"></app-adsterra-banner>
-                <span class="cm-ad-label">Ad</span>
               </div>
             </div>
           </div>
@@ -257,7 +251,7 @@
         <div class="cm-now-playing">
           <!-- Album Art -->
           <div class="cm-artwork-wrapper">
-            <div class="cm-artwork" [class.ad-active]="showCoverAd">
+            <div class="cm-artwork">
               <img 
                 *ngIf="!imageLoadError"
                 [src]="playerService.currentTrack()?.thumbnailHigh || playerService.currentTrack()?.thumbnail || 'ganatube-logo.webp'" 
@@ -267,12 +261,6 @@
               />
               <div *ngIf="imageLoadError" class="cm-artwork-fallback">
                 <span>GanaTube</span>
-              </div>
-              
-              <!-- Hardcore Ad Overlay (Ad ↔ Cover loop) -->
-              <div class="cm-ad-overlay" [class.active]="showCoverAd">
-                <app-adsterra-banner [tag]="coverAdTag"></app-adsterra-banner>
-                <span class="cm-ad-label">Ad</span>
               </div>
             </div>
           </div>

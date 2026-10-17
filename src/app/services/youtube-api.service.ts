@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, forkJoin, ReplaySubject } from 'rxjs';
 import { catchError, map, take, timeout } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { ContentFilterService } from './content-filter.service';
 
 export interface YouTubeSearchResult {
   videoId: string;
@@ -68,18 +69,22 @@ export class YoutubeApiService {
   private _appInitData: any = null;
   private _appInitLoaded = new ReplaySubject<any>(1);
   private _manageUrl = 'https://manageads.ganatube.in/managegt-api.php';
+  private contentFilter = inject(ContentFilterService);
 
   constructor(private http: HttpClient) {
     this.fetchLiveCuratedSongs();
     this.preloadAppInit();
   }
 
-  /** Preload all app settings (sections, playlists, header, popups) in ONE request */
+  /** Preload all app settings (sections, playlists, header, popups, blocked_content) in ONE request */
   private preloadAppInit() {
     this.http.get<any>(`${this._manageUrl}?action=app_init`).pipe(
       catchError(() => of(null))
     ).subscribe(data => {
       this._appInitData = data;
+      if (data?.blocked_content) {
+        this.contentFilter.initFromAppInit(data.blocked_content);
+      }
       this._appInitLoaded.next(data);
     });
   }
@@ -150,6 +155,7 @@ export class YoutubeApiService {
       .set('limit', limit.toString());
 
     return this.http.get<YouTubeSearchResult[]>(`${backendUrl}/trending`, { params }).pipe(
+      map(results => (results || []).filter((track: YouTubeSearchResult) => !this.isBanned(track))),
       catchError((err) => {
         console.warn('Backend trending server failed, falling back to search API:', err);
         return this.searchMusic(`Trending ${language} Songs`, limit);
@@ -176,7 +182,7 @@ export class YoutubeApiService {
           duration: song.duration ? Number(song.duration) : undefined,
           publishedAt: '',
           source: 'gt'
-        } as YouTubeSearchResult));
+        } as YouTubeSearchResult)).filter((track: YouTubeSearchResult) => !this.isBanned(track));
       }),
       catchError(err => {
         console.warn('Live trending failed, falling back to search API:', err);
@@ -185,9 +191,11 @@ export class YoutubeApiService {
     );
   }
 
-  private isBanned(item: any): boolean {
+  public isBanned(item: any): boolean {
+    if (!item) return false;
+    if (this.contentFilter.isBlocked(item)) return true;
     const title = (item.title || item.snippet?.title || '').toLowerCase();
-    const channel = (item.channelTitle || item.snippet?.channelTitle || '').toLowerCase();
+    const channel = (item.channelTitle || item.snippet?.channelTitle || item.artist || '').toLowerCase();
     const bannedKeywords = ['dj remix', 'non stop remix', 'bollywood dj', 'dj jitesh', 'dj dalal', 'remix dj'];
     
     return bannedKeywords.some(kw => title.includes(kw) || channel.includes(kw));
@@ -200,11 +208,13 @@ export class YoutubeApiService {
       try {
         const parsed = JSON.parse(cached);
         if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) { // 24 hours expiry
-          const upgraded = (parsed.data || []).map((t: YouTubeSearchResult) => ({
-            ...t,
-            thumbnail: getHighResThumbnail(t.thumbnailHigh || t.thumbnail),
-            thumbnailHigh: getHighResThumbnail(t.thumbnailHigh || t.thumbnail)
-          }));
+          const upgraded = (parsed.data || [])
+            .filter((t: YouTubeSearchResult) => !this.isBanned(t))
+            .map((t: YouTubeSearchResult) => ({
+              ...t,
+              thumbnail: getHighResThumbnail(t.thumbnailHigh || t.thumbnail),
+              thumbnailHigh: getHighResThumbnail(t.thumbnailHigh || t.thumbnail)
+            }));
           const shuffled = [...upgraded].sort(() => 0.5 - Math.random());
           return of(shuffled);
         }
@@ -276,11 +286,22 @@ export class YoutubeApiService {
         if (!res) return null;
         if (res.coverImage) res.coverImage = getHighResThumbnail(res.coverImage);
         if (res.preloadedSongs && Array.isArray(res.preloadedSongs)) {
-          res.preloadedSongs = res.preloadedSongs.map((s: any) => ({
-            ...s,
-            thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
-            thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
-          }));
+          res.preloadedSongs = res.preloadedSongs
+            .filter((s: any) => !this.isBanned(s))
+            .map((s: any) => ({
+              ...s,
+              thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
+              thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
+            }));
+        }
+        if (res.songs && Array.isArray(res.songs)) {
+          res.songs = res.songs
+            .filter((s: any) => !this.isBanned(s))
+            .map((s: any) => ({
+              ...s,
+              thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
+              thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
+            }));
         }
         return res;
       }),
@@ -299,11 +320,22 @@ export class YoutubeApiService {
         if (!res) return null;
         if (res.coverImage) res.coverImage = getHighResThumbnail(res.coverImage);
         if (res.preloadedSongs && Array.isArray(res.preloadedSongs)) {
-          res.preloadedSongs = res.preloadedSongs.map((s: any) => ({
-            ...s,
-            thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
-            thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
-          }));
+          res.preloadedSongs = res.preloadedSongs
+            .filter((s: any) => !this.isBanned(s))
+            .map((s: any) => ({
+              ...s,
+              thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
+              thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
+            }));
+        }
+        if (res.songs && Array.isArray(res.songs)) {
+          res.songs = res.songs
+            .filter((s: any) => !this.isBanned(s))
+            .map((s: any) => ({
+              ...s,
+              thumbnail: getHighResThumbnail(s.thumbnailHigh || s.thumbnail),
+              thumbnailHigh: getHighResThumbnail(s.thumbnailHigh || s.thumbnail)
+            }));
         }
         return res;
       }),

@@ -1,500 +1,654 @@
 export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
   'how-it-works': {
-    title: 'How It Works - The Complete Guide to GanaTube',
+    title: 'How It Works - Discover Music with GanaTube.in',
     html: `
       <div class="static-content-block">
-        <h2>Welcome to Your New Favorite Music Player</h2>
-        <p>GanaTube is designed to provide you with the most seamless, uninterrupted, and highest quality music streaming experience available for free. Whether you are commuting, working, driving, or just relaxing at home, our Progressive Web App (PWA) technology combined with smart algorithmic queuing ensures that the perfect soundtrack is always just a tap away.</p>
-        <p>This comprehensive guide will walk you through every aspect of GanaTube, ensuring you get the absolute most out of our platform.</p>
-        
-        <h3>Getting Started</h3>
-        <h4>1. Accessing GanaTube</h4>
-        <p>GanaTube is a Progressive Web App (PWA). This means you don't need to visit a traditional app store to download it. Simply navigate to <a href="https://ganatube.in" style="color: var(--color-primary);">ganatube.in</a> on any modern browser (Chrome, Safari, Edge, Firefox) on your mobile device, tablet, or desktop computer. The site is fully responsive and will adapt to your screen size instantly.</p>
-        
-        <h4>2. Installing the App (Optional but Recommended)</h4>
-        <p>For the best native-app-like experience, we highly recommend installing GanaTube.</p>
-        <ul class="feature-list">
-          <li><strong>On Android (Chrome):</strong> Tap the three dots menu in the top right corner and select "Install app" or "Add to Home screen".</li>
-          <li><strong>On iOS (Safari):</strong> Tap the Share button at the bottom of the screen and select "Add to Home Screen".</li>
-          <li><strong>On Desktop (Chrome/Edge):</strong> Look for the install icon (a small screen with a downward arrow) in the right side of your URL address bar.</li>
-        </ul>
-        <p>Once installed, GanaTube will launch as a standalone application without the browser interface, providing a more immersive experience.</p>
+        <h2>Discover Music with GanaTube.in</h2>
+        <p>GanaTube.in makes it easier to explore music, find tracks that match your taste, and enjoy a more convenient listening experience. Whether you already know what you want to hear or are looking for something new, our platform helps you navigate music through a simple and user-friendly interface.</p>
 
-        <h4>3. Creating an Account (Optional)</h4>
-        <p>GanaTube is 100% free and you can start listening immediately without signing up. However, utilizing the optional Secure Social Login unlocks essential features:</p>
-        <ul class="feature-list">
-          <li><strong>Cross-Device Sync:</strong> Your Liked Songs, custom playlists, and listening history will sync seamlessly across all your devices.</li>
-          <li><strong>Personalized Recommendations:</strong> Over time, the app learns your preferences to curate better discovery playlists.</li>
-        </ul>
-        <p>Simply click the "Login with Authentication Provider" button. We only request basic profile information and do not post on your behalf or access your personal data.</p>
+        <h3>01. Find Your Music</h3>
+        <p>Begin your journey by searching for a song, artist, album, or playlist. Enter a few words related to the music you have in mind and explore the available results. From familiar favorites to new musical interests, GanaTube.in helps you discover content that fits your preferences.</p>
 
-        <h3>Core Playback Features</h3>
-        <h4>The Player Interface</h4>
-        <p>The GanaTube player is built for maximum usability. At the bottom of your screen, you'll always find the mini-player. Tapping it expands it to the full-screen view. Here you'll find:</p>
-        <ul class="feature-list">
-          <li><strong>Standard Controls:</strong> Play, pause, skip forward, skip backward.</li>
-          <li><strong>Loop & Shuffle:</strong> Repeat a single track, repeat the queue, or shuffle your current list.</li>
-          <li><strong>Audio Quality Selector:</strong> Tap the settings gear to choose between Best or Smart modes depending on your internet connection.</li>
-          <li><strong>Lyrics (Where Available):</strong> Sing along with synchronized lyrics accessible directly from the player.</li>
-        </ul>
+        <h3>02. Browse and Discover</h3>
+        <p>Explore music beyond your initial search. Visit artist profiles, browse album collections, and discover playlists featuring different styles and genres. Navigate through the available selections to find new artists, revisit popular tracks, and expand your musical horizons.</p>
 
+        <h3>03. Enjoy a Seamless Listening Experience</h3>
+        <p>Choose a track and start listening through the available player. Use playback controls to navigate between songs and manage upcoming tracks according to your preferences. The responsive interface is designed to make music accessible across desktop and mobile devices, with playback capabilities depending on the supported music source and browser.</p>
 
+        <h3>04. Keep Your Favorites Organized</h3>
+        <p>Make your music experience more personal by saving tracks and creating playlists, where supported. Organize your selections around your favorite artists, genres, moods, or daily activities. These tools help you build collections that make returning to the music you enjoy more convenient.</p>
 
-        <h4>Smart Algorithmic Queuing (Auto-Play)</h4>
-        <p>Never run out of music. When your current song or playlist ends, GanaTube's intelligent engine takes over. It analyzes the metadata (genre, artist, language, tempo) of what you were just listening to and instantly generates an infinite queue of similar tracks. It's like having a personal DJ who knows exactly what vibe you're going for.</p>
+        <h3>05. Share the Experience</h3>
+        <p>Music is even better when shared. Explore available collaborative listening features to enjoy music with friends and exchange musical discoveries. Where synchronized listening rooms are supported, participants can join through a shared link and enjoy coordinated playback according to the room's available controls.</p>
 
-        <h3>Specialized Listening Modes</h3>
-        <h4>Car Mode</h4>
-        <p>Safety first! When driving, you shouldn't be squinting at a tiny screen. Activate Car Mode from the player menu. The interface transforms, stripping away distractions and presenting massive, easy-to-tap buttons for Play/Pause, Next, and Previous. The UI becomes high-contrast, perfect for quick glances.</p>
-        
-        <h4>Minimize Mode (Floating Mini Player)</h4>
-        <p>Want to browse the app while keeping an eye on what's playing? Minimize Mode shrinks the player down to a floating widget that you can drag around the screen while you search for new tracks, create playlists, or browse the discovery page.</p>
-
-
-
-        <h3>Discovery and Exploration</h3>
-        <h4>Language-Based Recommendations</h4>
-        <p>GanaTube is deeply integrated with Indian regional music. On the homepage, select your preferred languages (Hindi, Punjabi, Bhojpuri, Tamil, Telugu, English, etc.). The entire interface will dynamically update, presenting customized shelves, new releases, and curated playlists specific to those languages.</p>
-
-        <h4>Search with Advanced Filters</h4>
-        <p>Looking for something specific? Hit Ctrl+K (on desktop) or tap the search icon. Our robust search engine allows you to filter results by Songs, Albums, Playlists, or Artists, ensuring you find exactly what you need quickly.</p>
-
-        <h4>Shorts & Listen Together</h4>
-        <ul class="feature-list">
-          <li><strong>Shorts:</strong> A dedicated feed for short-form music discovery. Swipe vertically to sample new tracks quickly. If you hear something you like, tap to add it to your queue.</li>
-          <li><strong>Listen Together:</strong> Create a virtual room and share the link with friends. Anyone in the room can add songs to the collaborative queue, and the audio is synchronized for everyone. Perfect for remote parties or studying with friends.</li>
-        </ul>
+        <h3>Start Exploring GanaTube.in</h3>
+        <p>Your next favorite song could be just a search away. Explore the available music catalog, discover new sounds, and find a listening experience that suits your style.</p>
+        <div class="contact-card" style="text-align: center; margin-top: 24px;">
+          <p><a href="/search" style="font-weight: 600; font-size: 1.1rem; margin-right: 16px;">Explore Music</a> · <a href="/features" style="font-weight: 600; font-size: 1.1rem; margin-left: 16px;">Discover Our Features</a></p>
+        </div>
       </div>
     `
   },
   'features': {
-    title: 'GanaTube Features - The Ultimate Free Music Experience',
+    title: 'Platform Features - GanaTube.in',
     html: `
       <div class="static-content-block">
-        <h2>Everything You Need, Nothing You Don't.</h2>
-        <p>GanaTube is built with a singular focus: delivering a premium music listening experience without the premium price tag. Here is a comprehensive breakdown of the features that make GanaTube the best platform for your daily soundtrack.</p>
+        <h2>GanaTube.in Platform Features</h2>
+        <p>GanaTube.in brings together music exploration, personalized listening tools, and performance-focused web technology to create a convenient music experience. From discovering new tracks to managing playlists, each feature is designed to make navigation simpler and music more accessible.</p>
 
-        <h3>100% Free & Uninterrupted</h3>
-        <ul class="feature-list">
-          <li><strong>Zero Audio Ads:</strong> Unlike other free tiers that interrupt your vibe with jarring audio advertisements every three songs, GanaTube guarantees absolute zero audio ads between tracks. Period.</li>
-          <li><strong>No Paywalls or Subscriptions:</strong> Every feature listed on this page is available to every user. We don't hide high-quality audio behind a monthly fee.</li>
-        </ul>
+        <h3>Distraction-Free Listening</h3>
+        <p>Enjoy a cleaner listening interface designed to keep the focus on music. GanaTube.in aims to provide a streamlined playback experience with responsive controls and efficient loading, helping users navigate between tracks with minimal friction. Audio availability and playback behavior depend on the supported music source.</p>
 
-        <h3>Advanced Playback Capabilities</h3>
-        <ul class="feature-list">
+        <h3>Offline Access and Content Caching</h3>
+        <p>Browser caching helps improve loading efficiency and may make certain previously accessed resources available when connectivity is limited. Offline playback of complete music tracks depends on the availability of supported offline functionality and the permissions associated with the relevant content source.</p>
 
-          <li><strong>Smart Algorithmic Queuing:</strong> Our intelligent engine auto-generates infinite, perfectly tailored queues based on the track, artist, or genre you are currently enjoying. The music never has to stop.</li>
-          <li><strong>Car Mode:</strong> A simplified, high-contrast interface with massive buttons designed specifically for safe operation while driving.</li>
-          <li><strong>Minimize Mode:</strong> A floating mini-player that lets you navigate the app, search, and manage playlists without losing sight or control of the current track.</li>
-          <li><strong>Music Quality Selector:</strong> Optimize your data usage. Choose between Best Quality (for Wi-Fi and audiophiles), and Smart mode (perfect for poor network conditions or limited mobile data plans).</li>
-        </ul>
+        <h3>Shared Listening Experiences</h3>
+        <p>Discover music with friends through collaborative listening features, where available. Shared rooms can provide a convenient way to coordinate playback, exchange track suggestions, and enjoy music together, depending on the room's supported functionality.</p>
 
-        <h3>Seamless Integration & Technology</h3>
-        <ul class="feature-list">
-          <li><strong>Progressive Web App (PWA):</strong> Install GanaTube directly from your browser to your home screen or desktop. It behaves exactly like a native app, utilizing negligible storage space compared to traditional applications.</li>
+        <h3>Flexible Queue Controls</h3>
+        <p>Create a listening sequence that suits your preferences. Add tracks to the queue, adjust their order, remove selections, and navigate through upcoming music using the available player controls. These tools provide greater flexibility when managing a listening session.</p>
 
-          <li><strong>Keyboard Shortcuts:</strong> Power users on desktop can navigate effortlessly. Use Ctrl+K for instant search, Spacebar for Play/Pause, Arrow keys for track navigation, and more.</li>
-        </ul>
+        <h3>Efficient Media Loading</h3>
+        <p>A performance-conscious interface helps reduce unnecessary resource loading. Lightweight components and interaction-based media initialization, where implemented, can improve responsiveness and help limit avoidable data usage, particularly on mobile connections.</p>
 
-        <h3>Personalization & Social</h3>
-        <ul class="feature-list">
-          <li><strong>Language-Based dynamic UI:</strong> Select your preferred regional languages (Hindi, Punjabi, Tamil, Telugu, Bhojpuri, English, etc.) and watch the homepage transform with customized recommendations, trending tracks, and editorial playlists specific to your choices.</li>
-          <li><strong>Listen Together Rooms:</strong> Generate a unique room link, share it with friends, and enjoy synchronized, collaborative listening sessions. Anyone can add to the queue.</li>
-          <li><strong>Cross-Device Sync (Secure Social Login):</strong> Optionally log in with Authentication Provider to ensure your Liked Songs, custom created playlists, and listening history are instantly available on your phone, tablet, and PC.</li>
-          <li><strong>Curated Editorial Playlists:</strong> Expertly crafted playlists for every mood, activity, and genre, updated regularly.</li>
-          <li><strong>Advanced Search Filters:</strong> Don't just search; find. Filter your queries specifically by Artists, Albums, Songs, or Playlists to cut through the noise.</li>
-        </ul>
+        <h3>Personalized Music Organization</h3>
+        <p>Keep your preferred tracks organized with favorites and custom playlists, where supported. Local browser storage can retain selected settings and library information between sessions, depending on device and browser capabilities.</p>
 
-        <h3>Bonus Features</h3>
-        <ul class="feature-list">
-          <li><strong>Music Shorts Feed:</strong> Discover new music rapidly with a vertical scrolling feed of short, catchy audio snippets.</li>
-          <li><strong>Lucky Draw / Spin Wheel:</strong> Engage with the platform and spin the wheel for fun daily interactions and recommendations.</li>
-          <li><strong>AMOLED Dark Theme:</strong> A gorgeous, deep black interface that looks incredible, reduces eye strain in low light, and saves battery life on OLED screens.</li>
-        </ul>
+        <h3>Privacy-Conscious Design</h3>
+        <p>GanaTube.in aims to handle personal information responsibly and limit unnecessary data collection. Account information, if collected through supported sign-in options, is handled according to the platform's applicable privacy practices. For details about data handling, please consult our <a href="/privacy-policy">Privacy Policy</a>.</p>
+
+        <h3>Performance and Reliability</h3>
+        <p>We prioritize responsive page layouts, efficient resource utilization, and a consistent experience across supported devices. Performance optimization may include reducing unnecessary JavaScript execution, improving loading behavior, and evaluating key user-experience metrics such as Core Web Vitals.</p>
+        <p>Our objective is to make music discovery and navigation convenient for users across a range of devices and network conditions.</p>
+
+        <p style="margin-top: 32px; font-weight: 600; font-size: 1.15rem; color: #ffffff;">GanaTube.in — Discover music. Explore new sounds. Make every listening session your own.</p>
       </div>
     `
   },
   'faq': {
-    title: 'Frequently Asked Questions (FAQ)',
+    title: 'Frequently Asked Questions - GanaTube.in',
     html: `
       <div class="static-content-block">
-        <h2>We've Got Answers</h2>
-        <p>Find detailed answers to the most common questions about using GanaTube.</p>
+        <h2>Frequently Asked Questions</h2>
+        <p>Find answers to common questions about GanaTube.in, including music playback, browser storage, offline functionality, shared listening features, and user privacy. This section helps you understand how the platform works and what to expect while using its services.</p>
 
         <div class="faq-item">
-          <h3>1. Is GanaTube really 100% free?</h3>
-          <p>Yes. GanaTube is completely free to use. There are no premium subscriptions, no hidden fees, and absolutely no paywalls. Every feature is available to all users.</p>
+          <h3>Does GanaTube.in play audio advertisements?</h3>
+          <p>GanaTube.in aims to provide a music-focused listening experience without disruptive audio advertisements inserted into playback. Display advertising may be used on certain website pages to support platform operations. The availability and behavior of advertisements depend on the relevant page and service implementation.</p>
         </div>
 
         <div class="faq-item">
-          <h3>2. Are there really no audio ads between songs?</h3>
-          <p>Absolutely. We understand how jarring it is to have your music interrupted by loud advertisements. GanaTube relies on a different model (primarily visual display ads that do not interrupt playback) to keep the servers running, ensuring your listening experience is completely uninterrupted.</p>
+          <h3>Where are my favorites and listening preferences saved?</h3>
+          <p>Depending on the features you use, selected preferences, favorites, and playlist information may be retained using browser storage or other supported storage mechanisms. This can help preserve your settings between visits. Clearing browser data may remove locally stored information, and availability across different devices depends on whether account-based synchronization is implemented.</p>
         </div>
 
         <div class="faq-item">
-          <h3>3. Where does GanaTube get its music?</h3>
-          <p>GanaTube acts as a highly optimized, custom interface. We utilize official third-party APIs (primarily licensed third-party APIs) to source and stream audio content. We do not host, store, or distribute any copyrighted audio files on our own servers. We simply provide a superior player experience for publicly available streams.</p>
-        </div>
-
-
-
-        <div class="faq-item">
-          <h3>6. Do I need to create an account?</h3>
-          <p>No, an account is entirely optional. You can use almost all features anonymously. However, if you want your Liked Songs and custom playlists to sync between your phone and your computer, you will need to log in using the optional Secure Social Login.</p>
+          <h3>Can I listen to music without an internet connection?</h3>
+          <p>Offline access depends on the content source and the functionality supported by GanaTube.in. Browser caching may retain certain website resources for faster loading, but this does not necessarily mean complete music tracks are available offline. Full offline playback requires an implemented caching mechanism and permission to store and play the relevant audio content.</p>
         </div>
 
         <div class="faq-item">
-          <h3>7. What is the "Smart Algorithmic Queue"?</h3>
-          <p>It's our auto-play feature. When your selected song or playlist ends, our system analyzes the genre, artist, and mood of what you were just listening to and automatically lines up similar tracks, creating an endless, personalized radio station so you never have to manually pick the next song.</p>
+          <h3>How do shared listening rooms work?</h3>
+          <p>Where available, shared listening rooms allow users to coordinate music playback through a common room or shared link. Depending on the implemented features, a host may manage playback while other participants follow the session. Synchronization accuracy and available controls depend on network conditions, the playback source, and the room's technical implementation.</p>
         </div>
 
         <div class="faq-item">
-          <h3>8. How do I install GanaTube as an App (PWA)?</h3>
-          <p>On Android (Chrome), tap the three dots in the top right and select "Install app". On iOS (Safari), tap the Share icon at the bottom and select "Add to Home Screen". On desktop browsers, click the install icon in the address bar.</p>
+          <h3>How can I report an issue or recommend an improvement?</h3>
+          <p>We welcome suggestions, technical feedback, and reports of problems that affect your experience. To contact the GanaTube.in team, email <a href="mailto:support@ganatube.in">support@ganatube.in</a> or visit our <a href="/contact">Contact Page</a>. Please include a brief description of the issue and the device or browser involved when relevant.</p>
         </div>
 
         <div class="faq-item">
-          <h3>9. How do I use Car Mode?</h3>
-          <p>When a song is playing, expand the player to full screen and look for the car icon in the controls menu. Tapping it switches the interface to large, high-contrast buttons designed for easy tapping while driving.</p>
+          <h3>Why is a music or video preview unavailable?</h3>
+          <p>Playback or preview problems can occur because of network interruptions, browser compatibility, regional restrictions, or limitations imposed by the content provider. Try refreshing the page, checking your internet connection, or opening the content again after a short interval. Some tracks may be unavailable in certain locations or may no longer be accessible through their original source.</p>
         </div>
 
         <div class="faq-item">
-          <h3>10. Can I listen with my friends simultaneously?</h3>
-          <p>Yes! Use our "Listen Together" feature. Create a room, share the generated link with your friends, and anyone who joins can add songs to a shared queue that plays synchronously for everyone in the room.</p>
+          <h3>How does GanaTube.in protect my personal information?</h3>
+          <p>We aim to handle personal information responsibly and collect only the information necessary for the platform's supported functions. If Google Sign-In is available, basic account information may be processed for authentication. Personal information is handled according to our applicable data practices and privacy commitments.</p>
+          <p style="margin-top: 10px;">For details about the information we collect, how it is used, and the choices available to you, please read our <a href="/privacy-policy">Privacy Policy</a>.</p>
         </div>
 
-        <div class="faq-item">
-          <h3>11. How can I save cellular data while streaming?</h3>
-          <p>Open the player settings (gear icon) and change the Music Quality to "Smart". This streams the audio at a lower bitrate, consuming significantly less mobile data.</p>
-        </div>
-
-
-
-        <div class="faq-item">
-          <h3>13. Is GanaTube available on iOS/iPhone?</h3>
-          <p>Yes, but as a web app. Apple does not allow apps like ours in the App Store, but you can get the exact same experience by opening Safari, going to ganatube.in, and selecting "Add to Home Screen".</p>
-        </div>
-
-        <div class="faq-item">
-          <h3>14. How do I change the language of the songs recommended to me?</h3>
-          <p>On the homepage or in settings, look for the Language preferences. You can select multiple languages (e.g., Hindi, Punjabi, English). The homepage shelves and algorithmic recommendations will instantly adjust to prioritize content in those languages.</p>
-        </div>
-
-        <div class="faq-item">
-          <h3>15. Are there keyboard shortcuts for desktop users?</h3>
-          <p>Yes. Press <code>Ctrl + K</code> to instantly focus the search bar. Use the <code>Spacebar</code> to play/pause, and use the Left/Right arrow keys to skip tracks.</p>
-        </div>
-
-        <div class="faq-item">
-          <h3>16. What is the Music Shorts feature?</h3>
-          <p>It's a vertical feed (similar to TikTok or Reels) specifically for discovering new music quickly. Swipe up to hear the best 15-30 second snippet of a trending song. If you like it, tap to play the full version or add it to your library.</p>
-        </div>
-
-        <div class="faq-item">
-          <h3>17. How do I report a bug or suggest a feature?</h3>
-          <p>We love feedback! Please email us directly at <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a>.</p>
-        </div>
-
-        <div class="faq-item">
-          <h3>18. Is GanaTube legal?</h3>
-          <p>Yes. GanaTube operates purely as an API client interface. We do not host any copyrighted material. We simply embed and stream content made publicly available by third-party platforms via their official APIs, adhering to their terms of service regarding embedding.</p>
+        <div class="contact-card" style="margin-top: 32px;">
+          <h3>Still have questions?</h3>
+          <p>Contact us at <a href="mailto:support@ganatube.in">support@ganatube.in</a> or visit our <a href="/contact">Contact Page</a> for assistance.</p>
         </div>
       </div>
     `
   },
   'about': {
-    title: 'About GanaTube - Our Story & Mission',
+    title: 'About GanaTube.in - Music Discovery Platform',
     html: `
       <div class="static-content-block">
-        <h2>The Story of GanaTube</h2>
-        <p>Music is a universal right, a constant companion, and the soundtrack to our lives. Yet, the modern landscape of music streaming has become increasingly fragmented, expensive, and hostile to the user experience. Between exorbitant monthly subscription fees, aggressive paywalls blocking basic features, and jarring audio advertisements that ruin the vibe every three songs, simply listening to your favorite tunes has become a chore.</p>
-        <p>GanaTube was born out of a deep frustration with this status quo. We asked ourselves a simple question: <strong>Why can't there be a premium, feature-rich music streaming experience that respects the user and is genuinely free?</strong></p>
-        <p>Our journey began with a small team of developers and music lovers who believed that technology could provide a better way. We decided to leverage the power of the modern web—specifically Progressive Web App (PWA) architecture—and powerful third-party APIs to build a custom player. We weren't trying to build a new record label; we were building a better, more humane lens through which to experience the music that was already out there.</p>
+        <h2>About GanaTube.in</h2>
+        <p>GanaTube.in is a music discovery and listening platform designed to make exploring music simple, accessible, and seamless. Our focus is on delivering an intuitive listening experience through efficient music search, convenient playlist management, streamlined playback controls, and a privacy-conscious approach to technology.</p>
 
         <h3>Our Mission</h3>
-        <p><strong>To democratize access to a premium music listening experience for everyone, regardless of their ability to pay.</strong></p>
-        <p>We believe that an uninterrupted listening experience without screaming audio ads is a baseline requirement, not a premium perk. We are committed to maintaining a platform where the barriers to entry are nonexistent.</p>
+        <p>At GanaTube.in, we believe discovering and enjoying music should be straightforward, enjoyable, and free from unnecessary distractions. We prioritize usability, responsive performance, and intuitive navigation to help listeners find the music they love with minimal effort.</p>
+        <p>What began as an initiative to build a fast, browser-based music platform has evolved into a comprehensive music discovery experience. GanaTube.in brings together music search, artist and album exploration, playlist tools, synchronized listening rooms, and features designed to make music discovery more convenient across desktop and mobile devices.</p>
 
-        <h3>Our Vision for the Future</h3>
-        <p>We are constantly iterating and improving. Our vision for GanaTube is to become the definitive unified music platform for the Indian subcontinent and beyond. We are heavily focused on localization, ensuring that whether you listen to Bhojpuri folk, Punjabi hip-hop, Tamil cinema tracks, or global pop, GanaTube feels custom-tailored to your cultural context.</p>
+        <h3>What We Offer</h3>
+        <h4>Music Discovery and Search</h4>
+        <p>Explore a broad selection of music through search and discovery tools designed to help you find songs, artists, albums, and playlists. Discover music across different genres, moods, eras, and listening preferences, along with regularly updated selections of trending tracks and new releases.</p>
 
-        <h3>Our Core Values</h3>
-        <ul class="feature-list">
-          <li><strong>User-Centric Design:</strong> Every feature, from Car Mode to the floating mini-player, is designed to solve a real problem and stay out of your way.</li>
-          <li><strong>Zero Interruption:</strong> We commit to never placing audio advertisements between your songs. The music must flow.</li>
-          <li><strong>Technological Elegance:</strong> We rely on cutting-edge web technologies (PWA, IndexedDB, dynamic caching) to deliver native-app performance without the bloat of traditional app stores.</li>
-          <li><strong>Cultural Relevance:</strong> We understand the massive diversity in musical taste, particularly in India. Our algorithms and curation are deeply tied to language and regional preferences.</li>
-        </ul>
+        <h4>Playlists and Playback Controls</h4>
+        <p>Organize your listening experience with personalized playlists, saved favorites, and flexible queue management. GanaTube.in provides convenient tools for organizing music and retaining selected preferences across sessions, where supported by your browser and device.</p>
 
-        <h3>The Tech Behind the Magic</h3>
-        <p>GanaTube does not operate massive server farms hosting petabytes of copyrighted MP3s. Instead, we are an incredibly lightweight, lightning-fast client built with Angular. We utilize public APIs (primarily licensed third-party APIs) to dynamically fetch and stream audio data on the fly. By acting as a sophisticated, beautifully designed wrapper around existing public infrastructure, we keep our operating costs low, which allows us to pass the savings (100% free usage) entirely to you.</p>
+        <h4>Synchronized Listening Rooms</h4>
+        <p>Enjoy music together through synchronized listening rooms. Create a private room, share its link with friends, and experience coordinated playback with real-time controls, subject to feature availability and playback-source limitations.</p>
 
-        <p>Join us on this journey. Install the app, build your playlists, and let the music play.</p>
+        <h4>Music Guides and Editorial Content</h4>
+        <p>Discover original articles, music exploration guides, playlist recommendations, genre introductions, and practical listening tips published by the GanaTube.in team. Our editorial content is designed to help users explore different musical styles, discover artists, and make more informed listening choices.</p>
+
+        <h3>Our Commitment to Privacy</h3>
+        <p>We recognize the importance of protecting user privacy. GanaTube.in aims to limit data collection to information reasonably necessary to provide and maintain its services. Where Google sign-in is available, this may include basic account information, such as your name and email address.</p>
+        <p>We do not sell personal information to third parties or build behavioral profiles for advertising purposes. Where technically feasible, preferences and listening-related settings may be stored locally on your device to improve convenience and reduce unnecessary data transmission.</p>
+        <p>Our data practices are subject to the applicable features, service providers, and technologies used by the platform. For complete information about data collection, usage, and your rights, please review our <a href="/privacy-policy">Privacy Policy</a> and <a href="/terms-of-service">Terms of Service</a>.</p>
+
+        <h3>Technology and Performance</h3>
+        <p>GanaTube.in is developed using modern web technologies, with progressive web application capabilities and service-worker-based caching where supported. Our technical approach emphasizes responsive interfaces, efficient resource loading, and a smooth experience across a range of devices and network conditions.</p>
+        <p>We also work to make our editorial content accessible to search engines through appropriate page rendering and indexing practices. Regional discovery features and bandwidth-conscious loading help support a more accessible experience for listeners with different preferences and connectivity conditions.</p>
+        <p>Playback availability, offline functionality, and supported features may depend on the browser, device, network, and underlying music source.</p>
+
+        <h3>Get in Touch</h3>
+        <p>We value feedback from our users and welcome questions, feature suggestions, bug reports, and partnership inquiries. Your feedback helps us identify opportunities to improve the platform and deliver a more reliable music discovery experience.</p>
+        <div class="contact-card">
+          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+          <p>You can also visit our <a href="/contact">Contact Page</a> for further assistance.</p>
+        </div>
+        <p style="margin-top: 24px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.5);">© 2025 GanaTube.in. All rights reserved.</p>
       </div>
     `
   },
   'privacy-policy': {
-    title: 'Privacy Policy',
+    title: 'Privacy Policy | GanaTube.in',
     html: `
       <div class="static-content-block">
         <h2>Privacy Policy</h2>
-        <p><strong>Effective Date:</strong> September 11, 2026<br>
-        <strong>Last Updated:</strong> September 11, 2026</p>
+        <p><strong>Effective Date:</strong> 06/04/2025<br>
+        <strong>Last Updated:</strong> 06/04/2025</p>
 
-        <p>Welcome to GanaTube ("we", "our", "us"). We respect your privacy and are committed to protecting the personal information you share with us. This comprehensive Privacy Policy outlines our practices regarding the collection, use, processing, and disclosure of your information when you use our website, mobile application, and related services (collectively, the "Service").</p>
-        <p>By accessing or using GanaTube, you agree to the terms outlined in this policy. If you do not agree with these terms, please refrain from using our Service.</p>
+        <p>At GanaTube.in, we take your privacy seriously. Please read this Privacy Policy to learn how we treat your personal data. By using or accessing our Services in any manner, you acknowledge that you accept the practices and policies outlined below, and you hereby consent that we will collect, use and share your information as described in this Privacy Policy.</p>
+        <p>Remember that your use of GanaTube.in's Services is at all times subject to our <a href="/terms-of-service">Terms of Service</a>, which incorporates this Privacy Policy. Any terms we use in this Policy without defining them have the definitions given to them in the Terms of Service.</p>
 
-        <h3>1. Information We Collect</h3>
-        <p>GanaTube is designed to function with minimal data collection. You can use the vast majority of our features without creating an account or providing any personally identifiable information (PII).</p>
+        <h3>What this Privacy Policy Covers</h3>
+        <p>This Privacy Policy covers how we treat Personal Data that we gather when you access or use our Services. "Personal Data" means any information that identifies or relates to a particular individual and also includes information referred to as "personally identifiable information" or "personal information" under applicable data privacy laws, rules or regulations. This Privacy Policy does not cover the practices of companies we don't own or control or people we don't manage.</p>
 
-        <h4>1.1 Information Provided by You</h4>
+        <h3>Personal Data We Collect</h3>
+        <h4>Information You Provide to Us</h4>
         <ul class="feature-list">
-          <li><strong>Account Information (Optional):</strong> If you choose to log in using our Secure Single Sign-On (SSO) integration, we receive basic profile information provided by Authentication Provider. This includes your name, email address, and profile picture. We use this strictly to authenticate you and sync your library across devices. We do not have access to your Authentication Provider password.</li>
-          <li><strong>Communications:</strong> If you contact us directly via support@ganatube.in, we will collect your email address, the contents of your message, and any attachments you provide.</li>
+          <li><strong>Account Information:</strong> When you sign in using Google authentication, we collect only your email address and name. We do not access, store, or collect any other information from your Google account.</li>
+          <li><strong>User Content:</strong> We collect information you provide when you create playlists, save favorites, leave feedback, or interact with our Services.</li>
+          <li><strong>Usage Data:</strong> We automatically collect information about how you interact with our Services, including songs you listen to, playlists you create, and features you use.</li>
         </ul>
 
-        <h4>1.2 Information Collected Automatically</h4>
+        <h4>Information Collected Automatically</h4>
         <ul class="feature-list">
-          <li><strong>Usage Data:</strong> We automatically collect information regarding how you interact with the Service. This includes your search queries, the songs and playlists you listen to, the features you use (e.g., Car Mode), and your language preferences. This data is essential for our smart algorithmic queuing and recommendation systems.</li>
-          <li><strong>Device and Connection Information:</strong> We collect hardware models, operating system versions, browser types, and IP addresses. This helps us optimize the Service for different devices and diagnose technical issues.</li>
+          <li><strong>Device Information:</strong> We collect information about the device you use to access our Services, including device type, operating system, and browser type.</li>
+          <li><strong>Usage Information:</strong> We collect information about your interactions with our Services, such as pages visited, features used, and time spent on the platform.</li>
+          <li><strong>Log Data:</strong> When you use our Services, we automatically collect and store certain information in our server logs, including your IP address, access times, and pages viewed.</li>
         </ul>
 
-        <h3>2. How We Use Your Information</h3>
-        <p>We use the collected information for the following specific purposes:</p>
+        <h4>Local Storage and Cookies</h4>
+        <p>We use browser local storage to improve your experience and provide browser preference storage. This includes:</p>
         <ul class="feature-list">
-          <li><strong>To Provide and Maintain the Service:</strong> Ensuring audio streams seamlessly, and syncing your playlists across devices (if logged in).</li>
-          <li><strong>To Personalize Your Experience:</strong> Using your listening history and language preferences to power the "Smart Algorithmic Queue" and generate relevant homepage recommendations.</li>
-          <li><strong>To Improve our Platform:</strong> Analyzing aggregated, anonymized usage data to understand which features are popular, identify bugs, and plan future developments.</li>
-          <li><strong>To Communicate with You:</strong> Responding to your support requests, inquiries, or feedback submitted to support@ganatube.in.</li>
+          <li>Your favorite songs and playlists</li>
+          <li>Your audio quality preferences</li>
+          <li>Your recent listening history</li>
+          <li>Saved preferences and playback context</li>
+          <li>User preferences and settings</li>
         </ul>
 
-        <h3>3. Data Sharing and Disclosure</h3>
-        <p><strong>We do not sell, rent, or trade your personal information to third parties.</strong> We only share information in the following limited circumstances:</p>
+        <h3>How We Use Your Personal Data</h3>
+        <p>We use the Personal Data we collect to:</p>
         <ul class="feature-list">
-          <li><strong>Advertising Partners (Authentication Provider AdSense):</strong> We partner with Authentication Provider AdSense to display visual advertisements. Third-party vendors, including Authentication Provider, use cookies to serve ads based on a user's prior visits to our website or other websites. You may opt out of personalized advertising at any time by visiting <a href="https://adssettings.Authentication Provider.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Authentication Provider Ads Settings</a>.</li>
-          <li><strong>Service Providers:</strong> We may employ third-party companies (e.g., cloud hosting providers, analytics services) to facilitate our Service. These third parties have access to your Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</li>
-          <li><strong>API Partners:</strong> GanaTube utilizes licensed third-party APIs to power its search and streaming experience. By using our Service, you acknowledge and agree that your data is accessed and processed in accordance with the <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Privacy Policies of our Content Providers</a> and the <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Terms of Service of our Content Providers</a>.</li>
-          <li><strong>Legal Requirements:</strong> We may disclose your information if required to do so by law or in response to valid requests by public authorities (e.g., a court or a government agency).</li>
+          <li>Provide, maintain, and improve our Services, including personalized music recommendations</li>
+          <li>Authenticate your identity when you sign in using Google</li>
+          <li>Save and sync your favorites, playlists, and preferences across devices</li>
+          <li>Enable features like room sessions, local preferences, and collaborative playlists</li>
+          <li>Respond to your inquiries and provide customer support</li>
+          <li>Send you updates about our Services (you can opt out at any time)</li>
+          <li>Detect, prevent, and address technical issues and security threats</li>
+          <li>Analyze usage patterns to improve our Services and develop new features</li>
         </ul>
 
-        <h3>4. Your Data Protection Rights (GDPR / CCPA)</h3>
-        <p>We respect your right to control your personal data. Depending on your jurisdiction, you may have the right to:</p>
+        <h3>Google Sign-In Authentication</h3>
+        <p>When you choose to sign in using Google, we use Google's OAuth 2.0 authentication service. Through this process:</p>
         <ul class="feature-list">
-          <li><strong>Access & Portability:</strong> Request a copy of the personal information we hold about you.</li>
-          <li><strong>Rectification & Deletion:</strong> Request that we correct inaccuracies or completely delete your account data and saved playlists.</li>
-          <li><strong>Opt-Out of Personalized Ads:</strong> Manage your ad preferences via <a href="https://adssettings.Authentication Provider.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Authentication Provider Ads Settings</a>.</li>
+          <li>We only request and receive your email address and name from Google</li>
+          <li>We do not access, store, or collect any other information from your Google account</li>
+          <li>We do not have access to your Google account password</li>
+          <li>Google's use of your information is governed by Google's Privacy Policy. We encourage you to review their privacy practices.</li>
+          <li>You can revoke our access to your Google account at any time through your Google account settings</li>
         </ul>
-        <p>To exercise any of these rights, please email us directly at <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a>.</p>
 
-        <h3>5. Data Security</h3>
-        <p>We prioritize the security of your data. GanaTube enforces HTTPS encryption for all data transmitted between your device and our servers. However, please remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+        <h3>How We Share Your Personal Data</h3>
+        <p>We do not sell your Personal Data. We may share your information in the following circumstances:</p>
+        <ul class="feature-list">
+          <li><strong>Service Providers:</strong> We may share your data with third-party service providers who perform services on our behalf, such as hosting, analytics, and customer support. These providers are bound by contractual obligations to keep your data confidential.</li>
+          <li><strong>Legal Requirements:</strong> We may disclose your information if required by law, regulation, legal process, or governmental request.</li>
+          <li><strong>Protection of Rights:</strong> We may share information to protect our rights, privacy, safety, or property, or that of our users or others.</li>
+          <li><strong>Business Transfers:</strong> If we are involved in a merger, acquisition, or sale of assets, your information may be transferred as part of that transaction.</li>
+          <li><strong>With Your Consent:</strong> We may share your information with your explicit consent or at your direction.</li>
+        </ul>
 
-        <h3>6. Third-Party Links and Content</h3>
-        <p>Our Service may contain links to other sites or serve content hosted by third parties that are not operated by us. If you click on a third-party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</p>
+        <h3>Data Security</h3>
+        <p>We implement appropriate technical and organizational measures to protect your Personal Data against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee absolute security.</p>
 
-        <h3>7. Children's Privacy</h3>
-        <p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If you are a parent or guardian and you are aware that your child has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.</p>
+        <h3>Data Retention</h3>
+        <p>We retain your Personal Data for as long as your account is active or as needed to provide you with our Services. We may retain certain information after you close your account if retention is necessary to comply with legal obligations, resolve disputes, or enforce our agreements.</p>
 
-        <h3>8. Changes to This Privacy Policy</h3>
-        <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Effective Date" at the top. You are advised to review this Privacy Policy periodically for any changes.</p>
+        <h3>Your Rights and Choices</h3>
+        <h4>Access and Update Your Information</h4>
+        <p>You can access and update your account information through your profile settings on our platform.</p>
 
-        <h3>9. Contact Us</h3>
-        <p>If you have any questions about this Privacy Policy, the data we hold on you, or you would like to exercise one of your data protection rights, please do not hesitate to contact us at: <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a></p>
+        <h4>Delete Your Account</h4>
+        <p>You can request to delete your account at any time by contacting us. When you delete your account, we will delete your Personal Data, subject to certain exceptions where we are required to retain information by law.</p>
+
+        <h4>Local Storage Management</h4>
+        <p>You can clear your local storage data at any time through your browser settings. Note that clearing local storage will remove your cached preferences, and locally stored playlists.</p>
+
+        <h4>Opt-Out of Communications</h4>
+        <p>You can opt-out of receiving promotional communications from us by following the unsubscribe instructions in those communications or by contacting us directly.</p>
+
+        <h3>Children's Privacy</h3>
+        <p>Our Services are not directed to individuals under the age of 13. We do not knowingly collect Personal Data from children under 13. If you believe we have collected information from a child under 13, please contact us immediately, and we will take steps to delete such information.</p>
+
+        <h3>Third-Party Services</h3>
+        <p>Our Services may contain links to third-party websites or services. We are not responsible for the privacy practices of these third parties. We encourage you to read their privacy policies.</p>
+        <p>We use third-party services to provide our music streaming functionality. These services may have their own privacy policies, and we encourage you to review them.</p>
+
+        <h3>Advertising and Cookies</h3>
+        <p>GanaTube.in may display ads provided by Google AdSense. Google may use cookies (including the DoubleClick cookie) to serve ads based on your prior visits to this and other websites. You can opt out of personalized advertising by visiting Google Ads Settings at <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">https://adssettings.google.com</a>. You can also learn more about how Google uses cookies for ads at <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">https://policies.google.com/technologies/ads</a>.</p>
+        <p>Our <a href="/cookie-policy">Cookie Policy</a> explains how you can control cookies and local storage in your browser. Disabling certain cookies may affect ad relevance but should not impact core playback functionality.</p>
+
+        <h3>International Data Transfers</h3>
+        <p>Your information may be transferred to and processed in countries other than your country of residence. These countries may have data protection laws that differ from those in your country. By using our Services, you consent to the transfer of your information to these countries.</p>
+
+        <h3>Changes to This Privacy Policy</h3>
+        <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Effective date" at the top of this Privacy Policy. You are advised to review this Privacy Policy periodically for any changes.</p>
+
+        <h3>Contact Us</h3>
+        <p>If you have any questions about this Privacy Policy or our privacy practices, please contact us:</p>
+        <div class="contact-card">
+          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+          <p><strong>Website:</strong> <a href="https://ganatube.in">https://ganatube.in</a></p>
+        </div>
+        <p style="margin-top: 16px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.7);">By using GanaTube.in, you acknowledge that you have read and understood this Privacy Policy and agree to the collection and use of your information as described herein.</p>
       </div>
     `
   },
   'terms-of-service': {
-    title: 'Terms of Service',
+    title: 'Terms of Service | GanaTube.in',
     html: `
       <div class="static-content-block">
         <h2>Terms of Service</h2>
-        <p><strong>Effective Date:</strong> September 11, 2026</p>
+        <p><strong>Effective Date:</strong> 06/04/2025<br>
+        <strong>Last Updated:</strong> 06/04/2025</p>
 
-        <p>Welcome to GanaTube. Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the https://ganatube.in website or the GanaTube Progressive Web Application (the "Service") operated by GanaTube ("us", "we", or "our").</p>
-        <p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users, and others who access or use the Service. By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.</p>
+        <p>Welcome to GanaTube.in. These Terms of Service ("Terms") constitute a legally binding agreement between you and GanaTube.in regarding your use of our Services. Please read these Terms carefully before using our Services.</p>
+        <p>By accessing or using GanaTube.in's Services in any manner, you acknowledge that you have read, understood, and agree to be bound by these Terms and our <a href="/privacy-policy">Privacy Policy</a>, which is incorporated by reference into these Terms. If you do not agree to these Terms, please do not use our Services.</p>
 
-        <h3>1. Description of Service & Third-Party APIs</h3>
-        <p>GanaTube is an independent media player and content discovery application. The Service acts as an interface that allows users to search for, organize, and stream publicly available media content sourced from third-party platforms via their official Application Programming Interfaces (APIs), primarily the licensed third-party APIs. GanaTube does not host, upload, or control any of the audio content accessed through the Service.</p>
-        <p><strong>By accessing or using GanaTube, you expressly agree to be bound by the <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Terms of Service of our Content Providers</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Privacy Policies of our Content Providers</a>.</strong></p>
+        <h3>What These Terms Cover</h3>
+        <p>These Terms apply to your access to and use of GanaTube.in's website, applications, and services (collectively, our "Services"). These Terms include important information about your legal rights, including limitations of liability, warranty disclaimers, and dispute resolution.</p>
 
-        <h3>2. Acceptable Use</h3>
-        <p>You agree not to use the Service in any way that causes, or may cause, damage to the Service or impairment of the availability or accessibility of the Service; or in any way which is unlawful, illegal, fraudulent, or harmful. Specifically, you agree NOT to:</p>
+        <h3>Description of Service</h3>
+        <p>GanaTube.in is a music discovery and streaming platform that aggregates music content and public metadata from third-party media sources and providers. Our Services allow you to:</p>
         <ul class="feature-list">
-          <li>Use the Service to extract, rip, or permanently download copyrighted audio streams into shareable formats (e.g., MP3 files) for distribution.</li>
-          <li>Attempt to reverse engineer, decompile, or bypass any security measures implemented by GanaTube or the underlying third-party APIs.</li>
-          <li>Use the Service to build a competitive product or service.</li>
-          <li>Engage in any automated use of the system, such as using scripts to send automated queries or artificially inflate play counts.</li>
+          <li>Search and discover music content</li>
+          <li>Stream music and audio content</li>
+          <li>Create and manage playlists</li>
+          <li>Save favorite songs</li>
+          <li>Share music with friends</li>
+          <li>Access music recommendations</li>
+          <li>Use playlist and queue tools for personal listening</li>
+        </ul>
+        <p>GanaTube.in aggregates content and metadata from public third-party services. Specifically, we utilize:</p>
+        <ul class="feature-list">
+          <li>Public third-party music providers and metadata databases for music search, cataloging, and discovery functionality</li>
+          <li>Third-party web streaming providers for audio and media content playback</li>
+        </ul>
+        <p>We do not host, store, upload, or own the media content accessible through our Services. All content is dynamically indexed from third-party sources, and we act solely as a search and discovery platform.</p>
+        <p><strong>Important Notice:</strong> We are not affiliated with, endorsed by, or officially partnered with any commercial music platform or recording label. We index publicly available web content for discovery and educational purposes only.</p>
+
+        <h3>Third-Party Services and Content Providers</h3>
+        <p>Our Services rely on third-party infrastructure and providers to deliver music information, metadata, search results, and media playback. These include:</p>
+        <ul class="feature-list">
+          <li><strong>Music Information Services:</strong> We use third-party data providers for search indexing, song metadata, album art, and artist biographies. We do not own this data and act strictly as an indexer.</li>
+          <li><strong>Public Media Sources:</strong> Media streaming is delivered through third-party public web sources. Your interaction with third-party content through our Services remains subject to the respective terms and conditions of those third-party providers.</li>
+          <li><strong>Authentication Services:</strong> We offer secure user authentication (such as Google Sign-In) for personal library management.</li>
+          <li><strong>Cloud Infrastructure:</strong> We utilize standard cloud hosting and storage for application delivery and user preference synchronization.</li>
+        </ul>
+        <p>We aggregate and present content from these third-party sources, but we do not claim ownership of the content. All music, audio, video, artwork, and related content remain the property of their respective copyright holders.</p>
+        <p>Your use of third-party content through our Services is subject to the terms and policies of those respective third-party providers. We are not responsible for the availability, accuracy, or legality of content hosted on external networks.</p>
+        <p><strong>Third-Party Notice:</strong> Content availability depends on external networks and source providers. These services may change, update, or discontinue access at any time without prior notice.</p>
+
+        <h3>Acceptable Use</h3>
+        <p>You agree to use our Services only for lawful purposes and in accordance with these Terms. You agree not to:</p>
+        <ul class="feature-list">
+          <li>Use our Services to infringe upon any intellectual property rights, including copyright, trademark, or patent rights</li>
+          <li>Reproduce, distribute, or publicly perform copyrighted content without proper authorization from the rights holders</li>
+          <li>Use automated systems (bots, scrapers) to access our Services in a manner that could harm or overload our systems</li>
+          <li>Attempt to reverse engineer, decompile, or disassemble our Services</li>
+          <li>Use our Services to transmit any malicious code, viruses, or harmful content</li>
+          <li>Impersonate any person or entity or misrepresent your affiliation with any person or entity</li>
+          <li>Violate any applicable local, state, national, or international law or regulation</li>
         </ul>
 
-        <h3>3. Intellectual Property and Third-Party Content</h3>
-        <p>The Service, including its original code, design, interface, and branding (excluding the third-party audio and video content streamed through it), are and will remain the exclusive property of GanaTube and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of GanaTube.</p>
-        <p>All audio content, video streams, album artwork, and metadata streamed via the Service belong to their respective copyright holders. GanaTube accesses this content through official public APIs in full compliance with third-party developer terms, including licensed third-party APIs Services Developer Policies. GanaTube claims no ownership over this third-party content. If you are a copyright holder and believe your content is being inappropriately accessed, please refer to our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>.</p>
+        <h3>Copyright and Intellectual Property</h3>
+        <h4>Content Ownership</h4>
+        <p>All music, audio, video, artwork, and related content accessible through our Services are the property of their respective copyright owners. GanaTube.in does not claim ownership of any copyrighted content. We act solely as an aggregator and search platform.</p>
 
-        <h3>4. User Accounts</h3>
-        <p>While using GanaTube does not require an account, you may opt to log in via Authentication Provider SSO. When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service. You are responsible for safeguarding the password (managed by your authentication provider) that you use to access the Service.</p>
+        <h4>Respect for Copyright</h4>
+        <p>GanaTube.in respects intellectual property rights. We aggregate and provide access to content from third-party sources for informational and discovery purposes only. Users are responsible for ensuring their use of content complies with applicable copyright laws.</p>
+        <p>You agree that you will only stream, download, or otherwise access content through our Services in a manner that respects the rights of copyright holders and complies with applicable laws.</p>
 
-        <h3>5. Termination</h3>
-        <p>We may terminate or suspend access to our Service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. All provisions of the Terms which by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
+        <h4>DMCA Takedown Policy</h4>
+        <p>If you believe that content accessible through our Services infringes your copyright, you may submit a notification pursuant to the Digital Millennium Copyright Act (DMCA) by providing our Copyright Agent with the following information in writing:</p>
+        <ul class="feature-list">
+          <li>A physical or electronic signature of a person authorized to act on behalf of the copyright owner</li>
+          <li>Identification of the copyrighted work claimed to have been infringed</li>
+          <li>Identification of the material claimed to be infringing and information reasonably sufficient to permit us to locate the material</li>
+          <li>Your contact information</li>
+          <li>A statement that you have a good faith belief that use of the material is not authorized by the copyright owner</li>
+          <li>A statement that the information in the notification is accurate and, under penalty of perjury, that you are authorized to act on behalf of the copyright owner</li>
+        </ul>
+        <p>Please send DMCA notifications to: <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+        <p>Upon receipt of a valid DMCA notification, we will promptly investigate and, if appropriate, remove or disable access to the allegedly infringing content. We reserve the right to terminate accounts of users who are repeat infringers.</p>
 
-        <h3>6. Disclaimer of Warranties</h3>
-        <p>Your use of the Service is at your sole risk. The Service is provided on an "AS IS" and "AS AVAILABLE" basis. The Service is provided without warranties of any kind, whether express or implied, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, non-infringement, or course of performance.</p>
-        <p>GanaTube does not warrant that a) the Service will function uninterrupted, secure, or available at any particular time or location; b) any errors or defects will be corrected; c) the Service is free of viruses or other harmful components; or d) the results of using the Service will meet your requirements.</p>
+        <h3>Compliance and Service Termination</h3>
+        <p>GanaTube.in is committed to respecting intellectual property rights and copyright laws. We operate in good faith as a content aggregation platform and do not intend to infringe upon any copyrights.</p>
+        <ul class="feature-list">
+          <li><strong>Commitment to Compliance:</strong> If we receive a formal warning, cease and desist notice, or legal notice from any copyright owner, authorized rights holder, or content provider regarding indexed content, we are committed to taking immediate action. This may include:
+            <ul style="margin-top: 8px;">
+              <li>Immediately disabling or removing the affected content or links within 24 hours of receiving notice</li>
+              <li>Ceasing access to the disputed content source</li>
+              <li>Temporarily suspending or permanently terminating our Services if required</li>
+              <li>Cooperating fully with copyright holders to resolve any concerns</li>
+              <li>Providing written confirmation of compliance actions taken</li>
+            </ul>
+          </li>
+          <li><strong>Response Timeline:</strong> We commit to responding to any legal notice, cease and desist letter, or takedown request within 24 hours of receipt. We will take corrective action immediately and provide confirmation of compliance within 48 hours.</li>
+          <li><strong>Good Faith Operation:</strong> GanaTube.in operates as an educational music discovery platform without intent to cause harm to content owners or service providers. We acknowledge that:
+            <ul style="margin-top: 8px;">
+              <li>We do not claim any ownership of the media accessible through our platform</li>
+              <li>We respect the policies and terms of all external service providers</li>
+              <li>We are prepared to immediately remove content or cease operations if notified that any activity infringes upon legitimate rights</li>
+              <li>We will not contest or delay compliance with verified takedown requests</li>
+              <li>We maintain no backup systems or mirrors to circumvent takedown actions</li>
+            </ul>
+          </li>
+        </ul>
+        <p>We operate in good faith and are committed to complying promptly with any legitimate requests from content owners, creators, or authorized representatives. Our goal is to promote music discovery while rigorously respecting intellectual property rights.</p>
+        
+        <div class="contact-card">
+          <h4>Priority Contact for Rights Holders</h4>
+          <p>If you are a copyright owner, legal representative, or official representative of any recording label, artist, or content provider and believe our Services are infringing upon your rights or conflicting with your distribution terms, please contact us immediately at <a href="mailto:support@ganatube.in">support@ganatube.in</a> with <strong>"URGENT: Legal Notice"</strong> in the subject line. We will respond within 24 hours and take immediate corrective action.</p>
+        </div>
 
-        <h3>7. Limitation of Liability</h3>
-        <p>In no event shall GanaTube, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from (i) your access to or use of or inability to access or use the Service; (ii) any conduct or content of any third party on the Service; (iii) any content obtained from the Service; and (iv) unauthorized access, use, or alteration of your transmissions or content, whether based on warranty, contract, tort (including negligence), or any other legal theory, whether or not we have been informed of the possibility of such damage.</p>
+        <h3>Monitoring and Compliance Measures</h3>
+        <ul class="feature-list">
+          <li><strong>Active Monitoring:</strong> We actively monitor our contact channels for any legal notices, complaints, or requests from copyright holders. We maintain dedicated systems to ensure prompt detection and response to any compliance-related communications.</li>
+          <li><strong>No Commercial Exploitation:</strong> GanaTube.in operates without directly monetizing copyrighted content. We do not charge users for access to music, and we do not generate revenue from the distribution of copyrighted materials. Our service exists purely as a discovery and aggregation platform.</li>
+          <li><strong>Voluntary Compliance:</strong> Even in the absence of formal legal action, if we become aware that our use of any content source is causing concern, conflicting with provider terms, or otherwise problematic, we reserve the right to voluntarily discontinue that functionality or suspend the relevant features entirely.</li>
+          <li><strong>No Intent to Circumvent:</strong> We explicitly state that we have no intention to circumvent technological protection measures, bypass paywalls, or violate digital rights management (DRM) systems. Our Services rely strictly on publicly accessible web sources and do not attempt to bypass security measures.</li>
+          <li><strong>Transparent Attribution:</strong> We provide clear attribution to content sources and artists wherever possible, including links to official platforms where users can access content through legitimate channels. We encourage users to support artists and content creators through official platforms.</li>
+        </ul>
 
-        <h3>8. Changes to Terms</h3>
-        <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material we will try to provide at least 30 days notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion. By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms.</p>
+        <h3>User Content and Accounts</h3>
+        <ul class="feature-list">
+          <li><strong>User-Generated Content:</strong> You may create playlists, save favorites, and share music through our Services. You retain ownership of any content you create, but by using our Services, you grant us a license to store, display, and process your user-generated content to provide our Services.</li>
+          <li><strong>Account Responsibility:</strong> You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</li>
+          <li><strong>Account Termination:</strong> We reserve the right to suspend or terminate your account at any time, with or without cause or notice, if you violate these Terms or engage in any activity that we determine is harmful to our Services or other users.</li>
+        </ul>
 
-        <h3>9. Contact Us</h3>
-        <p>If you have any questions about these Terms, please contact us at <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a>.</p>
+        <h3>Disclaimers and Limitations</h3>
+        <ul class="feature-list">
+          <li><strong>Service Availability:</strong> Our Services are provided "as is" and "as available" without warranties of any kind, either express or implied. We do not guarantee that our Services will be uninterrupted, secure, error-free, or free from viruses or harmful components.</li>
+          <li><strong>Content Accuracy:</strong> While we strive to provide accurate music metadata and content, we do not guarantee the accuracy, completeness, or reliability of any content accessible through our Services. Content is aggregated from third-party sources and may contain errors or inaccuracies.</li>
+          <li><strong>Limitation of Liability:</strong> To the maximum extent permitted by law, GanaTube.in and its officers, directors, employees, and agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses, resulting from your use of our Services.</li>
+          <li><strong>Indemnification:</strong> You agree to indemnify, defend, and hold harmless GanaTube.in and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, costs, and expenses (including reasonable attorney's fees) arising out of or relating to: your use of our Services, your violation of these Terms, your violation of any rights of any third party, or any content you submit, post, or transmit through our Services.</li>
+        </ul>
+
+        <h3>Third-Party Links and Services</h3>
+        <p>Our Services may contain links to third-party websites or services that are not owned or controlled by GanaTube.in. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites or services.</p>
+        <p>You acknowledge and agree that GanaTube.in shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with the use of or reliance on any such content, goods, or services available on or through any such websites or services.</p>
+
+        <h3>Modifications to Terms</h3>
+        <p>We reserve the right to modify these Terms at any time. We will notify users of any material changes by posting the new Terms on this page and updating the "Effective date" at the top of this Terms of Service.</p>
+        <p>Your continued use of our Services after any changes to these Terms constitutes acceptance of the new Terms. If you do not agree to the modified Terms, you must discontinue your use of our Services.</p>
+
+        <h3>Termination</h3>
+        <p>We may terminate or suspend your access to our Services immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach these Terms.</p>
+        <p>Upon termination, your right to use our Services will cease immediately. All provisions of these Terms that by their nature should survive termination shall survive termination, including ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
+
+        <h3>Commitment to Legal Compliance & Safe Harbor</h3>
+        <ul class="feature-list">
+          <li><strong>Transparent Operation:</strong> We operate transparently and disclose that:
+            <ul style="margin-top: 8px;">
+              <li>We rely on external web data and indexing services for music cataloging</li>
+              <li>Content availability may change or be modified by source providers at any time</li>
+              <li>We respect the intellectual property rights and distribution terms of all rights holders</li>
+              <li>We are prepared to modify or cease operations if required for compliance reasons</li>
+            </ul>
+          </li>
+          <li><strong>Immediate Cessation Commitment:</strong> Upon receiving any form of legal notice, DMCA notice, or formal inquiry from copyright owners, their representatives, legal authorities, or rights management organizations, we commit to immediately (within 24 hours):
+            <ul style="margin-top: 8px;">
+              <li>Acknowledge receipt of the communication</li>
+              <li>Disable the specific index entry, link, or functionality in question</li>
+              <li>Suspend the entire service if required by legal authorities</li>
+              <li>Provide written confirmation of actions taken</li>
+              <li>Cooperate fully with verified rights holders to resolve any issues</li>
+            </ul>
+          </li>
+          <li><strong>No Resistance to Takedown:</strong> We will not challenge, delay, or resist legitimate takedown requests. We will not attempt to circumvent takedown actions through mirrors or alternative indexing.</li>
+          <li><strong>Non-Commercial Platform Operation:</strong> As we operate without charging users or directly monetizing copyrighted recordings, we maintain a non-commercial, good faith operation dedicated to music discovery.</li>
+        </ul>
+
+        <h3>Governing Law and Dispute Resolution</h3>
+        <p>These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which GanaTube.in operates, without regard to its conflict of law provisions.</p>
+        <p>Any disputes arising out of or relating to these Terms or our Services shall be resolved through good faith negotiations. If such negotiations are unsuccessful, disputes shall be resolved through binding arbitration or in the appropriate courts of jurisdiction.</p>
+        <p><strong>Priority Resolution for Copyright Holders:</strong> For any inquiries or concerns related to copyright or intellectual property, we commit to resolving issues swiftly and without litigation. We prioritize immediate compliance and amicable resolution above all else.</p>
+
+        <h3>Contact Us</h3>
+        <p>If you have any questions about these Terms of Service, please contact us:</p>
+        <div class="contact-card">
+          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+          <p><strong>Website:</strong> <a href="https://ganatube.in">https://ganatube.in</a></p>
+        </div>
+        <p style="margin-top: 16px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.7);">By using GanaTube.in, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. If you do not agree to these Terms, please do not use our Services.</p>
       </div>
     `
   },
   'cookie-policy': {
-    title: 'Cookie & Storage Policy',
+    title: 'Cookie & Local Storage Policy | GanaTube',
     html: `
       <div class="static-content-block">
         <h2>Cookie & Local Storage Policy</h2>
-        <p><strong>Effective Date:</strong> September 20, 2026</p>
-        <p>This Cookie & Local Storage Policy explains how GanaTube ("we", "us", or "our") uses cookies, HTML5 local storage, and related technologies on our website (<a href="https://ganatube.in" style="color: var(--color-primary);">ganatube.in</a>) and our Progressive Web Application (PWA). This policy explains what these technologies are, why we use them, and your options regarding how they are handled.</p>
+        <p><strong>Effective Date:</strong> 06/04/2025<br>
+        <strong>Last Updated:</strong> 06/04/2025</p>
+
+        <p>This Cookie & Local Storage Policy explains how GanaTube ("we", "us", or "our") uses standard HTTP cookies, HTML5 local storage (LocalStorage and SessionStorage), and IndexedDB technologies on <a href="https://ganatube.in">ganatube.in</a> and our Progressive Web Application.</p>
 
         <h3>1. What Are Cookies and Storage Technologies?</h3>
         <ul class="feature-list">
-          <li><strong>Cookies:</strong> Small text files placed on your browser or device by web servers. They help websites remember your session, preferences, and provide analytical information.</li>
-          <li><strong>Local Storage & IndexedDB:</strong> High-performance client-side storage mechanisms that permit web applications to save offline data, song queues, and user interface preferences locally on your device without transmitting data over the network.</li>
+          <li><strong>Cookies:</strong> Small alphanumeric data files placed on your device by web browsers when accessing websites. They help web applications remember session states, user preferences, and analytics data.</li>
+          <li><strong>HTML5 Local Storage & IndexedDB:</strong> High-performance client-side browser storage that enables modern web apps to store data locally on your device without transmitting it over the network on every HTTP request. This enables fast, persistent playback state.</li>
         </ul>
 
-        <h3>2. Categories of Cookies & Storage We Use</h3>
-        
-        <h4>A. Strictly Necessary & Functional Storage</h4>
-        <p>These are essential for the operation of GanaTube and cannot be disabled without breaking the player:</p>
+        <h3>2. Categories of Storage and Cookies We Use</h3>
+        <h4>A. Strictly Necessary & Functional Storage (Essential)</h4>
+        <p>These local storage items are essential for core music playback and navigation and cannot be disabled without disrupting the player:</p>
         <ul class="feature-list">
-          <li><strong>Player State:</strong> Storing current track queue, playback timestamps, repeat/shuffle status, and volume level so playback does not restart upon navigation.</li>
-          <li><strong>User Interface Preferences:</strong> Saving your language selections, audio quality settings, and AMOLED dark mode preferences.</li>
-          <li><strong>Authentication:</strong> Preserving login sessions securely if you sign in with Authentication Provider SSO.</li>
+          <li><strong>Audio Player State:</strong> Preserving current track index, playback timestamp, volume level, shuffle/repeat modes, and active queue lists so songs do not restart when navigating between pages.</li>
+          <li><strong>User Interface Preferences:</strong> Saving your language selections (Hindi, Punjabi, English, etc.), audio quality preferences, and AMOLED dark mode settings.</li>
+          <li><strong>Authentication State:</strong> Storing secure OAuth session tokens locally if you sign in with Google to maintain your session across page reloads.</li>
         </ul>
 
-        <h4>B. Advertising & Third-Party Cookies (Authentication Provider AdSense)</h4>
-        <p>GanaTube uses third-party advertising partners, including <strong>Authentication Provider AdSense</strong>, to help support the cost of running a free, uninterrupted streaming service:</p>
+        <h4>B. Third-Party Advertising Cookies (Google AdSense)</h4>
+        <p>GanaTube displays non-intrusive visual web banners powered by Google AdSense to fund server infrastructure and bandwidth costs while keeping streaming free:</p>
         <ul class="feature-list">
-          <li><strong>Third-Party Vendor Cookies:</strong> Third-party vendors, including Authentication Provider, use cookies to serve ads based on a user's prior visits to ganatube.in or other websites.</li>
-          <li><strong>Personalized Advertising:</strong> Authentication Provider's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our sites and/or other sites on the Internet.</li>
-          <li><strong>Non-Personalized Ads Option:</strong> In regions where applicable, non-personalized advertising cookies may be used for frequency capping, aggregated ad reporting, and fraud prevention.</li>
+          <li>Third-party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on a user's prior visits to GanaTube or other websites on the internet.</li>
+          <li>Google's advertising cookies enable it and its partners to serve relevant advertisements to users based on browsing behavior.</li>
+          <li>Cookies are also utilized for ad frequency capping, fraud prevention, and aggregated impression reporting.</li>
         </ul>
 
-        <h4>C. Performance and Analytics</h4>
-        <p>We use lightweight analytics cookies and event tracking to understand platform stability, popular music genres, and active user concurrency to ensure server capacity.</p>
+        <h4>C. Performance & Analytics Telemetry</h4>
+        <p>Lightweight, aggregated telemetry cookies help our engineering team monitor page load performance, stream error rates, and peak concurrency to guarantee high platform availability.</p>
 
-        <h3>3. How You Can Control and Opt Out of Cookies</h3>
-        <p>You have the full right to decide whether to accept or reject cookies:</p>
+        <h3>3. Managing and Opting Out of Cookies</h3>
+        <p>You have full autonomy over how cookies and storage mechanisms are utilized on your device:</p>
         <ul class="feature-list">
-          <li><strong>Opting Out of Authentication Provider Personalized Ads:</strong> You can opt out of personalized advertising by visiting Authentication Provider's official <a href="https://adssettings.Authentication Provider.com" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Authentication Provider Ads Settings</a>.</li>
-          <li><strong>Third-Party Ad Network Opt-Out:</strong> You can also opt out of many third-party advertising cookies by visiting <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">aboutads.info/choices/</a> or <a href="https://www.youronlinechoices.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Your Online Choices</a>.</li>
-          <li><strong>Browser Cookie Controls:</strong> You can modify your browser settings to decline or clear cookies. Please refer to your browser's help menu (Chrome, Safari, Firefox, Edge) for step-by-step instructions.</li>
+          <li><strong>Opt Out of Google Personalized Ads:</strong> You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Google Ads Settings</a>.</li>
+          <li><strong>Industry-Wide Ad Opt-Out:</strong> You can opt out of third-party advertising cookies through the <a href="https://optout.aboutads.info/" target="_blank" rel="noopener noreferrer">Digital Advertising Alliance (AboutAds)</a> or the <a href="https://www.youronlinechoices.eu/" target="_blank" rel="noopener noreferrer">European Interactive Digital Advertising Alliance (EDAA)</a>.</li>
+          <li><strong>Browser Cookie Controls:</strong> You can configure your browser (Chrome, Safari, Firefox, Edge) to block, reject, or clear cookies and local storage via your browser settings. Note that disabling local storage may cause the music player to lose playback progress or queue continuity upon page reload.</li>
         </ul>
 
         <h3>4. Contact Us</h3>
-        <p>If you have any questions or concerns regarding our use of cookies or local storage, please reach out to us at:</p>
-        <div class="contact-card">
-          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a></p>
-        </div>
+        <p>If you have any questions about our use of cookies or local storage technologies, please contact us at: <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
       </div>
     `
   },
   'dmca': {
-    title: 'DMCA & Copyright Policy',
+    title: 'DMCA & Copyright Policy | GanaTube',
     html: `
       <div class="static-content-block">
         <h2>DMCA & Copyright Policy</h2>
-        <p>GanaTube respects the intellectual property rights of artists, creators, and content owners, and we expect our users to do the same. In compliance with the Digital Millennium Copyright Act (17 U.S.C. § 512) and applicable global copyright laws, we maintain a clear procedure to address copyright infringement claims.</p>
-        <p>If you believe that any material or track available through GanaTube infringes upon a copyright you own or control, please submit a formal takedown notice with the required details listed below.</p>
+        <p><strong>Effective Date:</strong> 06/04/2025<br>
+        <strong>Last Updated:</strong> 06/04/2025</p>
 
-        <h3>Submitting a Takedown Notice</h3>
-        <p>To ensure prompt processing, please provide our designated copyright team with a written notice containing the following information:</p>
+        <p>GanaTube ("we", "us", "our") strictly respects the intellectual property rights of artists, record labels, composers, and copyright owners, and we expect all users of our platform to do the same. In compliance with the Digital Millennium Copyright Act (17 U.S.C. § 512), EU Copyright Directives, and applicable international copyright laws, we maintain an expedited notice-and-takedown procedure.</p>
+
+        <h3>1. Platform Architecture & Safe Harbor Notice</h3>
+        <p>GanaTube operates as an online discovery index, search aggregator, and media player interface. <strong>GanaTube does not host, upload, or store copyrighted sound recordings or media files on its servers.</strong> Audio and multimedia content streamed through GanaTube is delivered dynamically from third-party public web sources and media providers.</p>
+        <p>Because media files are hosted on external third-party services, removing or restricting access on the source platform automatically eliminates availability across GanaTube. However, we take all copyright concerns seriously and will promptly disable access to allegedly infringing content on our search index upon receiving a valid notification.</p>
+
+        <h3>2. 24-Hour Expedited Takedown Response</h3>
+        <p>We are committed to reviewing and processing all valid, complete DMCA takedown notices within <strong>24 hours of receipt</strong>. We do not delay or contest legitimate claims submitted by verified copyright holders or their authorized legal representatives.</p>
+
+        <h3>3. Submitting a DMCA Takedown Notice</h3>
+        <p>To file a legally binding takedown notice with our designated copyright agent, please provide a written communication containing the following statutory details:</p>
         <ul class="feature-list">
-          <li><strong>Contact Information:</strong> Your full legal name, company or organization (if applicable), physical address, phone number, and a valid email address.</li>
-          <li><strong>Identification of Copyrighted Work:</strong> A clear description or title of the copyrighted work you claim has been infringed.</li>
-          <li><strong>Location of Infringing Material:</strong> The specific GanaTube URL(s), search result link, or description reasonably sufficient to permit us to locate the material on our platform.</li>
-          <li><strong>Good Faith Statement:</strong> A statement that you have a good faith belief that the use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law.</li>
-          <li><strong>Statement of Accuracy:</strong> A statement made under penalty of perjury that the information in your notification is accurate and that you are the copyright owner or authorized to act on behalf of the owner.</li>
-          <li><strong>Physical or Electronic Signature:</strong> An authorized physical or electronic signature of the copyright owner or a person authorized to act on their behalf.</li>
+          <li><strong>1. Contact Information:</strong> Your full legal name, company or organization (if applicable), mailing address, telephone number, and an active email address.</li>
+          <li><strong>2. Identification of Copyrighted Work:</strong> A clear description of the copyrighted sound recording, musical composition, or album claimed to have been infringed, including registration numbers if available.</li>
+          <li><strong>3. Location of Infringing Material:</strong> The exact GanaTube URL(s), search query, or track identifier sufficient to allow our team to locate and disable the specific material on our platform.</li>
+          <li><strong>4. Good Faith Statement:</strong> The statement: <em>"I have a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law."</em></li>
+          <li><strong>5. Statement of Accuracy:</strong> The statement: <em>"I swear, under penalty of perjury, that the information in this notification is accurate and that I am the copyright owner or an agent authorized to act on behalf of the owner of an exclusive right that is allegedly infringed."</em></li>
+          <li><strong>6. Authorized Signature:</strong> A physical or electronic signature of the copyright owner or an authorized representative (typing your full legal name is legally sufficient for email submissions).</li>
         </ul>
 
-        <h3>Designated Copyright Agent</h3>
-        <p>Please send all takedown notices directly to our designated team:</p>
+        <h3>4. Designated Copyright Agent</h3>
+        <p>Please send all formal copyright notices and DMCA communications directly to our designated team:</p>
         <div class="contact-card">
-          <p><strong>Email:</strong> <a href="mailto:dmca@ganatube.in" style="color: var(--color-primary);">dmca@ganatube.in</a></p>
-          <p><strong>Secondary / Support:</strong> <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a></p>
-          <p style="margin-top: 10px; font-size: 0.9rem; color: rgba(255, 255, 255, 0.6);">Upon receipt of a valid and complete notification, we will review the submission promptly and take appropriate action in accordance with applicable laws. We may request additional information to verify identity or ownership.</p>
+          <p><strong>Primary DMCA Email:</strong> <a href="mailto:dmca@ganatube.in">dmca@ganatube.in</a></p>
+          <p><strong>Secondary Support Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+          <p><strong>Platform:</strong> GanaTube (<a href="https://ganatube.in">https://ganatube.in</a>)</p>
         </div>
 
-        <h3>Repeat Infringer Policy</h3>
-        <p>In accordance with the DMCA and other applicable intellectual property laws, GanaTube maintains a policy that provides for the restriction or termination, in appropriate circumstances, of users or services that are determined to be repeat infringers.</p>
+        <h3>5. Counter-Notification Procedure</h3>
+        <p>If you believe that material you submitted or curated was removed or disabled as a result of mistake or misidentification, you may submit a formal counter-notification to our copyright agent containing your contact details, identification of the removed material, a statement under penalty of perjury of good-faith belief of error, and consent to legal jurisdiction.</p>
+
+        <h3>6. Repeat Infringer Policy</h3>
+        <p>In accordance with Section 512(i) of the DMCA and applicable global copyright laws, GanaTube enforces a strict policy that provides for the termination, in appropriate circumstances, of access, accounts, or services of users who are found to be repeat copyright infringers.</p>
       </div>
     `
   },
   'disclaimer': {
-    title: 'Legal Disclaimer',
+    title: 'Legal Disclaimer | GanaTube',
     html: `
       <div class="static-content-block">
-        <h2>Disclaimer of Liability and Usage</h2>
-        <p><strong>Effective Date:</strong> September 20, 2026</p>
+        <h2>Legal Disclaimer</h2>
+        <p><strong>Effective Date:</strong> 06/04/2025<br>
+        <strong>Last Updated:</strong> 06/04/2025</p>
 
-        <h3>1. Content Source and Third-Party APIs</h3>
-        <p>The GanaTube platform (accessible at ganatube.in) acts solely as a specialized media player interface and search directory. <strong>GanaTube does not host, upload, or store any audio files, music tracks, or copyrighted video streams on its servers.</strong> All multimedia content streamed through the Service is sourced dynamically via official third-party APIs, primarily the official third-party content delivery APIs. By using GanaTube, users acknowledge that they are accessing third-party content in accordance with the <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Terms of Service of our Content Providers</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">Privacy Policies of our Content Providers</a>.</p>
+        <p>Please read this disclaimer carefully before using GanaTube (<a href="https://ganatube.in">ganatube.in</a>) or our Progressive Web Application. By accessing or using our Service, you acknowledge and agree to the terms described below.</p>
 
-        <h3>2. Copyright Infringement and Liability</h3>
-        <p>Because GanaTube does not control the content uploaded to or hosted on third-party networks, we cannot be held liable for copyright claims or external content. We do not exercise editorial control over metadata, album artwork, or audio streams provided through public APIs. All legal claims or takedown notices regarding the underlying media must be directed to the source host (the respective source host) or submitted via our <a href="/dmca" style="color: var(--color-primary);">DMCA & Copyright Policy</a>. Removal from the source platform automatically and permanently removes the content from GanaTube.</p>
+        <h3>1. Platform Purpose & Informational Usage</h3>
+        <p>GanaTube is engineered as an online music discovery, personal listening, and playlist organization interface. It is not intended to replace commercial music distribution platforms, licensing houses, or official record releases. We strongly encourage all music listeners to support artists, composers, and bands by purchasing original music, attending live concerts, and subscribing to official artist merchandise channels.</p>
 
-        <h3>3. Service Availability and Performance</h3>
-        <p>The GanaTube service is provided on an "as is" and "as available" basis. While we strive to maintain 100% uptime, the functionality of the platform relies heavily on the availability and stability of third-party APIs. If these underlying APIs change their structure, experience downtime, or restrict our access, the GanaTube platform may temporarily or permanently lose functionality without prior notice. We make no guarantees regarding uninterrupted access, speed, or flawless operation.</p>
+        <h3>2. Third-Party Media Content & External Providers</h3>
+        <p><strong>GanaTube does not host, upload, store, or re-encode audio or video files on its servers.</strong> Media streams, metadata, preview soundbites, album artwork, and lyrical data accessible through GanaTube originate from independent third-party services and public web sources.</p>
+        <p>GanaTube claims zero ownership over third-party multimedia content. All sound recordings, musical works, visual assets, and trademarks belong exclusively to their respective copyright holders. GanaTube exercises no editorial control over content hosted on external networks. If material is removed or modified on the source provider, it becomes automatically unavailable on GanaTube.</p>
 
-        <h3>4. Data Usage</h3>
-        <p>Users who utilize the platform on mobile networks are solely responsible for any data charges incurred. While GanaTube provides a "Smart" mode, audio streaming can consume significant bandwidth.</p>
+        <h3>3. Non-Affiliation Notice</h3>
+        <p>GanaTube is an independent project and is not affiliated with, endorsed by, sponsored by, or officially associated with any commercial streaming platforms, media corporations, or record labels. All product and company names are trademarks or registered trademarks of their respective holders. Their reference on GanaTube is strictly for identification and compatibility purposes.</p>
 
-        <h3>5. "Zero Audio Ads" Clarification</h3>
-        <p>Our promise of "Zero Audio Ads" refers strictly to our commitment that GanaTube does not inject its own audio advertisements or interruptions into the user's listening experience. GanaTube is supported exclusively through non-intrusive visual display advertising on the website to cover server and bandwidth costs.</p>
-        
-        <h3>6. Acceptance</h3>
-        <p>By using the ganatube.in website or installing the Progressive Web App, you acknowledge that you have read, understood, and agree to be bound by this disclaimer. If you do not agree, you must discontinue use of the Service immediately.</p>
+        <h3>4. "Zero Audio Ads" Clarification</h3>
+        <p>Our commitment to "Zero Audio Ads" means that GanaTube will never inject audio commercial breaks, vocal promos, or sponsor interruptions into your music sessions. The platform is supported solely through non-intrusive visual display advertisements on the website to help offset server hosting and bandwidth costs.</p>
+
+        <h3>5. Editorial Content & Music Guides</h3>
+        <p>Articles, blog posts, workout music breakdowns, lyrics analyses, and listening guides published on GanaTube are provided solely for educational, cultural, and recreational purposes. They represent the independent opinions and analyses of our editorial team and should not be construed as professional, legal, or commercial advice.</p>
+
+        <h3>6. No Warranties & Service Continuity</h3>
+        <p>GanaTube is provided on an "as is" and "as available" basis without warranties of any kind. While we strive to maintain high uptime and seamless playback, the continuous operation of GanaTube depends upon external web sources and network infrastructure. We do not guarantee uninterrupted access, absence of technical errors, or permanent catalog availability.</p>
+
+        <h3>7. Limitation of Liability</h3>
+        <p>To the fullest extent permitted by applicable law, GanaTube, its operators, contributors, and affiliates shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from your use of or inability to use the Service, including mobile cellular data charges, device compatibility issues, or third-party service modifications.</p>
+
+        <h3>8. Acceptance & Inquiries</h3>
+        <p>By using GanaTube, you signify your full acceptance of this Disclaimer. If you do not agree with any portion of this disclaimer, you must discontinue your use of the Service immediately. For any inquiries, reach out to us at <a href="mailto:support@ganatube.in">support@ganatube.in</a>.</p>
       </div>
     `
   },
   'contact': {
-    title: 'Contact Us',
+    title: 'Contact GanaTube.in - Support & Inquiries',
     html: `
       <div class="static-content-block">
-        <h2>Get in Touch with GanaTube</h2>
-        <p>We are always eager to hear from our users. Whether you have a feature suggestion, have encountered a bug, or just want to tell us how much you love the app, we are here to listen. We aim to respond to all inquiries within 24-48 hours.</p>
+        <h2>Contact GanaTube.in</h2>
+        <p>At GanaTube.in, we value user feedback and aim to make every interaction with our platform as smooth as possible. Whether you need technical assistance, want to share an idea, report a problem, or discuss a potential partnership, our team welcomes your inquiry.</p>
 
         <div class="contact-card">
-          <h3>General Support & Feedback</h3>
-          <p>For bug reports, feature requests, account issues, or general questions about using the app.</p>
-          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in" style="color: var(--color-primary);">support@ganatube.in</a></p>
+          <h3>Customer Support</h3>
+          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+          <p style="margin-top: 8px;">For general questions, playback difficulties, website errors, account-related concerns, or assistance with available features, contact our support team. Please include relevant details about your device, browser, and the issue you encountered so we can better understand your request.</p>
         </div>
 
         <div class="contact-card">
-          <h3>Copyright & Legal (DMCA)</h3>
-          <p>For copyright owners or agents reporting alleged infringement. Please review our DMCA & Copyright policy before submitting a request to ensure it contains all required information.</p>
-          <p><strong>Email:</strong> <a href="mailto:dmca@ganatube.in" style="color: var(--color-primary);">dmca@ganatube.in</a></p>
+          <h3>Business and Partnerships</h3>
+          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+          <p style="margin-top: 8px;">We welcome professional inquiries concerning business collaborations, promotional opportunities, technology integrations, sponsorship proposals, and media-related requests. If you have a proposal that aligns with GanaTube.in and its audience, feel free to get in touch.</p>
         </div>
 
         <div class="contact-card">
-          <h3>Social Media</h3>
-          <p>Follow us for updates on new features, curated playlist drops, and to interact with the community!</p>
-          <p><strong>Instagram:</strong> <a href="https://instagram.com/ganatube.in" target="_blank" style="color: var(--color-primary);">@ganatube.in</a></p>
+          <h3>Copyright and Legal Matters</h3>
+          <p><strong>Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
+          <p style="margin-top: 8px;">For copyright complaints, intellectual property concerns, trademark matters, or other legal inquiries, please contact us with a clear description of the issue and the relevant supporting information. Use a subject line such as “Copyright Notice” or “Legal Inquiry” to help identify the nature of your request.</p>
+          <p style="margin-top: 8px;">Please review our <a href="/dmca">DMCA Policy</a> for applicable procedures and submission requirements.</p>
         </div>
 
-        <h3>Bug Reporting Guidelines</h3>
-        <p>If you are emailing us to report a technical issue, please include the following information to help us resolve it faster:</p>
+        <h3>Suggestions and Feature Requests</h3>
+        <p>We are interested in hearing how GanaTube.in can become more useful to its visitors. Share your suggestions, describe the problem you want to solve, and explain how your proposed improvement could enhance the overall experience.</p>
+        <p>Our evaluation of suggestions may take into account user needs, technical feasibility, platform priorities, and potential benefits.</p>
+
+        <h3>Report a Technical Problem</h3>
+        <p>If you experience an error or unexpected behavior while using GanaTube.in, providing detailed information can help us investigate the issue more effectively.</p>
+        <p>Where possible, include:</p>
         <ul class="feature-list">
-          <li>Your device model (e.g., Samsung Galaxy S23, iPhone 14)</li>
-          <li>Your operating system (e.g., Android 13, iOS 16)</li>
-          <li>The browser you are using, or if you are using the installed PWA</li>
-          <li>A clear, step-by-step description of what causes the issue</li>
+          <li><strong>Browser details:</strong> Browser name and version.</li>
+          <li><strong>Device information:</strong> Device model and operating system.</li>
+          <li><strong>Steps to reproduce:</strong> The actions that led to the problem.</li>
+          <li><strong>Expected and actual results:</strong> Explain what you wanted to happen and what occurred instead.</li>
+          <li><strong>Supporting evidence:</strong> Screenshots or screen recordings, if available.</li>
         </ul>
+        <p><em>Please avoid including passwords, verification codes, or other sensitive personal information in your report.</em></p>
+
+        <h3>Stay Connected</h3>
+        <p>Keep an eye on our official communication channels for platform announcements, feature updates, music discovery discussions, and other community activities as they become available.</p>
+        <p>For website-related questions or assistance, email us directly or use the contact options provided on our platform.</p>
+
+        <div class="contact-card" style="text-align: center; margin-top: 24px;">
+          <p><a href="/" style="font-weight: 600; font-size: 1.1rem;">Visit GanaTube.in</a></p>
+          <p style="margin-top: 8px; color: rgba(255, 255, 255, 0.7);">GanaTube.in — Your destination for music discovery and listening.</p>
+        </div>
+        <p style="margin-top: 24px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.5);">© 2025 GanaTube.in. All rights reserved.</p>
       </div>
     `
   }
 };
+
+// Canonical URL aliases for route flexibility (e.g., /terms, /privacy, /about-us, /cookies, /help)
+PAGE_CONTENT['terms'] = PAGE_CONTENT['terms-of-service'];
+PAGE_CONTENT['privacy'] = PAGE_CONTENT['privacy-policy'];
+PAGE_CONTENT['cookie'] = PAGE_CONTENT['cookie-policy'];
+PAGE_CONTENT['cookies'] = PAGE_CONTENT['cookie-policy'];
+PAGE_CONTENT['about-us'] = PAGE_CONTENT['about'];
+PAGE_CONTENT['help'] = PAGE_CONTENT['faq'];

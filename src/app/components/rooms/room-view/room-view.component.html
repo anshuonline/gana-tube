@@ -106,11 +106,6 @@
           <p style="font-size: 14px; font-weight: 500;">Loading...</p>
         </div>
 
-        <!-- Hardcore Cover Ad Overlay (Active when video is off) -->
-        <div class="room-cover-ad-container" [class.active]="showCoverAd && !playerService.isVideoMode()" *ngIf="!playerService.isVideoMode()">
-          <app-adsterra-banner [tag]="coverAdTag"></app-adsterra-banner>
-          <span class="room-cover-ad-label">Sponsored</span>
-        </div>
 
         <div *ngIf="!playerService.currentTrack() && playerService.playerState() !== 'loading'" class="empty-art">
           <svg lucideMusic [attr.size]="48"></svg>

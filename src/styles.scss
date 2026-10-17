@@ -107,14 +107,6 @@ app-gtanalytic-layout,
 app-managegt-layout,
 app-managegt-header,
 .managegt-wrapper {
-  .sponsored-ad-banner,
-  .in-feed-ad-container,
-  .playlist-ad-row,
-  app-adsterra-banner,
-  .gt-ad-frame-wrap,
-  app-gt-native-banner,
-  .gt-native-host,
-  app-gt-social-bar,
   ins.adsbygoogle,
   .adsbygoogle,
   .google-auto-placed,
@@ -155,14 +147,7 @@ body.no-ads-section {
   div[id^="aswift_"],
   div[class*="google_ads"],
   #google-vignette,
-  .google-anchor-ad,
-  .sponsored-ad-banner,
-  .in-feed-ad-container,
-  app-adsterra-banner,
-  .gt-ad-frame-wrap,
-  app-gt-native-banner,
-  .gt-native-host,
-  app-gt-social-bar {
+  .google-anchor-ad {
     display: none !important;
     visibility: hidden !important;
     height: 0 !important;

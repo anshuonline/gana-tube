@@ -1026,8 +1026,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Sneha Patel",
     "authorId": "sneha-patel",
     "category": "Streaming Tech",
-    "status": "scheduled",
-    "scheduledDate": "2026-10-25T10:00:00.000Z",
+    "status": "published",
     "readTime": "6 min read",
     "coverImage": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
     "tags": [
@@ -1046,8 +1045,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Rohan Verma",
     "authorId": "rohan-verma",
     "category": "Desi Hip-Hop",
-    "status": "scheduled",
-    "scheduledDate": "2026-10-24T14:30:00.000Z",
+    "status": "published",
     "readTime": "7 min read",
     "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80",
     "tags": [
@@ -1066,7 +1064,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Kabir Mehta",
     "authorId": "kabir-mehta",
     "category": "Classical & Sufi",
-    "status": "draft",
+    "status": "published",
     "readTime": "5 min read",
     "coverImage": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=800&q=80",
     "tags": [
@@ -1320,7 +1318,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Rohan Verma",
     "authorId": "rohan-verma",
     "category": "Music Trends",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Country Music",
       "Morgan Wallen",
@@ -1331,7 +1329,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Morgan_Wallen_Concert_November_13.jpg",
     "readTime": "4 min read",
     "wordCount": 762,
-    "scheduledDate": "2026-10-18T04:30:00.000Z"
   },
   {
     "slug": "touring-boom-2026-pollstar-mid-year-analysis",
@@ -1342,7 +1339,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Kabir Mehta",
     "authorId": "kabir-mehta",
     "category": "Global Hits",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Live Music",
       "Touring Boom",
@@ -1353,7 +1350,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Taio_Cruz_%287906548170%29.jpg",
     "readTime": "4 min read",
     "wordCount": 789,
-    "scheduledDate": "2026-10-19T04:30:00.000Z"
   },
   {
     "slug": "grammys-2027-dates-eligibility-album-contenders",
@@ -1364,7 +1360,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Pooja Sharma",
     "authorId": "pooja-sharma",
     "category": "Pop Culture",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Grammy Awards",
       "Grammys 2027",
@@ -1375,7 +1371,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/2/26/Grammy-award_silhouette.jpg",
     "readTime": "4 min read",
     "wordCount": 781,
-    "scheduledDate": "2026-10-20T04:30:00.000Z"
   },
   {
     "slug": "spotify-passes-300-million-subscribers-streaming-business",
@@ -1386,7 +1381,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Sneha Patel",
     "authorId": "sneha-patel",
     "category": "Streaming Tech",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Spotify",
       "Music Streaming",
@@ -1397,7 +1392,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/7/70/Spotify_logo_3.png",
     "readTime": "4 min read",
     "wordCount": 802,
-    "scheduledDate": "2026-10-21T04:30:00.000Z"
   },
   {
     "slug": "arijit-singh-after-playback-farewell-indian-music",
@@ -1408,7 +1402,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Anshu Saxena",
     "authorId": "anshu-saxena",
     "category": "Bollywood Melodies",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Arijit Singh",
       "Bollywood Melodies",
@@ -1419,7 +1413,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Arijit_Singh_performing_live_at_Miranda_House%27s_Tempest%2714_hosted_by_Bharat_Jain.JPG",
     "readTime": "4 min read",
     "wordCount": 843,
-    "scheduledDate": "2026-10-22T04:30:00.000Z"
   },
   {
     "slug": "bangla-music-2026-coke-studio-cross-border-tours",
@@ -1430,7 +1423,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Kabir Mehta",
     "authorId": "kabir-mehta",
     "category": "Classical & Sufi",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Bangla Music",
       "Coke Studio Bangla",
@@ -1441,7 +1434,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Paban_Das_Baul_at_Nine_Lives_concert%2C_2009.jpg",
     "readTime": "4 min read",
     "wordCount": 764,
-    "scheduledDate": "2026-10-23T04:30:00.000Z"
   },
   {
     "slug": "how-music-charts-actually-work-billboard-hot-100-global-200",
@@ -1452,7 +1444,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Sneha Patel",
     "authorId": "sneha-patel",
     "category": "Streaming Tech",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Billboard Hot 100",
       "Music Charts",
@@ -1463,7 +1455,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Larry_Crane_mixing_on_Rupert_Neve_Designs_5088_console%2C_Jackpot%21_Recording_Studio_%28Portland%2C_Oregon%29.jpg",
     "readTime": "4 min read",
     "wordCount": 803,
-    "scheduledDate": "2026-10-24T04:30:00.000Z"
   },
   {
     "slug": "tame-impala-dracula-54-week-hit-slow-burn-success",
@@ -1474,7 +1465,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Rohan Verma",
     "authorId": "rohan-verma",
     "category": "Indie Pop",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Tame Impala",
       "Dracula",
@@ -1485,7 +1476,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Tame_Impala-3844_%2818847344151%29.jpg",
     "readTime": "4 min read",
     "wordCount": 867,
-    "scheduledDate": "2026-10-25T04:30:00.000Z"
   },
   {
     "slug": "singer-songwriter-surge-noah-kahan-myles-smith-confessional-pop",
@@ -1496,7 +1486,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Kabir Mehta",
     "authorId": "kabir-mehta",
     "category": "Indie Pop",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Singer-Songwriter",
       "Noah Kahan",
@@ -1507,7 +1497,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Emily_Frith_Peterboat_Stage_24-6-2018.jpg",
     "readTime": "4 min read",
     "wordCount": 843,
-    "scheduledDate": "2026-10-26T04:30:00.000Z"
   },
   {
     "slug": "latin-music-global-moment-bad-bunny-karol-g-peso-pluma",
@@ -1518,7 +1507,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Rohan Verma",
     "authorId": "rohan-verma",
     "category": "Global Hits",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Latin Music",
       "Bad Bunny",
@@ -1529,7 +1518,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Karol_G_en_2018.jpg",
     "readTime": "4 min read",
     "wordCount": 760,
-    "scheduledDate": "2026-10-27T04:30:00.000Z"
   },
   {
     "slug": "hip-hop-autumn-2026-drake-deluxe-don-toliver",
@@ -1540,7 +1528,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Rohan Verma",
     "authorId": "rohan-verma",
     "category": "Desi Hip-Hop",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Hip-Hop",
       "Drake",
@@ -1551,7 +1539,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/9/93/Drake_Live_at_Walmart_Soundcheck_%284636434192%29.jpg",
     "readTime": "4 min read",
     "wordCount": 776,
-    "scheduledDate": "2026-10-28T04:30:00.000Z"
   },
   {
     "slug": "rock-in-2026-u2-fontaines-dc-stadium-touring-giants",
@@ -1562,7 +1549,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Anshu Saxena",
     "authorId": "anshu-saxena",
     "category": "Music Trends",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Rock Music",
       "U2",
@@ -1573,7 +1560,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/c/ca/U2_concert.jpg",
     "readTime": "4 min read",
     "wordCount": 874,
-    "scheduledDate": "2026-10-29T04:30:00.000Z"
   },
   {
     "slug": "ten-albums-by-women-shaping-autumn-sound-2026",
@@ -1584,7 +1570,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Pooja Sharma",
     "authorId": "pooja-sharma",
     "category": "Pop Culture",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Women in Music",
       "Alanis Morissette",
@@ -1595,7 +1581,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Alanis_Morissette_at_Espacio_Movistar_1.jpg",
     "readTime": "4 min read",
     "wordCount": 754,
-    "scheduledDate": "2026-10-30T04:30:00.000Z"
   },
   {
     "slug": "electronic-music-autumn-2026-boys-noize-jacques-greene",
@@ -1606,7 +1591,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Sneha Patel",
     "authorId": "sneha-patel",
     "category": "Streaming Tech",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Electronic Music",
       "Boys Noize",
@@ -1617,7 +1602,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/d/d6/DJ_booth_with_DJ-Mixer%2C_two_turntables_and_two_CDJ-players_in_former_Bob_Beaman_nightclub_in_Munich.jpg",
     "readTime": "3 min read",
     "wordCount": 646,
-    "scheduledDate": "2026-10-31T04:30:00.000Z"
   },
   {
     "slug": "when-films-drive-music-soundtrack-hits-bollywood-hollywood-2026",
@@ -1628,7 +1612,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Pooja Sharma",
     "authorId": "pooja-sharma",
     "category": "Bollywood Melodies",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Film Soundtracks",
       "Bollywood Melodies",
@@ -1639,7 +1623,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/8/89/The_Grand_Stars_Orchestra_concert_stage.jpg",
     "readTime": "4 min read",
     "wordCount": 760,
-    "scheduledDate": "2026-11-01T04:30:00.000Z"
   },
   {
     "slug": "ambient-modern-classical-music-max-richter-brian-eno-autumn-2026",
@@ -1650,7 +1633,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Sneha Patel",
     "authorId": "sneha-patel",
     "category": "Streaming Tech",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Ambient Music",
       "Modern Classical",
@@ -1661,7 +1644,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/d/da/Stage_Piano_2_%2811678967343%29.jpg",
     "readTime": "4 min read",
     "wordCount": 854,
-    "scheduledDate": "2026-11-02T04:30:00.000Z"
   },
   {
     "slug": "metal-music-autumn-2026-anniversary-classics-judas-priest",
@@ -1672,7 +1654,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Kabir Mehta",
     "authorId": "kabir-mehta",
     "category": "Music Trends",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Metal Music",
       "Judas Priest",
@@ -1683,7 +1665,6 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/9/98/Judas_Priest_%2853802698324%29.jpg",
     "readTime": "4 min read",
     "wordCount": 862,
-    "scheduledDate": "2026-11-03T04:30:00.000Z"
   },
   {
     "slug": "how-to-keep-up-with-new-music-without-drowning-listeners-guide",
@@ -1694,7 +1675,7 @@ export const BLOG_POSTS: BlogPost[] = [
     "author": "Anshu Saxena",
     "authorId": "anshu-saxena",
     "category": "Music Trends",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Music Discovery",
       "Listening Guide",
@@ -1705,18 +1686,17 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Groove_and_needle_in_close_embrace_from_beginning_to_end.jpg",
     "readTime": "4 min read",
     "wordCount": 834,
-    "scheduledDate": "2026-11-04T04:30:00.000Z"
   },
   {
     "slug": "road-to-2027-music-awards-tours-releases-year-end-calendar",
     "title": "The Road to 2027: Awards, Tours and Releases to Watch in the Last Ten Weeks of 2026",
     "excerpt": "The final stretch of the year is traditionally the busiest in music. Awards campaigns begin, labels release their biggest albums and tours move into their most visible phases. With ten weeks left, here is a ...",
-    "content": "<p class=\"lead-text\">The final stretch of the year is traditionally the busiest in music. Awards campaigns begin, labels release their biggest albums and tours move into their most visible phases. With ten weeks left, here is a calendar of events and storylines worth following.</p>\n\n    <h2>Late October</h2>\n    <p>The Recording Academy's first round of Grammy voting closes on October 22, and a day later, a major batch of albums arrives, including Anderson .Paak and Cordae's Heavy Is the Crown, Michael Kiwanuka's FUDGE and John Legend's Muse. The BTS world tour, as originally scheduled, wraps its Latin American run in São Paulo at the end of the month. Meanwhile, Taylor Swift's \"Patient Zero\" will try to hold the Hot 100 for a third week against Ella Langley and Drake.</p>\n\n    <h2>November</h2>\n    <p>November is the heaviest month. On November 4, Travis Japan release JEWELRY BOX. On November 6, Alanis Morissette, Skepta, Shygirl and Boys Noize release albums, along with expanded editions from Roxy Music and Evanescence and a Bob Dylan live archive. On November 13, U2 and Royal Blood arrive, and Randy Travis releases Same Old Way.</p>\n\n    <p>The key date is Monday, November 16. The Grammy nominations will be announced that day, and TOMORROW X TOGETHER will release Perfect Storm. The final week of the month sees a wave of vinyl editions on November 26 and 27, timed for holiday shopping.</p>\n\n    <p>Tour-wise, Myles Smith's English and Irish arena tour is scheduled for November. Olivia Rodrigo's Unraveled Tour, which started on September 25 in Hartford, Connecticut, continues, and Burna Boy's Unity Tour, announced in the summer, is expected to begin before the year ends alongside a new studio album.</p>\n\n    <h2>December</h2>\n    <p>Slayyyter's Wor$t Man in America arrives on December 4. The final round of Grammy voting begins on December 10 and runs until January 7. Streaming platforms traditionally publish their year-in-review features in early December, giving listeners a chance to see their own habits and giving fans a first look at the most-streamed artists of the year.</p>\n\n    <h2>Into 2027</h2>\n    <p>The 2027 Grammy Awards will take place on Sunday, February 7, in Los Angeles, and air on ABC for the first time since 1972. Arijit Singh begins a nine-city India tour in January to mark twenty years of his career, and the BTS world tour continues into March, with dates in Australia, Hong Kong and the Philippines planned for 2027.</p>\n\n    <h2>Storylines to Follow</h2>\n    <p>Several narratives could shape the end of the year. Can Taylor Swift add to her tally of 16 Hot 100 number ones, which leaves her four short of The Beatles? How long will Ella Langley's \"Choosin' Texas\" remain in the top five? Will Drake and Don Toliver's \"Solar Eclipse\" climb? And will Olivia Rodrigo's \"Expectations\" remix with Chappell Roan reach the top ten?</p>\n\n    <p>On the awards side, the key questions are which of 2026's biggest albums, including Rodrigo's, BTS's Arirang and Drake's ICEMAN, will be recognised, and whether country's huge year translates into nominations. In the live sphere, Pollstar's year-end numbers will show whether the 12 percent growth reported at mid-year held up.</p>\n\n    <h2>The Business Backdrop</h2>\n    <p>Behind the headlines are industry shifts that will continue into the new year. Spotify has guided for 305 million Premium subscribers in the third quarter, and its new remixing tool and ticket-access feature are still rolling out. The AI music debate is also moving fast, with labels, platforms and generators still negotiating the terms of coexistence. Expect more licensing deals and disclosure rules before the year is out.</p>\n\n    <h2>How to Plan Your Listening</h2>\n    <p>A calendar like this one can be overwhelming, so choose a few anchor dates. Perhaps you will mark November 6 for the albums, November 16 for the nominations and December 4 for the next big pop release. Add a concert or two if you can, and set aside time for catching up on the records that matter most to you.</p>\n\n    <h2>A Last Word</h2>\n    <p>Every year ends with a rush, and 2026 is no exception. But the best way to enjoy it is not to chase everything. Choose what moves you, ignore the noise and let the music do its work. There is plenty ahead.</p>\n\n    <p>last date jaab post huya usske baad se aag 17 tarik hai daily 1 post dikhna chaiye or aaagar 17 se over ho raha to 17tarik v add karo 18 tarik ke baad schedule rakho automatic post hoga</p>\n\n    <h2></USER_REQUEST></h2>\n    <h2><ADDITIONAL_METADATA></h2>\n    <p>The current local time is: 2026-10-17T20:28:10+05:30.</p>\n\n    <h2></ADDITIONAL_METADATA></h2>\n    <div class=\"blog-highlight-box\">\n      <h3>Experience High-Fidelity Streaming on GanaTube</h3>\n      <p>Stream your favorite artists with studio-master acoustic clarity and zero audio interruptions. Create real-time <strong>Listen Together</strong> rooms with friends, explore curated charts, and enjoy continuous playback without mandatory registrations on <a href=\"/\">GanaTube.in</a>.</p>\n    </div>",
+    "content": "<p class=\"lead-text\">The final stretch of the year is traditionally the busiest in music. Awards campaigns begin, labels release their biggest albums and tours move into their most visible phases. With ten weeks left, here is a calendar of events and storylines worth following.</p>\n\n    <h2>Late October</h2>\n    <p>The Recording Academy's first round of Grammy voting closes on October 22, and a day later, a major batch of albums arrives, including Anderson .Paak and Cordae's Heavy Is the Crown, Michael Kiwanuka's FUDGE and John Legend's Muse. The BTS world tour, as originally scheduled, wraps its Latin American run in São Paulo at the end of the month. Meanwhile, Taylor Swift's \"Patient Zero\" will try to hold the Hot 100 for a third week against Ella Langley and Drake.</p>\n\n    <h2>November</h2>\n    <p>November is the heaviest month. On November 4, Travis Japan release JEWELRY BOX. On November 6, Alanis Morissette, Skepta, Shygirl and Boys Noize release albums, along with expanded editions from Roxy Music and Evanescence and a Bob Dylan live archive. On November 13, U2 and Royal Blood arrive, and Randy Travis releases Same Old Way.</p>\n\n    <p>The key date is Monday, November 16. The Grammy nominations will be announced that day, and TOMORROW X TOGETHER will release Perfect Storm. The final week of the month sees a wave of vinyl editions on November 26 and 27, timed for holiday shopping.</p>\n\n    <p>Tour-wise, Myles Smith's English and Irish arena tour is scheduled for November. Olivia Rodrigo's Unraveled Tour, which started on September 25 in Hartford, Connecticut, continues, and Burna Boy's Unity Tour, announced in the summer, is expected to begin before the year ends alongside a new studio album.</p>\n\n    <h2>December</h2>\n    <p>Slayyyter's Wor$t Man in America arrives on December 4. The final round of Grammy voting begins on December 10 and runs until January 7. Streaming platforms traditionally publish their year-in-review features in early December, giving listeners a chance to see their own habits and giving fans a first look at the most-streamed artists of the year.</p>\n\n    <h2>Into 2027</h2>\n    <p>The 2027 Grammy Awards will take place on Sunday, February 7, in Los Angeles, and air on ABC for the first time since 1972. Arijit Singh begins a nine-city India tour in January to mark twenty years of his career, and the BTS world tour continues into March, with dates in Australia, Hong Kong and the Philippines planned for 2027.</p>\n\n    <h2>Storylines to Follow</h2>\n    <p>Several narratives could shape the end of the year. Can Taylor Swift add to her tally of 16 Hot 100 number ones, which leaves her four short of The Beatles? How long will Ella Langley's \"Choosin' Texas\" remain in the top five? Will Drake and Don Toliver's \"Solar Eclipse\" climb? And will Olivia Rodrigo's \"Expectations\" remix with Chappell Roan reach the top ten?</p>\n\n    <p>On the awards side, the key questions are which of 2026's biggest albums, including Rodrigo's, BTS's Arirang and Drake's ICEMAN, will be recognised, and whether country's huge year translates into nominations. In the live sphere, Pollstar's year-end numbers will show whether the 12 percent growth reported at mid-year held up.</p>\n\n    <h2>The Business Backdrop</h2>\n    <p>Behind the headlines are industry shifts that will continue into the new year. Spotify has guided for 305 million Premium subscribers in the third quarter, and its new remixing tool and ticket-access feature are still rolling out. The AI music debate is also moving fast, with labels, platforms and generators still negotiating the terms of coexistence. Expect more licensing deals and disclosure rules before the year is out.</p>\n\n    <h2>How to Plan Your Listening</h2>\n    <p>A calendar like this one can be overwhelming, so choose a few anchor dates. Perhaps you will mark November 6 for the albums, November 16 for the nominations and December 4 for the next big pop release. Add a concert or two if you can, and set aside time for catching up on the records that matter most to you.</p>\n\n    <h2>A Last Word</h2>\n    <p>Every year ends with a rush, and 2026 is no exception. But the best way to enjoy it is not to chase everything. Choose what moves you, ignore the noise and let the music do its work. There is plenty ahead.</p>\n\n    <div class=\"blog-highlight-box\">\n      <h3>Experience High-Fidelity Streaming on GanaTube</h3>\n      <p>Stream your favorite artists with studio-master acoustic clarity and zero audio interruptions. Create real-time <strong>Listen Together</strong> rooms with friends, explore curated charts, and enjoy continuous playback without mandatory registrations on <a href=\"/\">GanaTube.in</a>.</p>\n    </div>",
     "date": "Nov 5, 2026",
     "author": "Anshu Saxena",
     "authorId": "anshu-saxena",
     "category": "Music Trends",
-    "status": "scheduled",
+    "status": "published",
     "tags": [
       "Year-End Music",
       "Awards Season",
@@ -1727,6 +1707,5 @@ export const BLOG_POSTS: BlogPost[] = [
     "coverImage": "https://upload.wikimedia.org/wikipedia/commons/4/41/Finale_%282013-08-25_by_Ian_T._McFarland%29.jpg",
     "readTime": "4 min read",
     "wordCount": 767,
-    "scheduledDate": "2026-11-05T04:30:00.000Z"
   }
 ];

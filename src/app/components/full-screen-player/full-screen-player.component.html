@@ -77,7 +77,6 @@
             [src]="useLowQualityCover ? effectiveTrack()?.thumbnail : (effectiveTrack()?.thumbnailHigh || effectiveTrack()?.thumbnail)" 
             [alt]="effectiveTrack()?.title"
             class="fs-album-art track-transition"
-            [class.ad-active]="showCoverAd"
             [class.track-changing]="isChanging"
             (load)="onCoverLoad()"
             (error)="onCoverError()"
@@ -86,12 +85,6 @@
           <!-- Loading Spinner -->
           <div class="fs-loading-spinner" *ngIf="playerService.playerState() === 'loading'">
             <svg lucideLoader2 [attr.size]="48" class="spin-animation" stroke="rgba(255,255,255,0.8)"></svg>
-          </div>
-          
-          <!-- Hardcore Ad Overlay (Ad ↔ Cover loop) -->
-          <div class="fs-cover-ad-container" [class.active]="showCoverAd">
-            <app-adsterra-banner [tag]="coverAdTag"></app-adsterra-banner>
-            <span class="fs-cover-ad-label">Sponsored</span>
           </div>
           
           <!-- Guide Overlay for Double Tap -->
@@ -112,8 +105,9 @@
 
         </div>
 
-        <!-- Amazon affiliate offer cards (desktop side rail / mobile shelf) -->
+        <!-- Amazon affiliate offer cards (temporarily disabled for AdSense approval review)
         <app-affiliate-cards *ngIf="activeView === 'artwork' && (!isDesktop || !isSidebarVisible)"></app-affiliate-cards>
+        -->
       </div>
 
       <!-- Lists View Container -->

@@ -9,7 +9,7 @@
   <div class="sidebar-backdrop" *ngIf="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
 
   <!-- Sidebar -->
-  <nav class="app-sidebar" [class.mobile-open]="isMobileMenuOpen()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog'">
+  <nav class="app-sidebar" [class.mobile-open]="isMobileMenuOpen()" *ngIf="currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog' && currentPage() !== 'filter-content' && currentPage() !== 'content-filter'">
     <div class="sidebar-items">
       <div class="sidebar-item" (click)="resetSearchState()" [class.active]="currentPage() === 'home'">
         <svg lucideHome [attr.size]="24"></svg>
@@ -55,7 +55,7 @@
   </nav>
 
   <!-- Header -->
-  <header class="app-header" [class.scrolled]="isScrolled()" [class.header-hidden]="isNavbarHidden() && isNavbarAutoHide()" *ngIf="currentPage() !== 'rooms-view' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog' && currentPage() !== 'profile'">
+  <header class="app-header" [class.scrolled]="isScrolled()" [class.header-hidden]="isNavbarHidden() && isNavbarAutoHide()" *ngIf="currentPage() !== 'rooms-view' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'advertise' && currentPage() !== 'ad-booking' && currentPage() !== 'ad-terms' && currentPage() !== 'ad-prohibited' && currentPage() !== 'shorts' && currentPage() !== 'blog' && currentPage() !== 'profile' && currentPage() !== 'filter-content' && currentPage() !== 'content-filter'">
     <div class="header-inner">
       <div class="header-left">
         <!-- Mobile Hamburger Menu -->
@@ -103,16 +103,11 @@
           </ng-template>
         </ng-template>
       </div>
-
-      <!-- API Key Warning Banner -->
-      <div class="api-notice" *ngIf="apiKeyMissing">
-        <span>🔑 Demo mode — Add your <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">YouTube API Key</a> in <code>environment.ts</code> to enable real search</span>
-      </div>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="(currentPage() === 'home' || currentPage() === 'search') && (hasSearched() || isSearchMode())" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'" [class.is-gtanalytic]="currentPage() === 'gtanalytic'" [class.is-managegt]="currentPage() === 'managegt'" [class.is-blog]="currentPage() === 'blog'" [class.is-cms-management]="currentPage() === 'cms-management' || currentPage() === 'cms-admin'">
+  <main class="main-content" [class.has-player]="playerService.currentTrack() !== null" [class.searched]="(currentPage() === 'home' || currentPage() === 'search') && (hasSearched() || isSearchMode())" [class.blur]="isSearchMode()" [class.is-shorts]="currentPage() === 'shorts'" [class.is-rooms-view]="currentPage() === 'rooms-view'" [class.is-gtanalytic]="currentPage() === 'gtanalytic'" [class.is-managegt]="currentPage() === 'managegt'" [class.is-blog]="currentPage() === 'blog'" [class.is-cms-management]="currentPage() === 'cms-management' || currentPage() === 'cms-admin'" [class.is-filter-content]="currentPage() === 'filter-content' || currentPage() === 'content-filter'">
     <div *ngIf="currentPage() === 'profile'" class="profile-page-container genz-profile">
 
       <!-- Ambient Background -->
@@ -1198,12 +1193,6 @@
               </div>
             </ng-container>
 
-            <!-- Hardcore In-Feed Ad (Every 2 sections) -->
-            <div class="in-feed-ad-container" *ngIf="shelfIdx % 2 === 1">
-              <app-gt-native-banner *ngIf="shelfIdx === 1" [fallbackTag]="inFeedAdTag()"></app-gt-native-banner>
-              <app-adsterra-banner *ngIf="shelfIdx !== 1" [tag]="inFeedAdTag()"></app-adsterra-banner>
-              <span class="ad-label">Sponsored</span>
-            </div>
 
             <!-- Inject Artists after 5th shelf (index 4) or at the end if fewer than 5 shelves -->
             <ng-container *ngIf="shelfIdx === 4 || (loadedShelves().length < 5 && shelfIdx === loadedShelves().length - 1)">
@@ -1343,6 +1332,9 @@
       <router-outlet></router-outlet>
     </div>
 
+    <!-- Content Filter Panel Section -->
+    <app-content-filter *ngIf="currentPage() === 'filter-content' || currentPage() === 'content-filter'"></app-content-filter>
+
     <!-- Discovery Page Section -->
     <app-discovery-page 
       *ngIf="currentPage() === 'discovery'"
@@ -1376,328 +1368,421 @@
       (back)="closePlaylist()">
     </app-playlist-page>
 
-    <!-- SEO & Discovery Showcase Section (Why GanaTube & High-Intent SEO Hubs) - ONLY ON HOME PAGE -->
+    <!-- SEO & Discovery Showcase Section (TuneFree-Style Editorial Discovery Hub & Guide) - ONLY ON HOME PAGE -->
     <div class="footer-seo-container" *ngIf="currentPage() === 'home' && !hasSearched() && !isSearchMode()">
       
-      <!-- TOP HUB: Browse Music by Genre, Mood & Theme (Pills/Chips Bar) -->
-      <section class="seo-card-block seo-genres-block">
-        <div class="seo-block-header compact">
+      <!-- HERO CONTEXT CARD: Find music with context -->
+      <section class="seo-card-block hub-hero-banner">
+        <div class="hub-hero-inner">
+          <div class="hub-hero-text">
+            <h2 class="hub-hero-title">Find music with context, then keep the songs that fit.</h2>
+            <p class="hub-hero-sub">
+              GanaTube combines high-speed search, new releases, artist pages, playlists, favorites and queue controls with original articles about listening habits, playlist building, lyrics, focus music, workouts and shared listening.
+            </p>
+          </div>
+          <div class="hub-hero-pills">
+            <a routerLink="/how-it-works" class="hub-pill-btn">
+              <svg lucideZap [attr.size]="14"></svg>
+              <span>How It Works</span>
+            </a>
+            <a routerLink="/features" class="hub-pill-btn">
+              <svg lucideSliders [attr.size]="14"></svg>
+              <span>Platform Features</span>
+            </a>
+            <a routerLink="/faq" class="hub-pill-btn">
+              <svg lucideHelpCircle [attr.size]="14"></svg>
+              <span>FAQ & Help</span>
+            </a>
+            <a routerLink="/blog" class="hub-pill-btn">
+              <svg lucideNewspaper [attr.size]="14"></svg>
+              <span>Blog & Updates</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: Why GanaTube? (3 Pillars) -->
+      <section class="seo-card-block">
+        <div class="seo-block-header">
           <div class="seo-pill-badge mini">
-            <svg lucideMusic [attr.size]="13"></svg>
-            <span>MUSIC DISCOVERY HUBS</span>
+            <svg lucideSparkles [attr.size]="13"></svg>
+            <span>CORE PILLARS</span>
           </div>
-          <h3 class="seo-block-title">Popular Music Genres & Moods</h3>
-          <p class="seo-block-sub">Tap any genre or mood to explore curated tracks, trending chartbusters, and endless mixes</p>
+          <h3 class="seo-block-title">Why GanaTube?</h3>
+          <p class="seo-block-sub">Designed from the ground up for speed, privacy, and rich musical discovery</p>
         </div>
-        <div class="seo-tag-chips-wrap">
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Bollywood Hits' }" class="seo-tag-pill">Bollywood Hits</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Trending Hindi Songs' }" class="seo-tag-pill">Trending Hindi</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Punjabi Pop Chartbusters' }" class="seo-tag-pill">Punjabi Pop</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Lo-Fi Chill Beats' }" class="seo-tag-pill">Lo-Fi Chill</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Workout Gym Motivation' }" class="seo-tag-pill">Workout Beats</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Romantic Melodies' }" class="seo-tag-pill">Romantic Hits</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Sad Songs & Heartbreak' }" class="seo-tag-pill">Sad Songs</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: '90s Bollywood Evergreen' }" class="seo-tag-pill">90s Classics</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Bhojpuri Hit Gaana' }" class="seo-tag-pill">Bhojpuri Dhamaka</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'South Indian Hits' }" class="seo-tag-pill">South Hits</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Global English Pop' }" class="seo-tag-pill">English Pop</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Devotional & Bhakti Songs' }" class="seo-tag-pill">Bhakti & Aarti</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Party Mashup DJ Nonstop' }" class="seo-tag-pill">Party Mashup</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Indie Pop India' }" class="seo-tag-pill">Indie India</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Desi Hip Hop & Rap' }" class="seo-tag-pill">Desi Hip-Hop</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Acoustic Guitar Relax' }" class="seo-tag-pill">Acoustic Relax</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Sleep & Meditation 432Hz' }" class="seo-tag-pill">Sleep & Relax</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'Haryanvi Songs Latest' }" class="seo-tag-pill">Haryanvi Hits</a>
-        </div>
-      </section>
-
-      <!-- MAIN CARD: Why GanaTube (Searchable Keywords & Terms) -->
-      <section class="footer-seo-card">
-        <!-- Top Badge & Title -->
-        <div class="seo-card-header">
-          <div class="seo-pill-badge">
-            <svg lucideSparkles [attr.size]="14"></svg>
-            <span>FREE ONLINE MUSIC STREAMING • NO ADS • NO LOGIN</span>
+        <div class="hub-grid-3">
+          <div class="hub-pillar-card">
+            <div class="hub-pillar-badge">
+              <svg lucideCompass [attr.size]="18"></svg>
+            </div>
+            <h4 class="hub-pillar-title">Broad Music Discovery</h4>
+            <p class="hub-pillar-desc">
+              Search across an expansive music catalog and move swiftly between tracks, verified albums, artist discographies, mood playlists, regional languages, and fresh chart releases.
+            </p>
           </div>
-          <h2 class="seo-main-title">Why <span class="gradient-brand">GanaTube</span>?</h2>
-          <p class="seo-sub-title">Free Music Online Without Ads | India's Best Ad-Free Online Music Web App</p>
-        </div>
-
-        <!-- Smart SEO Content Paragraphs -->
-        <div class="seo-body-paragraphs">
-          <p>
-            <strong>GanaTube</strong> is the ultimate destination to <strong>play free music online without ads</strong> and <strong>stream songs without login</strong>. Experience seamless, high-definition (HD) music streaming across millions of tracks including latest <a routerLink="/language/hindi" class="seo-keyword-link">Hindi songs</a>, <a routerLink="/language/punjabi" class="seo-keyword-link">Punjabi chartbusters</a>, classic Bollywood melodies, vibrant <a routerLink="/language/bhojpuri" class="seo-keyword-link">Bhojpuri gana</a>, <a routerLink="/language/english" class="seo-keyword-link">English pop hits</a>, <a routerLink="/language/haryanvi" class="seo-keyword-link">Haryanvi tunes</a>, <a routerLink="/language/bengali" class="seo-keyword-link">Bengali songs</a>, and <a routerLink="/language/tamil" class="seo-keyword-link">Tamil hits</a> — all completely free with zero subscription fees.
-          </p>
-          <p>
-            Whether you need an <strong>unblocked music player</strong> for school, college, or workplace Wi-Fi, background audio playback on mobile and PC, real-time synchronized karaoke lyrics, or synchronized <a routerLink="/rooms" class="seo-keyword-link">Listen Together rooms</a> with friends, GanaTube delivers a distraction-free AMOLED dark web player with blazing-fast search across songs, albums, and artists.
-          </p>
-        </div>
-
-        <!-- 4 Feature Highlights Grid -->
-        <div class="seo-features-grid">
-          <div class="seo-feature-card">
-            <div class="feature-icon-badge">
-              <svg lucideFlame [attr.size]="20"></svg>
+          <div class="hub-pillar-card">
+            <div class="hub-pillar-badge">
+              <svg lucideHeart [attr.size]="18"></svg>
             </div>
-            <div class="feature-text">
-              <h4 class="feature-heading">100% Ad-Free Audio</h4>
-              <p class="feature-detail">Stream continuous music without annoying audio ads or commercial interruptions.</p>
-            </div>
+            <h4 class="hub-pillar-title">Personalized for You</h4>
+            <p class="hub-pillar-desc">
+              Content tailored to your individual tastes — Bollywood, Punjabi, Lo-Fi, Hip-Hop, Rock, Country, R&B, Latin, K-Pop, and dozens more genres with curated playlists and daily charts.
+            </p>
           </div>
-
-          <div class="seo-feature-card">
-            <div class="feature-icon-badge">
-              <svg lucideCheck [attr.size]="20"></svg>
+          <div class="hub-pillar-card">
+            <div class="hub-pillar-badge">
+              <svg lucideZap [attr.size]="18"></svg>
             </div>
-            <div class="feature-text">
-              <h4 class="feature-heading">No Login Required</h4>
-              <p class="feature-detail">Zero mandatory signups or credit cards. Jump right in and play any song instantly.</p>
-            </div>
-          </div>
-
-          <div class="seo-feature-card">
-            <div class="feature-icon-badge">
-              <svg lucideRadio [attr.size]="20"></svg>
-            </div>
-            <div class="feature-text">
-              <h4 class="feature-heading">Listen Together Rooms</h4>
-              <p class="feature-detail">Real-time synchronized playback and live room chat with friends anywhere in the world.</p>
-            </div>
-          </div>
-
-          <div class="seo-feature-card">
-            <div class="feature-icon-badge">
-              <svg lucideSparkles [attr.size]="20"></svg>
-            </div>
-            <div class="feature-text">
-              <h4 class="feature-heading">Unblocked Web Player</h4>
-              <p class="feature-detail">Lightweight AMOLED dark player unblocked on school, university, and office networks.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3 Transparent Pillars -->
-        <div class="seo-pillars-grid">
-          <div class="seo-pillar-card">
-            <h4 class="pillar-heading">What You Get</h4>
-            <ul class="pillar-bullet-list">
-              <li>High-definition 320kbps audio fidelity across global and regional tracks.</li>
-              <li>Background audio playback on desktop, laptop, Android & iOS devices.</li>
-              <li>Smart auto-queue algorithm that keeps the music playing endlessly.</li>
-              <li>Installable Progressive Web App (PWA) with zero disk storage footprint.</li>
-            </ul>
-          </div>
-
-          <div class="seo-pillar-card">
-            <h4 class="pillar-heading">Performance & Privacy</h4>
-            <ul class="pillar-bullet-list">
-              <li>Official API streaming architecture with zero hosted copyrighted files.</li>
-              <li>Strict DMCA compliance and instant copyright protection mechanisms.</li>
-              <li>Privacy-first local storage with optional Google cross-device library sync.</li>
-              <li>Pure AMOLED black UI (`#121212`) designed to conserve battery on OLED screens.</li>
-            </ul>
-          </div>
-
-          <div class="seo-pillar-card">
-            <h4 class="pillar-heading">Explore Platform</h4>
-            <ul class="pillar-bullet-list">
-              <li><a routerLink="/discovery" class="seo-keyword-link">Discovery Charts</a>: Top trending songs across 10+ languages.</li>
-              <li><a routerLink="/curated-playlists" class="seo-keyword-link">Curated Playlists</a>: Hand-picked mood, party & study playlists.</li>
-              <li><a routerLink="/rooms" class="seo-keyword-link">Live Audio Rooms</a>: Join community rooms and listen with friends.</li>
-              <li><a routerLink="/privacy-policy" class="seo-keyword-link">Privacy Policy</a>: Transparent data protection and cookie disclosures.</li>
-            </ul>
+            <h4 class="hub-pillar-title">Lightweight Listening</h4>
+            <p class="hub-pillar-desc">
+              Start listening instantly without complex setups, mandatory logins, or commercial interruptions, then optionally sync your account for saved favorites, playlists, and cross-session library tools.
+            </p>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 2: Popular Searches / High-Volume SEO Terms (Pill Grid) -->
+      <!-- SECTION: GanaTube Music Guide -->
+      <section class="seo-card-block">
+        <div class="seo-block-header">
+          <div class="seo-pill-badge mini">
+            <svg lucideBookOpen [attr.size]="13"></svg>
+            <span>EDITORIAL PLATFORM GUIDE</span>
+          </div>
+          <h3 class="seo-block-title">GanaTube Music Guide</h3>
+          <p class="seo-block-sub">How our architecture balances deep discovery with distraction-free playback</p>
+        </div>
+        <div class="hub-guide-body">
+          <p>
+            GanaTube is engineered to help listeners quickly discover music without getting lost in clutter. The home page combines country-aware sections, trending tracks, quick genre jump points and recent releases into a clean, modern layout.
+          </p>
+          <p>
+            Search gives you instant access to songs, full albums, artist discographies and user-curated playlists. When you find music you want to return to, you can save it to your personal library, organize it into playlists, and keep playback going with background playback and queue controls.
+          </p>
+          <p>
+            Beyond basic streaming, GanaTube publishes in-depth editorial articles covering release analysis, workout playlists, lyric meaning, music theory, study audio, and chart breakdowns — helping you get more value out of every listening session.
+          </p>
+        </div>
+      </section>
+
+      <!-- SECTION: Listening FAQ -->
+      <section class="seo-card-block">
+        <div class="seo-block-header">
+          <div class="seo-pill-badge mini">
+            <svg lucideHelpCircle [attr.size]="13"></svg>
+            <span>LISTENING FAQ</span>
+          </div>
+          <h3 class="seo-block-title">Listening FAQ</h3>
+          <p class="seo-block-sub">Clear answers to frequent streaming and navigation questions</p>
+        </div>
+        <div class="hub-faq-cards">
+          <div class="hub-faq-card">
+            <h4 class="hub-faq-q">
+              <span class="faq-indicator"></span>
+              How does GanaTube organize music discovery?
+            </h4>
+            <p class="hub-faq-a">
+              GanaTube combines live search, country-aware homepage sections, genre playlists, artist pages, and album collections. That makes it easy to move between a broad catalog search and curated listening paths that fit your day.
+            </p>
+          </div>
+          <div class="hub-faq-card">
+            <h4 class="hub-faq-q">
+              <span class="faq-indicator"></span>
+              Do I need an account to listen?
+            </h4>
+            <p class="hub-faq-a">
+              No. You can start listening right away. Creating a free account lets you save favorite tracks, build personal playlists, and sync your music library across devices.
+            </p>
+          </div>
+          <div class="hub-faq-card">
+            <h4 class="hub-faq-q">
+              <span class="faq-indicator"></span>
+              What kind of music articles does GanaTube publish?
+            </h4>
+            <p class="hub-faq-a">
+              GanaTube covers playlist curation, lyrics, workout music, study audio, chart deep dives, and listening habits. The articles are written for active listeners who want deeper context around the music they stream.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: GanaTube Blog & Updates -->
+      <section class="seo-card-block">
+        <div class="hub-section-split-header">
+          <div>
+            <div class="seo-pill-badge mini">
+              <svg lucideNewspaper [attr.size]="13"></svg>
+              <span>EDITORIAL INSIGHTS</span>
+            </div>
+            <h3 class="seo-block-title">GanaTube Blog & Updates</h3>
+            <p class="seo-block-sub">
+              Read original articles covering playlist curation, music for focus, lyric breakdowns, workout playlists, release deep dives, and community listening.
+            </p>
+          </div>
+          <a routerLink="/blog" class="hub-action-link">
+            <span>Explore all articles</span>
+            <svg lucideArrowRight [attr.size]="15"></svg>
+          </a>
+        </div>
+        <div class="hub-articles-grid">
+          <a routerLink="/blog" class="hub-article-card">
+            <span class="article-tag">CHART ANALYSIS</span>
+            <h4 class="article-title">Taylor Swift's "Patient Zero" Holds the Hot 100 as Country and Hip-Hop Collide in the Top Five</h4>
+            <p class="article-excerpt">A deep examination into billboard chart retention, streaming velocity, and how genre crossover is redefining the modern commercial top tier.</p>
+            <div class="article-meta">Read feature &rarr;</div>
+          </a>
+          <a routerLink="/blog" class="hub-article-card">
+            <span class="article-tag">FOCUS & SCIENCE</span>
+            <h4 class="article-title">The Science of Deep Work Audio: Why 120-130 BPM Electronic Beats Elevate Cognitive Flow</h4>
+            <p class="article-excerpt">Neuroscience insights on how steady tempo, minimalist melodies, and non-vocal frequencies sustain high focus during extended programming and study blocks.</p>
+            <div class="article-meta">Read feature &rarr;</div>
+          </a>
+          <a routerLink="/blog" class="hub-article-card">
+            <span class="article-tag">CURATION</span>
+            <h4 class="article-title">The Art of the Workout Queue: Matching Acoustic Dynamism to High-Intensity Heart Rate Zones</h4>
+            <p class="article-excerpt">How to construct progression queues that sync build-ups and drops to interval training stages, avoiding physical fatigue plateaus.</p>
+            <div class="article-meta">Read feature &rarr;</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SECTION: Frequently Asked Questions & Support -->
+      <section class="seo-card-block">
+        <div class="hub-section-split-header">
+          <div>
+            <div class="seo-pill-badge mini">
+              <svg lucideHelpCircle [attr.size]="13"></svg>
+              <span>SUPPORT & HELP</span>
+            </div>
+            <h3 class="seo-block-title">Frequently Asked Questions</h3>
+            <p class="seo-block-sub">
+              Quick answers about using GanaTube, finding music, saving playlists, account setup, and platform features.
+            </p>
+          </div>
+          <a routerLink="/faq" class="hub-action-link">
+            <span>Explore all FAQs</span>
+            <svg lucideArrowRight [attr.size]="15"></svg>
+          </a>
+        </div>
+        <div class="hub-faq-cards">
+          <div class="hub-faq-card">
+            <h4 class="hub-faq-q">
+              <span class="faq-indicator"></span>
+              Is GanaTube unblocked on school, university, and office Wi-Fi?
+            </h4>
+            <p class="hub-faq-a">
+              Yes. GanaTube runs as a high-performance web application over secure HTTPS with negligible bandwidth overhead and zero intrusive bloat, keeping it accessible across educational and corporate networks.
+            </p>
+          </div>
+          <div class="hub-faq-card">
+            <h4 class="hub-faq-q">
+              <span class="faq-indicator"></span>
+              Can I listen together in real time with friends?
+            </h4>
+            <p class="hub-faq-a">
+              Yes. Our Listen Together rooms synchronize playback down to the millisecond across multiple listeners. Jump into a room, chat in real time, and co-curate the active listening queue.
+            </p>
+          </div>
+          <div class="hub-faq-card">
+            <h4 class="hub-faq-q">
+              <span class="faq-indicator"></span>
+              Does background playback work on mobile and desktop?
+            </h4>
+            <p class="hub-faq-a">
+              Yes. You can switch browser tabs, minimize your window, or lock your mobile device while audio keeps playing seamlessly with synchronized lyrics and dynamic smart queue continuity.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: Popular Searches (Pills Bar) -->
       <section class="seo-card-block">
         <div class="seo-block-header compact">
           <div class="seo-pill-badge mini">
             <svg lucideSearch [attr.size]="13"></svg>
             <span>POPULAR SEARCHES</span>
           </div>
-          <h3 class="seo-block-title">Trending Search Terms & Keywords</h3>
-          <p class="seo-block-sub">Frequently searched music queries on GanaTube</p>
+          <h3 class="seo-block-title">Trending Search Terms & Queries</h3>
+          <p class="seo-block-sub">Frequently explored music genres, artists, and moods on GanaTube</p>
         </div>
         <div class="seo-tag-chips-wrap">
           <a [routerLink]="['/search']" [queryParams]="{ q: 'free music online without ads' }" class="seo-search-pill">free music online without ads</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'listen to free music unblocked' }" class="seo-search-pill">listen to free music unblocked</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'unblocked music player' }" class="seo-search-pill">unblocked music player</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'free music streaming unblocked' }" class="seo-search-pill">free music streaming unblocked</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'free music online unblocked' }" class="seo-search-pill">free music online unblocked</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'music player unblocked' }" class="seo-search-pill">music player unblocked</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'listen songs online free without login' }" class="seo-search-pill">listen songs online without login</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'ad free music streaming' }" class="seo-search-pill">ad-free music streaming</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'best free music app in india' }" class="seo-search-pill">best free music app in india</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'hindi songs online free' }" class="seo-search-pill">hindi songs online free</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'latest punjabi songs 2026' }" class="seo-search-pill">latest punjabi songs 2026</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'bollywood 90s evergreen songs' }" class="seo-search-pill">bollywood 90s evergreen hits</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'lo-fi beats for studying' }" class="seo-search-pill">lo-fi beats for study & focus</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'bhojpuri gana free online' }" class="seo-search-pill">bhojpuri hit gaana</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'latest punjabi songs 2025' }" class="seo-search-pill">latest punjabi songs 2025</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'bollywood 90s evergreen hits' }" class="seo-search-pill">bollywood 90s evergreen hits</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'lo-fi beats for study and focus' }" class="seo-search-pill">lo-fi beats for study & focus</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'bhojpuri hit gaana' }" class="seo-search-pill">bhojpuri hit gaana</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'listen together music with friends' }" class="seo-search-pill">listen together rooms</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'sleep music delta waves' }" class="seo-search-pill">sleep & relaxing music</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'gym workout motivation songs' }" class="seo-search-pill">gym workout songs</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'unblocked songs for school' }" class="seo-search-pill">unblocked songs for school</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'free music web player' }" class="seo-search-pill">free music web player</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'gym workout motivation songs' }" class="seo-search-pill">gym workout motivation</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'ambient sleep music 432hz' }" class="seo-search-pill">sleep & meditation music</a>
           <a [routerLink]="['/search']" [queryParams]="{ q: 'background music player pc' }" class="seo-search-pill">background music playback</a>
         </div>
       </section>
 
-      <!-- SECTION 3: Frequently Asked Questions & Support (Minimal Accordion/Card Grid) -->
+      <!-- SECTION: Discovering Music on GanaTube: A Comprehensive Platform Guide (5 Editorial Paragraphs) -->
       <section class="seo-card-block">
         <div class="seo-block-header">
           <div class="seo-pill-badge mini">
-            <svg lucideSparkles [attr.size]="13"></svg>
-            <span>LISTENING FAQ & ASSISTANCE</span>
+            <svg lucideFileText [attr.size]="13"></svg>
+            <span>ENGINEERING & CATALOG INSIGHTS</span>
           </div>
-          <h3 class="seo-block-title">Frequently Asked Questions</h3>
-          <p class="seo-block-sub">Everything you need to know about streaming free online music on GanaTube</p>
+          <h3 class="seo-block-title">Discovering Music on GanaTube.in: A Comprehensive Platform Guide</h3>
+          <p class="seo-block-sub">How our technical infrastructure powers zero-latency, high-fidelity music streaming</p>
         </div>
-
-        <div class="seo-faq-grid">
-          <div class="seo-faq-item">
-            <h4 class="faq-question">
-              <span class="faq-dot"></span>
-              How do I listen to free music online without login or account?
-            </h4>
-            <p class="faq-answer">
-              Simply open GanaTube, search for your favorite song, album, or artist in the search bar, and click play. We do not require signups, passwords, or payment details. You get unlimited ad-free music access immediately.
+        <div class="hub-editorial-stack">
+          <div class="editorial-entry">
+            <h4 class="editorial-heading">High-Dynamic-Range Audio & Data-Efficient Streaming</h4>
+            <p class="editorial-text">
+              Every stream rendered through GanaTube is dynamically calibrated for acoustic clarity while conserving network data consumption. Whether streaming on limited 4G cellular networks or high-speed fiber broadband, our playback pipeline dynamically buffers audio segments to prevent stutters, providing clean low-end bass response and transparent vocal separation across headphones, desktop monitors, and car audio systems.
             </p>
           </div>
-
-          <div class="seo-faq-item">
-            <h4 class="faq-question">
-              <span class="faq-dot"></span>
-              Is GanaTube unblocked on school, university, and office Wi-Fi?
-            </h4>
-            <p class="faq-answer">
-              Yes. GanaTube is built as a lightweight, clean web application that loads swiftly over standard secure HTTPS connections without heavy downloads or intrusive trackers, making it accessible on school and workplace networks.
+          <div class="editorial-entry">
+            <h4 class="editorial-heading">Broad Indian Regional & International Catalog Coverage</h4>
+            <p class="editorial-text">
+              GanaTube indexes an exhaustive global catalog spanning Hindi Bollywood soundtracks, high-energy Punjabi bhangra, soulful Bengali melodies, Bhojpuri party anthems, Haryanvi folk-pop, Tamil and Telugu blockbusters, alongside global English pop, synthwave, Latin reggaeton, and K-Pop releases. Dedicated regional hubs refresh daily so listeners never miss trending regional charts or breakout indie artists.
             </p>
           </div>
-
-          <div class="seo-faq-item">
-            <h4 class="faq-question">
-              <span class="faq-dot"></span>
-              Can I play music in the background while browsing or working?
-            </h4>
-            <p class="faq-answer">
-              Yes! GanaTube supports seamless background playback. You can switch between browser tabs, minimize your window, or lock your phone screen while enjoying uninterrupted streaming, synchronized lyrics, and auto-queue recommendations.
+          <div class="editorial-entry">
+            <h4 class="editorial-heading">Distraction-Free AMOLED Black Aesthetics & OLED Power Optimization</h4>
+            <p class="editorial-text">
+              Constructed with a pure AMOLED dark canvas (`#000000`), GanaTube provides an eye-friendly, glare-free aesthetic designed for late-night listening and deep productivity sessions. Because true black pixels emit zero illumination on OLED and AMOLED displays, running GanaTube continuously on mobile devices or modern laptops significantly lowers battery draw compared to light-themed web streaming applications.
             </p>
           </div>
-
-          <div class="seo-faq-item">
-            <h4 class="faq-question">
-              <span class="faq-dot"></span>
-              How does the "Listen Together" room feature work with friends?
-            </h4>
-            <p class="faq-answer">
-              Click on "Listen Together" from the navigation, create a room with one click, and share your unique room invite link. Playback timestamps are synced in real time across all listeners with live chat and collaborative queueing.
+          <div class="editorial-entry">
+            <h4 class="editorial-heading">Real-Time Synchronized "Listen Together" Rooms</h4>
+            <p class="editorial-text">
+              Music is inherently social. Through GanaTube's WebSocket-powered Listen Together infrastructure, hosts can spin up synchronized listening rooms in seconds. Friends can join via direct invite link without mandatory accounts, chat in real time, and request tracks into a shared queue with synchronized playback markers accurate to within fractions of a second across different browsers and regions.
+            </p>
+          </div>
+          <div class="editorial-entry">
+            <h4 class="editorial-heading">Privacy-First Architecture & DMCA Copyright Integrity</h4>
+            <p class="editorial-text">
+              GanaTube does not host copyrighted files or MP3 downloads. All playback is surfaced through third-party web streaming sources with full respect for intellectual property rights. Users benefit from client-side privacy where playlists and favorites can live locally in your browser storage or sync safely across devices via secure sign-in. A clear DMCA and copyright policy ensures ongoing compliance and transparency.
             </p>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 4: Comprehensive Platform Guide (Context & Deep Search Keywords) -->
-      <section class="seo-card-block">
-        <div class="seo-block-header">
-          <div class="seo-pill-badge mini">
-            <svg lucideCompass [attr.size]="13"></svg>
-            <span>PLATFORM GUIDE</span>
+      <!-- SECTION: Feedback Card (Without Google login prompt) -->
+      <section class="seo-card-block hub-feedback-card">
+        <div class="hub-feedback-content">
+          <div class="hub-feedback-icon">
+            <svg lucideMessageSquare [attr.size]="22"></svg>
           </div>
-          <h3 class="seo-block-title">Discovering Music on GanaTube: Comprehensive Platform Guide</h3>
-          <p class="seo-block-sub">How GanaTube delivers the best free music streaming experience online</p>
-        </div>
-
-        <div class="seo-guide-columns">
-          <div class="seo-guide-col">
-            <h4 class="guide-col-title">High-Fidelity Audio & Smart Queue</h4>
-            <p class="guide-col-desc">
-              Every track on GanaTube streams with high dynamic range audio clarity, automatically calibrated to save mobile data on 4G/5G while preserving crystal-clear highs and deep bass. Our algorithmic auto-queue ensures that when your favorite song ends, closely matching recommendations and artist hits keep playing without awkward silences.
-            </p>
-          </div>
-
-          <div class="seo-guide-col">
-            <h4 class="guide-col-title">10+ Indian & Global Languages</h4>
-            <p class="guide-col-desc">
-              From trending Hindi Bollywood hits and upbeat Punjabi bhangra to Bhojpuri dance tracks, Haryanvi beats, Tamil melodies, Telugu mass tracks, Bengali classics, and global English pop — GanaTube offers dedicated language hubs with daily updated charts, curated playlists, and top artist collections.
-            </p>
-          </div>
-
-          <div class="seo-guide-col">
-            <h4 class="guide-col-title">True AMOLED Dark & Zero Battery Drain</h4>
-            <p class="guide-col-desc">
-              Built with an uncompromising AMOLED black aesthetic (`#121212`), GanaTube eliminates glare during night sessions while drastically reducing display battery consumption on mobile and laptop OLED screens. Enjoy distraction-free listening with real-time lyrics and an adjustable sleep timer.
-            </p>
+          <div class="hub-feedback-copy">
+            <h4 class="hub-feedback-title">Help Us Improve GanaTube</h4>
+            <p class="hub-feedback-sub">Have feedback, feature ideas, or an issue to report? Let our engineering team know.</p>
           </div>
         </div>
-      </section>
-
-      <!-- SECTION 5: Minimal Community / Feedback CTA -->
-      <section class="seo-card-block seo-feedback-cta">
-        <div class="feedback-cta-content">
-          <div class="feedback-cta-icon">
-            <svg lucideMessageSquare [attr.size]="20"></svg>
-          </div>
-          <div class="feedback-cta-text">
-            <h4 class="feedback-cta-heading">Help Us Make GanaTube Better</h4>
-            <p class="feedback-cta-sub">Have a feature request, missing song, or improvement idea? We'd love to hear from you.</p>
-          </div>
-        </div>
-        <button class="feedback-cta-btn" (click)="openFeedbackPopup()">
+        <button class="hub-feedback-btn" (click)="openFeedbackPopup()">
           <span>Share Feedback</span>
+          <svg lucideArrowRight [attr.size]="14"></svg>
         </button>
       </section>
 
     </div>
 
-    <!-- Modern Footer -->
-    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts'">
-      <div class="footer-giant-brand">ganatube.in</div>
-      <div class="footer-content">
-        <div class="footer-col" style="grid-column: span 2; padding-right: 20px;">
-          <h3 class="col-title" style="font-size: 1.8rem; margin-bottom: 8px;">Experience seamless, distraction-free music streaming with ganatube.in.</h3>
-          <p class="col-desc" style="font-size: 1rem; color: rgba(255, 255, 255, 0.7); max-width: 600px;">We prioritize speed, privacy, and exceptional audio quality. Enjoy powerful features like lightning-fast search, PC background playback, and collaborative listening rooms. Our mission is to deliver a premium musical journey without any interruptions.</p>
+    <!-- Modern Footer with "More Ways to Discover" Discovery Card -->
+    <footer class="app-footer-modern" *ngIf="currentPage() !== 'rooms' && currentPage() !== 'rooms-view' && currentPage() !== 'playlist' && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'search' && !isSearchMode() && currentPage() !== 'shorts' && currentPage() !== 'filter-content' && currentPage() !== 'content-filter'">
+      
+      <!-- "More Ways to Discover Music on GanaTube" Discovery Card (Direct Match to TuneFree) -->
+      <div class="more-ways-hub-card">
+        <div class="more-ways-content-area">
+          <h3 class="more-ways-card-title">More Ways to Discover Music on GanaTube</h3>
+          <div class="more-ways-text-grid">
+            <p>
+              GanaTube combines music search, new releases, genre browsing, artist pages, albums, playlists, favorites and queue tools so listeners can move from discovery to playback without a heavy interface.
+            </p>
+            <p>
+              Our blog and platform updates highlight engineering efforts, performance adjustments, synchronization upgrades, and core functional developments to ensure lightweight, clean audio discovery.
+            </p>
+          </div>
         </div>
-        <div class="footer-col">
-          <h3 class="col-title">Ecosystem & Features</h3>
-          <ul class="col-links">
-            <li><a routerLink="/features">Features</a></li>
-            <li><a routerLink="/how-it-works">How It Works</a></li>
-            <li><a routerLink="/faq">FAQ</a></li>
-            <li><a routerLink="/blog">Blogs</a></li>
+        <div class="more-ways-pills-col">
+          <a routerLink="/how-it-works" class="more-ways-pill">How It Works</a>
+          <a routerLink="/features" class="more-ways-pill">Platform Features</a>
+          <a routerLink="/faq" class="more-ways-pill">Frequently Asked Questions</a>
+          <a routerLink="/blog" class="more-ways-pill">Blog & Updates</a>
+          <a routerLink="/about" class="more-ways-pill">About Us</a>
+          <a routerLink="/contact" class="more-ways-pill">Contact Support</a>
+        </div>
+      </div>
+
+      <!-- 4-Column Clean Nav Footer -->
+      <div class="footer-columns-grid">
+        <div class="footer-brand-section">
+          <div class="footer-brand-badge">
+            <img src="/ganatube-logo.webp" alt="GanaTube Logo" class="footer-logo-img" />
+            <span class="brand-title">GanaTube</span>
+          </div>
+          <p class="footer-brand-desc">Music discovery, embedded playback and lightweight playlist tools.</p>
+        </div>
+
+        <div class="footer-links-group">
+          <h4 class="footer-group-title">DISCOVER</h4>
+          <ul class="footer-group-list">
+            <li><a routerLink="/home">Home</a></li>
+            <li><a [routerLink]="['/search']" [queryParams]="{ q: 'New Releases 2025' }">New Releases</a></li>
+            <li><a routerLink="/search">Search</a></li>
+            <li><a routerLink="/blog">Blog</a></li>
+            <li><a routerLink="/discovery">Trending</a></li>
           </ul>
         </div>
-        <div class="footer-col">
-          <h3 class="col-title">Corporate & Legal</h3>
-          <ul class="col-links">
-            <!-- <li><a routerLink="/advertise">Advertise With Us</a></li> -->
-            <li><a routerLink="/about">About Us</a></li>
-            <li><a routerLink="/privacy-policy">Privacy Policy</a></li>
-            <li><a routerLink="/terms-of-service">Terms of Service</a></li>
-            <li><a routerLink="/cookie-policy">Cookie Policy</a></li>
-            <li><a routerLink="/dmca">DMCA & Copyright Policy</a></li>
-            <li><a routerLink="/disclaimer">Disclaimer</a></li>
+
+        <div class="footer-links-group">
+          <h4 class="footer-group-title">GENRES</h4>
+          <ul class="footer-group-list">
+            <li><a [routerLink]="['/search']" [queryParams]="{ q: 'Pop' }">Pop</a></li>
+            <li><a [routerLink]="['/search']" [queryParams]="{ q: 'Hip-Hop' }">Hip-Hop</a></li>
+            <li><a [routerLink]="['/search']" [queryParams]="{ q: 'Rock' }">Rock</a></li>
+            <li><a [routerLink]="['/search']" [queryParams]="{ q: 'Jazz' }">Jazz</a></li>
+            <li><a routerLink="/language/hindi">Bollywood</a></li>
+            <li><a routerLink="/language/punjabi">Punjabi</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-group">
+          <h4 class="footer-group-title">COMPANY</h4>
+          <ul class="footer-group-list">
+            <li><a routerLink="/about">About</a></li>
             <li><a routerLink="/contact">Contact</a></li>
+            <li><a routerLink="/privacy-policy">Privacy</a></li>
+            <li><a routerLink="/terms-of-service">Terms</a></li>
+            <li><a routerLink="/dmca">DMCA</a></li>
+            <li><a routerLink="/faq">FAQ</a></li>
           </ul>
         </div>
       </div>
-      <div class="footer-bottom-bar" style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 40px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-        <div class="copyright" style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;">
-          &copy; {{ currentYear || '2026' }} ganatube.in. All rights reserved.
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-meta-bar">
+        <div class="footer-copyright-text">
+          &copy; {{ currentYear || '2025' }} GanaTube.
         </div>
-        <div class="app-version" style="color: rgba(255, 255, 255, 0.3); font-size: 0.8rem; font-family: monospace;">
-          App Version {{ appVersion }}
+        <div class="footer-legal-inline-nav">
+          <a routerLink="/privacy-policy">Privacy</a>
+          <span class="legal-dot">·</span>
+          <a routerLink="/terms-of-service">Terms</a>
+          <span class="legal-dot">·</span>
+          <a routerLink="/dmca">DMCA</a>
+          <span class="legal-dot">·</span>
+          <a routerLink="/faq">FAQ</a>
+          <span class="legal-dot">·</span>
+          <a routerLink="/disclaimer">Disclaimer</a>
         </div>
+      </div>
+
+      <!-- Trust Disclosure Footnote -->
+      <div class="footer-trust-footnote">
+        GanaTube offers clean music listening and local discovery utilities. For transparency, users can review our About, Privacy, Terms, DMCA, Disclaimer, and Contact pages at any time.
       </div>
     </footer>
   </main>
 
-  <!-- Hardcore Global Ad Banner (above mini player) -->
-  <div class="sponsored-ad-banner" *ngIf="!isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic' && currentPage() !== 'cms-management' && currentPage() !== 'cms-admin' && currentPage() !== 'admin' && currentPage() !== 'rooms-view' && currentPage() !== 'rooms' && currentPage() !== 'blog'">
-    <app-adsterra-banner [tag]="bottomAdTag()"></app-adsterra-banner>
-    <span class="ad-label">Sponsored</span>
-  </div>
 
   <!-- Fixed Music Player -->
   <app-music-player 
@@ -1982,6 +2067,7 @@
 <!-- Promo Popup (ManageGT controlled, frequency-based) -->
 <app-promo-popup-modal *ngIf="!isAdminPage()"></app-promo-popup-modal>
 
-<!-- Entry Splash Ad Gate (24-hour reward interstitial) -->
+<!-- Entry Splash Ad Gate (24-hour reward interstitial) (Commented out for clean review mode)
 <app-entry-splash-ad *ngIf="!isAdminPage()"></app-entry-splash-ad>
-<app-gt-social-bar *ngIf="!isAnalyticsOrManageGt() && currentPage() !== 'managegt' && currentPage() !== 'gtanalytic'"></app-gt-social-bar>
+-->
+

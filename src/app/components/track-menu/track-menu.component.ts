@@ -19,11 +19,13 @@ import {
   LucideVolume1,
   LucideVolume2,
   LucideChevronDown,
-  LucideChevronUp
+  LucideChevronUp,
+  LucideBan
 } from '@lucide/angular';
 import { FormsModule } from '@angular/forms';
 import { OfflineService } from '../../services/offline.service';
 import { YoutubeApiService } from '../../services/youtube-api.service';
+import { ContentFilterService } from '../../services/content-filter.service';
 
 @Component({
   selector: 'app-track-menu',
@@ -43,7 +45,8 @@ import { YoutubeApiService } from '../../services/youtube-api.service';
     LucideVolume1,
     LucideVolume2,
     LucideChevronDown,
-    LucideChevronUp
+    LucideChevronUp,
+    LucideBan
   ],
   templateUrl: './track-menu.component.html',
   styleUrls: ['./track-menu.component.scss']
@@ -72,6 +75,7 @@ export class TrackMenuComponent implements OnInit, OnChanges {
   public algorithmService = inject(AlgorithmService);
   public offlineService = inject(OfflineService);
   public toastService = inject(ToastService);
+  public contentFilter = inject(ContentFilterService);
   private router = inject(Router);
 
   isMobile = false;
@@ -479,5 +483,13 @@ export class TrackMenuComponent implements OnInit, OnChanges {
 
   getSliderBackground(value: number): string {
     return `linear-gradient(to right, #fff ${value}%, #333 ${value}%)`;
+  }
+
+  blockTrack(event: Event): void {
+    event.stopPropagation();
+    if (!this.track) return;
+    this.contentFilter.blockSong(this.track, 'Blocked via Track Menu').subscribe(() => {
+      this.close();
+    });
   }
 }

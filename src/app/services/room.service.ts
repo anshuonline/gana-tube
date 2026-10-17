@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { Track } from './player.service';
 import { ToastService } from './toast.service';
 import { inject } from '@angular/core';
+import { ContentFilterService } from './content-filter.service';
 
 export interface RoomMember {
   socketId: string;
@@ -55,6 +56,8 @@ export interface RoomInfo {
 })
 export class RoomService {
   private socket!: Socket;
+  private toastService = inject(ToastService);
+  private contentFilter = inject(ContentFilterService);
   
   public currentRoomInfo = signal<RoomInfo | null>(null);
   public members = signal<RoomMember[]>([]);
@@ -65,8 +68,6 @@ export class RoomService {
   public onLikeReceived = new EventEmitter<{senderName: string}>();
   public publicRooms = signal<RoomInfo[]>([]);
   public roomError = signal<string | null>(null);
-
-  private toastService = inject(ToastService);
 
   constructor() {
     this.connect();
@@ -249,6 +250,10 @@ export class RoomService {
   }
 
   requestSong(track: Track) {
+    if (this.contentFilter.isBlocked(track)) {
+      this.toastService.show('This song has been blocked and cannot be requested.', 'error');
+      return;
+    }
     this.socket.emit('room:recommend_song', { track });
   }
 

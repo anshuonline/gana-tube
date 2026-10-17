@@ -181,53 +181,6 @@
   }
 }
 
-.cm-ad-overlay {
-  position: absolute;
-  inset: 0;
-  background: #000;
-  opacity: 0;
-  transform: scale(1.05);
-  pointer-events: none;
-  transition: opacity 0.5s, transform 0.5s;
-  z-index: 5;
-
-  &.active {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-  }
-
-  a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    text-decoration: none;
-  }
-
-  .cm-ad-media {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-
-  .cm-ad-label {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0,0,0,0.7);
-    color: rgba(255,255,255,0.7);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-}
-
 // --- Controls Area (right of artwork) ---
 .cm-controls-area {
   flex: 1;

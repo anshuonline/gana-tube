@@ -121,12 +121,6 @@
             </button>
           </div>
         </div>
-
-        <!-- Hardcore In-Feed Ad (Every 6 songs, Max 6) -->
-        <div class="playlist-ad-row" *ngIf="i % 6 === 5 && i < 36">
-          <app-adsterra-banner [tag]="playlistAdTag()"></app-adsterra-banner>
-          <span class="ad-label">Sponsored</span>
-        </div>
       </ng-container>
       </div>
 

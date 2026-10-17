@@ -44,8 +44,6 @@ import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-
 import { CastService } from '../../services/cast.service';
 import { RoomService } from '../../services/room.service';
 import { Subscription } from 'rxjs';
-import { AdsterraBannerComponent } from '../ads/adsterra-banner/adsterra-banner.component';
-import { ADSTERRA_TAGS } from '../ads/ads.config';
 
 @Component({
   selector: 'app-full-screen-player',
@@ -54,7 +52,6 @@ import { ADSTERRA_TAGS } from '../ads/ads.config';
     CommonModule, 
     FormsModule,
     DragDropModule,
-    AdsterraBannerComponent,
     LucideChevronDown, 
     LucidePlay, 
     LucidePause, 
@@ -137,8 +134,6 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   lastSearchedQuery = '';
   private searchSub: Subscription | null = null;
 
-  readonly coverAdTag = ADSTERRA_TAGS.banner300x250;
-
   activeView: 'artwork' | 'queue' | 'lyrics' | 'related' | 'search' = 'artwork';
   isSidebarVisible = false;
   showMenu = false;
@@ -178,9 +173,6 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   
   searchResults: Track[] = [];
   searchLoading = false;
-  
-  showCoverAd = false;
-  private adTimers: any[] = [];
   
   displayTrack = signal<Track | null>(null);
   isChanging = false;
@@ -265,33 +257,6 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
           this.fetchRelated(track);
         }
       }
-      
-      // Manage Ad Timers
-      if (track) {
-        this.clearAdTimers();
-        this.showCoverAd = false;
-        
-        const loopAd = () => {
-          // Wait 5 seconds before showing ad
-          const t1 = setTimeout(() => {
-            if (this.isVisible) {
-              this.showCoverAd = true;
-            }
-            
-            // Wait 5 seconds before hiding (total cycle = 10s)
-            const t2 = setTimeout(() => {
-              this.showCoverAd = false;
-              
-              // Start next cycle
-              loopAd();
-            }, 5000);
-            this.adTimers.push(t2);
-          }, 5000);
-          this.adTimers.push(t1);
-        };
-        
-        loopAd();
-      }
     }, { allowSignalWrites: true });
 
     // Automatically track active lyric line based on playback time
@@ -331,7 +296,6 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clearAdTimers();
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
@@ -344,11 +308,6 @@ export class FullScreenPlayerComponent implements OnInit, OnDestroy {
       this.relatedSub.unsubscribe();
       this.relatedSub = null;
     }
-  }
-
-  clearAdTimers(): void {
-    this.adTimers.forEach(t => clearTimeout(t));
-    this.adTimers = [];
   }
 
   @HostListener('window:resize')

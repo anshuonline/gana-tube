@@ -32,9 +32,9 @@
     <!-- ================= 1. BLOG LISTING VIEW ================= -->
     <div *ngIf="!currentPost" class="blog-list-view">
       
-      <!-- Spotlight Hero Article Banner (Spotify Style) -->
+      <!-- Spotlight Hero Article Banner (Minimalist Editorial Style) -->
       <section class="spotlight-hero" *ngIf="featuredPost && selectedCategory === 'all' && !searchFilter" (click)="openPost(featuredPost.slug)">
-        <div class="spotlight-bg" [style.backgroundImage]="'url(' + featuredPost.coverImage + ')'"></div>
+        <div class="spotlight-bg"></div>
         <div class="spotlight-overlay"></div>
 
         <div class="spotlight-content">
@@ -53,7 +53,7 @@
               </span>
               <div class="author-details">
                 <span class="author-name">{{ featuredPost.author }}</span>
-                <span class="author-sub">{{ getAuthor(featuredPost.authorId).role }} • {{ featuredPost.date }}</span>
+                <span class="author-sub">{{ getAuthor(featuredPost.authorId).role }}</span>
               </div>
             </div>
 
@@ -105,27 +105,10 @@
               role="button"
               (keydown.enter)="openPost(post.slug)"
             >
-              <!-- Card Thumbnail -->
-              <div class="card-thumb-container">
-                <img
-                  [src]="post.coverImage"
-                  [alt]="post.title"
-                  (error)="onImageError($event, post)"
-                  loading="lazy"
-                  class="card-thumb-img"
-                />
-                <div class="card-thumb-shade"></div>
-                <span class="card-category-pill">{{ post.category || post.tags[0] }}</span>
-              </div>
-
               <!-- Card Body -->
               <div class="card-body">
                 <div class="card-meta-line">
-                  <span class="meta-date">
-                    <svg lucideClock [attr.size]="12"></svg>
-                    {{ post.date }}
-                  </span>
-                  <span class="meta-dot">•</span>
+                  <span class="card-category-pill">{{ post.category || post.tags[0] }}</span>
                   <span class="meta-time">{{ post.readTime }}</span>
                 </div>
 
@@ -313,10 +296,6 @@
         <header class="article-header">
           <div class="header-badges-row">
             <span class="article-cat-badge">{{ currentPost.category || currentPost.tags[0] }}</span>
-            <span class="article-date">
-              <svg lucideClock [attr.size]="13"></svg>
-              {{ currentPost.date }}
-            </span>
             <span class="article-read">{{ currentPost.readTime }}</span>
           </div>
 
@@ -340,17 +319,6 @@
             </div>
           </div>
         </header>
-
-        <!-- Featured Cover Image with Ambient Glow -->
-        <div class="article-hero-media">
-          <div class="ambient-glow" [style.backgroundImage]="'url(' + currentPost.coverImage + ')'"></div>
-          <img
-            [src]="currentPost.coverImage"
-            [alt]="currentPost.title"
-            (error)="onImageError($event, currentPost)"
-            class="article-featured-img"
-          />
-        </div>
 
         <!-- High-Contrast Clean Article Prose -->
         <div class="article-body-prose" [innerHTML]="currentPost.content"></div>
@@ -399,11 +367,8 @@
           <h3 class="related-title">More From GanaTube Editorial</h3>
           <div class="related-grid">
             <article class="related-card" *ngFor="let rel of getRelatedPosts(currentPost)" (click)="openPost(rel.slug)">
-              <div class="related-thumb">
-                <img [src]="rel.coverImage" [alt]="rel.title" loading="lazy" />
-                <span class="related-tag">{{ rel.category || rel.tags[0] }}</span>
-              </div>
               <div class="related-info">
+                <span class="related-tag">{{ rel.category || rel.tags[0] }}</span>
                 <h4 class="related-headline">{{ rel.title }}</h4>
                 <div class="related-meta">
                   <span>{{ rel.author }}</span>

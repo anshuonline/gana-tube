@@ -18,6 +18,24 @@ import { PAGE_CONTENT } from '../../data/static-pages';
       padding: 40px 20px;
       min-height: calc(100vh - 200px);
     }
+    .static-page-content a {
+      color: #38bdf8;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .static-page-content a:hover {
+      color: #ffffff;
+    }
+    .contact-card a {
+      color: #38bdf8;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(56, 189, 248, 0.6);
+    }
+    .contact-card a:hover {
+      color: #ffffff;
+      border-bottom-color: #ffffff;
+    }
   `]
 })
 export class StaticPageComponent implements OnInit {

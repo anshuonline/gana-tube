@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, ViewEncapsulation, HostListener, computed, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideChevronLeft, LucideChevronRight, LucideHeart, LucideClock, LucideArrowLeft, LucideFileText, LucideStar } from '@lucide/angular';
+  import { LucideSearch, LucideUsers, LucideDownload, LucidePlay, LucideHome, LucideLibrary, LucideUser, LucideMessageSquare, LucideMusic, LucideShare2, LucideCheck, LucideFlame, LucideCompass, LucideMenu, LucideGift, LucideImage, LucideEdit3, LucideLogOut, LucideX, LucideRadio, LucideSparkles, LucideChevronDown, LucideChevronLeft, LucideChevronRight, LucideHeart, LucideClock, LucideArrowLeft, LucideFileText, LucideStar, LucideBookOpen, LucideArrowRight, LucideZap, LucideHelpCircle, LucideNewspaper, LucideSliders } from '@lucide/angular';
 
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
@@ -22,6 +22,7 @@ import { UserService } from './services/user.service';
 import { AnalyticsService } from './services/analytics.service';
 import { AppStateService } from './services/app-state.service';
 import { SearchHistoryService } from './services/search-history.service';
+import { ContentFilterService } from './services/content-filter.service';
 import { environment } from '../environments/environment';
 import { Subject, forkJoin, of } from 'rxjs';
 import { takeUntil, filter, catchError } from 'rxjs/operators';
@@ -51,14 +52,11 @@ import { CuratedPlaylistsComponent } from './components/curated-playlists/curate
   import { PromoPopupModalComponent } from './components/promo-popup-modal/promo-popup-modal.component';
   import { BackgroundPlayPopupComponent } from './components/background-play-popup/background-play-popup.component';
   import { EntrySplashAdComponent } from './components/entry-splash-ad/entry-splash-ad.component';
-import { AdsterraBannerComponent } from './components/ads/adsterra-banner/adsterra-banner.component';
-import { NativeBannerComponent } from './components/ads/native-banner/native-banner.component';
-import { SocialBarComponent } from './components/ads/social-bar/social-bar.component';
-import { ADSTERRA_TAGS, pickLeaderboardTag } from './components/ads/ads.config';
 import { RoomsDiscoverComponent } from './components/rooms/rooms-discover/rooms-discover.component';
 import { RoomViewComponent } from './components/rooms/room-view/room-view.component';
 import { RoomFeaturesPopupComponent } from './components/room-features-popup/room-features-popup.component';
 import { IntroVideoComponent } from './components/intro-video/intro-video.component';
+import { ContentFilterComponent } from './components/content-filter/content-filter.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
@@ -118,6 +116,13 @@ export interface HeroSlide {
     LucideClock,
     LucideStar,
     LucideArrowLeft,
+    LucideFileText,
+    LucideBookOpen,
+    LucideArrowRight,
+    LucideZap,
+    LucideHelpCircle,
+    LucideNewspaper,
+    LucideSliders,
     SearchBarComponent,
     SearchResultsComponent,
     MusicPlayerComponent,
@@ -148,13 +153,11 @@ export interface HeroSlide {
     PromoPopupModalComponent,
     BackgroundPlayPopupComponent,
     EntrySplashAdComponent,
-    AdsterraBannerComponent,
-    NativeBannerComponent,
-    SocialBarComponent,
     RoomsDiscoverComponent,
     RoomViewComponent,
     RoomFeaturesPopupComponent,
-    IntroVideoComponent
+    IntroVideoComponent,
+    ContentFilterComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
@@ -168,6 +171,7 @@ export class App implements OnInit {
   public pwaService = inject(PwaService);
   public analyticsService = inject(AnalyticsService);
   public roomService = inject(RoomService);
+  public contentFilterService = inject(ContentFilterService);
 
   openSpinWheel() {
     this.spinWheel?.open();
@@ -182,7 +186,7 @@ export class App implements OnInit {
   isCarModeVisible = signal<boolean>(false);
   apiKeyMissing = false;
   appVersion = 'v1.0.6';
-  currentYear = new Date().getFullYear();
+  currentYear = 2025;
   isMobileMenuOpen = signal<boolean>(false);
   isRouteLoading = signal<boolean>(false);
   isRouteDone = signal<boolean>(false);
@@ -677,19 +681,6 @@ export class App implements OnInit {
   linkCopied = false;
   pageContent = PAGE_CONTENT;
 
-  // Hardcore Ad State (direct ad-network tags — ManageAds removed)
-  viewportWidth = signal<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  bottomAdTag = computed(() => pickLeaderboardTag(this.viewportWidth()));
-  inFeedAdTag = computed(() =>
-    this.viewportWidth() >= 900 ? ADSTERRA_TAGS.banner728x90 : ADSTERRA_TAGS.banner160x300
-  );
-
-  @HostListener('window:resize')
-  onViewportResize(): void {
-    if (typeof window !== 'undefined') {
-      this.viewportWidth.set(window.innerWidth);
-    }
-  }
 
   // Home feed dynamic chips
   dynamicChips = signal<string[]>(['All', 'Trending', 'New Releases', 'Romantic', 'Lofi Chill', 'Party Hits', 'Acoustic', 'Arijit Singh', 'Pritam', 'Shreya Ghoshal']);
@@ -884,13 +875,13 @@ export class App implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  // ── Strict Ad Suppression Guard for GTAnalytic & ManageGT ──
+  // ── Strict Ad Suppression Guard for GTAnalytic, ManageGT & Content Filter ──
   isAnalyticsOrManageGt(customUrl?: string): boolean {
     const page = this.currentPage();
-    if (page === 'managegt' || page === 'gtanalytic' || page === 'cms-management' || page === 'cms-admin') return true;
+    if (page === 'managegt' || page === 'gtanalytic' || page === 'cms-management' || page === 'cms-admin' || page === 'filter-content' || page === 'content-filter') return true;
     if (typeof window !== 'undefined') {
       const p = (customUrl || window.location.pathname || '').toLowerCase();
-      if (p.startsWith('/gtanalytic') || p.startsWith('/managegt') || p.includes('gtanalytic') || p.includes('managegt') || p.startsWith('/cms-management') || p.startsWith('/cms-admin')) {
+      if (p.startsWith('/gtanalytic') || p.startsWith('/managegt') || p.includes('gtanalytic') || p.includes('managegt') || p.startsWith('/cms-management') || p.startsWith('/cms-admin') || p.startsWith('/filter-content') || p.startsWith('/content-filter')) {
         return true;
       }
     }
@@ -932,13 +923,7 @@ export class App implements OnInit {
         'div[id^="aswift_"]',
         'div[class*="google_ads"]',
         '#google-vignette',
-        '.google-anchor-ad',
-        '.sponsored-ad-banner',
-        '.in-feed-ad-container',
-        '.playlist-ad-row',
-        'app-adsterra-banner',
-        'app-gt-native-banner',
-        'app-gt-social-bar'
+        '.google-anchor-ad'
       ];
       document.querySelectorAll(selectors.join(',')).forEach(el => {
         try {
@@ -1807,9 +1792,17 @@ export class App implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
 
-      } else if (event.urlAfterRedirects.startsWith('/managegt') || event.urlAfterRedirects.startsWith('/gtanalytic') || event.urlAfterRedirects.startsWith('/cms-management') || event.urlAfterRedirects.startsWith('/cms-admin')) {
-        const seg = event.urlAfterRedirects.split('/')[1];
-        this.currentPage.set(seg === 'cms-admin' ? 'cms-management' : seg);
+      } else if (event.urlAfterRedirects.startsWith('/managegt') || event.urlAfterRedirects.startsWith('/gtanalytic') || event.urlAfterRedirects.startsWith('/cms-management') || event.urlAfterRedirects.startsWith('/cms-admin') || event.urlAfterRedirects.startsWith('/filter-content') || event.urlAfterRedirects.startsWith('/content-filter')) {
+        const rawSeg = event.urlAfterRedirects.split('/')[1] || '';
+        const seg = rawSeg.split('?')[0].split('#')[0];
+        const targetPage = seg === 'cms-admin' ? 'cms-management' : ((seg === 'content-filter' || seg === 'filter-content') ? 'filter-content' : seg);
+
+        this.currentPage.set(targetPage);
+        this.selectedPlaylist.set(null);
+        this.loadingPageTitle.set('');
+        this.isFullScreenPlayerVisible.set(false);
+        this.isSearchMode.set(false);
+        this.hasSearched.set(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       } else if (url === 'language') {
@@ -1869,7 +1862,7 @@ export class App implements OnInit {
       }
 
       // Check if it's a valid static page or one of our main pages
-      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'cms-management', 'cms-admin', 'discovery', 'offline', 'curated-playlists', 'blog'].includes(url) || this.pageContent[url]) {
+      if (['home', 'profile', 'search', 'library', 'socials', 'admin', 'managegt', 'gtanalytic', 'cms-management', 'cms-admin', 'discovery', 'offline', 'curated-playlists', 'blog', 'filter-content', 'content-filter'].includes(url) || this.pageContent[url]) {
         this.selectedPlaylist.set(null);
         this.loadingPageTitle.set('');
         this.currentPage.set(url);
@@ -1904,6 +1897,11 @@ export class App implements OnInit {
         this.updateSEO(
           'Free Music Online Without Ads | Best Online Music App - GanaTube',
           'Play free music online without ads and without login on GanaTube. Enjoy the best free music app in India for streaming seamless, ad-free online music instantly.'
+        );
+      } else if (this.pageContent[url]) {
+        this.updateSEO(
+          `${this.pageContent[url].title} | GanaTube`,
+          `Read the official ${this.pageContent[url].title} on GanaTube. Free, distraction-free music streaming and discovery.`
         );
       }
     });
@@ -2446,6 +2444,11 @@ export class App implements OnInit {
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const videoId = params.get('v') || params.get('play');
       if (videoId) {
+        if (this.contentFilterService.isBlockedVideoId(videoId)) {
+          this.toastService.show('This song has been blocked and cannot be played.', 'error');
+          this.router.navigate(['/home'], { replaceUrl: true });
+          return;
+        }
         // 1. Check if the user was already playing this song before refreshing
         let savedTrack: Track | null = null;
         if (typeof localStorage !== 'undefined') {

@@ -6,8 +6,8 @@
 // ═══════════════════════════════════════════════════════════════════════
 
 export const ENTRY_SPLASH_CONFIG = {
-  // Master toggle: set to true when ad script is ready to go live
-  enabled: true,
+  // Master toggle: set to false for clean review mode
+  enabled: false,
 
   // Forced countdown time in seconds before skip unlocks
   countdownSeconds: 6,
@@ -23,15 +23,5 @@ export const ENTRY_SPLASH_CONFIG = {
   safetyTimeoutMs: 6000,
 
   // AD NETWORK SCRIPT CODE
-  // Adsterra 300x250 Banner Ad Unit
-  adScript: `<script>
-  atOptions = {
-    'key' : 'ea39d6f7f9636d606fda87856f77c46e',
-    'format' : 'iframe',
-    'height' : 250,
-    'width' : 300,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highrevenueformat.com/ea39d6f7f9636d606fda87856f77c46e/invoke.js"></script>`
+  adScript: ``
 };

@@ -56,7 +56,8 @@ const AFFILIATE_CARDS: AffiliateCardProduct[] = [
   styleUrls: ['./affiliate-cards.component.scss']
 })
 export class AffiliateCardsComponent {
-  readonly products = AFFILIATE_CARDS;
+  // Temporarily empty for clean AdSense approval review (set back to AFFILIATE_CARDS once approved)
+  readonly products: AffiliateCardProduct[] = [];
   private dismissed = new Set<string>();
 
   get visibleProducts(): AffiliateCardProduct[] {
