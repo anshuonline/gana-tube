@@ -231,6 +231,12 @@ export class AnalyticsService {
     );
   }
 
+  getGuestDevices(password: string, range: string = 'dau') {
+    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getGuestDevices&pwd=${encodeURIComponent(password)}&range=${encodeURIComponent(range)}`).pipe(
+      catchError(err => (err?.name === 'AbortError' || err?.message?.includes('aborted')) ? EMPTY : throwError(() => err))
+    );
+  }
+
   getRoomAnalytics(password: string) {
     const backendUrl = (environment as any).backendUrl || 'http://localhost:3000/api';
     return this.http.get<{status: string, data?: any, message?: string}>(`${backendUrl}/room-analytics?pwd=${encodeURIComponent(password)}`).pipe(

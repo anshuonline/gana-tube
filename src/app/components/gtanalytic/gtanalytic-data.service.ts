@@ -108,6 +108,14 @@ export class GtanalyticDataService {
     return this.analyticsService.getGuestGeography(pwd, range);
   }
 
+  getGuestDevices(range: string = 'dau'): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) {
+      return of({ status: 'error', message: 'Unauthorized: Admin password required' });
+    }
+    return this.analyticsService.getGuestDevices(pwd, range);
+  }
+
   getDailySummary(date: string = ''): Observable<any> {
     const pwd = this.getPassword();
     if (!pwd) {

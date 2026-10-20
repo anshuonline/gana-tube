@@ -23,6 +23,16 @@
         <span class="geo-top-pill">Top 50</span>
       </button>
 
+      <!-- Device & Screen Breakdown Button -->
+      <button class="devices-action-btn" (click)="openDevicesModal()" title="View Device Ratio & Screen Size Analytics">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <span>Devices & Screens</span>
+        <span class="devices-ratio-pill">Ratio</span>
+      </button>
+
       <!-- IP & Bot Filter Settings Button -->
       <button class="settings-action-btn" (click)="openSettingsModal()" title="Manage Excluded IPs & Hostinger Bot Filter">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -106,6 +116,52 @@
       <div class="metric-sub">Total session time accumulated</div>
     </div>
 
+  </div>
+
+  <!-- Live Device Ratio Quick-Card -->
+  <div class="device-ratio-strip" *ngIf="recentDeviceRatio().total > 0">
+    <div class="strip-header">
+      <div class="strip-title-row">
+        <span class="strip-icon">📱</span>
+        <div>
+          <h3 class="strip-title">Audience Device Ratio</h3>
+          <p class="strip-sub">Live mobile vs desktop device split across recent active visitors</p>
+        </div>
+      </div>
+      <button class="strip-detail-btn" (click)="openDevicesModal()">
+        <span>Explore Full Screen &amp; OS Breakdown</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <!-- Multi-Color Segment Bar -->
+    <div class="ratio-bar-container">
+      <div class="ratio-segment mobile-seg" [style.width.%]="recentDeviceRatio().mobilePct" [title]="'Mobile: ' + recentDeviceRatio().mobilePct + '% (' + recentDeviceRatio().mobile + ' users)'"></div>
+      <div class="ratio-segment pc-seg" [style.width.%]="recentDeviceRatio().pcPct" [title]="'PC: ' + recentDeviceRatio().pcPct + '% (' + recentDeviceRatio().pc + ' users)'"></div>
+      <div class="ratio-segment tablet-seg" [style.width.%]="recentDeviceRatio().tabletPct" [title]="'Tablet: ' + recentDeviceRatio().tabletPct + '% (' + recentDeviceRatio().tablet + ' users)'"></div>
+    </div>
+
+    <!-- Legend & Stats Row -->
+    <div class="ratio-legend-row">
+      <div class="legend-item">
+        <span class="dot mobile-dot"></span>
+        <span class="legend-name">Mobile</span>
+        <span class="legend-val">{{ recentDeviceRatio().mobilePct }}%</span>
+        <span class="legend-count">({{ recentDeviceRatio().mobile }} users)</span>
+      </div>
+      <div class="legend-item">
+        <span class="dot pc-dot"></span>
+        <span class="legend-name">PC / Desktop</span>
+        <span class="legend-val">{{ recentDeviceRatio().pcPct }}%</span>
+        <span class="legend-count">({{ recentDeviceRatio().pc }} users)</span>
+      </div>
+      <div class="legend-item" *ngIf="recentDeviceRatio().tablet > 0">
+        <span class="dot tablet-dot"></span>
+        <span class="legend-name">Tablet</span>
+        <span class="legend-val">{{ recentDeviceRatio().tabletPct }}%</span>
+        <span class="legend-count">({{ recentDeviceRatio().tablet }} users)</span>
+      </div>
+    </div>
   </div>
 
   <!-- Tabs Bar: "Active Guests" vs "Guests Ka Gana" vs "Guest Activity" -->
@@ -1139,7 +1195,388 @@
       <!-- Modal Footer -->
       <div class="modal-foot">
         <span class="geo-footer-hint">GanaTube Analytics Privacy &amp; Bot Guard</span>
-        <button class="modal-action-btn" (click)="closeSettingsModal()">Done</button>
+  <!-- ── AUDIENCE DEVICE & SCREEN DEMOGRAPHICS MODAL ── -->
+  <div class="guest-modal-backdrop" *ngIf="isDevicesModalOpen()" (click)="closeDevicesModal()">
+    <div class="guest-modal-card devices-modal-card" (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="modal-head">
+        <div class="modal-head-left">
+          <div class="devices-modal-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </div>
+          <div>
+            <div class="geo-modal-title-row">
+              <h2 class="modal-title">Audience Devices &amp; Screen Resolutions</h2>
+              <span class="devices-ratio-pill">Device Ratio</span>
+            </div>
+            <p class="modal-sub">Breakdown of mobile vs desktop visitors, operating systems, and exact display sizes</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeDevicesModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Filter Bar: DAU / WAU / MAU / YAU / All Time + Sub-Tabs -->
+      <div class="geo-controls-bar">
+        <!-- Range Filter Pills -->
+        <div class="geo-range-pills">
+          <button 
+            class="geo-range-pill" 
+            [class.active]="devicesRange() === 'dau'" 
+            (click)="setDevicesRange('dau')">
+            <span>DAU</span>
+            <span class="range-sub-txt">(24h)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="devicesRange() === 'wau'" 
+            (click)="setDevicesRange('wau')">
+            <span>WAU</span>
+            <span class="range-sub-txt">(7d)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="devicesRange() === 'mau'" 
+            (click)="setDevicesRange('mau')">
+            <span>MAU</span>
+            <span class="range-sub-txt">(30d)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="devicesRange() === 'yau'" 
+            (click)="setDevicesRange('yau')">
+            <span>YAU</span>
+            <span class="range-sub-txt">(365d)</span>
+          </button>
+          <button 
+            class="geo-range-pill" 
+            [class.active]="devicesRange() === 'all'" 
+            (click)="setDevicesRange('all')">
+            <span>All Time</span>
+          </button>
+        </div>
+
+        <div class="geo-controls-right">
+          <!-- Sub-Tab Pills -->
+          <div class="geo-view-pills">
+            <button 
+              class="geo-view-pill" 
+              [class.active]="devicesActiveTab() === 'overview'" 
+              (click)="devicesActiveTab.set('overview')">
+              <span>Overview</span>
+            </button>
+            <button 
+              class="geo-view-pill" 
+              [class.active]="devicesActiveTab() === 'screens'" 
+              (click)="devicesActiveTab.set('screens')">
+              <span>Screen Sizes</span>
+              <span class="pill-cnt" *ngIf="devicesData()?.screen_sizes?.length">({{ devicesData()?.screen_sizes?.length }})</span>
+            </button>
+            <button 
+              class="geo-view-pill" 
+              [class.active]="devicesActiveTab() === 'os'" 
+              (click)="devicesActiveTab.set('os')">
+              <span>OS Systems</span>
+            </button>
+            <button 
+              class="geo-view-pill" 
+              [class.active]="devicesActiveTab() === 'browsers'" 
+              (click)="devicesActiveTab.set('browsers')">
+              <span>Browsers</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="geo-loading-state" *ngIf="devicesLoading()">
+        <div class="geo-spinner"></div>
+        <p>Crunching device and screen resolution statistics...</p>
+      </div>
+
+      <!-- Error State -->
+      <div class="geo-error-state" *ngIf="!devicesLoading() && devicesError()">
+        <p>⚠️ {{ devicesError() }}</p>
+        <button class="geo-retry-btn" (click)="loadDevicesData()">Retry</button>
+      </div>
+
+      <!-- Modal Content Body -->
+      <div class="modal-body devices-modal-body" *ngIf="!devicesLoading() && !devicesError() && devicesData()">
+
+        <!-- Top Summary Cards -->
+        <div class="device-summary-cards">
+          <div class="dev-summary-card">
+            <span class="dev-card-lbl">Total Active Guests</span>
+            <span class="dev-card-val">{{ devicesData().summary.total_active_guests | number }}</span>
+            <span class="dev-card-sub">{{ devicesData().range_label }}</span>
+          </div>
+
+          <div class="dev-summary-card pink-border">
+            <span class="dev-card-lbl">📱 Mobile Visitors</span>
+            <span class="dev-card-val highlight-pink">{{ devicesData().summary.mobile_ratio }}%</span>
+            <span class="dev-card-sub">{{ devicesData().summary.mobile_count | number }} mobile devices</span>
+          </div>
+
+          <div class="dev-summary-card blue-border">
+            <span class="dev-card-lbl">💻 PC / Desktop</span>
+            <span class="dev-card-val highlight-blue">{{ devicesData().summary.pc_ratio }}%</span>
+            <span class="dev-card-sub">{{ devicesData().summary.pc_count | number }} desktop users</span>
+          </div>
+
+          <div class="dev-summary-card green-border" *ngIf="devicesData().summary.tablet_count > 0">
+            <span class="dev-card-lbl">📲 Tablet Devices</span>
+            <span class="dev-card-val highlight-green">{{ devicesData().summary.tablet_ratio }}%</span>
+            <span class="dev-card-sub">{{ devicesData().summary.tablet_count | number }} tablets</span>
+          </div>
+        </div>
+
+        <!-- 1. TAB: OVERVIEW (Multi-column Dashboard) -->
+        <div class="devices-tab-content" *ngIf="devicesActiveTab() === 'overview'">
+          <div class="devices-overview-grid">
+
+            <!-- Device Type Proportions -->
+            <div class="overview-section-box">
+              <div class="box-head">
+                <span class="box-title">Device Form Factor Ratio</span>
+                <span class="box-badge">Share</span>
+              </div>
+              <div class="device-type-list">
+                <div class="device-type-item" *ngFor="let dev of devicesData().devices">
+                  <div class="dev-item-row">
+                    <span class="dev-icon">{{ dev.name.toLowerCase() === 'mobile' ? '📱' : (dev.name.toLowerCase() === 'pc' ? '💻' : '📲') }}</span>
+                    <span class="dev-name">{{ dev.name }}</span>
+                    <span class="dev-cnt">{{ dev.count | number }} users</span>
+                    <span class="dev-pct">{{ dev.percentage }}%</span>
+                  </div>
+                  <div class="dev-bar-bg">
+                    <div class="dev-bar-fill" [style.width.%]="dev.percentage" [style.background]="getDeviceBadgeColor(dev.name)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Screen Sizes (Quick 6) -->
+            <div class="overview-section-box">
+              <div class="box-head">
+                <span class="box-title">Top Display Dimensions</span>
+                <button class="box-link-btn" (click)="devicesActiveTab.set('screens')">View all {{ devicesData().screen_sizes?.length }} →</button>
+              </div>
+              <div class="screen-size-list">
+                <div class="screen-size-item" *ngFor="let sc of (devicesData().screen_sizes || []).slice(0, 6)">
+                  <div class="screen-item-row">
+                    <span class="screen-name"><code>{{ sc.name }}</code></span>
+                    <span class="screen-cat-badge">{{ getScreenCategory(sc.name) }}</span>
+                    <span class="screen-cnt">{{ sc.count | number }} users</span>
+                    <span class="screen-pct">{{ sc.percentage }}%</span>
+                  </div>
+                  <div class="dev-bar-bg">
+                    <div class="dev-bar-fill cyan-fill" [style.width.%]="sc.percentage"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Operating Systems (Quick 6) -->
+            <div class="overview-section-box">
+              <div class="box-head">
+                <span class="box-title">Operating Systems</span>
+                <button class="box-link-btn" (click)="devicesActiveTab.set('os')">View all →</button>
+              </div>
+              <div class="device-type-list">
+                <div class="device-type-item" *ngFor="let o of (devicesData().operating_systems || []).slice(0, 6)">
+                  <div class="dev-item-row">
+                    <span class="dev-icon">{{ getOsIcon(o.name) }}</span>
+                    <span class="dev-name">{{ o.name }}</span>
+                    <span class="dev-cnt">{{ o.count | number }} users</span>
+                    <span class="dev-pct">{{ o.percentage }}%</span>
+                  </div>
+                  <div class="dev-bar-bg">
+                    <div class="dev-bar-fill purple-fill" [style.width.%]="o.percentage"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Browsers (Quick 6) -->
+            <div class="overview-section-box">
+              <div class="box-head">
+                <span class="box-title">Web Browsers</span>
+                <button class="box-link-btn" (click)="devicesActiveTab.set('browsers')">View all →</button>
+              </div>
+              <div class="device-type-list">
+                <div class="device-type-item" *ngFor="let b of (devicesData().browsers || []).slice(0, 6)">
+                  <div class="dev-item-row">
+                    <span class="dev-icon">{{ getBrowserIcon(b.name) }}</span>
+                    <span class="dev-name">{{ b.name }}</span>
+                    <span class="dev-cnt">{{ b.count | number }} users</span>
+                    <span class="dev-pct">{{ b.percentage }}%</span>
+                  </div>
+                  <div class="dev-bar-bg">
+                    <div class="dev-bar-fill amber-fill" [style.width.%]="b.percentage"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2. TAB: SCREEN RESOLUTIONS TABLE -->
+        <div class="devices-tab-content" *ngIf="devicesActiveTab() === 'screens'">
+          <div class="tab-filter-bar">
+            <div class="tab-search-wrapper">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input 
+                type="text" 
+                class="tab-search-input" 
+                placeholder="Search screen resolution (e.g. 1920x1080, 393x873)..." 
+                [ngModel]="devicesSearchQuery()" 
+                (ngModelChange)="devicesSearchQuery.set($event)">
+              <button *ngIf="devicesSearchQuery()" class="tab-search-clear" (click)="devicesSearchQuery.set('')">&times;</button>
+            </div>
+            <span class="table-results-cnt">Showing {{ getFilteredScreens().length }} resolutions</span>
+          </div>
+
+          <div class="devices-table-wrap">
+            <table class="devices-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">#</th>
+                  <th>Screen Size</th>
+                  <th>Device Form Factor</th>
+                  <th>Unique Visitors</th>
+                  <th style="width: 250px;">Audience Share</th>
+                  <th>Songs Streamed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="!getFilteredScreens().length">
+                  <td colspan="6" class="empty-state">
+                    <p>No screen resolution records match your search.</p>
+                  </td>
+                </tr>
+
+                <tr *ngFor="let sc of getFilteredScreens(); let i = index">
+                  <td class="rank-cell">{{ i + 1 }}</td>
+                  <td>
+                    <span class="screen-code"><code>{{ sc.name }}</code></span>
+                  </td>
+                  <td>
+                    <span class="screen-cat-badge">{{ getScreenCategory(sc.name) }}</span>
+                  </td>
+                  <td>
+                    <span class="stat-highlight">{{ sc.count | number }} guests</span>
+                  </td>
+                  <td>
+                    <div class="table-progress-cell">
+                      <div class="progress-bar-bg">
+                        <div class="progress-bar-fill cyan-fill" [style.width.%]="sc.percentage"></div>
+                      </div>
+                      <span class="progress-pct">{{ sc.percentage }}%</span>
+                    </div>
+                  </td>
+                  <td style="color: rgba(255, 255, 255, 0.7);">
+                    {{ sc.plays | number }} plays
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. TAB: OPERATING SYSTEMS TABLE -->
+        <div class="devices-tab-content" *ngIf="devicesActiveTab() === 'os'">
+          <div class="devices-table-wrap">
+            <table class="devices-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">#</th>
+                  <th>Operating System</th>
+                  <th>Unique Guests</th>
+                  <th style="width: 250px;">Audience Share</th>
+                  <th>Total Streams</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let o of devicesData().operating_systems; let i = index">
+                  <td class="rank-cell">{{ i + 1 }}</td>
+                  <td>
+                    <div class="name-icon-cell">
+                      <span class="os-icon">{{ getOsIcon(o.name) }}</span>
+                      <span class="os-name-bold">{{ o.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="stat-highlight">{{ o.count | number }} guests</span>
+                  </td>
+                  <td>
+                    <div class="table-progress-cell">
+                      <div class="progress-bar-bg">
+                        <div class="progress-bar-fill purple-fill" [style.width.%]="o.percentage"></div>
+                      </div>
+                      <span class="progress-pct">{{ o.percentage }}%</span>
+                    </div>
+                  </td>
+                  <td style="color: rgba(255, 255, 255, 0.7);">
+                    {{ o.plays | number }} plays
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. TAB: BROWSERS TABLE -->
+        <div class="devices-tab-content" *ngIf="devicesActiveTab() === 'browsers'">
+          <div class="devices-table-wrap">
+            <table class="devices-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">#</th>
+                  <th>Web Browser</th>
+                  <th>Unique Guests</th>
+                  <th style="width: 250px;">Audience Share</th>
+                  <th>Total Streams</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let b of devicesData().browsers; let i = index">
+                  <td class="rank-cell">{{ i + 1 }}</td>
+                  <td>
+                    <div class="name-icon-cell">
+                      <span class="os-icon">{{ getBrowserIcon(b.name) }}</span>
+                      <span class="os-name-bold">{{ b.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="stat-highlight">{{ b.count | number }} guests</span>
+                  </td>
+                  <td>
+                    <div class="table-progress-cell">
+                      <div class="progress-bar-bg">
+                        <div class="progress-bar-fill amber-fill" [style.width.%]="b.percentage"></div>
+                      </div>
+                      <span class="progress-pct">{{ b.percentage }}%</span>
+                    </div>
+                  </td>
+                  <td style="color: rgba(255, 255, 255, 0.7);">
+                    {{ b.plays | number }} plays
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-foot">
+        <span class="geo-footer-hint">GanaTube Real-Time Client Telemetry Engine</span>
+        <button class="modal-action-btn" (click)="closeDevicesModal()">Close</button>
       </div>
 
     </div>

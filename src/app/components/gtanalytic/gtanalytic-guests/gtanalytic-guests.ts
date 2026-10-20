@@ -50,6 +50,32 @@ export class GtanalyticGuestsComponent implements OnDestroy {
     total_guest_time_seconds: 0
   });
 
+  recentDeviceRatio = computed(() => {
+    const list = this.dataService.analyticsData()?.recent_guests || [];
+    let mobile = 0;
+    let pc = 0;
+    let tablet = 0;
+    let unknown = 0;
+    for (const g of list) {
+      const t = (g.device_type || '').toLowerCase();
+      if (t === 'mobile') mobile++;
+      else if (t === 'pc') pc++;
+      else if (t === 'tablet') tablet++;
+      else unknown++;
+    }
+    const total = list.length || 1;
+    return {
+      total: list.length,
+      mobile,
+      pc,
+      tablet,
+      unknown,
+      mobilePct: Math.round((mobile / total) * 100),
+      pcPct: Math.round((pc / total) * 100),
+      tabletPct: Math.round((tablet / total) * 100)
+    };
+  });
+
   onlineGuests = computed(() => {
     const list = this.dataService.analyticsData()?.online_guests || [];
     const q = this.searchQuery().toLowerCase().trim();
@@ -799,8 +825,112 @@ export class GtanalyticGuestsComponent implements OnDestroy {
     });
   }
 
+  // ── Audience Device & Screen Demographics Modal ──
+  isDevicesModalOpen = signal<boolean>(false);
+  devicesRange = signal<'dau' | 'wau' | 'mau' | 'yau' | 'all'>('dau');
+  devicesLoading = signal<boolean>(false);
+  devicesData = signal<any>(null);
+  devicesError = signal<string>('');
+  devicesActiveTab = signal<'overview' | 'screens' | 'os' | 'browsers'>('overview');
+  devicesSearchQuery = signal<string>('');
+  private devicesSub?: Subscription;
+
+  openDevicesModal() {
+    this.devicesSearchQuery.set('');
+    this.devicesError.set('');
+    this.isDevicesModalOpen.set(true);
+    this.loadDevicesData();
+  }
+
+  closeDevicesModal() {
+    this.isDevicesModalOpen.set(false);
+    this.devicesSub?.unsubscribe();
+  }
+
+  setDevicesRange(range: 'dau' | 'wau' | 'mau' | 'yau' | 'all') {
+    if (this.devicesRange() === range) return;
+    this.devicesRange.set(range);
+    this.loadDevicesData();
+  }
+
+  loadDevicesData() {
+    this.devicesSub?.unsubscribe();
+    this.devicesLoading.set(true);
+    this.devicesError.set('');
+
+    this.devicesSub = this.dataService.getGuestDevices(this.devicesRange()).subscribe({
+      next: (res: any) => {
+        if (res.status === 'success' && res.data) {
+          this.devicesData.set(res.data);
+        } else {
+          this.devicesError.set(res.message || 'Failed to load device analytics');
+        }
+        this.devicesLoading.set(false);
+      },
+      error: () => {
+        this.devicesError.set('Network error loading device analytics');
+        this.devicesLoading.set(false);
+      }
+    });
+  }
+
+  getFilteredScreens(): any[] {
+    const list = this.devicesData()?.screen_sizes || [];
+    const q = this.devicesSearchQuery().toLowerCase().trim();
+    if (!q) return list;
+    return list.filter((s: any) => (s.name || '').toLowerCase().includes(q));
+  }
+
+  getScreenCategory(screen: string): string {
+    if (!screen || screen === 'Unknown') return 'Unknown';
+    const parts = screen.split('x');
+    if (parts.length !== 2) return 'Standard';
+    const w = parseInt(parts[0], 10);
+    const h = parseInt(parts[1], 10);
+    const maxDim = Math.max(w, h);
+    const minDim = Math.min(w, h);
+    if (minDim <= 500) return '📱 Mobile';
+    if (minDim <= 850) return '📲 Tablet';
+    if (maxDim >= 2560) return '🖥️ 2K / 4K Ultra';
+    if (maxDim >= 1920) return '💻 1080p FHD PC';
+    if (maxDim >= 1366) return '💻 HD Laptop';
+    return '📱 Mobile / Handheld';
+  }
+
+  getDeviceBadgeColor(name: string): string {
+    const n = (name || '').toLowerCase();
+    if (n.includes('mobile')) return '#ec4899';
+    if (n.includes('pc')) return '#3b82f6';
+    if (n.includes('tablet')) return '#10b981';
+    return '#8b5cf6';
+  }
+
+  getOsIcon(os: string): string {
+    const o = (os || '').toLowerCase();
+    if (o.includes('android')) return '🤖';
+    if (o.includes('ios') || o.includes('iphone') || o.includes('ipad')) return '🍎';
+    if (o.includes('windows')) return '🪟';
+    if (o.includes('mac')) return '🍏';
+    if (o.includes('linux')) return '🐧';
+    if (o.includes('chrome')) return '🌐';
+    return '💻';
+  }
+
+  getBrowserIcon(browser: string): string {
+    const b = (browser || '').toLowerCase();
+    if (b.includes('chrome')) return '🌐';
+    if (b.includes('safari')) return '🧭';
+    if (b.includes('edge')) return '🌊';
+    if (b.includes('firefox')) return '🦊';
+    if (b.includes('opera')) return '🔴';
+    if (b.includes('samsung')) return '📱';
+    return '🌐';
+  }
+
   ngOnDestroy(): void {
     this.geoSub?.unsubscribe();
+    this.devicesSub?.unsubscribe();
   }
 }
+
 
