@@ -186,7 +186,7 @@ export class App implements OnInit {
   isCarModeVisible = signal<boolean>(false);
   apiKeyMissing = false;
   appVersion = 'v1.0.6';
-  currentYear = 2025;
+  currentYear = new Date().getFullYear();
   isMobileMenuOpen = signal<boolean>(false);
   isRouteLoading = signal<boolean>(false);
   isRouteDone = signal<boolean>(false);

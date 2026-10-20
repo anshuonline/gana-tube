@@ -155,7 +155,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <p><strong>Email:</strong> <a href="mailto:support@ganatube.in">support@ganatube.in</a></p>
           <p>You can also visit our <a href="/contact">Contact Page</a> for further assistance.</p>
         </div>
-        <p style="margin-top: 24px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.5);">© 2025 GanaTube.in. All rights reserved.</p>
+        <p style="margin-top: 24px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.5);">© 2025-${new Date().getFullYear()} GanaTube.in. All rights reserved.</p>
       </div>
     `
   },
@@ -639,7 +639,7 @@ export const PAGE_CONTENT: Record<string, { title: string; html: string }> = {
           <p><a href="/" style="font-weight: 600; font-size: 1.1rem;">Visit GanaTube.in</a></p>
           <p style="margin-top: 8px; color: rgba(255, 255, 255, 0.7);">GanaTube.in — Your destination for music discovery and listening.</p>
         </div>
-        <p style="margin-top: 24px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.5);">© 2025 GanaTube.in. All rights reserved.</p>
+        <p style="margin-top: 24px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.5);">© 2025-${new Date().getFullYear()} GanaTube.in. All rights reserved.</p>
       </div>
     `
   }
