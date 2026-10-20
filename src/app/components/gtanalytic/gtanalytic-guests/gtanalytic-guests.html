@@ -1195,6 +1195,12 @@
       <!-- Modal Footer -->
       <div class="modal-foot">
         <span class="geo-footer-hint">GanaTube Analytics Privacy &amp; Bot Guard</span>
+        <button class="modal-action-btn" (click)="closeSettingsModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ── AUDIENCE DEVICE & SCREEN DEMOGRAPHICS MODAL ── -->
   <div class="guest-modal-backdrop" *ngIf="isDevicesModalOpen()" (click)="closeDevicesModal()">
     <div class="guest-modal-card devices-modal-card" (click)="$event.stopPropagation()">
