@@ -22,23 +22,49 @@ export class PwaService {
       this.isInstalledPWA.set(isStandalone);
       this.setupAutoFullscreen();
 
+      // Check if early capture in index.html already caught beforeinstallprompt
+      const earlyPrompt = (window as any).__deferredInstallPrompt;
+      if (earlyPrompt) {
+        this.deferredPrompt = earlyPrompt;
+        this.canInstall.set(true);
+      }
+
+      // Listen for custom event fired when early capture catches the prompt
+      window.addEventListener('gt-install-available', () => {
+        const p = (window as any).__deferredInstallPrompt;
+        if (p) {
+          this.deferredPrompt = p;
+          this.canInstall.set(true);
+        }
+      });
+
+      // Also listen on window directly for standard lifecycle
       window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent the mini-infobar from appearing on mobile
+        // Prevent default mini-infobar on mobile so custom UI has control
         e.preventDefault();
-        // Stash the event so it can be triggered later.
+        (window as any).__deferredInstallPrompt = e;
         this.deferredPrompt = e;
-        // Update UI notify the user they can install the PWA
         this.canInstall.set(true);
       });
 
+      window.addEventListener('gt-app-installed', () => {
+        this.clearInstalled();
+      });
+
       window.addEventListener('appinstalled', () => {
-        // Clear the deferredPrompt so it can be garbage collected
-        this.deferredPrompt = null;
-        this.canInstall.set(false);
-        this.isInstalledPWA.set(true);
-        console.log('PWA was installed');
+        this.clearInstalled();
       });
     }
+  }
+
+  private clearInstalled() {
+    this.deferredPrompt = null;
+    if (typeof window !== 'undefined') {
+      (window as any).__deferredInstallPrompt = null;
+    }
+    this.canInstall.set(false);
+    this.isInstalledPWA.set(true);
+    console.log('PWA was successfully installed');
   }
 
   private setupAutoFullscreen() {
@@ -70,17 +96,28 @@ export class PwaService {
   private toastService = inject(ToastService);
 
   public async installApp() {
-    if (this.deferredPrompt) {
-      // Show the install prompt
-      this.deferredPrompt.prompt();
-      // Wait for the user to respond to the prompt
-      const { outcome } = await this.deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      // We've used the prompt, and can't use it again, throw it away
+    const prompt = this.deferredPrompt || (typeof window !== 'undefined' ? (window as any).__deferredInstallPrompt : null);
+    if (prompt) {
+      try {
+        // Show native browser install prompt dialog
+        prompt.prompt();
+        // Wait for the user to respond to the prompt
+        const choice = await prompt.userChoice;
+        console.log(`User response to install prompt: ${choice?.outcome}`);
+        if (choice?.outcome === 'accepted') {
+          this.clearInstalled();
+        }
+      } catch (err) {
+        console.error('Error invoking native install prompt:', err);
+        this.toastService.show('Click the Install icon (⤓) in the address bar or browser menu → "Install GanaTube".', 'info');
+      }
       this.deferredPrompt = null;
+      if (typeof window !== 'undefined') {
+        (window as any).__deferredInstallPrompt = null;
+      }
       this.canInstall.set(false);
     } else {
-      this.toastService.show('To install: open browser menu → "Add to Home Screen" or "Install App".', 'info');
+      this.toastService.show('To install: click the Install icon (⤓) in your browser search/address bar or open menu (⋮) → "Install GanaTube".', 'info');
     }
   }
 }

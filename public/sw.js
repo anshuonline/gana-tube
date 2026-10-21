@@ -1,16 +1,21 @@
-const CACHE_NAME = 'ganatube-v5';
+const CACHE_NAME = 'ganatube-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/manifest.json',
+  '/site.webmanifest',
   '/favicon-192x192.png',
-  '/manifest.json'
+  '/web-app-manifest-192x192.png',
+  '/web-app-manifest-512x512.png'
 ];
 
-// Install - cache static assets
+// Install - cache static assets safely without failing the whole installation
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await Promise.allSettled(
+        STATIC_ASSETS.map((url) => cache.add(url).catch((err) => console.warn('PWA Cache item failed:', url, err)))
+      );
     })
   );
   self.skipWaiting();
@@ -39,10 +44,10 @@ self.addEventListener('fetch', (event) => {
   if (!url.startsWith(self.location.origin)) return;
 
   // Skip API and socket calls
-  if (url.includes('/api/') || url.includes('/socket.io/')) return;
+  if (url.includes('/api/') || url.includes('/socket.io/') || url.includes('managegt-api.php')) return;
 
-  // Skip Angular SPA admin routes — let the browser handle navigation
-  if (url.includes('/managegt/')) return;
+  // Skip Angular SPA admin & analytics routes — let the browser handle navigation
+  if (url.includes('/managegt') || url.includes('/gtanalytic')) return;
 
   // Cache-first for hashed static assets (JS/CSS) - they never change
   if (url.match(/\.[a-zA-Z0-9_-]{8,}\.(js|css)$/)) {

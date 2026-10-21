@@ -1,7 +1,49 @@
 {
-  "name": "GanaTube - Free Music",
+  "id": "/",
+  "name": "GanaTube - Free Music Online Without Ads",
   "short_name": "GanaTube",
+  "description": "Stream unlimited free online music without ads or login on GanaTube. Listen to top artists, custom playlists, trending tracks, and live Listen Together rooms.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay",
+    "fullscreen"
+  ],
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "orientation": "any",
+  "categories": [
+    "music",
+    "entertainment",
+    "audio"
+  ],
   "icons": [
+    {
+      "src": "/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
@@ -12,10 +54,63 @@
       "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#0A0A0A",
-  "background_color": "#0A0A0A",
-  "display": "standalone"
+  "screenshots": [
+    {
+      "src": "/screenshot-2.png",
+      "sizes": "1024x463",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GanaTube Music Player"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search Music",
+      "short_name": "Search",
+      "description": "Search for songs, artists, albums",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Listen Together Rooms",
+      "short_name": "Rooms",
+      "description": "Listen to music live with friends",
+      "url": "/rooms",
+      "icons": [
+        {
+          "src": "/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Trending Playlists",
+      "short_name": "Playlists",
+      "description": "Top curated music playlists",
+      "url": "/curated-playlists",
+      "icons": [
+        {
+          "src": "/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }

@@ -10,12 +10,25 @@
   RewriteRule ^ /index.html [L]
 </IfModule>
 
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest .json
+  AddType application/javascript .js
+</IfModule>
+
 <IfModule mod_headers.c>
   # Prevent caching of index.html so updates show instantly
   <FilesMatch "\.(html|htm)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires "0"
+  </FilesMatch>
+
+  # Service Worker & Manifests: Always fresh and allow root scope
+  <FilesMatch "(sw\.js|manifest\.json|site\.webmanifest)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+    Header set Service-Worker-Allowed "/"
   </FilesMatch>
 </IfModule>
 

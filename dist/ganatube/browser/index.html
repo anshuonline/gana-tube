@@ -115,7 +115,20 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GanaTube">
-    <link rel="manifest" href="/site.webmanifest?v=3">
+    <link rel="manifest" href="/manifest.json?v=6">
+    <!-- PWA Install Prompt Capture: Capture event early so it is never missed -->
+    <script>
+      window.__deferredInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window.__deferredInstallPrompt = e;
+        window.dispatchEvent(new CustomEvent('gt-install-available'));
+      });
+      window.addEventListener('appinstalled', function() {
+        window.__deferredInstallPrompt = null;
+        window.dispatchEvent(new CustomEvent('gt-app-installed'));
+      });
+    </script>
     <!-- PWA Auto-Fullscreen without F11 -->
     <script>
       (function() {
@@ -155,12 +168,17 @@
     </script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(
-            (registration) => { console.log('SW registered: ', registration); },
-            (err) => { console.log('SW registration failed: ', err); }
+        var registerSW = function() {
+          navigator.serviceWorker.register('/sw.js?v=6', { scope: '/' }).then(
+            function(registration) { console.log('SW registered: ', registration.scope); },
+            function(err) { console.warn('SW registration failed: ', err); }
           );
-        });
+        };
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          registerSW();
+        } else {
+          window.addEventListener('load', registerSW);
+        }
       }
     </script>
     <!-- Allison Dream Font -->
@@ -209,5 +227,5 @@
       });
       document.addEventListener('dragstart', event => event.preventDefault());
     </script>
-  <script src="main-KVWLVE67.js" type="module"></script></body>
+  <script src="main-I7GZK4GN.js" type="module"></script></body>
 </html>

@@ -1,16 +1,24 @@
 {
-  "name": "GanaTube.in",
-  "short_name": "GanaTube.in",
-  "description": "Free Music Streaming - Listen to Latest Bollywood, Punjabi & English Songs Online",
+  "id": "/",
+  "name": "GanaTube - Free Music Online Without Ads",
+  "short_name": "GanaTube",
+  "description": "Stream unlimited free online music without ads or login on GanaTube. Listen to top artists, custom playlists, trending tracks, and live Listen Together rooms.",
   "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
   "display_override": [
+    "standalone",
+    "window-controls-overlay",
     "fullscreen"
   ],
-  "display": "fullscreen",
   "background_color": "#0A0A0A",
   "theme_color": "#0A0A0A",
   "orientation": "any",
-  "categories": ["music", "entertainment"],
+  "categories": [
+    "music",
+    "entertainment",
+    "audio"
+  ],
   "icons": [
     {
       "src": "/favicon-48x48.png",
@@ -34,22 +42,34 @@
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "screenshot-2.png",
-      "sizes": "1280x720",
+      "src": "/screenshot-2.png",
+      "sizes": "1024x463",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "GanaTube Homepage"
+      "label": "GanaTube Music Player"
     }
   ],
   "shortcuts": [
@@ -57,8 +77,40 @@
       "name": "Search Music",
       "short_name": "Search",
       "description": "Search for songs, artists, albums",
-      "url": "/?action=search",
-      "icons": [{ "src": "/web-app-manifest-512x512.png", "sizes": "512x512" }]
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Listen Together Rooms",
+      "short_name": "Rooms",
+      "description": "Listen to music live with friends",
+      "url": "/rooms",
+      "icons": [
+        {
+          "src": "/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Trending Playlists",
+      "short_name": "Playlists",
+      "description": "Top curated music playlists",
+      "url": "/curated-playlists",
+      "icons": [
+        {
+          "src": "/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

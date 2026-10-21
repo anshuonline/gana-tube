@@ -1226,69 +1226,78 @@
       </div>
 
       <!-- Filter Bar: DAU / WAU / MAU / YAU / All Time + Sub-Tabs -->
-      <div class="geo-controls-bar">
+      <div class="devices-controls-bar">
         <!-- Range Filter Pills -->
-        <div class="geo-range-pills">
+        <div class="devices-range-pills">
           <button 
-            class="geo-range-pill" 
+            type="button"
+            class="devices-range-pill" 
             [class.active]="devicesRange() === 'dau'" 
             (click)="setDevicesRange('dau')">
             <span>DAU</span>
             <span class="range-sub-txt">(24h)</span>
           </button>
           <button 
-            class="geo-range-pill" 
+            type="button"
+            class="devices-range-pill" 
             [class.active]="devicesRange() === 'wau'" 
             (click)="setDevicesRange('wau')">
             <span>WAU</span>
             <span class="range-sub-txt">(7d)</span>
           </button>
           <button 
-            class="geo-range-pill" 
+            type="button"
+            class="devices-range-pill" 
             [class.active]="devicesRange() === 'mau'" 
             (click)="setDevicesRange('mau')">
             <span>MAU</span>
             <span class="range-sub-txt">(30d)</span>
           </button>
           <button 
-            class="geo-range-pill" 
+            type="button"
+            class="devices-range-pill" 
             [class.active]="devicesRange() === 'yau'" 
             (click)="setDevicesRange('yau')">
             <span>YAU</span>
             <span class="range-sub-txt">(365d)</span>
           </button>
           <button 
-            class="geo-range-pill" 
+            type="button"
+            class="devices-range-pill" 
             [class.active]="devicesRange() === 'all'" 
             (click)="setDevicesRange('all')">
             <span>All Time</span>
           </button>
         </div>
 
-        <div class="geo-controls-right">
+        <div class="devices-controls-right">
           <!-- Sub-Tab Pills -->
-          <div class="geo-view-pills">
+          <div class="devices-view-pills">
             <button 
-              class="geo-view-pill" 
+              type="button"
+              class="devices-view-pill" 
               [class.active]="devicesActiveTab() === 'overview'" 
               (click)="devicesActiveTab.set('overview')">
               <span>Overview</span>
             </button>
             <button 
-              class="geo-view-pill" 
+              type="button"
+              class="devices-view-pill" 
               [class.active]="devicesActiveTab() === 'screens'" 
               (click)="devicesActiveTab.set('screens')">
               <span>Screen Sizes</span>
               <span class="pill-cnt" *ngIf="devicesData()?.screen_sizes?.length">({{ devicesData()?.screen_sizes?.length }})</span>
             </button>
             <button 
-              class="geo-view-pill" 
+              type="button"
+              class="devices-view-pill" 
               [class.active]="devicesActiveTab() === 'os'" 
               (click)="devicesActiveTab.set('os')">
               <span>OS Systems</span>
             </button>
             <button 
-              class="geo-view-pill" 
+              type="button"
+              class="devices-view-pill" 
               [class.active]="devicesActiveTab() === 'browsers'" 
               (click)="devicesActiveTab.set('browsers')">
               <span>Browsers</span>
@@ -1314,9 +1323,9 @@
 
         <!-- Top Summary Cards -->
         <div class="device-summary-cards">
-          <div class="dev-summary-card">
+          <div class="dev-summary-card cyan-border">
             <span class="dev-card-lbl">Total Active Guests</span>
-            <span class="dev-card-val">{{ devicesData().summary.total_active_guests | number }}</span>
+            <span class="dev-card-val highlight-cyan">{{ devicesData().summary.total_active_guests | number }}</span>
             <span class="dev-card-sub">{{ devicesData().range_label }}</span>
           </div>
 
@@ -1374,12 +1383,12 @@
                 <div class="screen-size-item" *ngFor="let sc of (devicesData().screen_sizes || []).slice(0, 6)">
                   <div class="screen-item-row">
                     <span class="screen-name"><code>{{ sc.name }}</code></span>
-                    <span class="screen-cat-badge">{{ getScreenCategory(sc.name) }}</span>
+                    <span class="screen-cat-badge" [ngClass]="getScreenBadgeClass(sc.name)">{{ getScreenCategory(sc.name) }}</span>
                     <span class="screen-cnt">{{ sc.count | number }} users</span>
                     <span class="screen-pct">{{ sc.percentage }}%</span>
                   </div>
                   <div class="dev-bar-bg">
-                    <div class="dev-bar-fill cyan-fill" [style.width.%]="sc.percentage"></div>
+                    <div class="dev-bar-fill" [style.width.%]="sc.percentage" [style.background]="'linear-gradient(90deg, #06b6d4, #38bdf8)'"></div>
                   </div>
                 </div>
               </div>
@@ -1400,7 +1409,7 @@
                     <span class="dev-pct">{{ o.percentage }}%</span>
                   </div>
                   <div class="dev-bar-bg">
-                    <div class="dev-bar-fill purple-fill" [style.width.%]="o.percentage"></div>
+                    <div class="dev-bar-fill" [style.width.%]="o.percentage" [style.background]="getOsBarColor(o.name)"></div>
                   </div>
                 </div>
               </div>
@@ -1421,7 +1430,7 @@
                     <span class="dev-pct">{{ b.percentage }}%</span>
                   </div>
                   <div class="dev-bar-bg">
-                    <div class="dev-bar-fill amber-fill" [style.width.%]="b.percentage"></div>
+                    <div class="dev-bar-fill" [style.width.%]="b.percentage" [style.background]="getBrowserBarColor(b.name)"></div>
                   </div>
                 </div>
               </div>
@@ -1471,7 +1480,7 @@
                     <span class="screen-code"><code>{{ sc.name }}</code></span>
                   </td>
                   <td>
-                    <span class="screen-cat-badge">{{ getScreenCategory(sc.name) }}</span>
+                    <span class="screen-cat-badge" [ngClass]="getScreenBadgeClass(sc.name)">{{ getScreenCategory(sc.name) }}</span>
                   </td>
                   <td>
                     <span class="stat-highlight">{{ sc.count | number }} guests</span>
@@ -1479,7 +1488,7 @@
                   <td>
                     <div class="table-progress-cell">
                       <div class="progress-bar-bg">
-                        <div class="progress-bar-fill cyan-fill" [style.width.%]="sc.percentage"></div>
+                        <div class="progress-bar-fill" [style.width.%]="sc.percentage" [style.background]="'linear-gradient(90deg, #06b6d4, #38bdf8)'"></div>
                       </div>
                       <span class="progress-pct">{{ sc.percentage }}%</span>
                     </div>
@@ -1521,7 +1530,7 @@
                   <td>
                     <div class="table-progress-cell">
                       <div class="progress-bar-bg">
-                        <div class="progress-bar-fill purple-fill" [style.width.%]="o.percentage"></div>
+                        <div class="progress-bar-fill" [style.width.%]="o.percentage" [style.background]="getOsBarColor(o.name)"></div>
                       </div>
                       <span class="progress-pct">{{ o.percentage }}%</span>
                     </div>
@@ -1563,7 +1572,7 @@
                   <td>
                     <div class="table-progress-cell">
                       <div class="progress-bar-bg">
-                        <div class="progress-bar-fill amber-fill" [style.width.%]="b.percentage"></div>
+                        <div class="progress-bar-fill" [style.width.%]="b.percentage" [style.background]="getBrowserBarColor(b.name)"></div>
                       </div>
                       <span class="progress-pct">{{ b.percentage }}%</span>
                     </div>

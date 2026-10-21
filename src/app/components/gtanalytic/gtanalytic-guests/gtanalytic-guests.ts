@@ -897,12 +897,42 @@ export class GtanalyticGuestsComponent implements OnDestroy {
     return '📱 Mobile / Handheld';
   }
 
+  getScreenBadgeClass(screen: string): string {
+    const cat = this.getScreenCategory(screen).toLowerCase();
+    if (cat.includes('fhd') || cat.includes('ultra')) return 'badge-cyan';
+    if (cat.includes('laptop')) return 'badge-blue';
+    if (cat.includes('tablet')) return 'badge-emerald';
+    return 'badge-pink';
+  }
+
   getDeviceBadgeColor(name: string): string {
     const n = (name || '').toLowerCase();
-    if (n.includes('mobile')) return '#ec4899';
-    if (n.includes('pc')) return '#3b82f6';
-    if (n.includes('tablet')) return '#10b981';
-    return '#8b5cf6';
+    if (n.includes('mobile')) return 'linear-gradient(90deg, #ec4899, #f472b6)';
+    if (n.includes('pc')) return 'linear-gradient(90deg, #0284c7, #38bdf8)';
+    if (n.includes('tablet')) return 'linear-gradient(90deg, #059669, #34d399)';
+    return 'linear-gradient(90deg, #6366f1, #818cf8)';
+  }
+
+  getOsBarColor(os: string): string {
+    const o = (os || '').toLowerCase();
+    if (o.includes('windows')) return 'linear-gradient(90deg, #0284c7, #38bdf8)';
+    if (o.includes('android')) return 'linear-gradient(90deg, #059669, #10b981)';
+    if (o.includes('ios') || o.includes('iphone') || o.includes('ipad')) return 'linear-gradient(90deg, #6366f1, #a855f7)';
+    if (o.includes('mac')) return 'linear-gradient(90deg, #0ea5e9, #67e8f9)';
+    if (o.includes('linux')) return 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+    if (o.includes('chrome')) return 'linear-gradient(90deg, #06b6d4, #22d3ee)';
+    return 'linear-gradient(90deg, #8b5cf6, #c084fc)';
+  }
+
+  getBrowserBarColor(browser: string): string {
+    const b = (browser || '').toLowerCase();
+    if (b.includes('chrome')) return 'linear-gradient(90deg, #0284c7, #06b6d4)';
+    if (b.includes('edge')) return 'linear-gradient(90deg, #0ea5e9, #38bdf8)';
+    if (b.includes('safari')) return 'linear-gradient(90deg, #3b82f6, #60a5fa)';
+    if (b.includes('firefox')) return 'linear-gradient(90deg, #ea580c, #f59e0b)';
+    if (b.includes('opera')) return 'linear-gradient(90deg, #9333ea, #c084fc)';
+    if (b.includes('samsung')) return 'linear-gradient(90deg, #4f46e5, #6366f1)';
+    return 'linear-gradient(90deg, #06b6d4, #38bdf8)';
   }
 
   getOsIcon(os: string): string {
