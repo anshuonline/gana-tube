@@ -14,6 +14,7 @@ import { AnalyticsService } from './analytics.service';
 
 import { OfflineService } from './offline.service';
 import { ContentFilterService } from './content-filter.service';
+import { JingleService } from './jingle.service';
 
 export interface Track extends YouTubeSearchResult {}
 
@@ -157,6 +158,7 @@ export class PlayerService {
   private spinService = inject(SpinService);
   public offlineService = inject(OfflineService);
   private contentFilter = inject(ContentFilterService);
+  public jingleService = inject(JingleService);
   private trackStartTime: number = 0;
   // Qualified play tracking (prevents instant skips from artificially inflating plays and play time)
   private currentPlayTrackedId: string | null = null;
@@ -795,6 +797,17 @@ export class PlayerService {
   }
 
   togglePlayPause(): void {
+    if (this.jingleService.isJinglePlaying()) {
+      if (this.playerState() === 'playing') {
+        this.jingleService.pauseJingle();
+        this.playerState.set('paused');
+      } else {
+        this.jingleService.resumeJingle();
+        this.playerState.set('playing');
+      }
+      return;
+    }
+
     if (this.isPlayingOffline() || this.isPlayingSaavn()) {
       if (this.playerState() === 'playing') {
         this.pause();
@@ -815,6 +828,12 @@ export class PlayerService {
   }
 
   pause(): void {
+    if (this.jingleService.isJinglePlaying()) {
+      this.jingleService.pauseJingle();
+      this.playerState.set('paused');
+      return;
+    }
+
     if (this.isPlayingOffline() || this.isPlayingSaavn()) {
       this.htmlAudio?.pause();
       this.broadcastPlaybackSync(false);
@@ -1020,6 +1039,8 @@ export class PlayerService {
         this.ytPlayer.unMute();
       }
     }
+
+    this.jingleService.setVolume(value, this.isMuted());
   }
 
   setMusicQuality(quality: 'Low' | 'Standard' | 'Best'): void {
@@ -1291,6 +1312,18 @@ export class PlayerService {
     // Reset qualified play session for incoming track
     this.currentPlayTrackedId = null;
     this.currentPlayDurationListened = 0;
+
+    // ── Promotional Jingle Interstitial (randomly max 4 times in 24h, never mid-song, only before song start/change) ──
+    this.jingleService.stopJingle();
+    if (!isRemote && !this.isInRoom() && this.jingleService.shouldTriggerJingle()) {
+      try {
+        await this.jingleService.playJingle(this.volume(), this.isMuted());
+      } catch (e) {
+        console.warn('Jingle playback skipped:', e);
+      }
+    }
+    // If user skipped or selected another track while jingle was playing, bail out
+    if (saavnToken !== this.saavnToken) return;
 
     if (current) {
       if (typeof localStorage !== 'undefined' && current.videoId) {
