@@ -2006,6 +2006,9 @@
 <!-- One-time Room Features Popup -->
 <app-room-features-popup *ngIf="currentPage() === 'home' && !isSearchMode()"></app-room-features-popup>
 
+<!-- Promotional Jingle Interstitial Overlay -->
+<app-jingle-overlay></app-jingle-overlay>
+
 <!-- Install PWA Modal -->
 <div class="gt-install-modal-backdrop" *ngIf="showInstallModal" (click)="closeInstallModal()"></div>
 <div class="gt-install-modal" *ngIf="showInstallModal" role="dialog" aria-modal="true" aria-labelledby="gtInstallTitle">

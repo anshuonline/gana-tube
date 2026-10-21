@@ -1306,24 +1306,39 @@ export class PlayerService {
     this.location.replaceState('/play?v=' + videoId);
     const current = this.currentTrack();
     this.initHtmlAudio();
-    this.startLoadTimeout();
     const saavnToken = ++this.saavnToken;
     
     // Reset qualified play session for incoming track
     this.currentPlayTrackedId = null;
     this.currentPlayDurationListened = 0;
 
-    // ── Promotional Jingle Interstitial (randomly max 4 times in 24h, never mid-song, only before song start/change) ──
-    this.jingleService.stopJingle();
-    if (!isRemote && !this.isInRoom() && this.jingleService.shouldTriggerJingle()) {
+    // ── 1. IMMEDIATELY SILENCE & STOP PREVIOUS PLAYBACK ENGINES (CRITICAL) ──
+    try { this.ytPlayer?.stopAll?.(); } catch (_) {}
+    if (this.htmlAudio) {
       try {
-        await this.jingleService.playJingle(this.volume(), this.isMuted());
+        this.htmlAudio.pause();
+        this.htmlAudio.src = '';
+      } catch (_) {}
+    }
+    this.clearLoadTimeout();
+    this.clearStuckLoadingTimer();
+    this.jingleService.stopJingle();
+
+    // ── 2. PROMOTIONAL JINGLE INTERSTITIAL (max 4x/24h, 10s countdown, skip after 5s) ──
+    if (!isRemote && !this.isInRoom() && this.jingleService.shouldTriggerJingle()) {
+      // In parallel: pre-resolve Saavn stream while jingle plays so upcoming song starts instantly!
+      this.resolveSaavnStream(current);
+      try {
+        await this.jingleService.startJingle(current, this.volume(), this.isMuted());
       } catch (e) {
         console.warn('Jingle playback skipped:', e);
       }
+      // If user selected another track while jingle was playing, bail out
+      if (saavnToken !== this.saavnToken) return;
     }
-    // If user skipped or selected another track while jingle was playing, bail out
-    if (saavnToken !== this.saavnToken) return;
+
+    // Start load timeout only when actual track begins loading
+    this.startLoadTimeout();
 
     if (current) {
       if (typeof localStorage !== 'undefined' && current.videoId) {

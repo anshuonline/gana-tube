@@ -57,6 +57,7 @@ import { RoomViewComponent } from './components/rooms/room-view/room-view.compon
 import { RoomFeaturesPopupComponent } from './components/room-features-popup/room-features-popup.component';
 import { IntroVideoComponent } from './components/intro-video/intro-video.component';
 import { ContentFilterComponent } from './components/content-filter/content-filter.component';
+import { JingleOverlayComponent } from './components/jingle-overlay/jingle-overlay.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { register as registerSwiperElements } from 'swiper/element/bundle';
 
@@ -157,7 +158,8 @@ export interface HeroSlide {
     RoomViewComponent,
     RoomFeaturesPopupComponent,
     IntroVideoComponent,
-    ContentFilterComponent
+    ContentFilterComponent,
+    JingleOverlayComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],

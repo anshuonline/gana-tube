@@ -1,0 +1,59 @@
+<div class="gt-jingle-backdrop" *ngIf="jingleService.isJingleActive()" (click)="$event.stopPropagation()">
+  <div class="gt-jingle-card" role="dialog" aria-modal="true" aria-label="GanaTube Jingle">
+    <div class="jingle-ambient-glow"></div>
+
+    <div class="jingle-brand-header">
+      <div class="logo-container">
+        <div class="logo-pulse-glow"></div>
+        <img src="ganatube-logo.webp" alt="GanaTube" class="jingle-logo" />
+      </div>
+
+      <div class="brand-badge">
+        <svg lucideSparkles [attr.size]="12"></svg>
+        <span>AD-FREE STREAMING</span>
+      </div>
+
+      <h2 class="jingle-headline">GanaTube Experience</h2>
+      <p class="jingle-tagline">Unlimited free music online without ads</p>
+    </div>
+
+    <!-- Upcoming Song Card -->
+    <div class="upcoming-track-box" *ngIf="jingleService.upcomingTrack() as track">
+      <div class="track-cover-wrapper">
+        <img [src]="track.thumbnail || 'ganatube-logo.webp'" [alt]="track.title" class="track-cover" />
+        <div class="track-icon-badge">
+          <svg lucideMusic [attr.size]="14"></svg>
+        </div>
+      </div>
+      <div class="track-info">
+        <span class="next-tag">UP NEXT</span>
+        <h4 class="track-title" [title]="track.title">{{ track.title }}</h4>
+        <span class="track-artist">{{ track.channelTitle }}</span>
+      </div>
+    </div>
+
+    <!-- Bottom Actions: 10s Countdown + 5s Skip Button -->
+    <div class="jingle-bottom-bar">
+      <div class="countdown-pill">
+        <span class="countdown-dot"></span>
+        <span class="countdown-text">Song starts in <strong class="seconds-digit">{{ jingleService.secondsRemaining() }}s</strong></span>
+      </div>
+
+      <div class="skip-action-wrapper">
+        <button
+          *ngIf="jingleService.canSkip()"
+          class="btn-skip active"
+          type="button"
+          (click)="onSkip()"
+          aria-label="Skip Jingle">
+          <span>Skip Jingle</span>
+          <svg lucideArrowRight [attr.size]="15"></svg>
+        </button>
+
+        <div *ngIf="!jingleService.canSkip()" class="btn-skip locked">
+          <span>Skip in {{ jingleService.skipCountdown() }}s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

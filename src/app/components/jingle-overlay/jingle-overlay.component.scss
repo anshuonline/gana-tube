@@ -1,0 +1,350 @@
+.gt-jingle-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: jingleFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.gt-jingle-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: #0d0d14;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: 32px 24px 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9), 0 0 40px rgba(168, 85, 247, 0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: jingleScaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.jingle-ambient-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(236, 72, 153, 0.2) 50%, transparent 80%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.jingle-brand-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .logo-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+
+    .logo-pulse-glow {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(236, 72, 153, 0.4));
+      filter: blur(12px);
+      animation: pulseGlow 2.5s ease-in-out infinite alternate;
+    }
+
+    .jingle-logo {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: #e879f9;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .jingle-headline {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 40%, rgba(255, 255, 255, 0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .jingle-tagline {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.upcoming-track-box {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 12px 14px;
+  margin-bottom: 24px;
+  text-align: left;
+
+  .track-cover-wrapper {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #1a1a24;
+
+    .track-cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .track-icon-badge {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      opacity: 0.85;
+    }
+  }
+
+  .track-info {
+    min-width: 0;
+    flex: 1;
+
+    .next-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #a855f7;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .track-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-artist {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.5);
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.jingle-bottom-bar {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  .countdown-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 8px 14px;
+
+    .countdown-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #a855f7;
+      box-shadow: 0 0 8px #a855f7;
+      animation: blinkDot 1s infinite;
+    }
+
+    .countdown-text {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.7);
+
+      .seconds-digit {
+        color: #ffffff;
+        font-weight: 800;
+        margin-left: 2px;
+      }
+    }
+  }
+
+  .skip-action-wrapper {
+    flex-shrink: 0;
+
+    .btn-skip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &.locked {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.45);
+        cursor: not-allowed;
+        user-select: none;
+      }
+
+      &.active {
+        background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+        border: none;
+        color: #ffffff;
+        cursor: pointer;
+        box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35);
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+          filter: brightness(1.1);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+    }
+  }
+}
+
+@keyframes jingleFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes jingleScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  from {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 0.85;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes blinkDot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@media (max-width: 480px) {
+  .gt-jingle-card {
+    padding: 24px 18px 18px;
+    border-radius: 24px;
+  }
+
+  .jingle-brand-header {
+    margin-bottom: 18px;
+
+    .logo-container {
+      width: 68px;
+      height: 68px;
+      margin-bottom: 12px;
+
+      .jingle-logo {
+        width: 58px;
+        height: 58px;
+      }
+    }
+
+    .jingle-headline {
+      font-size: 1.3rem;
+    }
+  }
+
+  .upcoming-track-box {
+    padding: 10px 12px;
+    margin-bottom: 18px;
+  }
+
+  .jingle-bottom-bar {
+    .countdown-pill {
+      padding: 6px 10px;
+      .countdown-text {
+        font-size: 0.75rem;
+      }
+    }
+
+    .skip-action-wrapper .btn-skip {
+      padding: 8px 14px;
+      font-size: 0.78rem;
+    }
+  }
+}

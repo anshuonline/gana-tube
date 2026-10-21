@@ -1,5 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 
+export interface JingleTrackInfo {
+  title?: string;
+  channelTitle?: string;
+  thumbnail?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -7,17 +13,20 @@ export class JingleService {
   private readonly JINGLE_URL = encodeURI('/assets/jingle for Ganatube.in/promotionalaudio.mp3');
   private readonly STORAGE_KEY = 'gt_jingle_history';
   private readonly MAX_PLAYS_24H = 4;
-  private readonly MIN_COOLDOWN_MS = 3.5 * 60 * 60 * 1000; // Minimum 3.5 hours between jingles
+  private readonly MIN_COOLDOWN_MS = 3.5 * 60 * 60 * 1000; // 3.5 hours minimum gap
 
-  public isJinglePlaying = signal<boolean>(false);
+  // Reactive UI signals for the overlay
+  public isJingleActive = signal<boolean>(false);
+  public isJinglePlaying = this.isJingleActive;
+  public secondsRemaining = signal<number>(10);
+  public skipCountdown = signal<number>(5);
+  public canSkip = signal<boolean>(false);
+  public upcomingTrack = signal<JingleTrackInfo | null>(null);
 
   private currentAudio: HTMLAudioElement | null = null;
   private currentResolver: (() => void) | null = null;
-  private safetyTimeout: any = null;
+  private timerInterval: any = null;
 
-  /**
-   * Retrieves clean timestamps of jingles played within the last 24 hours.
-   */
   private getCleanHistory(now: number): number[] {
     if (typeof localStorage === 'undefined') return [];
     try {
@@ -25,7 +34,6 @@ export class JingleService {
       if (!raw) return [];
       const timestamps: number[] = JSON.parse(raw);
       if (!Array.isArray(timestamps)) return [];
-      // Filter out timestamps older than 24h
       const recent = timestamps.filter(ts => typeof ts === 'number' && (now - ts) < 24 * 60 * 60 * 1000);
       if (recent.length !== timestamps.length) {
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(recent));
@@ -36,20 +44,13 @@ export class JingleService {
     }
   }
 
-  /**
-   * Determines whether the promotional jingle should play before starting/changing track.
-   * Rules:
-   * 1. Max 4 times in any rolling 24-hour period.
-   * 2. Minimum cooldown of 3.5 hours since the last jingle.
-   * 3. Random distribution (probability-based).
-   */
   public shouldTriggerJingle(): boolean {
     if (typeof window === 'undefined') return false;
 
     const now = Date.now();
     const history = this.getCleanHistory(now);
 
-    // Hard ceiling: Maximum 4 times in rolling 24 hours
+    // Strict cap: max 4 times in 24 hours
     if (history.length >= this.MAX_PLAYS_24H) {
       return false;
     }
@@ -57,48 +58,84 @@ export class JingleService {
     const lastPlay = history.length > 0 ? Math.max(...history) : 0;
     const timeSinceLastPlay = now - lastPlay;
 
-    // Must satisfy minimum cooldown (3.5 hours)
+    // Minimum cooldown of 3.5 hours between jingles
     if (lastPlay > 0 && timeSinceLastPlay < this.MIN_COOLDOWN_MS) {
       return false;
     }
 
-    // Random trigger:
-    // If more than 6 hours have passed (or first play in 24h), 50% chance
-    // If between 3.5h and 6h, 30% chance
+    // Random trigger probability
     const chance = timeSinceLastPlay > 6 * 60 * 60 * 1000 ? 0.5 : 0.3;
     return Math.random() < chance;
   }
 
+  public recordPlayNow(): void {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const now = Date.now();
+      const history = this.getCleanHistory(now);
+      history.push(now);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(history));
+    } catch (_) {}
+  }
+
   /**
-   * Plays the promotional jingle.
-   * Returns a promise that resolves when the jingle completes, is interrupted,
-   * encounters an error, or hits safety timeout.
+   * Starts the promotional jingle experience (audio + 10s countdown + 5s skip button).
    */
-  public playJingle(volume: number = 80, isMuted: boolean = false): Promise<void> {
+  public startJingle(track: JingleTrackInfo | null, volume: number = 80, isMuted: boolean = false): Promise<void> {
     return new Promise<void>((resolve) => {
-      this.stopJingle(); // Cleanup any previous playback
+      this.stopJingle();
+
+      // Record immediately so rapid clicks never trigger multiple jingles
+      this.recordPlayNow();
 
       this.currentResolver = resolve;
-      this.isJinglePlaying.set(true);
+      this.upcomingTrack.set(track);
+      this.secondsRemaining.set(10);
+      this.skipCountdown.set(5);
+      this.canSkip.set(false);
+      this.isJingleActive.set(true);
 
       const finish = () => {
-        if (this.safetyTimeout) {
-          clearTimeout(this.safetyTimeout);
-          this.safetyTimeout = null;
+        if (this.timerInterval) {
+          clearInterval(this.timerInterval);
+          this.timerInterval = null;
         }
         if (this.currentAudio) {
           try {
             this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
             this.currentAudio.src = '';
           } catch (_) {}
           this.currentAudio = null;
         }
-        this.isJinglePlaying.set(false);
+        this.isJingleActive.set(false);
         const r = this.currentResolver;
         this.currentResolver = null;
         if (r) r();
       };
 
+      // Start 10-second countdown and 5-second skip countdown
+      let remaining = 10;
+      let skipLeft = 5;
+
+      this.timerInterval = setInterval(() => {
+        remaining--;
+        this.secondsRemaining.set(Math.max(0, remaining));
+
+        if (skipLeft > 0) {
+          skipLeft--;
+          this.skipCountdown.set(skipLeft);
+          if (skipLeft === 0) {
+            this.canSkip.set(true);
+          }
+        }
+
+        if (remaining <= 0) {
+          finish();
+        }
+      }, 1000);
+
+      // Play audio
       try {
         const audio = new Audio(this.JINGLE_URL);
         audio.preload = 'auto';
@@ -107,42 +144,54 @@ export class JingleService {
         this.currentAudio = audio;
 
         audio.onended = () => {
-          this.recordPlay(Date.now());
           finish();
         };
 
         audio.onerror = (e) => {
-          console.warn('Jingle playback error, skipping to song:', e);
-          finish();
+          console.warn('Jingle audio error, continuing countdown/skip:', e);
         };
 
-        // Safety timeout: max 12 seconds in case of slow buffer or stall
-        this.safetyTimeout = setTimeout(() => {
-          console.warn('Jingle playback timeout reached, proceeding to song');
-          finish();
-        }, 12000);
-
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((err) => {
-            console.warn('Jingle autoplay restricted or failed:', err);
-            finish();
+        const p = audio.play();
+        if (p !== undefined) {
+          p.catch((err) => {
+            console.warn('Jingle autoplay restricted:', err);
           });
         }
-      } catch (err) {
-        console.warn('Failed to initialize jingle audio:', err);
-        finish();
+      } catch (e) {
+        console.warn('Failed to start jingle audio:', e);
       }
     });
   }
 
   /**
-   * Immediately stops any currently active jingle.
+   * Called when user clicks "Skip" button (enabled after 5s).
+   */
+  public skipJingle(): void {
+    if (this.currentAudio) {
+      try {
+        this.currentAudio.pause();
+        this.currentAudio.currentTime = 0;
+      } catch (_) {}
+    }
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+    this.isJingleActive.set(false);
+    if (this.currentResolver) {
+      const r = this.currentResolver;
+      this.currentResolver = null;
+      r();
+    }
+  }
+
+  /**
+   * Completely aborts any active jingle (e.g. user selects a different track).
    */
   public stopJingle(): void {
-    if (this.safetyTimeout) {
-      clearTimeout(this.safetyTimeout);
-      this.safetyTimeout = null;
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
     }
     if (this.currentAudio) {
       try {
@@ -152,7 +201,7 @@ export class JingleService {
       } catch (_) {}
       this.currentAudio = null;
     }
-    this.isJinglePlaying.set(false);
+    this.isJingleActive.set(false);
     if (this.currentResolver) {
       const r = this.currentResolver;
       this.currentResolver = null;
@@ -177,17 +226,5 @@ export class JingleService {
       this.currentAudio.volume = Math.max(0, Math.min(1, volume / 100));
       this.currentAudio.muted = isMuted;
     }
-  }
-
-  /**
-   * Records a timestamp of a completed jingle in localStorage.
-   */
-  private recordPlay(timestamp: number): void {
-    if (typeof localStorage === 'undefined') return;
-    try {
-      const history = this.getCleanHistory(timestamp);
-      history.push(timestamp);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(history));
-    } catch (_) {}
   }
 }
