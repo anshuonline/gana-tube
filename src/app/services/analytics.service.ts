@@ -219,6 +219,30 @@ export class AnalyticsService {
     }
   }
 
+  async recordJingleEvent(eventType: 'play' | 'complete' | 'skip', upcomingTrack?: any) {
+    if (this.isBotEnvironment()) return;
+    const isGuest = !this.currentUserEmail;
+    const guestId = isGuest ? this.getGuestId() : null;
+    try {
+      await fetch(`${this.apiUrl}?action=recordJingleEvent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_type: eventType,
+          is_guest: isGuest,
+          guest_id: guestId,
+          email: this.currentUserEmail,
+          upcoming_video_id: upcomingTrack?.videoId || '',
+          upcoming_title: upcomingTrack?.title || '',
+          ...this.getDeviceInfo()
+        }),
+        keepalive: true
+      });
+    } catch(e) {
+      // Silent catch
+    }
+  }
+
   getAnalytics(password: string, filter: string = 'all_time') {
     return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getAnalytics&pwd=${encodeURIComponent(password)}&filter=${filter}`).pipe(
       catchError(err => (err?.name === 'AbortError' || err?.message?.includes('aborted')) ? EMPTY : throwError(() => err))

@@ -1,15 +1,18 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { AnalyticsService } from './analytics.service';
 
 export interface JingleTrackInfo {
   title?: string;
   channelTitle?: string;
   thumbnail?: string;
+  videoId?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class JingleService {
+  private analyticsService = inject(AnalyticsService);
   private readonly JINGLE_URL = encodeURI('/assets/jingle for Ganatube.in/promotionalaudio.mp3');
   private readonly STORAGE_KEY = 'gt_jingle_history';
   private readonly MAX_PLAYS_24H = 4;
@@ -88,6 +91,9 @@ export class JingleService {
       // Record immediately so rapid clicks never trigger multiple jingles
       this.recordPlayNow();
 
+      // Track play impression in Analytics backend
+      this.analyticsService.recordJingleEvent('play', track);
+
       this.currentResolver = resolve;
       this.upcomingTrack.set(track);
       this.secondsRemaining.set(10);
@@ -95,7 +101,7 @@ export class JingleService {
       this.canSkip.set(false);
       this.isJingleActive.set(true);
 
-      const finish = () => {
+      const finish = (isNaturalComplete: boolean = true) => {
         if (this.timerInterval) {
           clearInterval(this.timerInterval);
           this.timerInterval = null;
@@ -108,6 +114,12 @@ export class JingleService {
           } catch (_) {}
           this.currentAudio = null;
         }
+
+        if (isNaturalComplete && this.isJingleActive()) {
+          // Track full completion in Analytics backend
+          this.analyticsService.recordJingleEvent('complete', this.upcomingTrack());
+        }
+
         this.isJingleActive.set(false);
         const r = this.currentResolver;
         this.currentResolver = null;
@@ -131,7 +143,7 @@ export class JingleService {
         }
 
         if (remaining <= 0) {
-          finish();
+          finish(true);
         }
       }, 1000);
 
@@ -144,7 +156,7 @@ export class JingleService {
         this.currentAudio = audio;
 
         audio.onended = () => {
-          finish();
+          finish(true);
         };
 
         audio.onerror = (e) => {
@@ -167,6 +179,9 @@ export class JingleService {
    * Called when user clicks "Skip" button (enabled after 5s).
    */
   public skipJingle(): void {
+    // Track skip action in Analytics backend
+    this.analyticsService.recordJingleEvent('skip', this.upcomingTrack());
+
     if (this.currentAudio) {
       try {
         this.currentAudio.pause();
