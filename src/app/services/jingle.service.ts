@@ -48,27 +48,7 @@ export class JingleService {
   }
 
   public shouldTriggerJingle(): boolean {
-    if (typeof window === 'undefined') return false;
-
-    const now = Date.now();
-    const history = this.getCleanHistory(now);
-
-    // Strict cap: max 4 times in 24 hours
-    if (history.length >= this.MAX_PLAYS_24H) {
-      return false;
-    }
-
-    const lastPlay = history.length > 0 ? Math.max(...history) : 0;
-    const timeSinceLastPlay = now - lastPlay;
-
-    // Minimum cooldown of 3.5 hours between jingles
-    if (lastPlay > 0 && timeSinceLastPlay < this.MIN_COOLDOWN_MS) {
-      return false;
-    }
-
-    // Random trigger probability
-    const chance = timeSinceLastPlay > 6 * 60 * 60 * 1000 ? 0.5 : 0.3;
-    return Math.random() < chance;
+    return false; // Jingle disabled
   }
 
   public recordPlayNow(): void {
@@ -85,94 +65,7 @@ export class JingleService {
    * Starts the promotional jingle experience (audio + 10s countdown + 5s skip button).
    */
   public startJingle(track: JingleTrackInfo | null, volume: number = 80, isMuted: boolean = false): Promise<void> {
-    return new Promise<void>((resolve) => {
-      this.stopJingle();
-
-      // Record immediately so rapid clicks never trigger multiple jingles
-      this.recordPlayNow();
-
-      // Track play impression in Analytics backend
-      this.analyticsService.recordJingleEvent('play', track);
-
-      this.currentResolver = resolve;
-      this.upcomingTrack.set(track);
-      this.secondsRemaining.set(10);
-      this.skipCountdown.set(5);
-      this.canSkip.set(false);
-      this.isJingleActive.set(true);
-
-      const finish = (isNaturalComplete: boolean = true) => {
-        if (this.timerInterval) {
-          clearInterval(this.timerInterval);
-          this.timerInterval = null;
-        }
-        if (this.currentAudio) {
-          try {
-            this.currentAudio.pause();
-            this.currentAudio.currentTime = 0;
-            this.currentAudio.src = '';
-          } catch (_) {}
-          this.currentAudio = null;
-        }
-
-        if (isNaturalComplete && this.isJingleActive()) {
-          // Track full completion in Analytics backend
-          this.analyticsService.recordJingleEvent('complete', this.upcomingTrack());
-        }
-
-        this.isJingleActive.set(false);
-        const r = this.currentResolver;
-        this.currentResolver = null;
-        if (r) r();
-      };
-
-      // Start 10-second countdown and 5-second skip countdown
-      let remaining = 10;
-      let skipLeft = 5;
-
-      this.timerInterval = setInterval(() => {
-        remaining--;
-        this.secondsRemaining.set(Math.max(0, remaining));
-
-        if (skipLeft > 0) {
-          skipLeft--;
-          this.skipCountdown.set(skipLeft);
-          if (skipLeft === 0) {
-            this.canSkip.set(true);
-          }
-        }
-
-        if (remaining <= 0) {
-          finish(true);
-        }
-      }, 1000);
-
-      // Play audio
-      try {
-        const audio = new Audio(this.JINGLE_URL);
-        audio.preload = 'auto';
-        audio.volume = Math.max(0, Math.min(1, volume / 100));
-        audio.muted = isMuted;
-        this.currentAudio = audio;
-
-        audio.onended = () => {
-          finish(true);
-        };
-
-        audio.onerror = (e) => {
-          console.warn('Jingle audio error, continuing countdown/skip:', e);
-        };
-
-        const p = audio.play();
-        if (p !== undefined) {
-          p.catch((err) => {
-            console.warn('Jingle autoplay restricted:', err);
-          });
-        }
-      } catch (e) {
-        console.warn('Failed to start jingle audio:', e);
-      }
-    });
+    return Promise.resolve();
   }
 
   /**

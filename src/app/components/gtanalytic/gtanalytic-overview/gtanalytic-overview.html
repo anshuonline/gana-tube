@@ -108,22 +108,6 @@
         </div>
       </div>
 
-      <!-- Promotional Jingle Impressions & Retention -->
-      <div class="kpi-card jingle-gradient">
-        <div class="kpi-header">
-          <span class="kpi-label">Promo Jingle Plays</span>
-          <div class="kpi-icon-pill">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          </div>
-        </div>
-        <div class="kpi-number">{{ jingleSummary().total_plays || 0 | number }}</div>
-        <div class="kpi-subtext">
-          <span class="highlight-green">{{ jingleSummary().total_completes || 0 | number }} Suna</span>
-          <span class="mx-1 opacity-40">·</span>
-          <span class="highlight-amber">{{ jingleSummary().total_skips || 0 | number }} Skipped</span>
-        </div>
-      </div>
-
     </div>
 
     <!-- Middle Split Section -->
@@ -254,54 +238,6 @@
         </div>
       </div>
 
-    </div>
-
-    <!-- Jingle Retention & Performance Detailed Panel -->
-    <div class="dashboard-panel jingle-panel mt-4">
-      <div class="panel-header">
-        <div class="panel-titles">
-          <div class="title-with-pill">
-            <h2 class="panel-title">Audio Jingle Retention & Skip Analytics</h2>
-            <span class="jingle-tag-pill">24h Frequency Capped</span>
-          </div>
-          <p class="panel-subtitle">Audience engagement metrics for promotional audio before track starts</p>
-        </div>
-      </div>
-
-      <div class="jingle-stats-row">
-        <div class="jingle-stat-box">
-          <span class="stat-num">{{ jingleSummary().total_plays || 0 | number }}</span>
-          <span class="stat-title">Total Jingle Plays</span>
-          <span class="stat-hint">Triggered before song begins</span>
-        </div>
-
-        <div class="jingle-stat-box completed">
-          <span class="stat-num text-green">{{ jingleSummary().total_completes || 0 | number }}</span>
-          <span class="stat-title">Listened Full (10s)</span>
-          <span class="stat-hint">{{ jingleSummary().completion_rate || 0 }}% retention rate</span>
-        </div>
-
-        <div class="jingle-stat-box skipped">
-          <span class="stat-num text-amber">{{ jingleSummary().total_skips || 0 | number }}</span>
-          <span class="stat-title">Skipped After 5s</span>
-          <span class="stat-hint">{{ jingleSummary().skip_rate || 0 }}% skip rate</span>
-        </div>
-      </div>
-
-      <!-- Retention Bar -->
-      <div class="jingle-bar-container" *ngIf="(jingleSummary().total_plays || 0) > 0">
-        <div class="jingle-bar-header">
-          <span class="bar-title">Audience Listen vs Skip Ratio</span>
-          <span class="bar-legend">
-            <span class="dot dot-green"></span> Full Listen: {{ jingleSummary().completion_rate || 0 }}%
-            <span class="dot dot-amber ml-3"></span> Skipped: {{ jingleSummary().skip_rate || 0 }}%
-          </span>
-        </div>
-        <div class="jingle-stacked-bar">
-          <div class="segment segment-complete" [style.width.%]="jingleSummary().completion_rate || 0"></div>
-          <div class="segment segment-skip" [style.width.%]="jingleSummary().skip_rate || 0"></div>
-        </div>
-      </div>
     </div>
 
   </div>

@@ -18,13 +18,6 @@ export class GtanalyticOverviewComponent {
   summary = computed(() => this.dataService.analyticsData()?.summary || {});
   guestSummary = computed(() => this.dataService.analyticsData()?.guest_summary || {});
   roomStats = computed(() => this.dataService.roomAnalytics());
-  jingleSummary = computed(() => this.dataService.analyticsData()?.jingle_summary || {
-    total_plays: 0,
-    total_completes: 0,
-    total_skips: 0,
-    skip_rate: 0,
-    completion_rate: 0
-  });
 
   // Streams split chart (Registered Plays vs Guest Plays)
   streamsSplitLabels = ['User Plays', 'Guest Plays'];

@@ -1324,19 +1324,6 @@ export class PlayerService {
     this.clearStuckLoadingTimer();
     this.jingleService.stopJingle();
 
-    // ── 2. PROMOTIONAL JINGLE INTERSTITIAL (max 4x/24h, 10s countdown, skip after 5s) ──
-    if (!isRemote && !this.isInRoom() && this.jingleService.shouldTriggerJingle()) {
-      // In parallel: pre-resolve Saavn stream while jingle plays so upcoming song starts instantly!
-      this.resolveSaavnStream(current);
-      try {
-        await this.jingleService.startJingle(current, this.volume(), this.isMuted());
-      } catch (e) {
-        console.warn('Jingle playback skipped:', e);
-      }
-      // If user selected another track while jingle was playing, bail out
-      if (saavnToken !== this.saavnToken) return;
-    }
-
     // Start load timeout only when actual track begins loading
     this.startLoadTimeout();
 
