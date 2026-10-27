@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,35 +18,40 @@ export class GtanalyticLoginComponent {
   private dataService = inject(GtanalyticDataService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   password = '';
-  loading = false;
-  error = '';
+  loading = signal<boolean>(false);
+  error = signal<string>('');
 
-  isSwinging = false;
-  showNazarBubble = false;
+  isSwinging = signal<boolean>(false);
+  showNazarBubble = signal<boolean>(false);
   private bubbleTimeout: any;
 
   triggerNazarDefense() {
-    this.isSwinging = true;
-    this.showNazarBubble = true;
+    this.isSwinging.set(true);
+    this.showNazarBubble.set(true);
+    this.cdr.markForCheck();
     this.toastService.show('🌶️ Buri nazar wale tera muh kala! 🍋', 'info', 4000);
 
     clearTimeout(this.bubbleTimeout);
     this.bubbleTimeout = setTimeout(() => {
-      this.showNazarBubble = false;
-      this.isSwinging = false;
+      this.showNazarBubble.set(false);
+      this.isSwinging.set(false);
+      this.cdr.markForCheck();
     }, 4000);
   }
 
   login() {
     if (!this.password.trim()) return;
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
+    this.cdr.markForCheck();
 
     this.analyticsService.getAnalytics(this.password.trim(), 'all_time', true).subscribe({
       next: (res) => {
-        this.loading = false;
+        this.loading.set(false);
+        this.cdr.markForCheck();
         if (res.status === 'success') {
           this.dataService.setPassword(this.password.trim());
           if ((res as any).is_primary_admin !== undefined) {
@@ -56,12 +61,14 @@ export class GtanalyticLoginComponent {
           this.dataService.loadRooms();
           this.router.navigate(['/gtanalytic/overview']);
         } else {
-          this.error = res.message || 'Invalid password';
+          this.error.set(res.message || 'Invalid password');
+          this.cdr.markForCheck();
         }
       },
       error: () => {
-        this.loading = false;
-        this.error = 'Failed to connect to analytics server';
+        this.loading.set(false);
+        this.error.set('Failed to connect to analytics server');
+        this.cdr.markForCheck();
       }
     });
   }

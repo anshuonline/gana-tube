@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -24,24 +24,27 @@ export class GtanalyticLayoutComponent implements OnInit {
   dataService = inject(GtanalyticDataService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
-  isMobileMenuOpen = false;
+  isMobileMenuOpen = signal<boolean>(false);
   selectedNavPath = '/gtanalytic/overview';
 
-  isSwinging = false;
-  showNazarBubble = false;
+  isSwinging = signal<boolean>(false);
+  showNazarBubble = signal<boolean>(false);
   private bubbleTimeout: any;
 
   triggerNazarDefense(event?: Event) {
     if (event) event.stopPropagation();
-    this.isSwinging = true;
-    this.showNazarBubble = true;
+    this.isSwinging.set(true);
+    this.showNazarBubble.set(true);
+    this.cdr.markForCheck();
     this.toastService.show('🌶️ Buri nazar wale tera muh kala! 🍋', 'info', 4000);
 
     clearTimeout(this.bubbleTimeout);
     this.bubbleTimeout = setTimeout(() => {
-      this.showNazarBubble = false;
-      this.isSwinging = false;
+      this.showNazarBubble.set(false);
+      this.isSwinging.set(false);
+      this.cdr.markForCheck();
     }, 4000);
   }
 
@@ -88,35 +91,39 @@ export class GtanalyticLayoutComponent implements OnInit {
     this.dataService.setFilter(filter);
   }
 
-  isRefreshingManual = false;
+  isRefreshingManual = signal<boolean>(false);
   private refreshTimeout: any;
 
   refreshData() {
-    this.isRefreshingManual = true;
+    this.isRefreshingManual.set(true);
+    this.cdr.markForCheck();
     this.dataService.triggerRefresh();
     clearTimeout(this.refreshTimeout);
     this.refreshTimeout = setTimeout(() => {
-      this.isRefreshingManual = false;
-    }, 1200);
+      this.isRefreshingManual.set(false);
+      this.cdr.markForCheck();
+    }, 700);
   }
 
   // Multi-User Access Keys & Login Audit Logs Management
-  showKeyModal = false;
-  modalTab: 'keys' | 'logs' = 'keys';
-  accessKeys: any[] = [];
-  loadingKeys = false;
-  loginLogs: any[] = [];
-  loadingLogs = false;
+  showKeyModal = signal<boolean>(false);
+  modalTab = signal<'keys' | 'logs'>('keys');
+  accessKeys = signal<any[]>([]);
+  loadingKeys = signal<boolean>(false);
+  loginLogs = signal<any[]>([]);
+  loadingLogs = signal<boolean>(false);
   newKeyLabel = '';
   newKeyPwd = '';
-  creatingKey = false;
-  copiedKeyId: number | null = null;
-  deletingKeyId: number | null = null;
+  creatingKey = signal<boolean>(false);
+  copiedKeyId = signal<number | null>(null);
+  copiedLogIp = signal<string | null>(null);
+  deletingKeyId = signal<number | null>(null);
 
   openKeyModal(tab: 'keys' | 'logs' = 'keys') {
-    this.modalTab = tab;
-    this.showKeyModal = true;
-    if (this.modalTab === 'keys') {
+    this.modalTab.set(tab);
+    this.showKeyModal.set(true);
+    this.cdr.markForCheck();
+    if (tab === 'keys') {
       this.loadAccessKeys();
     } else {
       this.loadLoginLogs();
@@ -124,8 +131,9 @@ export class GtanalyticLayoutComponent implements OnInit {
   }
 
   setModalTab(tab: 'keys' | 'logs') {
-    this.modalTab = tab;
-    if (tab === 'keys' && this.accessKeys.length === 0) {
+    this.modalTab.set(tab);
+    this.cdr.markForCheck();
+    if (tab === 'keys' && this.accessKeys().length === 0) {
       this.loadAccessKeys();
     } else if (tab === 'logs') {
       this.loadLoginLogs();
@@ -133,47 +141,56 @@ export class GtanalyticLayoutComponent implements OnInit {
   }
 
   closeKeyModal() {
-    this.showKeyModal = false;
+    this.showKeyModal.set(false);
     this.newKeyLabel = '';
     this.newKeyPwd = '';
+    this.cdr.markForCheck();
   }
 
   loadAccessKeys() {
-    this.loadingKeys = true;
+    this.loadingKeys.set(true);
+    this.cdr.markForCheck();
     this.dataService.getAccessKeys().pipe(
       finalize(() => {
-        this.loadingKeys = false;
+        this.loadingKeys.set(false);
+        this.cdr.markForCheck();
       })
     ).subscribe({
       next: (res) => {
         if (res.status === 'success') {
-          this.accessKeys = res.data || [];
+          this.accessKeys.set(res.data || []);
         } else {
           this.toastService.show(res.message || 'Failed to load access keys', 'error');
         }
+        this.cdr.markForCheck();
       },
       error: () => {
         this.toastService.show('Failed to connect to server', 'error');
+        this.cdr.markForCheck();
       }
     });
   }
 
   loadLoginLogs() {
-    this.loadingLogs = true;
+    this.loadingLogs.set(true);
+    this.cdr.markForCheck();
     this.dataService.getLoginLogs().pipe(
       finalize(() => {
-        this.loadingLogs = false;
+        this.loadingLogs.set(false);
+        this.cdr.markForCheck();
       })
     ).subscribe({
       next: (res) => {
         if (res.status === 'success') {
-          this.loginLogs = res.data || [];
+          this.loginLogs.set(res.data || []);
         } else {
           this.toastService.show(res.message || 'Failed to load login audit logs', 'error');
         }
+        this.cdr.markForCheck();
       },
       error: () => {
         this.toastService.show('Failed to connect to analytics server', 'error');
+        this.cdr.markForCheck();
       }
     });
   }
@@ -185,6 +202,7 @@ export class GtanalyticLayoutComponent implements OnInit {
       res += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     this.newKeyPwd = res;
+    this.cdr.markForCheck();
   }
 
   createAccessKey() {
@@ -199,10 +217,15 @@ export class GtanalyticLayoutComponent implements OnInit {
       return;
     }
 
-    this.creatingKey = true;
-    this.dataService.createAccessKey(label, pwd).subscribe({
+    this.creatingKey.set(true);
+    this.cdr.markForCheck();
+    this.dataService.createAccessKey(label, pwd).pipe(
+      finalize(() => {
+        this.creatingKey.set(false);
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
       next: (res) => {
-        this.creatingKey = false;
         if (res.status === 'success') {
           this.toastService.show(`Access key generated for "${label}"!`, 'success');
           this.newKeyLabel = '';
@@ -211,10 +234,11 @@ export class GtanalyticLayoutComponent implements OnInit {
         } else {
           this.toastService.show(res.message || 'Failed to create access key', 'error');
         }
+        this.cdr.markForCheck();
       },
       error: () => {
-        this.creatingKey = false;
         this.toastService.show('Error creating access key', 'error');
+        this.cdr.markForCheck();
       }
     });
   }
@@ -227,10 +251,12 @@ export class GtanalyticLayoutComponent implements OnInit {
     }
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(textToCopy).then(() => {
-        this.copiedKeyId = key.id;
+        this.copiedKeyId.set(key.id);
+        this.cdr.markForCheck();
         this.toastService.show(`Password copied for ${key.user_label}!`, 'success');
         setTimeout(() => {
-          this.copiedKeyId = null;
+          this.copiedKeyId.set(null);
+          this.cdr.markForCheck();
         }, 2500);
       }).catch(() => {
         this.toastService.show('Failed to copy to clipboard', 'error');
@@ -239,41 +265,50 @@ export class GtanalyticLayoutComponent implements OnInit {
   }
 
   deleteAccessKey(id: number) {
-    this.deletingKeyId = id;
-    this.dataService.deleteAccessKey(id).subscribe({
+    this.deletingKeyId.set(id);
+    this.cdr.markForCheck();
+    this.dataService.deleteAccessKey(id).pipe(
+      finalize(() => {
+        this.deletingKeyId.set(null);
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
       next: (res) => {
-        this.deletingKeyId = null;
         if (res.status === 'success') {
-          this.accessKeys = this.accessKeys.filter(k => k.id !== id);
+          this.accessKeys.update(keys => keys.filter(k => k.id !== id));
           this.toastService.show('Access key revoked successfully', 'info');
         } else {
           this.toastService.show(res.message || 'Failed to delete key', 'error');
         }
+        this.cdr.markForCheck();
       },
       error: () => {
-        this.deletingKeyId = null;
         this.toastService.show('Error deleting access key', 'error');
+        this.cdr.markForCheck();
       }
     });
   }
 
   toggleMobileMenu() {
-    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    this.isMobileMenuOpen.update(v => !v);
+    this.cdr.markForCheck();
   }
 
   closeMobileMenu() {
-    this.isMobileMenuOpen = false;
+    this.isMobileMenuOpen.set(false);
+    this.cdr.markForCheck();
   }
 
-  copiedLogIp: string | null = null;
   copyIp(ip: string) {
     if (!ip || ip === '—') return;
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(ip).then(() => {
-        this.copiedLogIp = ip;
+        this.copiedLogIp.set(ip);
+        this.cdr.markForCheck();
         this.toastService.show(`IP ${ip} copied!`, 'info', 2000);
         setTimeout(() => {
-          this.copiedLogIp = null;
+          this.copiedLogIp.set(null);
+          this.cdr.markForCheck();
         }, 2000);
       });
     }

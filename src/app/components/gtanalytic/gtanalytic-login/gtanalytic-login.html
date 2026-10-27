@@ -5,9 +5,9 @@
       src="https://i.ibb.co/KpBxGvHJ/d63efb07-dce0-493f-8739-f7c2046722f7-1.webp" 
       alt="Nimbu Mirchi" 
       class="nimbu-mirchi-img"
-      [class.swinging]="isSwinging"
+      [class.swinging]="isSwinging()"
     />
-    <div class="nazar-speech-bubble" *ngIf="showNazarBubble">
+    <div class="nazar-speech-bubble" *ngIf="showNazarBubble()">
       <span class="bubble-emoji">🌶️</span>
       <span class="bubble-text">Buri nazar wale tera muh kala!</span>
       <span class="bubble-emoji">🍋</span>
@@ -38,17 +38,17 @@
 
     <button 
       (click)="login()" 
-      [disabled]="loading || !password.trim()"
+      [disabled]="loading() || !password.trim()"
       class="btn-login-submit">
-      <span *ngIf="!loading">Unlock Dashboard</span>
-      <span *ngIf="loading" class="loading-state">
+      <span *ngIf="!loading()">Unlock Dashboard</span>
+      <span *ngIf="loading()" class="loading-state">
         <span class="spinner"></span> Verifying...
       </span>
     </button>
 
-    <div *ngIf="error" class="login-error-banner">
+    <div *ngIf="error()" class="login-error-banner">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span>{{ error }}</span>
+      <span>{{ error() }}</span>
     </div>
   </div>
 </div>

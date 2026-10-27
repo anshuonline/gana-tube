@@ -42,7 +42,7 @@
       </div>
 
       <!-- Refresh Action -->
-      <button class="btn-action-icon" (click)="refreshData()" [class.loading]="dataService.loading() || isRefreshingManual" title="Refresh Analytics">
+      <button class="btn-action-icon" (click)="refreshData()" [class.loading]="dataService.loading() || isRefreshingManual()" title="Refresh Analytics">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </button>
 
@@ -68,9 +68,9 @@
           src="https://i.ibb.co/KpBxGvHJ/d63efb07-dce0-493f-8739-f7c2046722f7-1.webp" 
           alt="Nimbu Mirchi" 
           class="nimbu-mirchi-img"
-          [class.swinging]="isSwinging"
+          [class.swinging]="isSwinging()"
         />
-        <div class="nazar-speech-bubble" *ngIf="showNazarBubble">
+        <div class="nazar-speech-bubble" *ngIf="showNazarBubble()">
           <span class="bubble-emoji">🌶️</span>
           <span class="bubble-text">Buri nazar wale tera muh kala!</span>
           <span class="bubble-emoji">🍋</span>
@@ -80,13 +80,13 @@
   </header>
 
   <!-- Mobile Overlay -->
-  <div class="mobile-overlay" *ngIf="isLoggedIn && isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+  <div class="mobile-overlay" *ngIf="isLoggedIn && isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
 
   <!-- Layout Body -->
   <div class="gtanalytic-body">
     
     <!-- Sidebar Navigation -->
-    <aside class="gtanalytic-sidebar" *ngIf="isLoggedIn" [class.open]="isMobileMenuOpen">
+    <aside class="gtanalytic-sidebar" *ngIf="isLoggedIn" [class.open]="isMobileMenuOpen()">
       <div class="sidebar-header-mobile">
         <span class="mobile-menu-title">Analytics Navigation</span>
         <button class="btn-close-mobile" (click)="closeMobileMenu()">&times;</button>
@@ -134,7 +134,7 @@
   </div>
 
   <!-- Access Keys & 7-Day Login Audit Modal (AMOLED Design System) -->
-  <div class="access-keys-modal-backdrop" *ngIf="showKeyModal" (click)="closeKeyModal()">
+  <div class="access-keys-modal-backdrop" *ngIf="showKeyModal()" (click)="closeKeyModal()">
     <div class="access-keys-modal-card" (click)="$event.stopPropagation()">
       
       <!-- Modal Header -->
@@ -160,24 +160,24 @@
       <div class="modal-tabs-bar">
         <button 
           class="modal-tab-btn" 
-          [class.active]="modalTab === 'keys'"
+          [class.active]="modalTab() === 'keys'"
           (click)="setModalTab('keys')">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M12 11l9-9"/><path d="M17 6l2 2"/></svg>
           <span>User Access Keys</span>
-          <span class="tab-badge" *ngIf="accessKeys.length > 0">{{ accessKeys.length }}</span>
+          <span class="tab-badge" *ngIf="accessKeys().length > 0">{{ accessKeys().length }}</span>
         </button>
         <button 
           class="modal-tab-btn" 
-          [class.active]="modalTab === 'logs'"
+          [class.active]="modalTab() === 'logs'"
           (click)="setModalTab('logs')">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           <span>Login History (7 Days)</span>
-          <span class="tab-badge-pulse" *ngIf="loginLogs.length > 0">{{ loginLogs.length }}</span>
+          <span class="tab-badge-pulse" *ngIf="loginLogs().length > 0">{{ loginLogs().length }}</span>
         </button>
       </div>
 
       <!-- TAB 1: ACCESS KEYS CONTENT -->
-      <div class="modal-tab-content" *ngIf="modalTab === 'keys'">
+      <div class="modal-tab-content" *ngIf="modalTab() === 'keys'">
         
         <!-- Create Key Form Card -->
         <div class="add-key-section">
@@ -221,9 +221,9 @@
           <button 
             class="btn-primary-create" 
             (click)="createAccessKey()" 
-            [disabled]="creatingKey || !newKeyLabel.trim() || !newKeyPwd.trim()">
-            <span *ngIf="!creatingKey">+ Generate Access Key</span>
-            <span *ngIf="creatingKey" class="btn-loading-flex">
+            [disabled]="creatingKey() || !newKeyLabel.trim() || !newKeyPwd.trim()">
+            <span *ngIf="!creatingKey()">+ Generate Access Key</span>
+            <span *ngIf="creatingKey()" class="btn-loading-flex">
               <span class="spinner-sm"></span> Creating Key...
             </span>
           </button>
@@ -233,28 +233,28 @@
         <div class="keys-list-section">
           <div class="keys-list-header">
             <div>
-              <h3 class="section-heading">Active Users & Passwords ({{ accessKeys.length }})</h3>
+              <h3 class="section-heading">Active Users & Passwords ({{ accessKeys().length }})</h3>
               <p class="section-subtext">Each key provides read access to the GTAnalytic dashboard</p>
             </div>
-            <button class="btn-refresh-pill" (click)="loadAccessKeys()" [disabled]="loadingKeys" title="Refresh list">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="loadingKeys"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <button class="btn-refresh-pill" (click)="loadAccessKeys()" [disabled]="loadingKeys()" title="Refresh list">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="loadingKeys()"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
               <span>Refresh</span>
             </button>
           </div>
 
-          <div *ngIf="loadingKeys && accessKeys.length === 0" class="state-empty-box">
+          <div *ngIf="loadingKeys() && accessKeys().length === 0" class="state-empty-box">
             <span class="spinner-sm"></span>
             <span>Loading access keys...</span>
           </div>
 
-          <div *ngIf="!loadingKeys && accessKeys.length === 0" class="state-empty-box">
+          <div *ngIf="!loadingKeys() && accessKeys().length === 0" class="state-empty-box">
             <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M12 11l9-9"/><path d="M17 6l2 2"/></svg>
             <p>No secondary user keys created yet.</p>
             <span>Create one above to give access to teammates or partners!</span>
           </div>
 
           <!-- Keys Table (Responsive Container) -->
-          <div class="keys-table-responsive" *ngIf="accessKeys.length > 0">
+          <div class="keys-table-responsive" *ngIf="accessKeys().length > 0">
             <table class="keys-table">
               <thead>
                 <tr>
@@ -265,7 +265,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let k of accessKeys">
+                <tr *ngFor="let k of accessKeys()">
                   <td>
                     <div class="user-row-cell">
                       <div class="user-avatar-circle">
@@ -291,16 +291,16 @@
                         class="btn-copy-action" 
                         (click)="copyKey(k)" 
                         title="Copy password to clipboard">
-                        <svg *ngIf="copiedKeyId !== k.id" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        <span>{{ copiedKeyId === k.id ? '✓ Copied' : 'Copy' }}</span>
+                        <svg *ngIf="copiedKeyId() !== k.id" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>{{ copiedKeyId() === k.id ? '✓ Copied' : 'Copy' }}</span>
                       </button>
                       <button 
                         class="btn-revoke-action" 
                         (click)="deleteAccessKey(k.id)" 
-                        [disabled]="deletingKeyId === k.id"
+                        [disabled]="deletingKeyId() === k.id"
                         title="Revoke access immediately">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        <span>{{ deletingKeyId === k.id ? 'Revoking...' : 'Revoke' }}</span>
+                        <span>{{ deletingKeyId() === k.id ? 'Revoking...' : 'Revoke' }}</span>
                       </button>
                     </div>
                   </td>
@@ -313,7 +313,7 @@
       </div>
 
       <!-- TAB 2: LOGIN AUDIT LOGS CONTENT (7 DAYS) -->
-      <div class="modal-tab-content" *ngIf="modalTab === 'logs'">
+      <div class="modal-tab-content" *ngIf="modalTab() === 'logs'">
         
         <div class="logs-banner-card">
           <div class="banner-left">
@@ -322,25 +322,25 @@
               All dashboard logins are audited with IP address, device, browser, OS, and location. Records automatically delete after 7 days from the database.
             </p>
           </div>
-          <button class="btn-refresh-pill" (click)="loadLoginLogs()" [disabled]="loadingLogs" title="Refresh Logs">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="loadingLogs"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          <button class="btn-refresh-pill" (click)="loadLoginLogs()" [disabled]="loadingLogs()" title="Refresh Logs">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="loadingLogs()"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             <span>Refresh</span>
           </button>
         </div>
 
-        <div *ngIf="loadingLogs && loginLogs.length === 0" class="state-empty-box">
+        <div *ngIf="loadingLogs() && loginLogs().length === 0" class="state-empty-box">
           <span class="spinner-sm"></span>
           <span>Loading login history...</span>
         </div>
 
-        <div *ngIf="!loadingLogs && loginLogs.length === 0" class="state-empty-box">
+        <div *ngIf="!loadingLogs() && loginLogs().length === 0" class="state-empty-box">
           <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           <p>No login activity recorded in the last 7 days.</p>
           <span>New logins will automatically show up here in real time!</span>
         </div>
 
         <!-- Logs Table (Responsive Container) -->
-        <div class="logs-table-responsive" *ngIf="loginLogs.length > 0">
+        <div class="logs-table-responsive" *ngIf="loginLogs().length > 0">
           <table class="keys-table logs-table">
             <thead>
               <tr>
@@ -353,7 +353,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let log of loginLogs">
+              <tr *ngFor="let log of loginLogs()">
                 <td>
                   <div class="user-row-cell">
                     <div class="user-avatar-circle" [class.admin-circle]="log.user_label === 'Primary Admin'">
@@ -373,7 +373,7 @@
                 <td>
                   <div class="ip-copy-wrap" (click)="copyIp(log.ip_address)" title="Click to copy IP">
                     <code class="ip-code">{{ log.ip_address }}</code>
-                    <span class="copy-tiny-icon">{{ copiedLogIp === log.ip_address ? '✓' : '📋' }}</span>
+                    <span class="copy-tiny-icon">{{ copiedLogIp() === log.ip_address ? '✓' : '📋' }}</span>
                   </div>
                 </td>
                 <td>
