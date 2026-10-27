@@ -9,7 +9,6 @@ import { RoomService } from './room.service';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { ToastService } from './toast.service';
-import { SpinService } from './spin.service';
 import { AnalyticsService } from './analytics.service';
 
 import { OfflineService } from './offline.service';
@@ -155,7 +154,7 @@ export class PlayerService {
   private userService = inject(UserService);
   private analyticsService = inject(AnalyticsService);
   private authService = inject(AuthService);
-  private spinService = inject(SpinService);
+  private toastService = inject(ToastService);
   public offlineService = inject(OfflineService);
   private contentFilter = inject(ContentFilterService);
   public jingleService = inject(JingleService);
@@ -1574,8 +1573,7 @@ export class PlayerService {
   }
 
   private http = inject(HttpClient);
-  listeningSeconds = signal<number>(0);
-
+  
   private triggerEngagement(): void {
     const current = this.currentTrack();
     if (current && this.trackStartTime > 0) {
@@ -1639,13 +1637,7 @@ export class PlayerService {
         if (this.isPlayingSaavn() || this.isPlayingOffline()) {
           this.ngZone.run(() => {
             this.updateMediaSessionPosition();
-            if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
-              this.listeningSeconds.update(v => v + deltaSeconds);
-              if (this.listeningSeconds() >= 120) {
-                this.listeningSeconds.set(0);
-                this.awardSpinChance();
-              }
-            }
+            
           });
           return;
         }
@@ -1708,15 +1700,7 @@ export class PlayerService {
             this.checkAndRecordQualifiedPlay(deltaSeconds);
           }
 
-          // Track listening time for spin wheel (120 seconds = 1 chance)
-          // ONLY if user has exhausted all daily spins (spinsLeft <= 0)
-          if (this.playerState() === 'playing' && this.spinService.spinsLeft() <= 0) {
-            this.listeningSeconds.update(v => v + deltaSeconds);
-            if (this.listeningSeconds() >= 120) {
-              this.listeningSeconds.set(0); // reset
-              this.awardSpinChance();
-            }
-          }
+          
         } catch (e) {
           console.error('Error in progress tracking interval', e);
         }
@@ -1725,26 +1709,6 @@ export class PlayerService {
   });
 }
   
-  private toastService = inject(ToastService);
-
-  private awardSpinChance(): void {
-    const user = this.authService.currentUser();
-    if (user && user.email) {
-      const backendUrl = 'https://manageads.ganatube.in/wheel-api.php';
-        
-      this.http.post<any>(`${backendUrl}?action=add_chance`, { email: user.email })
-        .subscribe({
-          next: (res) => {
-            if (res.status === 'success') {
-              this.spinService.spinsLeft.set(res.spins_left);
-              this.toastService.show('🎉 You earned a free Spin chance!', 'success');
-            }
-          },
-          error: (err) => console.error('Failed to add chance', err)
-        });
-    }
-  }
-
   private stopProgressTracking(): void {
     if (this.progressInterval) {
       clearInterval(this.progressInterval);

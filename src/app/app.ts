@@ -44,7 +44,6 @@ import { FeedbackPopupComponent, FeedbackPopupConfig, DEFAULT_FEEDBACK_POPUP_CON
 import { ShortsPageComponent } from './components/shorts-page/shorts-page.component';
 import { DiscoveryPageComponent } from './components/discovery-page/discovery-page.component';
 import { BlogPageComponent } from './components/blog-page/blog-page.component';
-import { SpinWheelComponent } from './components/spin-wheel/spin-wheel.component';
 import { OfflineLibraryComponent } from './components/offline-library/offline-library.component';
 import { CuratedPlaylistsComponent } from './components/curated-playlists/curated-playlists';
   import { LanguageSelectModalComponent } from './components/language-select-modal/language-select-modal.component';
@@ -145,8 +144,6 @@ export interface HeroSlide {
     ShortsPageComponent,
     DiscoveryPageComponent,
     BlogPageComponent,
-    SpinWheelComponent,
-    LucideGift,
     CuratedPlaylistsComponent,
     LanguageSelectModalComponent,
     LoginPromptModalComponent,
@@ -166,16 +163,11 @@ export interface HeroSlide {
 })
 export class App implements OnInit {
   @ViewChild(SearchBarComponent) searchBar!: SearchBarComponent;
-  @ViewChild('spinWheel') spinWheel!: SpinWheelComponent;
 
   public pwaService = inject(PwaService);
   public analyticsService = inject(AnalyticsService);
   public roomService = inject(RoomService);
   public contentFilterService = inject(ContentFilterService);
-
-  openSpinWheel() {
-    this.spinWheel?.open();
-  }
 
   results = signal<YouTubeSearchResult[]>([]);
   isLoading = signal<boolean>(false);
