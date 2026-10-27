@@ -42,12 +42,12 @@
       </div>
 
       <!-- Refresh Action -->
-      <button class="btn-action-icon" (click)="refreshData()" [class.loading]="dataService.loading()" title="Refresh Analytics">
+      <button class="btn-action-icon" (click)="refreshData()" [class.loading]="dataService.loading() || isRefreshingManual" title="Refresh Analytics">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </button>
 
-      <!-- Manage Access Keys (Multi-User Login) -->
-      <button class="btn-action-icon btn-access-keys" (click)="openKeyModal()" title="Manage User Access Keys (Passwords)">
+      <!-- Manage Access Keys & Login Audit (Multi-User) -->
+      <button class="btn-action-icon btn-access-keys" (click)="openKeyModal()" title="Manage User Access Keys & 7-Day Login Audit Logs">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="7.5" cy="15.5" r="4.5"/>
           <path d="M12 11l9-9"/>
@@ -133,128 +133,273 @@
 
   </div>
 
-  <!-- Access Keys Modal (Multi-User Login Management) -->
+  <!-- Access Keys & 7-Day Login Audit Modal (AMOLED Design System) -->
   <div class="access-keys-modal-backdrop" *ngIf="showKeyModal" (click)="closeKeyModal()">
     <div class="access-keys-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
       <div class="modal-header">
         <div class="modal-title-wrap">
           <div class="key-icon-badge">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="7.5" cy="15.5" r="4.5"/>
               <path d="M12 11l9-9"/>
               <path d="M17 6l2 2"/>
               <path d="M19 4l2 2"/>
             </svg>
           </div>
-          <div>
-            <h2 class="modal-title">User Access Keys</h2>
-            <p class="modal-subtitle">Generate & manage passwords for other users to access /gtanalytic/login</p>
+          <div class="modal-title-text">
+            <h2 class="modal-title">Access & Audit Management</h2>
+            <p class="modal-subtitle">Generate secondary logins & track 7-day login activity</p>
           </div>
         </div>
         <button class="btn-close-modal" (click)="closeKeyModal()" aria-label="Close modal">&times;</button>
       </div>
 
-      <!-- Add New Key Form -->
-      <div class="add-key-section">
-        <h3 class="section-heading">Create New Access Key</h3>
-        <div class="add-key-form">
-          <div class="form-group">
-            <label class="form-label">User / Member Name</label>
-            <input 
-              type="text" 
-              class="form-input" 
-              [(ngModel)]="newKeyLabel" 
-              placeholder="e.g. John Doe, Partner, Viewer"
-              (keyup.enter)="createAccessKey()"
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <div class="pwd-input-wrap">
-              <input 
-                type="text" 
-                class="form-input" 
-                [(ngModel)]="newKeyPwd" 
-                placeholder="Enter password or auto-generate..."
-                (keyup.enter)="createAccessKey()"
-              />
-              <button class="btn-generate-random" type="button" (click)="generateRandomKey()" title="Generate secure key">
-                🎲 Auto Key
-              </button>
-            </div>
-          </div>
-          <button 
-            class="btn-create-key" 
-            (click)="createAccessKey()" 
-            [disabled]="creatingKey || !newKeyLabel.trim() || !newKeyPwd.trim()">
-            <span *ngIf="!creatingKey">+ Generate Key</span>
-            <span *ngIf="creatingKey">Creating...</span>
-          </button>
-        </div>
+      <!-- Segmented Tabs Navigation -->
+      <div class="modal-tabs-bar">
+        <button 
+          class="modal-tab-btn" 
+          [class.active]="modalTab === 'keys'"
+          (click)="setModalTab('keys')">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M12 11l9-9"/><path d="M17 6l2 2"/></svg>
+          <span>User Access Keys</span>
+          <span class="tab-badge" *ngIf="accessKeys.length > 0">{{ accessKeys.length }}</span>
+        </button>
+        <button 
+          class="modal-tab-btn" 
+          [class.active]="modalTab === 'logs'"
+          (click)="setModalTab('logs')">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Login History (7 Days)</span>
+          <span class="tab-badge-pulse" *ngIf="loginLogs.length > 0">{{ loginLogs.length }}</span>
+        </button>
       </div>
 
-      <!-- Existing Keys List -->
-      <div class="keys-list-section">
-        <div class="keys-list-header">
-          <h3 class="section-heading">Active Users & Passwords ({{ accessKeys.length }})</h3>
-          <button class="btn-refresh-keys" (click)="loadAccessKeys()" [disabled]="loadingKeys" title="Refresh list">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="loadingKeys"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
+      <!-- TAB 1: ACCESS KEYS CONTENT -->
+      <div class="modal-tab-content" *ngIf="modalTab === 'keys'">
+        
+        <!-- Create Key Form Card -->
+        <div class="add-key-section">
+          <div class="section-title-row">
+            <h3 class="section-heading">Create New Access Key</h3>
+            <span class="section-tip">Grants direct login access at /gtanalytic/login</span>
+          </div>
+          
+          <div class="add-key-grid">
+            <div class="form-field-group">
+              <label class="form-label">User / Member Name</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input 
+                  type="text" 
+                  class="form-input" 
+                  [(ngModel)]="newKeyLabel" 
+                  placeholder="e.g. Enzo, Partner, Auditor"
+                  (keyup.enter)="createAccessKey()"
+                />
+              </div>
+            </div>
+
+            <div class="form-field-group">
+              <label class="form-label">Password Key</label>
+              <div class="input-with-action">
+                <input 
+                  type="text" 
+                  class="form-input font-mono" 
+                  [(ngModel)]="newKeyPwd" 
+                  placeholder="Enter password or auto-generate..."
+                  (keyup.enter)="createAccessKey()"
+                />
+                <button class="btn-auto-key" type="button" (click)="generateRandomKey()" title="Generate secure random password">
+                  🎲 Auto Key
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button 
+            class="btn-primary-create" 
+            (click)="createAccessKey()" 
+            [disabled]="creatingKey || !newKeyLabel.trim() || !newKeyPwd.trim()">
+            <span *ngIf="!creatingKey">+ Generate Access Key</span>
+            <span *ngIf="creatingKey" class="btn-loading-flex">
+              <span class="spinner-sm"></span> Creating Key...
+            </span>
           </button>
         </div>
 
-        <div *ngIf="loadingKeys && accessKeys.length === 0" class="keys-empty-state">
-          Loading access keys...
+        <!-- Keys List Section -->
+        <div class="keys-list-section">
+          <div class="keys-list-header">
+            <div>
+              <h3 class="section-heading">Active Users & Passwords ({{ accessKeys.length }})</h3>
+              <p class="section-subtext">Each key provides read access to the GTAnalytic dashboard</p>
+            </div>
+            <button class="btn-refresh-pill" (click)="loadAccessKeys()" [disabled]="loadingKeys" title="Refresh list">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="loadingKeys"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+
+          <div *ngIf="loadingKeys && accessKeys.length === 0" class="state-empty-box">
+            <span class="spinner-sm"></span>
+            <span>Loading access keys...</span>
+          </div>
+
+          <div *ngIf="!loadingKeys && accessKeys.length === 0" class="state-empty-box">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M12 11l9-9"/><path d="M17 6l2 2"/></svg>
+            <p>No secondary user keys created yet.</p>
+            <span>Create one above to give access to teammates or partners!</span>
+          </div>
+
+          <!-- Keys Table (Responsive Container) -->
+          <div class="keys-table-responsive" *ngIf="accessKeys.length > 0">
+            <table class="keys-table">
+              <thead>
+                <tr>
+                  <th>User / Member</th>
+                  <th>Password Key</th>
+                  <th>Created Date</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let k of accessKeys">
+                  <td>
+                    <div class="user-row-cell">
+                      <div class="user-avatar-circle">
+                        {{ k.user_label ? k.user_label[0].toUpperCase() : 'U' }}
+                      </div>
+                      <div class="user-name-wrap">
+                        <span class="user-name-text">{{ k.user_label }}</span>
+                        <span class="user-status-pill">Active</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="key-pill-wrapper">
+                      <code class="key-pill-code">{{ k.plain_hint || '••••••••' }}</code>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="date-cell-text">{{ k.created_at | date:'mediumDate' }}</span>
+                  </td>
+                  <td class="text-right">
+                    <div class="action-btn-group">
+                      <button 
+                        class="btn-copy-action" 
+                        (click)="copyKey(k)" 
+                        title="Copy password to clipboard">
+                        <svg *ngIf="copiedKeyId !== k.id" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>{{ copiedKeyId === k.id ? '✓ Copied' : 'Copy' }}</span>
+                      </button>
+                      <button 
+                        class="btn-revoke-action" 
+                        (click)="deleteAccessKey(k.id)" 
+                        [disabled]="deletingKeyId === k.id"
+                        title="Revoke access immediately">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        <span>{{ deletingKeyId === k.id ? 'Revoking...' : 'Revoke' }}</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div *ngIf="!loadingKeys && accessKeys.length === 0" class="keys-empty-state">
-          No secondary user keys generated yet. Create one above to give access to another user!
+      </div>
+
+      <!-- TAB 2: LOGIN AUDIT LOGS CONTENT (7 DAYS) -->
+      <div class="modal-tab-content" *ngIf="modalTab === 'logs'">
+        
+        <div class="logs-banner-card">
+          <div class="banner-left">
+            <span class="retention-badge">⏳ 7-Day Auto-Purge</span>
+            <p class="banner-desc">
+              All dashboard logins are audited with IP address, device, browser, OS, and location. Records automatically delete after 7 days from the database.
+            </p>
+          </div>
+          <button class="btn-refresh-pill" (click)="loadLoginLogs()" [disabled]="loadingLogs" title="Refresh Logs">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="loadingLogs"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Refresh</span>
+          </button>
         </div>
 
-        <div class="keys-table-wrap" *ngIf="accessKeys.length > 0">
-          <table class="keys-table">
+        <div *ngIf="loadingLogs && loginLogs.length === 0" class="state-empty-box">
+          <span class="spinner-sm"></span>
+          <span>Loading login history...</span>
+        </div>
+
+        <div *ngIf="!loadingLogs && loginLogs.length === 0" class="state-empty-box">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p>No login activity recorded in the last 7 days.</p>
+          <span>New logins will automatically show up here in real time!</span>
+        </div>
+
+        <!-- Logs Table (Responsive Container) -->
+        <div class="logs-table-responsive" *ngIf="loginLogs.length > 0">
+          <table class="keys-table logs-table">
             <thead>
               <tr>
-                <th>User / Name</th>
-                <th>Password</th>
-                <th>Created</th>
-                <th class="text-right">Actions</th>
+                <th>User / Member</th>
+                <th>Status</th>
+                <th>IP Address</th>
+                <th>Device & OS</th>
+                <th>Location</th>
+                <th>Timestamp</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let k of accessKeys">
-                <td class="font-medium text-white">
-                  <div class="user-cell">
-                    <span class="user-avatar">{{ k.user_label ? k.user_label[0].toUpperCase() : 'U' }}</span>
-                    <span>{{ k.user_label }}</span>
+              <tr *ngFor="let log of loginLogs">
+                <td>
+                  <div class="user-row-cell">
+                    <div class="user-avatar-circle" [class.admin-circle]="log.user_label === 'Primary Admin'">
+                      {{ log.user_label === 'Primary Admin' ? '👑' : (log.user_label ? log.user_label[0].toUpperCase() : 'U') }}
+                    </div>
+                    <div class="user-name-wrap">
+                      <span class="user-name-text">{{ log.user_label }}</span>
+                      <span class="user-role-label">{{ log.user_identifier || 'login' }}</span>
+                    </div>
                   </div>
                 </td>
                 <td>
-                  <span class="key-pill font-mono">{{ k.plain_hint || '••••••••' }}</span>
+                  <span class="status-badge" [class.success]="log.status === 'success'" [class.failed]="log.status !== 'success'">
+                    {{ log.status === 'success' ? '✓ Success' : '✗ Failed' }}
+                  </span>
                 </td>
-                <td class="text-muted text-xs">{{ k.created_at | date:'mediumDate' }}</td>
-                <td class="text-right">
-                  <div class="action-buttons-wrap">
-                    <button 
-                      class="btn-copy-key" 
-                      (click)="copyKey(k)" 
-                      title="Copy password to clipboard">
-                      {{ copiedKeyId === k.id ? '✓ Copied' : '📋 Copy' }}
-                    </button>
-                    <button 
-                      class="btn-delete-key" 
-                      (click)="deleteAccessKey(k.id)" 
-                      [disabled]="deletingKeyId === k.id"
-                      title="Revoke and delete this key">
-                      {{ deletingKeyId === k.id ? '...' : 'Revoke' }}
-                    </button>
+                <td>
+                  <div class="ip-copy-wrap" (click)="copyIp(log.ip_address)" title="Click to copy IP">
+                    <code class="ip-code">{{ log.ip_address }}</code>
+                    <span class="copy-tiny-icon">{{ copiedLogIp === log.ip_address ? '✓' : '📋' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="device-cell-info">
+                    <span class="device-emoji">{{ getDeviceIcon(log.device_type) }}</span>
+                    <span class="device-name-text">{{ log.os || 'Unknown OS' }} · {{ log.browser || 'Browser' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="location-text">
+                    {{ log.city ? (log.city + (log.country ? ', ' + log.country : '')) : (log.country || '—') }}
+                  </span>
+                </td>
+                <td>
+                  <div class="timestamp-cell">
+                    <span class="timestamp-date">{{ log.created_at | date:'MMM d, y' }}</span>
+                    <span class="timestamp-time">{{ log.created_at | date:'shortTime' }}</span>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+
       </div>
+
     </div>
   </div>
 

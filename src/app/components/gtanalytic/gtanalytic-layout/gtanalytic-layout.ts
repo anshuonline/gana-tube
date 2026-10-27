@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { GtanalyticDataService } from '../gtanalytic-data.service';
 import { ToastService } from '../../../services/toast.service';
 
@@ -83,23 +84,48 @@ export class GtanalyticLayoutComponent implements OnInit {
     this.dataService.setFilter(filter);
   }
 
+  isRefreshingManual = false;
+  private refreshTimeout: any;
+
   refreshData() {
+    this.isRefreshingManual = true;
     this.dataService.triggerRefresh();
+    clearTimeout(this.refreshTimeout);
+    this.refreshTimeout = setTimeout(() => {
+      this.isRefreshingManual = false;
+    }, 1200);
   }
 
-  // Multi-User Access Keys Management
+  // Multi-User Access Keys & Login Audit Logs Management
   showKeyModal = false;
+  modalTab: 'keys' | 'logs' = 'keys';
   accessKeys: any[] = [];
   loadingKeys = false;
+  loginLogs: any[] = [];
+  loadingLogs = false;
   newKeyLabel = '';
   newKeyPwd = '';
   creatingKey = false;
   copiedKeyId: number | null = null;
   deletingKeyId: number | null = null;
 
-  openKeyModal() {
+  openKeyModal(tab: 'keys' | 'logs' = 'keys') {
+    this.modalTab = tab;
     this.showKeyModal = true;
-    this.loadAccessKeys();
+    if (this.modalTab === 'keys') {
+      this.loadAccessKeys();
+    } else {
+      this.loadLoginLogs();
+    }
+  }
+
+  setModalTab(tab: 'keys' | 'logs') {
+    this.modalTab = tab;
+    if (tab === 'keys' && this.accessKeys.length === 0) {
+      this.loadAccessKeys();
+    } else if (tab === 'logs') {
+      this.loadLoginLogs();
+    }
   }
 
   closeKeyModal() {
@@ -110,9 +136,12 @@ export class GtanalyticLayoutComponent implements OnInit {
 
   loadAccessKeys() {
     this.loadingKeys = true;
-    this.dataService.getAccessKeys().subscribe({
-      next: (res) => {
+    this.dataService.getAccessKeys().pipe(
+      finalize(() => {
         this.loadingKeys = false;
+      })
+    ).subscribe({
+      next: (res) => {
         if (res.status === 'success') {
           this.accessKeys = res.data || [];
         } else {
@@ -120,8 +149,27 @@ export class GtanalyticLayoutComponent implements OnInit {
         }
       },
       error: () => {
-        this.loadingKeys = false;
         this.toastService.show('Failed to connect to server', 'error');
+      }
+    });
+  }
+
+  loadLoginLogs() {
+    this.loadingLogs = true;
+    this.dataService.getLoginLogs().pipe(
+      finalize(() => {
+        this.loadingLogs = false;
+      })
+    ).subscribe({
+      next: (res) => {
+        if (res.status === 'success') {
+          this.loginLogs = res.data || [];
+        } else {
+          this.toastService.show(res.message || 'Failed to load login audit logs', 'error');
+        }
+      },
+      error: () => {
+        this.toastService.show('Failed to connect to analytics server', 'error');
       }
     });
   }
@@ -211,6 +259,27 @@ export class GtanalyticLayoutComponent implements OnInit {
 
   closeMobileMenu() {
     this.isMobileMenuOpen = false;
+  }
+
+  copiedLogIp: string | null = null;
+  copyIp(ip: string) {
+    if (!ip || ip === '—') return;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(ip).then(() => {
+        this.copiedLogIp = ip;
+        this.toastService.show(`IP ${ip} copied!`, 'info', 2000);
+        setTimeout(() => {
+          this.copiedLogIp = null;
+        }, 2000);
+      });
+    }
+  }
+
+  getDeviceIcon(deviceType: string): string {
+    const dt = (deviceType || '').toLowerCase();
+    if (dt.includes('mobile') || dt.includes('phone')) return '📱';
+    if (dt.includes('tablet') || dt.includes('ipad')) return '📟';
+    return '💻';
   }
 
   logout() {

@@ -44,7 +44,7 @@ export class GtanalyticLoginComponent {
     this.loading = true;
     this.error = '';
 
-    this.analyticsService.getAnalytics(this.password.trim(), 'all_time').subscribe({
+    this.analyticsService.getAnalytics(this.password.trim(), 'all_time', true).subscribe({
       next: (res) => {
         this.loading = false;
         if (res.status === 'success') {

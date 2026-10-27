@@ -243,8 +243,13 @@ export class AnalyticsService {
     }
   }
 
-  getAnalytics(password: string, filter: string = 'all_time') {
-    return this.http.get<{status: string, data?: any, message?: string}>(`${this.apiUrl}?action=getAnalytics&pwd=${encodeURIComponent(password)}&filter=${filter}`).pipe(
+  getAnalytics(password: string, filter: string = 'all_time', recordLogin: boolean = false) {
+    let url = `${this.apiUrl}?action=getAnalytics&pwd=${encodeURIComponent(password)}&filter=${filter}`;
+    if (recordLogin) {
+      const dev = this.getDeviceInfo();
+      url += `&record_login=1&device_type=${encodeURIComponent(dev.device_type)}&os=${encodeURIComponent(dev.os)}&browser=${encodeURIComponent(dev.browser)}&screen_size=${encodeURIComponent(dev.screen_size)}`;
+    }
+    return this.http.get<{status: string, data?: any, message?: string}>(url).pipe(
       catchError(err => (err?.name === 'AbortError' || err?.message?.includes('aborted')) ? EMPTY : throwError(() => err))
     );
   }
@@ -433,6 +438,14 @@ export class AnalyticsService {
     return this.http.post<{status: string, message?: string}>(
       `${this.apiUrl}?action=deleteAccessKey`,
       { pwd: password, id }
+    );
+  }
+
+  getLoginLogs(password: string) {
+    return this.http.get<{status: string, data?: any[], message?: string}>(
+      `${this.apiUrl}?action=getLoginLogs&pwd=${encodeURIComponent(password)}`
+    ).pipe(
+      catchError(err => (err?.name === 'AbortError' || err?.message?.includes('aborted')) ? EMPTY : throwError(() => err))
     );
   }
 }

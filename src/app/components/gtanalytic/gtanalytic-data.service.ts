@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { of, Observable } from 'rxjs';
+import { of, Observable, timeout, finalize, catchError } from 'rxjs';
 import { AnalyticsService } from '../../services/analytics.service';
 
 @Injectable({
@@ -63,19 +63,23 @@ export class GtanalyticDataService {
     this.loading.set(true);
     this.error.set('');
 
-    this.analyticsService.getAnalytics(pwd, this.currentFilter()).subscribe({
+    this.analyticsService.getAnalytics(pwd, this.currentFilter()).pipe(
+      timeout(15000),
+      catchError(err => {
+        this.error.set('Connection to analytics server timed out or failed');
+        return of<{status: string, data?: any, message?: string}>({ status: 'error', data: null, message: 'Connection timed out or failed' });
+      }),
+      finalize(() => {
+        this.loading.set(false);
+      })
+    ).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.analyticsData.set(res.data);
           this.lastUpdated.set(new Date());
-        } else {
-          this.error.set(res.message || 'Failed to load analytics data');
+        } else if (res.message) {
+          this.error.set(res.message);
         }
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set('Connection to analytics server failed');
-        this.loading.set(false);
       }
     });
 
@@ -88,14 +92,15 @@ export class GtanalyticDataService {
     if (!pwd) return;
 
     this.roomLoading.set(true);
-    this.analyticsService.getRoomAnalytics(pwd).subscribe({
+    this.analyticsService.getRoomAnalytics(pwd).pipe(
+      timeout(10000),
+      catchError(() => of({ status: 'error', data: null })),
+      finalize(() => {
+        this.roomLoading.set(false);
+      })
+    ).subscribe({
       next: (res) => {
         this.roomAnalytics.set(res.status === 'success' ? res.data : null);
-        this.roomLoading.set(false);
-      },
-      error: () => {
-        this.roomAnalytics.set(null);
-        this.roomLoading.set(false);
       }
     });
   }
@@ -172,6 +177,12 @@ export class GtanalyticDataService {
     const pwd = this.getPassword();
     if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
     return this.analyticsService.deleteAccessKey(pwd, id);
+  }
+
+  getLoginLogs(): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.getLoginLogs(pwd);
   }
 
   startAutoRefresh() {
