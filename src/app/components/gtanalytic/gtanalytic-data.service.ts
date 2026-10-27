@@ -156,6 +156,24 @@ export class GtanalyticDataService {
     return this.analyticsService.purgeHostingerBots(pwd);
   }
 
+  getAccessKeys(): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.getAccessKeys(pwd);
+  }
+
+  createAccessKey(label: string, newPwd: string): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.createAccessKey(pwd, label, newPwd);
+  }
+
+  deleteAccessKey(id: number): Observable<any> {
+    const pwd = this.getPassword();
+    if (!pwd) return of({ status: 'error', message: 'Unauthorized' });
+    return this.analyticsService.deleteAccessKey(pwd, id);
+  }
+
   startAutoRefresh() {
     if (this.autoRefreshTimer) return;
     this.autoRefreshTimer = setInterval(() => {

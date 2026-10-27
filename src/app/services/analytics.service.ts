@@ -415,4 +415,24 @@ export class AnalyticsService {
     const url = `${this.apiUrl}?action=getUserActivity&pwd=${encodeURIComponent(password)}&filter=${encodeURIComponent(filter)}&compare_a=${compareA}&compare_b=${compareB}`;
     return this.http.get<{status: string, data?: any, message?: string}>(url);
   }
+
+  getAccessKeys(password: string) {
+    return this.http.get<{status: string, data?: any[], message?: string}>(
+      `${this.apiUrl}?action=getAccessKeys&pwd=${encodeURIComponent(password)}`
+    );
+  }
+
+  createAccessKey(password: string, label: string, newPwd: string) {
+    return this.http.post<{status: string, message?: string, data?: any}>(
+      `${this.apiUrl}?action=createAccessKey`,
+      { pwd: password, label, new_pwd: newPwd }
+    );
+  }
+
+  deleteAccessKey(password: string, id: number) {
+    return this.http.post<{status: string, message?: string}>(
+      `${this.apiUrl}?action=deleteAccessKey`,
+      { pwd: password, id }
+    );
+  }
 }

@@ -44,6 +44,11 @@
         <svg lucideMusic [attr.size]="24"></svg>
         <span class="sidebar-label">Curated Playlists</span>
       </div>
+
+      <div class="sidebar-item" (click)="openBlogPage()" [class.active]="currentPage() === 'blog'">
+        <svg lucideBookOpen [attr.size]="24"></svg>
+        <span class="sidebar-label">Articles & Guides</span>
+      </div>
     </div>
     
     <div class="sidebar-footer">
@@ -1568,10 +1573,10 @@
           <div class="hub-faq-card">
             <h4 class="hub-faq-q">
               <span class="faq-indicator"></span>
-              Is GanaTube unblocked on school, university, and office Wi-Fi?
+              Is GanaTube lightweight and accessible across all networks?
             </h4>
             <p class="hub-faq-a">
-              Yes. GanaTube runs as a high-performance web application over secure HTTPS with negligible bandwidth overhead and zero intrusive bloat, keeping it accessible across educational and corporate networks.
+              Yes. GanaTube runs as a high-performance web application over secure HTTPS with negligible bandwidth overhead and zero intrusive bloat, keeping it fast and accessible across mobile, residential, and corporate networks.
             </p>
           </div>
           <div class="hub-faq-card">
@@ -1595,31 +1600,31 @@
         </div>
       </section>
 
-      <!-- SECTION: Popular Searches (Pills Bar) -->
+      <!-- SECTION: Popular Music Genres & Moods (Pills Bar) -->
       <section class="seo-card-block">
         <div class="seo-block-header compact">
           <div class="seo-pill-badge mini">
-            <svg lucideSearch [attr.size]="13"></svg>
-            <span>POPULAR SEARCHES</span>
+            <svg lucideMusic [attr.size]="13"></svg>
+            <span>DISCOVER MUSIC</span>
           </div>
-          <h3 class="seo-block-title">Trending Search Terms & Queries</h3>
-          <p class="seo-block-sub">Frequently explored music genres, artists, and moods on GanaTube</p>
+          <h3 class="seo-block-title">Popular Genres &amp; Listening Moods</h3>
+          <p class="seo-block-sub">Explore curated sounds, regional languages, and trending moods on GanaTube</p>
         </div>
         <div class="seo-tag-chips-wrap">
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'free music online without ads' }" class="seo-search-pill">free music online without ads</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'listen to free music unblocked' }" class="seo-search-pill">listen to free music unblocked</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'unblocked music player' }" class="seo-search-pill">unblocked music player</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'listen songs online free without login' }" class="seo-search-pill">listen songs online without login</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'ad free music streaming' }" class="seo-search-pill">ad-free music streaming</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'hindi songs online free' }" class="seo-search-pill">hindi songs online free</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'latest punjabi songs 2025' }" class="seo-search-pill">latest punjabi songs 2025</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'bollywood 90s evergreen hits' }" class="seo-search-pill">bollywood 90s evergreen hits</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'lo-fi beats for study and focus' }" class="seo-search-pill">lo-fi beats for study & focus</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'bhojpuri hit gaana' }" class="seo-search-pill">bhojpuri hit gaana</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'listen together music with friends' }" class="seo-search-pill">listen together rooms</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'gym workout motivation songs' }" class="seo-search-pill">gym workout motivation</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'ambient sleep music 432hz' }" class="seo-search-pill">sleep & meditation music</a>
-          <a [routerLink]="['/search']" [queryParams]="{ q: 'background music player pc' }" class="seo-search-pill">background music playback</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Bollywood Hits' }" class="seo-search-pill">Bollywood Hits</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Punjabi Pop' }" class="seo-search-pill">Punjabi Pop</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Acoustic Indie' }" class="seo-search-pill">Acoustic Indie</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Lo-Fi Chill & Study' }" class="seo-search-pill">Lo-Fi Chill &amp; Study</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Hindi 90s Classics' }" class="seo-search-pill">Hindi 90s Classics</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Workout Motivation EDM' }" class="seo-search-pill">Workout Motivation</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Sufi & Ghazals' }" class="seo-search-pill">Sufi &amp; Ghazals</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Telugu Superhits' }" class="seo-search-pill">Telugu Hits</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Tamil Melodies' }" class="seo-search-pill">Tamil Melodies</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Bhojpuri Hits' }" class="seo-search-pill">Bhojpuri Hits</a>
+          <a [routerLink]="['/rooms']" class="seo-search-pill">Listen Together Rooms</a>
+          <a [routerLink]="['/search']" [queryParams]="{ q: 'Sleep & Ambient Meditation' }" class="seo-search-pill">Sleep &amp; Meditation</a>
+          <a [routerLink]="['/curated-playlists']" class="seo-search-pill">Curated Playlists</a>
+          <a [routerLink]="['/discovery']" class="seo-search-pill">Regional Discovery</a>
         </div>
       </section>
 

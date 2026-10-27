@@ -7,7 +7,7 @@
     "dev": "ng serve",
     "start:dev": "ng serve",
     "build": "echo Skipping frontend compilation because assets are pre-built",
-    "build:local": "ng build",
+    "build:local": "ng build && node prerender-blogs.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
