@@ -49,6 +49,10 @@ export class GtanalyticLayoutComponent implements OnInit {
     return this.dataService.isAuthenticated() && !this.router.url.includes('/login');
   }
 
+  get isPrimaryAdmin(): boolean {
+    return this.dataService.isPrimaryAdmin();
+  }
+
   navItems: NavItem[] = [
     { path: '/gtanalytic/overview', label: 'Overview', icon: 'dashboard' },
     { path: '/gtanalytic/user-activity', label: 'User Activity', icon: 'clock' },

@@ -49,6 +49,9 @@ export class GtanalyticLoginComponent {
         this.loading = false;
         if (res.status === 'success') {
           this.dataService.setPassword(this.password.trim());
+          if ((res as any).is_primary_admin !== undefined) {
+            this.dataService.setIsPrimaryAdmin(!!(res as any).is_primary_admin, (res as any).user_label || '');
+          }
           this.dataService.analyticsData.set(res.data);
           this.dataService.loadRooms();
           this.router.navigate(['/gtanalytic/overview']);

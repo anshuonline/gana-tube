@@ -18,6 +18,18 @@ export class GtanalyticDataService {
   refreshTrigger = signal<number>(0);
   private autoRefreshTimer: any = null;
 
+  isPrimaryAdmin = signal<boolean>(typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('gtanalytic_is_primary') === '1' : false);
+  userLabel = signal<string>(typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('gtanalytic_user_label') || '' : '');
+
+  setIsPrimaryAdmin(isPrimary: boolean, label: string = '') {
+    this.isPrimaryAdmin.set(isPrimary);
+    this.userLabel.set(label);
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('gtanalytic_is_primary', isPrimary ? '1' : '0');
+      if (label) sessionStorage.setItem('gtanalytic_user_label', label);
+    }
+  }
+
   triggerRefresh() {
     this.refreshTrigger.update(v => v + 1);
     if (this.isAuthenticated()) {
@@ -42,7 +54,11 @@ export class GtanalyticDataService {
     this.stopAutoRefresh();
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.removeItem('gtanalytic_pwd');
+      sessionStorage.removeItem('gtanalytic_is_primary');
+      sessionStorage.removeItem('gtanalytic_user_label');
     }
+    this.isPrimaryAdmin.set(false);
+    this.userLabel.set('');
     this.analyticsData.set(null);
     this.roomAnalytics.set(null);
   }
@@ -67,16 +83,19 @@ export class GtanalyticDataService {
       timeout(15000),
       catchError(err => {
         this.error.set('Connection to analytics server timed out or failed');
-        return of<{status: string, data?: any, message?: string}>({ status: 'error', data: null, message: 'Connection timed out or failed' });
+        return of<{status: string, data?: any, message?: string, is_primary_admin?: boolean, user_label?: string}>({ status: 'error', data: null, message: 'Connection timed out or failed' });
       }),
       finalize(() => {
         this.loading.set(false);
       })
     ).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res.status === 'success') {
           this.analyticsData.set(res.data);
           this.lastUpdated.set(new Date());
+          if (res.is_primary_admin !== undefined) {
+            this.setIsPrimaryAdmin(!!res.is_primary_admin, res.user_label || '');
+          }
         } else if (res.message) {
           this.error.set(res.message);
         }
