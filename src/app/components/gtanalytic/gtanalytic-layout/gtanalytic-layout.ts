@@ -114,10 +114,34 @@ export class GtanalyticLayoutComponent implements OnInit {
   loadingLogs = signal<boolean>(false);
   newKeyLabel = '';
   newKeyPwd = '';
+  showNewKeyPwd = signal<boolean>(false);
+  revealedKeyIds = signal<Set<number>>(new Set<number>());
   creatingKey = signal<boolean>(false);
   copiedKeyId = signal<number | null>(null);
   copiedLogIp = signal<string | null>(null);
   deletingKeyId = signal<number | null>(null);
+
+  toggleKeyVisibility(id: number) {
+    this.revealedKeyIds.update(set => {
+      const next = new Set(set);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+    this.cdr.markForCheck();
+  }
+
+  isKeyRevealed(id: number): boolean {
+    return this.revealedKeyIds().has(id);
+  }
+
+  toggleNewKeyPwdVisibility() {
+    this.showNewKeyPwd.update(v => !v);
+    this.cdr.markForCheck();
+  }
 
   openKeyModal(tab: 'keys' | 'logs' = 'keys') {
     this.modalTab.set(tab);
@@ -144,6 +168,8 @@ export class GtanalyticLayoutComponent implements OnInit {
     this.showKeyModal.set(false);
     this.newKeyLabel = '';
     this.newKeyPwd = '';
+    this.showNewKeyPwd.set(false);
+    this.revealedKeyIds.set(new Set<number>());
     this.cdr.markForCheck();
   }
 
@@ -202,6 +228,7 @@ export class GtanalyticLayoutComponent implements OnInit {
       res += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     this.newKeyPwd = res;
+    this.showNewKeyPwd.set(true);
     this.cdr.markForCheck();
   }
 

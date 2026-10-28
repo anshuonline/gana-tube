@@ -833,6 +833,30 @@
     }
   }
 
+  .btn-input-toggle-eye {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-card-subtle, #101016);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.14));
+    color: rgba(255, 255, 255, 0.6);
+    padding: 10px 12px;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background: var(--color-bg-hover, #161620);
+      color: var(--color-text-primary, #ffffff);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    svg {
+      display: block;
+    }
+  }
+
   .btn-auto-key {
     background: var(--color-bg-card-subtle, #101016);
     border: 1px solid var(--color-border, rgba(255, 255, 255, 0.14));
@@ -1071,17 +1095,52 @@
   }
 
   .key-pill-wrapper {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-bg-card-subtle, #101016);
+    border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    padding: 3px 6px 3px 10px;
   }
 
   .key-pill-code {
-    background: var(--color-bg-card-subtle, #101016);
-    border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1));
-    border-radius: 7px;
-    padding: 4px 10px;
+    background: transparent;
+    border: none;
+    padding: 0;
     color: var(--color-info, #38bdf8);
     font-size: 0.82rem;
+    font-family: monospace;
     letter-spacing: 0.02em;
+
+    &.masked {
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.14em;
+      font-size: 0.86rem;
+      user-select: none;
+    }
+  }
+
+  .btn-toggle-eye {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--color-text-primary, #ffffff);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    svg {
+      display: block;
+    }
   }
 
   .date-cell-text {
