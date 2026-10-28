@@ -22,9 +22,14 @@ export class AuthService {
     });
   }
 
-  async loginWithGoogle(): Promise<void> {
+  async loginWithGoogle(): Promise<User | null> {
     try {
-      await signInWithPopup(this.auth, this.provider);
+      const cred = await signInWithPopup(this.auth, this.provider);
+      if (cred?.user) {
+        this.currentUser.set(cred.user);
+        return cred.user;
+      }
+      return null;
     } catch (error: any) {
       // Don't log user-initiated cancellations
       if (error?.code !== 'auth/cancelled-popup-request' && error?.code !== 'auth/popup-closed-by-user') {

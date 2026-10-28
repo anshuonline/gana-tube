@@ -2269,7 +2269,10 @@ export class App implements OnInit {
     if (this.isLoggingIn) return;
     this.isLoggingIn = true;
     try {
-      await this.authService.loginWithGoogle();
+      const user = await this.authService.loginWithGoogle();
+      if (user && user.email) {
+        await this.userService.loadProfile(user.email, user.displayName || '', user.photoURL || '');
+      }
     } catch (e: any) {
       if (e?.code === 'auth/cancelled-popup-request' || e?.code === 'auth/popup-closed-by-user') {
         console.log('Login popup closed by user.');
